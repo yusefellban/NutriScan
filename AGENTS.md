@@ -12,6 +12,7 @@
 | Field                | Value                                                                                           |
 |----------------------|-------------------------------------------------------------------------------------------------|
 | **App Name**         | NutriScan AI                                                                                    |
+| **Package**          | ` iti.grad.nutriscan`                                                                              |
 | **Platform**         | Android (Kotlin + Jetpack Compose)                                                              |
 | **Domain**           | HealthTech — AI-powered food label scanning & personalized dietary safety for Egyptian market   |
 | **Users**            | Authenticated User (individual or household manager)                                            |
