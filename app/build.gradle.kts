@@ -62,6 +62,7 @@ dependencies {
     
     implementation(project(":presentation"))
     implementation(project(":data"))
+    implementation(libs.androidx.navigation.compose)
     
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
