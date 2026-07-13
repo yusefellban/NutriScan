@@ -1,148 +1,146 @@
-# NUTRISCAN AI — `presentation` Module — AI Agent Rules
+# NUTRISCAN AI — `presentation` Module — AI Agent Rules & Contract
 
-> **MANDATORY:** Read this file completely before touching any file under `presentation/`.
-> This is a **scoped extension** of the root `AGENTS.md`. It does not replace it —
-> every root rule (tech stack, safety notice, module boundaries, planning protocol,
-> testing requirements) still applies in full. This file exists to give an agent
-> working *only* inside `presentation/` everything it needs without re-reading the
-> entire 2000+ line root contract every time.
+> **MANDATORY:** Read this file **completely** before writing a single line of code in the
+> `presentation` module. This is a **scoped extension** of the root `AGENTS.md` — every rule
+> in the root file still applies. This file exists so an agent working exclusively inside
+> `presentation/` has everything it needs without re-reading the entire project contract.
+> Violations will be rejected in code review without exception.
 >
 > If anything here appears to conflict with the root `AGENTS.md`, the root file wins —
-> flag the discrepancy instead of silently picking one.
+> flag the conflict and ask before proceeding.
 
 ---
 
 ## 0. Module Identity
 
-| Field           | Value                                                                 |
-|-----------------|------------------------------------------------------------------------|
-| **Module**      | `presentation`                                                        |
-| **Contains**    | Compose screens, ViewModels, State/Event/Effect contracts, shared UI components, theme |
-| **Language**    | 100% Kotlin, 100% Jetpack Compose — zero XML, zero Java                |
-| **Imports**     | `domain` **only**. Never `data`.                                       |
-| **Imported by** | `app` only (for Hilt `@Module` binding / NavGraph wiring)              |
+| Field                  | Value                                                                                     |
+|------------------------|--------------------------------------------------------------------------------------------|
+| **Module**             | `presentation`                                                                              |
+| **Package root**       | `iti.grad.nutriscan.presentation`                                                          |
+| **Contains**           | Compose screens, ViewModels, State/Event/Effect contracts, shared UI components, theme     |
+| **Depends on**         | `domain` **only**                                                                           |
+| **Never depends on**   | `data` (no DTOs, no Room entities, no Retrofit types — ever)                                |
+| **Consumed by**        | `app` (for Hilt wiring + `NavGraph`) — `presentation` never depends on `app`                |
+| **Architecture**       | Clean Architecture (UI layer) + MVI (`State` / `Event` / `Effect`)                          |
+| **Root reference**     | See root `AGENTS.md` §2 (module structure), §3 (MVI), §5 (nav), §10 (Compose state), §11 (testing), §12 (planning), §13 (business rules), §14 (design system) |
 
-```
-       app
-        │
-    presentation ──► domain
-```
-
-**Hard boundary rules:**
-- ❌ NEVER import anything from `data/` (no `*Dto`, no `*Entity`, no Retrofit/Room types) into `presentation/`.
-- ❌ NEVER let a ViewModel call a `RepositoryImpl` directly — only UseCases from `domain`.
-- ❌ NEVER put `android.util.Log`, `println`, or raw `Context` references inside a ViewModel.
-  Use `Timber` (in Composables only, if ever needed) and `LocalContext.current` inside Composables.
-- ✅ A ViewModel may depend on `SavedStateHandle` and `domain` UseCases — nothing else external.
+This module is Android-facing but **its ViewModels must remain framework-agnostic** —
+see §3.5 below. Only Composables are allowed to touch `Context`, `LocalContext`, or
+Android UI APIs directly.
 
 ---
 
-## ⚠️ Safety Reminder (inherited from root — non-negotiable in this module too)
+## 1. Hard Boundary Rules — Zero Tolerance
 
-This is a health-safety app. In the presentation layer specifically:
-- Never let a `State` render a verdict, ingredient list, or health-profile field that
-  silently defaulted to empty/null when the underlying data failed to load — show an
-  explicit error state instead (`state.error != null`), never a fabricated "safe" UI.
-- Any screen that edits health conditions/allergies or performs a destructive action
-  (delete family member, clear list, log out, delete account) **must** emit a
-  `ShowConfirmDialog` effect before executing — see §6 below.
-- `NutriGptScreen` must always render the medical-disclaimer banner; it must not be
-  dismissible or conditionally hidden.
-- Red/Yellow/Green verdicts must never be conveyed by color alone — always icon + text + color.
+These are the module-specific instances of the root Layer Violation Rules (§3.5 in root):
+
+| Rule                                                          | Violation Example                                                        |
+|----------------------------------------------------------------|---------------------------------------------------------------------------|
+| Zero `data` module imports anywhere in `presentation`         | `import iti.grad.nutriscan.data.remote.dto.ScanResultDto`                 |
+| Zero references to DTOs, Room `@Entity`, or Retrofit services | `ScanResultDto` typed anywhere in a ViewModel, State, or Composable        |
+| ViewModel never calls a Repository directly                   | `class ScanResultViewModel(private val repo: IScanRepository)`            |
+| ViewModel never receives a `CoroutineDispatcher`               | Any `@IoDispatcher` qualifier used in a ViewModel constructor             |
+| ViewModel has zero Android framework references               | `import android.content.Context` inside a ViewModel                      |
+| `List<T>` never appears in a `State` data class                | `val ingredients: List<IngredientUiModel>`                                 |
+| `MutableSharedFlow` never used for one-shot effects            | `_effect = MutableSharedFlow<ScanResultEffect>()`                          |
+| `UiIntent` naming banned anywhere                              | `sealed interface ScanResultUiIntent`                                     |
+| No hardcoded `Color(0xFF...)` in any Composable                | `Modifier.background(Color(0xFF388E3C))`                                  |
+| No hardcoded strings in any `.kt` file under `presentation`    | `Text("Scan again")`                                                      |
+| No default unthemed Compose components                        | Raw `Button(...)` / `TextField(...)` instead of `AppButton` / `AppTextField` |
+| Health profile fields never silently defaulted in a UI mapper  | `condition ?: MedicalCondition.NONE` when mapping to a UiModel            |
+
+> Any agent producing code that violates a rule above must self-correct before presenting
+> the change — this is not a style preference, it is a merge blocker.
 
 ---
 
-## 1. Folder Structure — This Module
+## 2. Folder Structure — This Module Only
 
 ```
-presentation/src/main/kotlin/ iti.grad.nutriscan.presentation/
-├── auth/                  (login, register)
+presentation/src/main/kotlin/iti.grad.nutriscan.presentation/
+├── auth/
+│   ├── login/            {Screen, State, Event, Effect, ViewModel} + components/
+│   └── register/         {Screen, State, Event, Effect, ViewModel} + components/
 ├── common/
-│   ├── theme/             AppTheme, AppColors, AppTypography, AppShapes
-│   ├── components/        AppButton, AppTextField, AppLoadingOverlay, AppErrorWidget,
-│   │                      AppSnackbar, ConfirmationDialog, EmptyStateWidget,
-│   │                      VerdictBadge, LoadingShimmer
+│   ├── theme/            AppTheme.kt · AppColors.kt · AppTypography.kt · AppShapes.kt
+│   ├── components/       AppButton, AppTextField, AppLoadingOverlay, AppErrorWidget,
+│   │                     AppSnackbar, ConfirmationDialog, EmptyStateWidget,
+│   │                     VerdictBadge, LoadingShimmer  ← the shared catalogue (§7)
 │   └── Validation.kt
-├── onboarding/            (splash, carousel, profile_setup)
-├── home/
-├── scan/                  (camera, processing, result)
-├── nutrigpt/
+├── onboarding/            splash/ · carousel/ · profile_setup/
+├── home/                  HomeScreen + components/ (HomeFeedCategoryRow, FeedProductCard, ProfileSwitcher)
+├── scan/                  camera/ · processing/ · result/ (each with its own components/)
+├── nutrigpt/              NutriGptScreen + components/ (ChatBubble, QuickQuestionChips)
 ├── ingredient_detail/
-├── receipt/               (capture, result)
-├── history/
-├── report/                (list, detail)
-├── shopping/              (list, alternative)
-└── settings/              (profile, family, conditions, notifications, app)
-
-presentation/src/test/kotlin/ iti.grad.nutriscan.presentation/
-└── <mirrors main/ structure>       ← one *ViewModelTest.kt per ViewModel, MANDATORY
+├── receipt/               capture/ · result/
+├── history/               ScanHistoryScreen + components/ (ScanHistoryCard)
+├── report/                list/ · detail/
+├── shopping/              list/ · alternative/ (SmartAlternativeSheet — bottom sheet, not a route)
+└── settings/              profile/ · family/ · conditions/ · notifications/ · app/
 ```
 
-**Per-screen folder — every screen MUST contain exactly these files (plus optional `components/`):**
-
-```
-<screen_name>/
-├── <ScreenName>Screen.kt
-├── <ScreenName>State.kt
-├── <ScreenName>Event.kt
-├── <ScreenName>Effect.kt
-├── <ScreenName>ViewModel.kt
-└── components/            ← screen-local composables only used by this screen
-```
-
-- ❌ No `UiIntent` naming anywhere — it's `Event`, full stop (legacy WearZone naming is banned).
-- ❌ No merging State/Event/Effect into a single file "for convenience."
-- ❌ No screen-local component belongs in `components/` if it's reused by 2+ screens —
-  promote it to `common/components/` instead.
+**Rule:** a new screen always gets its own folder with exactly the five files below (§3.2).
+A new reusable widget always goes in that feature's local `components/` unless it is
+genuinely cross-feature — in that case it belongs in `common/components/` and must be
+added to the shared catalogue (§7).
 
 ---
 
-## 2. The MVI Contract — Non-Negotiable Shape
+## 3. The MVI Contract — Mandatory Per Screen
+
+### 3.1 Five Files Per Screen (no exceptions)
 
 ```
-User Action (Event)
-   → ViewModel.onEvent(event)
-      → private fun calls a UseCase (suspend, from domain)
-         → Result<T> returned
-      → _state.update { ... }        (StateFlow, for rendering)
-      → _effect.send(Effect)         (Channel, for one-shot events)
-   → Composable's LaunchedEffect(Unit) collects effect → navigate / snackbar / dialog
+<Feature>/
+├── <Feature>Screen.kt        ← Composable entry point, hiltViewModel(), collects state + effects
+├── <Feature>State.kt         ← data class, immutable, what the UI renders
+├── <Feature>Event.kt         ← sealed interface, what the user does
+├── <Feature>Effect.kt        ← sealed interface, one-shot side effects (nav, snackbar, dialogs)
+└── <Feature>ViewModel.kt     ← @HiltViewModel, owns State + Effect, exposes onEvent(event)
 ```
 
-### 2.1 `<Screen>State.kt`
+Naming is fixed: `Event` / `Effect` / `State` — never `UiIntent`, never `UiEffect`, never `UiState`.
+
+### 3.2 `State.kt` Rules
 
 ```kotlin
 data class ScanResultState(
     val isLoading: Boolean = true,
     val verdict: ScanVerdict? = null,
-    val ingredients: ImmutableList<IngredientUiModel> = persistentListOf(),  // ✅ ImmutableList — MANDATORY
+    // ✅ ImmutableList mandatory — plain List<T> is banned in every State class
+    val ingredients: ImmutableList<IngredientUiModel> = persistentListOf(),
     val error: UiError? = null,
 )
 ```
 
-- ✅ Every collection field MUST be `ImmutableList`/`ImmutableMap` (`kotlinx.collections.immutable`).
-  `List<T>` in a State class is a **rejected PR**, no exceptions.
-- ✅ Map domain models to `*UiModel` types inside the ViewModel — never expose a raw domain
-  model directly in State if it needs UI-only fields (e.g. localized display strings).
-- ✅ Default every field so `FeatureState()` alone is a valid, renderable initial state.
+- Every collection field is `ImmutableList` / `ImmutableMap` from `kotlinx.collections.immutable`.
+- State holds **UiModels**, never domain models directly and never DTOs.
+  A UiModel is a presentation-only shape mapped from the domain model inside the ViewModel
+  (e.g. `IngredientUiModel`, `ProfileVerdictUiModel`) — this keeps Compose stability and
+  keeps localization/formatting concerns out of `domain`.
+- Nullable fields represent "not loaded yet" or "not applicable" — never use a sentinel
+  value (empty string, `-1`) to mean "absent."
 
-### 2.2 `<Screen>Event.kt`
+### 3.3 `Event.kt` Rules
 
 ```kotlin
 sealed interface ScanResultEvent {
     data object SaveResultClicked : ScanResultEvent
     data class IngredientClicked(val ingredientName: String) : ScanResultEvent
+    data object RetryClicked : ScanResultEvent
 }
 ```
-- One `data object` per parameterless user action, one `data class` per action needing data.
-- Name events by what the user *did* (`...Clicked`, `...Confirmed`, `...Dismissed`), not by
-  what the system should do.
 
-### 2.3 `<Screen>Effect.kt`
+- One `data object` per parameterless user action, one `data class` when a payload is needed.
+- Event names describe the **user's action**, not the resulting side effect
+  (`SaveResultClicked`, not `SaveResult`).
+
+### 3.4 `Effect.kt` Rules
 
 ```kotlin
 sealed interface ScanResultEffect {
     data object NavigateBack : ScanResultEffect
+    data class NavigateToIngredientDetail(val ingredientName: String) : ScanResultEffect
     data class ShowSnackBarRes(val messageResId: Int) : ScanResultEffect
     data class ShowConfirmDialog(
         val titleResId: Int,
@@ -151,12 +149,15 @@ sealed interface ScanResultEffect {
     ) : ScanResultEffect
 }
 ```
-- ❌ NEVER use `MutableSharedFlow` for effects — it silently drops events with no subscriber.
-  Always `Channel<Effect>(Channel.BUFFERED)`.
-- Prefer `ShowSnackBarRes(messageResId: Int)` over `ShowSnackBar(message: String)` so the
-  message stays localizable — only use the string variant for truly dynamic content.
 
-### 2.4 `<Screen>ViewModel.kt`
+- Effects are **always** delivered via `Channel(Channel.BUFFERED)`, never `MutableSharedFlow`.
+- Any destructive action (delete, clear list, log out, edit health conditions) **must**
+  emit a `ShowConfirmDialog` effect before executing — see root §13.9. This is a hard
+  requirement, not a suggestion.
+- Prefer `ShowSnackBarRes(Int)` over `ShowSnackBar(String)` so the message always resolves
+  through `stringResource` at the Composable layer, keeping the ViewModel string-agnostic.
+
+### 3.5 `ViewModel.kt` Rules
 
 ```kotlin
 @HiltViewModel
@@ -164,8 +165,7 @@ class ScanResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getScanResultUseCase: GetScanResultUseCase,
     private val saveScanResultUseCase: SaveScanResultUseCase,
-    // ❌ NO CoroutineDispatcher here — ViewModel is threading-agnostic.
-    //    Dispatchers are injected into the data layer only.
+    // ❌ never a CoroutineDispatcher — repositories own dispatching
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScanResultState())
@@ -174,52 +174,47 @@ class ScanResultViewModel @Inject constructor(
     private val _effect = Channel<ScanResultEffect>(Channel.BUFFERED)
     val effect: Flow<ScanResultEffect> = _effect.receiveAsFlow()
 
-    private val route: ScanResultRoute = savedStateHandle.toRoute<ScanResultRoute>()
+    // ✅ type-safe nav args only — never a raw Bundle/String key lookup
+    private val route: ScanResultRoute = savedStateHandle.toRoute()
 
-    init { loadInitialData() }
+    init { analyzeLabel() }
 
     fun onEvent(event: ScanResultEvent) {
         when (event) {
-            is ScanResultEvent.SaveResultClicked   -> saveResult()
-            is ScanResultEvent.IngredientClicked   -> navigateToIngredientDetail(event.ingredientName)
+            is ScanResultEvent.SaveResultClicked  -> saveResult()
+            is ScanResultEvent.IngredientClicked  -> navigateToIngredientDetail(event.ingredientName)
+            is ScanResultEvent.RetryClicked       -> analyzeLabel()
         }
     }
 
-    private fun loadInitialData() {
-        viewModelScope.launch {                    // ✅ no Dispatcher arg
-            _state.update { it.copy(isLoading = true, error = null) }
+    // one private fun per event — never inline the logic in the `when` branch
+    private fun analyzeLabel() {
+        viewModelScope.launch {   // ✅ no Dispatchers.IO here — Main by default
+            _state.update { it.copy(isLoading = true) }
             getScanResultUseCase(route.imageUri)
-                .onSuccess { result -> _state.update { it.copy(isLoading = false, /* map */) } }
-                .onFailure { error  -> _state.update { it.copy(isLoading = false, error = UiError(error.localizedMessage)) } }
+                .onSuccess { result -> _state.update { it.copy(isLoading = false, verdict = result.verdict) } }
+                .onFailure { e -> _state.update { it.copy(isLoading = false, error = UiError(e.localizedMessage)) } }
         }
-    }
-
-    private fun saveResult() { /* ... */ }
-    private fun navigateToIngredientDetail(name: String) {
-        viewModelScope.launch { _effect.send(ScanResultEffect.NavigateToIngredientDetail(name)) }
     }
 }
 ```
 
 **Checklist for every ViewModel:**
-- [ ] `onEvent` is a lean `when` dispatcher — all real logic lives in `private fun`s
-- [ ] Route args extracted via `savedStateHandle.toRoute<Route>()` — never manual bundle parsing
-- [ ] Zero direct repository calls — UseCases only
-- [ ] Zero `Dispatchers.IO`/`Dispatchers.Default` in `viewModelScope.launch(...)`
-- [ ] Every destructive/safety-critical action emits `ShowConfirmDialog` before executing (§6)
-- [ ] Every mutation of health-profile-adjacent state validates before committing — no silent defaults
+- [ ] `@HiltViewModel` + `@Inject constructor`
+- [ ] Only UseCases injected — never a Repository or DAO directly
+- [ ] No `CoroutineDispatcher` in the constructor
+- [ ] `onEvent()` is a lean dispatcher — all logic lives in private functions, one per event
+- [ ] Nav args extracted via `savedStateHandle.toRoute<FeatureRoute>()` — never manual `get("key")`
+- [ ] Zero `android.*` imports except `androidx.lifecycle.*` / `androidx.navigation.*`
 
----
-
-## 3. Composable Screen Structure
+### 3.6 Screen Composable Rules
 
 ```kotlin
-// ✅ Stateful root — the ONLY level that touches the ViewModel
 @Composable
 fun ScanResultScreen(
-    viewModel: ScanResultViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToIngredientDetail: (String) -> Unit,
+    viewModel: ScanResultViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -229,117 +224,93 @@ fun ScanResultScreen(
             when (effect) {
                 is ScanResultEffect.NavigateBack -> onNavigateBack()
                 is ScanResultEffect.NavigateToIngredientDetail -> onNavigateToIngredientDetail(effect.ingredientName)
-                is ScanResultEffect.ShowSnackBarRes -> snackbarHostState.showSnackbar(/* resolved string */)
+                is ScanResultEffect.ShowSnackBarRes -> snackbarHostState.showSnackbar(
+                    // string resolved here, not in the ViewModel
+                    message = /* stringResource-backed lookup */ ""
+                )
             }
         }
     }
 
     ScanResultContent(state = state, onEvent = viewModel::onEvent, snackbarHostState = snackbarHostState)
 }
-
-// ✅ Stateless content — pure rendering, no ViewModel reference, fully previewable
-@Composable
-private fun ScanResultContent(
-    state: ScanResultState,
-    onEvent: (ScanResultEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
-) { /* ... */ }
 ```
 
-**Rules:**
-- Exactly one "stateful root" Composable per screen — it is the only place `hiltViewModel()`
-  or `viewModel.onEvent`/`viewModel.effect` may be referenced.
-- Everything below the root is stateless: state flows down as parameters, events flow up
-  as lambdas. A leaf component must never own its own `mutableStateOf` for anything the
-  parent needs to control (see §4.2).
-- Effects are collected exactly once via `LaunchedEffect(Unit)`.
-- Loading / error / content branching happens in the stateless content composable via
-  `when { state.isLoading -> ...; state.error != null -> ...; else -> ... }` — never inside
-  the stateful root.
+- The `<Feature>Screen` composable owns **navigation callbacks as lambdas** — it never
+  holds a `NavController` directly. `NavGraph.kt` (in `app`) wires the lambdas.
+- Always `collectAsStateWithLifecycle()`, never `collectAsState()` (avoids collecting
+  while the screen is backgrounded).
+- Split into `<Feature>Screen` (stateful, wiring) and a private `<Feature>Content`
+  (stateless, pure rendering from `State` + `onEvent`) — this makes the Content function
+  trivially previewable and testable.
 
 ---
 
-## 4. Compose State Management
+## 4. Navigation — Presentation Side
 
-### 4.1 Immutable Collections — MANDATORY
-
-```kotlin
-// ✅ CORRECT
-val ingredients: ImmutableList<IngredientUiModel> = persistentListOf()
-
-// ❌ BANNED — Compose treats plain List<T> as unstable → over-recomposition
-val ingredients: List<IngredientUiModel> = emptyList()
-```
-Use `.toImmutableList()` when mapping domain results inside the ViewModel.
-
-### 4.2 State Hoisting
-
-- Leaf/shared components (`common/components/*`) are stateless — no local `remember { mutableStateOf(...) }`
-  for anything that affects behavior the parent cares about.
-- Purely cosmetic, component-private animation state (e.g. a ripple toggle) may stay local.
-
-### 4.3 Recomposition Hygiene
-
-```kotlin
-LazyColumn {
-    items(scanHistory, key = { it.id }) { entry -> ScanHistoryCard(entry, onEvent) }  // ✅ key required
-}
-
-val hasRiskyItems by remember(shoppingItems) {
-    derivedStateOf { shoppingItems.any { it.verdict == ScanVerdict.RED } }             // ✅ derivedStateOf for computed values
-}
-```
-
-### 4.4 Side Effects Cheat Sheet
-
-| API                    | Use for                                                |
-|------------------------|----------------------------------------------------------|
-| `LaunchedEffect(Unit)` | Collecting `viewModel.effect` (runs once)                |
-| `LaunchedEffect(key)`  | Re-running work when `key` changes                       |
-| `SideEffect`           | Post-recomposition, non-Compose calls (e.g. analytics)    |
-| `DisposableEffect`     | Lifecycle-bound resources (e.g. CameraX preview binding)  |
+- `presentation` never imports `NavController` logic beyond exposing lambda callbacks
+  (`onNavigateBack: () -> Unit`, `onNavigateToX: (id: String) -> Unit`). Route wiring and
+  the `NavHost` itself live in `app/navigation/` (see root §5) — not this module.
+- Screens that take nav args extract them with `savedStateHandle.toRoute<FeatureRoute>()`.
+  Route data classes (`@Serializable`) are defined in `app`, but the ViewModel references
+  the route type to deserialize its own arguments.
+- Never pass a `Uri` through a route — routes carry `String` only (see root §5.3 table).
+- A destructive confirmation (`ConfirmationDialog`) or a bottom sheet
+  (e.g. `SmartAlternativeSheet`) is **not** a navigation destination — it's UI state/effect
+  local to the screen, not a new route.
 
 ---
 
-## 5. Navigation — This Module's Responsibility
+## 5. Compose State Management (Recap — Enforced Here)
 
-- `presentation` screens receive navigation as **lambdas** (`onNavigateBack: () -> Unit`,
-  `onNavigateToX: (Args) -> Unit`) — they never hold a `NavController` reference themselves.
-- Route args are read via `savedStateHandle.toRoute<FeatureRoute>()` (Navigation Compose
-  2.8.0+ type-safe API) inside the ViewModel — never parsed manually from a `Bundle`.
-- Adding a new screen means: create the screen folder here in `presentation/`, **and**
-  add its `@Serializable` route to `app/navigation/Route.kt` and wire it into
-  `app/navigation/NavGraph.kt` — those two files live in `app/`, not `presentation/`, but
-  every new screen implies edits there too. Call this out explicitly in the plan (§8).
-
----
-
-## 6. Destructive Action Contract — HARD REQUIREMENT
-
-Any action that deletes, clears, edits health conditions/allergies, or logs the user out
-**must** emit a `ShowConfirmDialog` effect first; the actual mutation only runs after the
-user confirms via a follow-up `Event`.
-
-```kotlin
-private fun requestDeleteFamilyMember(memberId: String) {
-    viewModelScope.launch {
-        _effect.send(
-            ManageFamilyEffect.ShowConfirmDialog(
-                titleResId   = R.string.dialog_delete_member_title,
-                messageResId = R.string.dialog_delete_member_message,
-                onConfirm    = ManageFamilyEvent.ConfirmDeleteMember(memberId),
-            )
-        )
-    }
-}
-```
-
-Applies to (non-exhaustive): delete shopping list item, clear shopping list, delete family
-member, edit health conditions/allergies, log out, delete account.
+| Concern                  | Rule                                                                                   |
+|---------------------------|-----------------------------------------------------------------------------------------|
+| Collections in State      | `ImmutableList` / `ImmutableMap` only — `persistentListOf()` as default                |
+| State hoisting            | Leaf composables are stateless; state is owned by the screen-level composable or VM    |
+| List rendering            | `LazyColumn { items(list, key = { it.id }) { ... } }` — always provide a stable `key`   |
+| Derived values             | `remember(key) { derivedStateOf { ... } }` — never recompute inline every recomposition |
+| One-shot effects           | `LaunchedEffect(Unit)` to collect the Effect Channel — runs exactly once               |
+| Keyed re-fetch             | `LaunchedEffect(someId) { viewModel.load(someId) }`                                     |
+| Non-Compose side effects   | `SideEffect { analytics.setScreen(...) }`                                               |
+| Lifecycle-bound resources  | `DisposableEffect` (e.g. CameraX preview binding) with `onDispose { }` cleanup          |
 
 ---
 
-## 7. Shared Component Catalogue — Use These, Never Reinvent
+## 6. Theming, Strings & Accessibility — Non-Negotiable in Every Composable
+
+### 6.1 Colors & Typography
+
+- Only `AppColors.*` tokens — never inline `Color(0xFF...)`.
+- Only `MaterialTheme.typography.*` mapped to `AppTypography` — never a hardcoded `fontSize`.
+- If a needed color/type token doesn't exist yet, add it to `AppColors.kt` /
+  `AppTypography.kt` in `common/theme/` — don't improvise inline.
+
+### 6.2 Strings — Zero Hardcoded Text
+
+- Every user-facing string: `stringResource(R.string.xxx)`. No exceptions — labels,
+  buttons, dialogs, snackbars, empty states, disclaimers, ingredient descriptions.
+- New strings must be declared in the feature's implementation plan (root §12.3 §6) with
+  **both** English and Arabic values before they appear in code.
+- Plurals use `pluralStringResource` — never manual string concatenation/`if/else`.
+- Arabic copy must read naturally (RTL, local phrasing) — not a literal machine translation.
+
+### 6.3 Verdict Colors (Special Rule)
+
+The Red/Yellow/Green verdict must never rely on color alone — always pair color with an
+icon and/or text label (`VerdictBadge` already does this — reuse it, don't rebuild it).
+
+### 6.4 Accessibility Checklist — Every Screen
+
+- [ ] Every `Image` / `AsyncImage` has a non-empty `contentDescription`
+- [ ] Every tappable element has a minimum touch target of `48.dp × 48.dp`
+- [ ] Custom interactive composables declare `semantics { role = Role.Button }` (or the
+      appropriate role)
+- [ ] Text-on-background contrast ratio ≥ 4.5:1
+- [ ] RTL verified for Arabic — use `start`/`end` padding, never `left`/`right`
+
+---
+
+## 7. Shared Component Catalogue — Use, Don't Reinvent
 
 ```
 AppButton(text, onClick, modifier, isLoading, enabled, variant: Primary|Secondary|Destructive)
@@ -349,7 +320,7 @@ AppErrorWidget(message, onRetry)
 AppSnackbar — via SnackbarHostState in Scaffold
 ConfirmationDialog(titleResId, messageResId, confirmLabel, onConfirm, onDismiss)
 EmptyStateWidget(titleResId, subtitleResId, illustrationRes)
-VerdictBadge(verdict: ScanVerdict, modifier)      ← always icon + text + color, never color alone
+VerdictBadge(verdict: ScanVerdict, modifier)
 IngredientChip(name, isFlagged, onClick)
 SafeAlternativeCard(alternative: SafeAlternativeUiModel, onClick)
 ProfileVerdictCard(profileVerdict: ProfileVerdictUiModel)
@@ -357,90 +328,98 @@ LoadingShimmer(modifier, shape)
 ScanHistoryCard(entry, onEvent)
 ```
 
-- ❌ FORBIDDEN: creating a new component duplicating one of the above.
-- ❌ FORBIDDEN: using raw `Button(...)`, `TextField(...)`, `AlertDialog(...)` directly —
-  always the `App*`-prefixed / catalogue equivalent.
-- Before adding a screen-local component to `components/`, check this catalogue first;
-  if it's a generalization of something here, extend the shared component instead.
+- **Before building a new component**, check this list. Duplicating an existing
+  component's function is forbidden.
+- Adding a genuinely new cross-feature component → add it here **and** to this table in
+  the same PR, so the catalogue stays authoritative.
+- Never reach for raw `Button`, `TextField`, `Text` with inline styling when an
+  `App*`-prefixed equivalent exists.
 
 ---
 
-## 8. Theming & Localization Rules (apply to every Composable in this module)
+## 8. Testing — Mandatory for Every ViewModel
 
-- Colors: only `AppColors.*` tokens (`presentation/common/theme/AppColors.kt`).
-  Never `Color(0xFF...)` inline.
-- Typography: only `MaterialTheme.typography.*` (backed by `AppTypography`). Never a
-  hardcoded `fontSize`.
-- Strings: only `stringResource(R.string.xxx)` / `pluralStringResource(...)`. Zero
-  hardcoded user-facing text in any `.kt` file — this includes snackbar messages, dialog
-  text, empty-state copy, and content descriptions.
-- Every new string needs both `res/values/strings.xml` (English) and
-  `res/values-ar/strings.xml` (Arabic) entries, listed in the task's plan file
-  (`docs/plans/`) *before* the code is written — see root §12.3.
-- RTL: use `start`/`end` padding and alignment, never `left`/`right`.
-- Every `Image`/`AsyncImage` needs a non-empty `contentDescription`; every tappable
-  element needs a minimum 48.dp × 48.dp touch target.
+> A feature is **not complete** without its `*ViewModelTest.kt`. A PR touching a
+> ViewModel without an accompanying test update is rejected without review (root §11.2).
 
----
+**Coverage target:** 95% for `presentation`.
 
-## 9. Testing Requirements — This Module
+Every ViewModel test file must cover:
+- [ ] Initial state emission(s)
+- [ ] Each `Event` → correct `State` transition
+- [ ] Each `Event` → correct `Effect` emission (via Channel)
+- [ ] Error/failure paths → correct error state
+- [ ] Any destructive event → `ShowConfirmDialog` effect fires **before** execution (root §13.9)
 
-> A ViewModel change without an updated `*ViewModelTest.kt` is a **rejected PR**. No exceptions.
+**Stack:** JUnit5 + MockK + Turbine, `TestCoroutineRule` (`UnconfinedTestDispatcher`) —
+see root §11.3–§11.5 for the full template and fixture patterns. Prefer Fakes for
+Repository substitutes reached via UseCases; MockK is acceptable for UseCases themselves.
 
-- **Tools:** JUnit5 + MockK + Turbine + `TestCoroutineRule` (`UnconfinedTestDispatcher`).
-- **Coverage target:** 95% for ViewModels.
-- **Every ViewModel test file must cover:**
-  - Initial state emission
-  - Each `Event` → correct `State` transition
-  - Each `Event` → correct `Effect` emission (via Turbine on `viewModel.effect`)
-  - Error/failure paths → correct error state
-- **Prefer Fakes over Mocks** for repository-shaped test doubles (`FakeScanRepository`,
-  etc.); Mocks (MockK) are acceptable for UseCases injected into a ViewModel test.
-- Route args in tests must be set into `SavedStateHandle` under the navigation bundle key
-  (`"androidx.navigation.NavStartDestinationArguments"`), not a raw `mapOf(...)`, or
-  `toRoute<T>()` will throw at test runtime.
-- Test file location mirrors screen location:
-  `presentation/src/test/kotlin/.../scan/result/ScanResultViewModelTest.kt`.
-- UI-level tests (Compose Testing / `composeTestRule`) are required only for key screens
-  (scan result, health profile setup, NutriGPT) — not mandatory for every screen, unlike
-  ViewModel tests.
+Test files live under `presentation/src/test/<feature>/<screen>/<Screen>ViewModelTest.kt`,
+mirroring the main source folder structure exactly.
+
+Key screens additionally get Compose UI tests (`composeTestRule`) rendering the
+`<Feature>Content` composable against a given `State` — no ViewModel needed for these.
 
 ---
 
-## 10. Prohibited Patterns — Quick Reference (this module)
+## 9. Presentation-Layer Business Rules (Screen-Specific)
 
-| Pattern                                       | Use Instead                                   |
-|------------------------------------------------|------------------------------------------------|
-| `List<T>` in a State data class                | `ImmutableList<T>`                              |
-| `MutableSharedFlow` for effects                | `Channel(Channel.BUFFERED)`                     |
-| `UiIntent` naming                              | `sealed interface FeatureEvent`                 |
-| Dispatcher injected/used in ViewModel          | Inject at Repository level only (in `data`)     |
-| `mutableStateOf` for ViewModel-level state     | `StateFlow` in the ViewModel                    |
-| Hardcoded `Color(0xFF...)` in a Composable     | `AppColors.*`                                   |
-| Hardcoded strings in a Composable              | `stringResource(R.string.xxx)`                  |
-| Hardcoded dimensions                           | `dimensionResource` / theme tokens              |
-| Default unthemed `Button`/`TextField`          | Shared `App*` component catalogue (§7)          |
-| Direct repository call from a ViewModel        | Go through a `domain` UseCase                   |
-| Data-layer imports (`*Dto`, `*Entity`) here    | Map to domain models before they reach this module |
-| Destructive action with no confirm step        | `ShowConfirmDialog` effect first (§6)           |
+These are the UI-facing consequences of root §13 — read root §13 for the full domain
+context. This section states what the **ViewModel/Composable** must specifically do.
 
----
-
-## 11. Before Writing Any Code in This Module
-
-1. Confirm the task is scoped to `presentation/` only. If it needs a new domain model,
-   UseCase, or repository method, that's cross-module — follow root §2.1 boundaries and
-   coordinate the `domain`/`data` changes too.
-2. Save an implementation plan to `docs/plans/YYYY-MM-DD-feature-name.md` per root §12 —
-   include the State/Event/Effect breakdown and the full string table (English + Arabic)
-   before writing a single Composable.
-3. Show the list of files to create/change before writing code.
-4. Implement: contracts (`State`/`Event`/`Effect`) → ViewModel → Screen/Content composables
-   → components → tests.
-5. Write the `*ViewModelTest.kt` in the same PR — not as a follow-up.
-6. Update `README.md` feature status and add a `docs/ai/YYYY-MM-DD-task-name.md` summary
-   per root §17.
+| Feature              | Presentation-layer requirement                                                                                     |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------|
+| Health Profile edit  | Emit `ShowConfirmDialog` before any save that changes an existing profile (root §13.2)                              |
+| Scan Result          | Distinguish `DomainError.OcrLowConfidence` from generic errors — dedicated "retake photo" state, not a generic error banner (root §13.3) |
+| Scan Result          | `safeAlternative` card renders only when non-null; never rendered for a `GREEN` verdict                             |
+| Scan Result          | If family profiles are active, render `ProfileVerdictCard` per member — never collapse to one blanket verdict       |
+| NutriGPT             | Conversation held as `ImmutableList<NutriGptMessageUiModel>` in State; optimistic user bubble → loading bubble → real response |
+| NutriGPT             | Medical disclaimer banner is pinned and cannot be dismissed by the user                                             |
+| Receipt Result       | Any line item with `matchConfidence < 0.7` renders as "Unrecognized" — never a fabricated verdict                   |
+| Home Feed            | Each category has its own independent loading shimmer — never a full-screen blocker while categories load          |
+| Home Feed            | `ProfileSwitcher` always visible when family profiles exist                                                         |
+| Shopping List        | Flagged (`RED`/`YELLOW`) items show a visual risk indicator in the row                                              |
+| Shopping List        | `SmartAlternativeSheet` is a bottom sheet, not a route — triggered from the list screen's local UI state             |
+| Shopping List / Family | Delete/remove actions always go through `ShowConfirmDialog` first (root §13.9)                                    |
+| Reports               | Read-only screens over pre-generated data — no write UseCases; "Share" emits `ExportAsPdf` / `ShareWithDoctor` effects |
 
 ---
 
-*Scoped extension of the root `AGENTS.md` · NutriScan AI — `presentation` module · Last updated: July 2026*
+## 10. Scope & Safety Rules (Presentation-Specific)
+
+- ❌ Do NOT add a `data` module import to fix a "quick" type mismatch — map through a
+  UseCase/domain model instead, or flag the gap in `domain`.
+- ❌ Do NOT add a new screen without first listing every string it introduces in the plan
+  (root §12.3 §6) — both Arabic and English values.
+- ❌ Do NOT invent a new effect-delivery mechanism (no `LiveData`, no `SharedFlow` for
+  one-shot events) — `Channel` only.
+- ❌ Do NOT skip the `<Feature>Content` stateless split "to save time" — it's required for
+  UI testability and previews.
+- ✅ Before writing code for a new screen, save an implementation plan to `docs/plans/`
+  per root §12 — it must include the State/Event/Effect breakdown and the string table.
+- ✅ Every ViewModel ships with its test file in the same PR.
+- ✅ Every new shared component is added to §7's catalogue table in the same PR.
+
+---
+
+## 11. Quick Reference
+
+| I need to know...                              | Where                          |
+|--------------------------------------------------|---------------------------------|
+| Full module dependency graph                     | Root AGENTS.md §2.1             |
+| MVI contract details (State/Event/Effect)        | This file §3 / Root §3          |
+| Route definitions & `NavGraph` wiring             | Root AGENTS.md §5               |
+| Dispatcher model (why VM has none)               | Root AGENTS.md §6.1             |
+| ViewModel test template (Turbine + MockK)         | Root AGENTS.md §11.5            |
+| Mandatory planning rule & plan template           | Root AGENTS.md §12              |
+| Destructive action contract                       | This file §3.4 / Root §13.9     |
+| Health profile safety rules                       | Root AGENTS.md §13.2            |
+| Shared component catalogue                        | This file §7 / Root §14.3       |
+| Localization rules                                | This file §6.2 / Root §14.4     |
+| Verdict accessibility rule                        | This file §6.3 / Root §14.5     |
+
+---
+
+*Scoped to `presentation/`. Defers to root `AGENTS.md` on any conflict or omission.*
+*Last updated: July 2026 · NutriScan AI — Android Track · v1.0*
