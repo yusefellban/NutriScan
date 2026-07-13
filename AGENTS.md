@@ -12,7 +12,6 @@
 | Field                | Value                                                                                           |
 |----------------------|-------------------------------------------------------------------------------------------------|
 | **App Name**         | NutriScan AI                                                                                    |
-| **Package**          | `com.nutriscan.ai`                                                                              |
 | **Platform**         | Android (Kotlin + Jetpack Compose)                                                              |
 | **Domain**           | HealthTech — AI-powered food label scanning & personalized dietary safety for Egyptian market   |
 | **Users**            | Authenticated User (individual or household manager)                                            |
@@ -200,7 +199,7 @@ root/
 ### 2.2 Complete Folder Structure
 
 ```
-app/src/main/kotlin/com.nutriscan.ai/
+app/src/main/kotlin/ iti.grad.nutriscan/
 ├── di/
 │   ├── CameraModule.kt
 │   ├── DatabaseModule.kt
@@ -216,7 +215,7 @@ app/src/main/kotlin/com.nutriscan.ai/
 ├── MainActivity.kt                      ← @AndroidEntryPoint, single Activity
 └── NutriScanApplication.kt             ← @HiltAndroidApp
 
-data/src/main/kotlin/com.nutriscan.ai.data/
+data/src/main/kotlin/ iti.grad.nutriscan.data/
 ├── db/
 │   ├── NutriScanDatabase.kt
 │   ├── entity/
@@ -273,7 +272,7 @@ data/src/main/kotlin/com.nutriscan.ai.data/
     ├── ShoppingListRepositoryImpl.kt
     └── ReportRepositoryImpl.kt
 
-domain/src/main/kotlin/com.nutriscan.ai.domain/
+domain/src/main/kotlin/ iti.grad.nutriscan.domain/
 ├── auth/
 │   ├── model/
 │   │   └── AuthUser.kt
@@ -360,7 +359,7 @@ domain/src/main/kotlin/com.nutriscan.ai.domain/
     └── usecase/
         └── GetHomeFeedUseCase.kt
 
-presentation/src/main/kotlin/com.nutriscan.ai.presentation/
+presentation/src/main/kotlin/ iti.grad.nutriscan.presentation/
 ├── auth/
 │   ├── login/
 │   │   ├── components/
@@ -1541,7 +1540,7 @@ class AppPreferencesDataSource @Inject constructor(
 ```proto
 // data/src/main/proto/user_preferences.proto
 syntax = "proto3";
-option java_package = "com.nutriscan.ai.data.local.proto";
+option java_package = " iti.grad.nutriscan.data.local.proto";
 
 message UserPreferences {
     string auth_token      = 1;
