@@ -6,46 +6,44 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import iti.grad.nutriscan.presentation.home.HomeScreen
-import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
+import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
+import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 
-/**
- * Root navigation graph for the NutriScan application.
- *
- * Architecture notes:
- * - [SplashRoute] is always the start destination.
- * - After the splash animation, the nav controller pops [SplashRoute] inclusive=true
- *   so the back stack only contains [HomeRoute] — pressing Back on Home exits the app.
- * - Type-safe routes only (AGENTS.md §1.6 — string routes are BANNED).
- *
- * @param navController The [NavHostController] that manages the back stack.
- *   Defaults to [rememberNavController] so callers don't need to create one.
- * @param modifier Modifier applied to the [NavHost].
- */
 @Composable
-fun NutriScanNavGraph(
+fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier,
+    startDestination: Any = LoginRoute
 ) {
     NavHost(
         navController = navController,
-        startDestination = SplashRoute,
-        modifier = modifier,
+        startDestination = startDestination
     ) {
-
-        composable<SplashRoute> {
-            SplashScreen(
+        composable<LoginRoute> {
+            LoginScreen(
                 onNavigateToHome = {
                     navController.navigate(HomeRoute) {
-                        // Pop splash off the back stack so the user cannot navigate back to it
-                        popUpTo<SplashRoute> { inclusive = true }
+                        popUpTo(LoginRoute) { inclusive = true }
                     }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(RegisterRoute)
                 }
             )
         }
-
+        composable<RegisterRoute> {
+            RegisterScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(LoginRoute) { inclusive = true }
+                    }
+                },
+                onNavigateToSignIn = {
+                    navController.navigateUp()
+                }
+            )
+        }
         composable<HomeRoute> {
-            HomeScreen()
+            // Placeholder for Home screen
         }
     }
 }

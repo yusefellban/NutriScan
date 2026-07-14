@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.background
@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,22 +49,18 @@ fun FigmaInputField(
     label: String,
     hint: String,
     leadingIconRes: Int,
-    hasError: Boolean,
-    errorResId: Int?,
+    hasError: Boolean = false,
+    errorResId: Int? = null,
     inputContainerBg: Color,
     inputLabelColor: Color,
     inputTextColor: Color,
-    isDark: Boolean,
     isPassword: Boolean = false,
     isPasswordVisible: Boolean = false,
     onVisibilityToggle: (() -> Unit)? = null
 ) {
-    val errorColor = AppTheme.colors.Error
-    val errorBannerBg = if (isDark)
-        Color(0x33000000) // rgba(0,0,0,0.2)
-    else
-        AppTheme.colors.ErrorBackground
-    val errorBannerTextColor = if (isDark) AppTheme.colors.Teal400 else AppTheme.colors.Teal1000
+    val errorColor = MaterialTheme.colorScheme.error
+    val errorBannerBg = AppTheme.colors.ErrorBackground
+    val errorBannerTextColor = MaterialTheme.colorScheme.primary
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Label

@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register.components
+package iti.grad.nutriscan.presentation.auth.register.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,8 +29,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import iti.grad.nutriscan.presentation.auth.register.RegisterEvent
-import iti.grad.nutriscan.presentation.auth.register.RegisterState
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
+import iti.grad.nutriscan.presentation.common.components.AuthActionButton
+import iti.grad.nutriscan.presentation.common.components.AuthBottomPrompt
+import iti.grad.nutriscan.presentation.common.components.FigmaInputField
+import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
@@ -42,13 +46,12 @@ import iti.grad.presentation.R
 @Composable
 fun RegisterFormBody(
     state: RegisterState,
-    onEvent: (RegisterEvent) -> Unit,
-    isDark: Boolean
+    onEvent: (RegisterEvent) -> Unit
 ) {
-    val inputContainerBg = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
-    val inputLabelColor  = if (isDark) AppTheme.colors.Teal600  else AppTheme.colors.Teal1000
-    val inputTextColor   = if (isDark) AppTheme.colors.Teal400  else AppTheme.colors.Teal1000
-    val signInTextColor  = if (isDark) AppTheme.colors.Teal500  else AppTheme.colors.Gray1000
+    val inputContainerBg = MaterialTheme.colorScheme.surface
+    val inputLabelColor  = MaterialTheme.colorScheme.onSurfaceVariant
+    val inputTextColor   = MaterialTheme.colorScheme.onSurface
+    val signInTextColor  = MaterialTheme.colorScheme.secondary
 
     Column(
         modifier = Modifier
@@ -67,8 +70,7 @@ fun RegisterFormBody(
             errorResId = state.emailErrorResId,
             inputContainerBg = inputContainerBg,
             inputLabelColor = inputLabelColor,
-            inputTextColor = inputTextColor,
-            isDark = isDark
+            inputTextColor = inputTextColor
         )
 
         // ── Password ───────────────────────────────────────────────────────
@@ -85,8 +87,7 @@ fun RegisterFormBody(
             errorResId = state.passwordErrorResId,
             inputContainerBg = inputContainerBg,
             inputLabelColor = inputLabelColor,
-            inputTextColor = inputTextColor,
-            isDark = isDark
+            inputTextColor = inputTextColor
         )
 
         // ── Confirm Password ───────────────────────────────────────────────
@@ -103,95 +104,28 @@ fun RegisterFormBody(
             errorResId = state.confirmPasswordErrorResId,
             inputContainerBg = inputContainerBg,
             inputLabelColor = inputLabelColor,
-            inputTextColor = inputTextColor,
-            isDark = isDark
+            inputTextColor = inputTextColor
         )
     }
 
     Spacer(modifier = Modifier.height(24.dp))
 
     // ── Sign Up Button ─────────────────────────────────────────────────────
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        // Glow ellipse beneath the button (Figma: blur 15px teal ellipse)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 17.dp)
-                .height(7.dp)
-                .align(Alignment.BottomCenter)
-                .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                .background(
-                    color = AppTheme.colors.Teal1000,
-                    shape = RoundedCornerShape(50)
-                )
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(AppTheme.colors.Teal1000)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onEvent(RegisterEvent.SignUpClicked) },
-            contentAlignment = Alignment.Center
-        ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    color = AppTheme.colors.OnPrimary,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else {
-                Text(
-                    text = stringResource(R.string.action_sign_up),
-                    fontFamily = LexendDeca,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 19.sp,
-                    lineHeight = 24.sp,
-                    color = AppTheme.colors.OnPrimary
-                )
-            }
-        }
-    }
+    AuthActionButton(
+        textResId = R.string.action_sign_up,
+        isLoading = state.isLoading,
+        onClick = { onEvent(RegisterEvent.SignUpClicked) }
+    )
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(24.dp))
+
+
 
     // ── Already have an account? Sign In. ─────────────────────────────────
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    SpanStyle(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.14).sp,
-                        color = signInTextColor
-                    )
-                ) { append("Already have an account? ") }
-                withStyle(
-                    SpanStyle(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 14.sp,
-                        letterSpacing = (-0.14).sp,
-                        color = signInTextColor,
-                        textDecoration = TextDecoration.Underline
-                    )
-                ) { append("Sign In.") }
-            },
-            modifier = Modifier.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onEvent(RegisterEvent.SignInClicked) }
-        )
-    }
+    AuthBottomPrompt(
+        questionText = "Already have an account?",
+        actionText = "Sign In.",
+        textColor = signInTextColor,
+        onClick = { onEvent(RegisterEvent.SignInClicked) }
+    )
 }

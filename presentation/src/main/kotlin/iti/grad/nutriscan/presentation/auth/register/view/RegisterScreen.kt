@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register
+package iti.grad.nutriscan.presentation.auth.register.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -59,11 +60,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.presentation.R
+import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.auth.register.components.RegisterHeader
-import iti.grad.nutriscan.presentation.auth.register.components.RegisterFormBody
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AuthHeader
+import iti.grad.nutriscan.presentation.auth.register.view.components.RegisterFormBody
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
@@ -84,28 +91,30 @@ fun RegisterScreen(
         }
     }
 
-    val isDark = isSystemInDarkTheme()
-    val screenBg = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Teal100
-
-    Box(modifier = Modifier.fillMaxSize().background(screenBg)) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                AppSnackbar(message = data.visuals.message)
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            RegisterHeader(isDark = isDark)
+            AuthHeader(titleResId = R.string.signup_title)
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            RegisterFormBody(state = state, onEvent = viewModel::onEvent, isDark = isDark)
+            RegisterFormBody(
+                state = state,
+                onEvent = viewModel::onEvent
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
 

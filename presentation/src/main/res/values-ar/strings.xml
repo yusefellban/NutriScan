@@ -11,4 +11,9 @@
     <string name="error_empty_field">خطأ: لا يمكن ترك الحقل فارغاً.</string>
     <string name="action_sign_up">تسجيل حساب</string>
     <string name="prompt_have_account">لديك حساب بالفعل؟ تسجيل الدخول.</string>
+    <string name="name_label">الاسم</string>
+    <string name="name_hint">أدخل اسمك...</string>
+    <string name="login_title">مرحباً بعودتك!</string>
+    <string name="action_sign_in">تسجيل الدخول</string>
+    <string name="prompt_no_account">ليس لديك حساب؟ سجل الآن.</string>
 </resources>

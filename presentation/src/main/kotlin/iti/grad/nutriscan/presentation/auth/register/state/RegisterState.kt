@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register
+package iti.grad.nutriscan.presentation.auth.register.state
 
 import androidx.annotation.StringRes
 
