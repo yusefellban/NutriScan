@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme Starting Window background — Teal1300, darker for dark theme -->
+    <color name="splash_background">#FF108188</color>
+</resources>

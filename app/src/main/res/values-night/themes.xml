@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. Used after the splash finishes. -->
-    <style name="Theme.NutriScan" parent="android:Theme.Material.Light.NoActionBar">
-        <!-- Compose handles all UI — only app launch scaffolding here. -->
-    </style>
-
     <!--
-        Starting Window theme for the Splash Screen (Android 12+ SplashScreen API).
-
-        windowSplashScreenBackground     — teal color shown instantly on cold launch
-        windowSplashScreenAnimatedIcon   — transparent drawable hides default app icon
-        windowSplashScreenIconBackgroundColor — must also be transparent / match bg
-        postSplashScreenTheme            — theme applied after splashscreen exits
-
-        The teal color here MUST match AppColors.Teal1000 (#13A4AB) exactly so the
-        transition from Starting Window → Compose Splash is completely seamless.
+        Dark theme variant of the Starting Window.
+        windowSplashScreenBackground uses values-night/colors.xml (Teal1300)
+        which is the darker starting color for dark mode.
     -->
     <style name="Theme.NutriScan.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
@@ -32,4 +21,3 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 </resources>
-

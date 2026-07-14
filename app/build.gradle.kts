@@ -73,4 +73,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.room.runtime)
+
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.navigation.compose)
 }
