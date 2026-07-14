@@ -23,12 +23,12 @@ object AppTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalAppColors.current
-
+        
     val typography: Typography
         @Composable
         @ReadOnlyComposable
         get() = LocalAppTypography.current
-
+        
     val shapes: AppShapes
         @Composable
         @ReadOnlyComposable
@@ -43,18 +43,21 @@ fun AppTheme(
     val colors = AppColors()
     val typography = AppTypography
     val shapes = AppShapes()
-
+    
     val view = LocalView.current
+    
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                // Set system status bar and navigation bar colors to Background (0xFFFAFAFA)
+                // Set system status bar and navigation bar colors to Background
+                @Suppress("DEPRECATION")
                 window.statusBarColor = colors.Background.toArgb()
+                @Suppress("DEPRECATION")
                 window.navigationBarColor = colors.Background.toArgb()
                 
                 val insetsController = WindowCompat.getInsetsController(window, view)
-                // Since our background is very light (0xFFFAFAFA), we want dark icons (isAppearanceLightStatusBars = true)
+                // Since our background is very light, we want dark icons (isAppearanceLightStatusBars = true)
                 insetsController.isAppearanceLightStatusBars = !darkTheme
                 insetsController.isAppearanceLightNavigationBars = !darkTheme
             }
