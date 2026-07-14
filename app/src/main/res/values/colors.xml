@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Starting Window teal background — must match AppColors.Teal1000 exactly -->
+    <color name="splash_background">#FF13A4AB</color>
+</resources>

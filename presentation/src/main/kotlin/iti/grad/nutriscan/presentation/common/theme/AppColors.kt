@@ -3,48 +3,179 @@ package iti.grad.nutriscan.presentation.common.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-// --- Base Colors ---
-val Teal100 = Color(0xFFE8FAFA)
-val Teal200 = Color(0xFFD4F1F2)
-val Teal300 = Color(0xFFCAF2F4)
-val Teal400 = Color(0xFFA3E9EC)
-val Teal500 = Color(0xFF75DEE3)
-val Teal600 = Color(0xFF47D3D9)
-val Teal700 = Color(0xFF2FC5CC)
-val Teal800 = Color(0xFF17B8BE)
-val Teal900 = Color(0xFF15AEB4)
-val Teal1000 = Color(0xFF13A4AB)
-val Teal1200 = Color(0xFF11939A)
-val Teal1300 = Color(0xFF108188)
-val Teal1400 = Color(0xFF0B5F65)
-val Teal1500 = Color(0xFF0A545A)
-val Teal1600 = Color(0xFF0F474A)
-
-val Gray100 = Color(0xFFF8F8F9)
-val Gray200 = Color(0xFFF1F1F1)
-val Gray300 = Color(0xFFE5E5E4)
-val Gray400 = Color(0xFFD6D6D5)
-val Gray500 = Color(0xFFC0C0C0)
-val Gray600 = Color(0xFFA6A5A5)
-val Gray700 = Color(0xFF898989)
-val Gray800 = Color(0xFF777777)
-val Gray900 = Color(0xFF717171)
-val Gray1000 = Color(0xFF6A6A6A)
-val Gray1200 = Color(0xFF5F5F5F)
-val Gray1300 = Color(0xFF545454)
-val Gray1400 = Color(0xFF3E3E3E)
-val Gray1500 = Color(0xFF535051)
-val Gray1600 = Color(0xFF393C3C)
-val White = Color(0xFFFFFFFF)
-
-// --- Domain-Specific App Colors ---
 @Immutable
 data class AppColors(
-    // These colors do not map directly to Material 3 standard structural colors,
-    // so they are kept in a custom class for domain-specific usages.
-    val VerdictGreen: Color = Color(0xFF388E3C),
-    val VerdictYellow: Color = Color(0xFFF9A825),
-    val VerdictRed: Color = Color(0xFFD32F2F),
-    val Warning: Color = Color(0xFFFF9500),        // SystemOrange
-    val ErrorBackground: Color = Color(0xFFFFF1F3) // Hygieia Red/10
+    // --- Teal Palette ---
+    val Teal100: Color,
+    val Teal200: Color,
+    val Teal300: Color,
+    val Teal400: Color,
+    val Teal500: Color,
+    val Teal600: Color,
+    val Teal700: Color,
+    val Teal800: Color,
+    val Teal900: Color,
+    val Teal1000: Color,
+    val Teal1200: Color,
+    val Teal1300: Color,
+    val Teal1400: Color,
+    val Teal1500: Color,
+    val Teal1600: Color,
+
+    // --- Gray Palette ---
+    val Gray100: Color,
+    val Gray200: Color,
+    val Gray300: Color,
+    val Gray400: Color,
+    val Gray500: Color,
+    val Gray600: Color,
+    val Gray700: Color,
+    val Gray800: Color,
+    val Gray900: Color,
+    val Gray1000: Color,
+    val Gray1200: Color,
+    val Gray1300: Color,
+    val Gray1400: Color,
+    val Gray1500: Color,
+    val Gray1600: Color,
+
+    // --- Semantic App Colors ---
+    val Primary: Color,
+    val PrimaryVariant: Color,
+    val Accent: Color,
+    val Background: Color,
+    val Surface: Color,
+    val SurfaceVariant: Color,
+    val OnPrimary: Color,
+    val TextPrimary: Color,
+    val TextSecondary: Color,
+    val Divider: Color,
+
+    // --- Health Verdicts & Alerts ---
+    val VerdictGreen: Color,
+    val VerdictYellow: Color,
+    val VerdictRed: Color,
+    val Warning: Color,
+    val Error: Color,
+    val ErrorBackground: Color,
+
+    // --- Splash specific ---
+    /** The starting background color for the Compose splash. Matches the Starting Window exactly. */
+    val SplashBackground: Color,
+    /** The final background color after the splash animation completes. */
+    val SplashBackgroundEnd: Color,
+)
+
+/** Light theme color palette. All teal values kept identical to original. */
+fun lightColors() = AppColors(
+    // Teal palette
+    Teal100 = Color(0xFFE8FAFA),
+    Teal200 = Color(0xFFD4F1F2),
+    Teal300 = Color(0xFFCAF2F4),
+    Teal400 = Color(0xFFA3E9EC),
+    Teal500 = Color(0xFF75DEE3),
+    Teal600 = Color(0xFF47D3D9),
+    Teal700 = Color(0xFF2FC5CC),
+    Teal800 = Color(0xFF17B8BE),
+    Teal900 = Color(0xFF15AEB4),
+    Teal1000 = Color(0xFF13A4AB),
+    Teal1200 = Color(0xFF11939A),
+    Teal1300 = Color(0xFF108188),
+    Teal1400 = Color(0xFF0B5F65),
+    Teal1500 = Color(0xFF0A545A),
+    Teal1600 = Color(0xFF0F474A),
+    // Gray palette
+    Gray100 = Color(0xFFF8F8F9),
+    Gray200 = Color(0xFFF1F1F1),
+    Gray300 = Color(0xFFE5E5E4),
+    Gray400 = Color(0xFFD6D6D5),
+    Gray500 = Color(0xFFC0C0C0),
+    Gray600 = Color(0xFFA6A5A5),
+    Gray700 = Color(0xFF898989),
+    Gray800 = Color(0xFF777777),
+    Gray900 = Color(0xFF717171),
+    Gray1000 = Color(0xFF6A6A6A),
+    Gray1200 = Color(0xFF5F5F5F),
+    Gray1300 = Color(0xFF545454),
+    Gray1400 = Color(0xFF3E3E3E),
+    Gray1500 = Color(0xFF535051),
+    Gray1600 = Color(0xFF393C3C),
+    // Semantic
+    Primary = Color(0xFF13A4AB),
+    PrimaryVariant = Color(0xFF0B5F65),
+    Accent = Color(0xFF47D3D9),
+    Background = Color(0xFFFFFFFF),
+    Surface = Color(0xFFFFFFFF),
+    SurfaceVariant = Color(0xFFF8F8F9),
+    OnPrimary = Color(0xFFFFFFFF),
+    TextPrimary = Color(0xFF393C3C),
+    TextSecondary = Color(0xFF777777),
+    Divider = Color(0xFFE5E5E4),
+    // Verdicts
+    VerdictGreen = Color(0xFF388E3C),
+    VerdictYellow = Color(0xFFF9A825),
+    VerdictRed = Color(0xFFD32F2F),
+    Warning = Color(0xFFFF9500),
+    Error = Color(0xFFFA4D5E),
+    ErrorBackground = Color(0xFFFFF1F3),
+    // Splash
+    SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
+    SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
+)
+
+/** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
+fun darkColors() = AppColors(
+    // Teal palette — unchanged (brand colors don't shift in dark mode)
+    Teal100 = Color(0xFFE8FAFA),
+    Teal200 = Color(0xFFD4F1F2),
+    Teal300 = Color(0xFFCAF2F4),
+    Teal400 = Color(0xFFA3E9EC),
+    Teal500 = Color(0xFF75DEE3),
+    Teal600 = Color(0xFF47D3D9),
+    Teal700 = Color(0xFF2FC5CC),
+    Teal800 = Color(0xFF17B8BE),
+    Teal900 = Color(0xFF15AEB4),
+    Teal1000 = Color(0xFF13A4AB),
+    Teal1200 = Color(0xFF11939A),
+    Teal1300 = Color(0xFF108188),
+    Teal1400 = Color(0xFF0B5F65),
+    Teal1500 = Color(0xFF0A545A),
+    Teal1600 = Color(0xFF0F474A),
+    // Gray palette — same raw values; semantic usage inverted below
+    Gray100 = Color(0xFFF8F8F9),
+    Gray200 = Color(0xFFF1F1F1),
+    Gray300 = Color(0xFFE5E5E4),
+    Gray400 = Color(0xFFD6D6D5),
+    Gray500 = Color(0xFFC0C0C0),
+    Gray600 = Color(0xFFA6A5A5),
+    Gray700 = Color(0xFF898989),
+    Gray800 = Color(0xFF777777),
+    Gray900 = Color(0xFF717171),
+    Gray1000 = Color(0xFF6A6A6A),
+    Gray1200 = Color(0xFF5F5F5F),
+    Gray1300 = Color(0xFF545454),
+    Gray1400 = Color(0xFF3E3E3E),
+    Gray1500 = Color(0xFF535051),
+    Gray1600 = Color(0xFF393C3C),
+    // Semantic — inverted for dark
+    Primary = Color(0xFF2FC5CC),            // Teal700 — slightly lighter for dark surfaces
+    PrimaryVariant = Color(0xFF13A4AB),     // Teal1000
+    Accent = Color(0xFF75DEE3),             // Teal500
+    Background = Color(0xFF0F1A1A),         // Very dark teal-tinted black
+    Surface = Color(0xFF162222),            // Dark teal-tinted surface
+    SurfaceVariant = Color(0xFF1D2E2E),     // Slightly lighter dark surface
+    OnPrimary = Color(0xFF0F1A1A),          // Dark text on teal buttons
+    TextPrimary = Color(0xFFE8FAFA),        // Teal100 — very light text
+    TextSecondary = Color(0xFFA6A5A5),      // Gray600
+    Divider = Color(0xFF1D2E2E),
+    // Verdicts — slightly lighter for dark backgrounds
+    VerdictGreen = Color(0xFF4CAF50),
+    VerdictYellow = Color(0xFFFFCA28),
+    VerdictRed = Color(0xFFEF5350),
+    Warning = Color(0xFFFFAD33),
+    Error = Color(0xFFFF6B7A),
+    ErrorBackground = Color(0xFF2A1215),
+    // Splash — starts on the dark teal starting window color
+    SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
+    SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode
 )

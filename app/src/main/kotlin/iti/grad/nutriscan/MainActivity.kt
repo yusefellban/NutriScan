@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,14 +20,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
+import iti.grad.nutriscan.navigation.NutriScanNavGraph
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.navigation.AppNavGraph
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        // 1. Edge-to-edge must be enabled BEFORE installSplashScreen
         enableEdgeToEdge()
+
+        // 2. Install the SplashScreen API — reads Theme.NutriScan.Splash from Manifest
+        installSplashScreen()
+
+        super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
                 Scaffold(
@@ -123,8 +131,11 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        items(alertColors.size) { index ->
-            ColorItem(alertColors[index].first, alertColors[index].second)
+        // 3. Set Compose content — Starting Window is dismissed instantly when Compose draws
+        setContent {
+            AppTheme {
+                NutriScanNavGraph()
+            }
         }
     }
 }
