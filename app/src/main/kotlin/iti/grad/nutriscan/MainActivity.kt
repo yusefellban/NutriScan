@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.navigation.AppNavGraph
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -29,9 +31,11 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = AppTheme.colors.Background
+                    containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
-                    ThemeShowcase(modifier = Modifier.padding(innerPadding))
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AppNavGraph()
+                    }
                 }
             }
         }
@@ -43,17 +47,17 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
     val colors = AppTheme.colors
     val typography = AppTheme.typography
 
+    val colorScheme = MaterialTheme.colorScheme
+
     val semanticColors = listOf(
-        "Primary" to colors.Primary,
-        "Primary Variant" to colors.PrimaryVariant,
-        "Accent" to colors.Accent,
-        "Background" to colors.Background,
-        "Surface" to colors.Surface,
-        "Surface Variant" to colors.SurfaceVariant,
-        "On Primary" to colors.OnPrimary,
-        "Text Primary" to colors.TextPrimary,
-        "Text Secondary" to colors.TextSecondary,
-        "Divider" to colors.Divider
+        "Primary" to colorScheme.primary,
+        "Background" to colorScheme.background,
+        "Surface" to colorScheme.surface,
+        "Surface Variant" to colorScheme.surfaceVariant,
+        "On Primary" to colorScheme.onPrimary,
+        "Text Primary" to colorScheme.onBackground,
+        "Text Secondary" to colorScheme.onSurfaceVariant,
+        "Divider" to colorScheme.outline
     )
 
     val alertColors = listOf(
@@ -61,7 +65,7 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
         "Verdict Yellow" to colors.VerdictYellow,
         "Verdict Red" to colors.VerdictRed,
         "Warning" to colors.Warning,
-        "Error" to colors.Error,
+        "Error" to colorScheme.error,
         "Error Background" to colors.ErrorBackground
     )
 
@@ -75,7 +79,7 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
             Text(
                 text = "Typography Showcase",
                 style = typography.displaySmall,
-                color = colors.TextPrimary
+                color = colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(16.dp))
             TypographyItem("Display Large", typography.displayLarge)
@@ -100,7 +104,7 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
             Text(
                 text = "Semantic Colors Showcase",
                 style = typography.displaySmall,
-                color = colors.TextPrimary
+                color = colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -114,7 +118,7 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
             Text(
                 text = "Health Verdicts & Alerts",
                 style = typography.displaySmall,
-                color = colors.TextPrimary
+                color = colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -128,8 +132,8 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
 @Composable
 fun TypographyItem(name: String, style: TextStyle) {
     Column(modifier = Modifier.padding(bottom = 8.dp)) {
-        Text(text = name, style = AppTheme.typography.labelMedium, color = AppTheme.colors.TextSecondary)
-        Text(text = "The quick brown fox jumps over the lazy dog", style = style, color = AppTheme.colors.TextPrimary)
+        Text(text = name, style = AppTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = "The quick brown fox jumps over the lazy dog", style = style, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
@@ -151,7 +155,7 @@ fun ColorItem(name: String, color: Color) {
         Text(
             text = name,
             style = AppTheme.typography.bodyLarge,
-            color = AppTheme.colors.TextPrimary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

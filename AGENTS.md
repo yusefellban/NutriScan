@@ -162,6 +162,7 @@ severe nut allergies, or Diabetes.
 | `android.util.Log` / `println`                 | No log hygiene                                      | `Timber.d()` / `Timber.e()`       |
 | Any global `object` with mutable state         | Thread-unsafe singleton                             | Inject via Hilt                    |
 | Silently defaulting health profile to empty    | Safety-critical failure — see Domain Notice         | Always validate before use         |
+| Fully qualified inline class names (e.g. `androidx...`) | Clutters code and reduces readability      | Use normal imports at the top      |
 
 ---
 
@@ -363,25 +364,35 @@ domain/src/main/kotlin/ iti.grad.nutriscan.domain/
 presentation/src/main/kotlin/ iti.grad.nutriscan.presentation/
 ├── auth/
 │   ├── login/
-│   │   ├── components/
-│   │   ├── LoginScreen.kt
-│   │   ├── LoginState.kt
-│   │   ├── LoginEvent.kt
-│   │   ├── LoginEffect.kt
-│   │   └── LoginViewModel.kt
+│   │   ├── state/
+│   │   │   ├── LoginState.kt
+│   │   │   ├── LoginEvent.kt
+│   │   │   └── LoginEffect.kt
+│   │   ├── view/
+│   │   │   ├── LoginScreen.kt
+│   │   │   └── components/
+│   │   │       └── LoginFormBody.kt
+│   │   └── viewmodel/
+│   │       └── LoginViewModel.kt
 │   └── register/
-│       ├── components/
-│       ├── RegisterScreen.kt
-│       ├── RegisterState.kt
-│       ├── RegisterEvent.kt
-│       ├── RegisterEffect.kt
-│       └── RegisterViewModel.kt
+│       ├── state/
+│       │   ├── RegisterState.kt
+│       │   ├── RegisterEvent.kt
+│       │   └── RegisterEffect.kt
+│       ├── view/
+│       │   ├── RegisterScreen.kt
+│       │   └── components/
+│       │       └── RegisterFormBody.kt
+│       └── viewmodel/
+│           └── RegisterViewModel.kt
 ├── common/
 │   ├── theme/
 │   │   ├── AppTheme.kt
 │   │   ├── AppColors.kt
 │   │   ├── AppTypography.kt
 │   │   └── AppShapes.kt
+│   ├── model/
+│   │   └── SocialMediaProvider.kt
 │   ├── components/
 │   │   ├── AppButton.kt
 │   │   ├── AppTextField.kt
@@ -391,164 +402,233 @@ presentation/src/main/kotlin/ iti.grad.nutriscan.presentation/
 │   │   ├── ConfirmationDialog.kt
 │   │   ├── EmptyStateWidget.kt
 │   │   ├── VerdictBadge.kt              ← Red/Yellow/Green verdict indicator
-│   │   └── LoadingShimmer.kt
+│   │   ├── LoadingShimmer.kt
+│   │   ├── FigmaInputField.kt           ← Shared auth input field
+│   │   ├── AuthHeader.kt                ← Shared auth header (logo + title)
+│   │   ├── AuthActionButton.kt          ← Shared auth primary button with glow
+│   │   ├── AuthBottomPrompt.kt          ← Shared "Already have account?" / "Don't have account?" prompt
+│   │   ├── AuthDivider.kt               ← "── OR ──" divider
+│   │   └── SocialLoginRow.kt            ← Facebook / Google / Instagram row
 │   └── Validation.kt
 ├── onboarding/
 │   ├── splash/
-│   │   ├── SplashScreen.kt
-│   │   ├── SplashState.kt
-│   │   ├── SplashEvent.kt
-│   │   ├── SplashEffect.kt
-│   │   └── SplashViewModel.kt
+│   │   ├── state/
+│   │   │   ├── SplashState.kt
+│   │   │   ├── SplashEvent.kt
+│   │   │   └── SplashEffect.kt
+│   │   ├── view/
+│   │   │   └── SplashScreen.kt
+│   │   └── viewmodel/
+│   │       └── SplashViewModel.kt
 │   ├── carousel/
-│   │   ├── OnboardingCarouselScreen.kt
-│   │   ├── OnboardingCarouselState.kt
-│   │   ├── OnboardingCarouselEvent.kt
-│   │   ├── OnboardingCarouselEffect.kt
-│   │   └── OnboardingCarouselViewModel.kt
+│   │   ├── state/
+│   │   │   ├── OnboardingCarouselState.kt
+│   │   │   ├── OnboardingCarouselEvent.kt
+│   │   │   └── OnboardingCarouselEffect.kt
+│   │   ├── view/
+│   │   │   └── OnboardingCarouselScreen.kt
+│   │   └── viewmodel/
+│   │       └── OnboardingCarouselViewModel.kt
 │   └── profile_setup/
-│       ├── HealthProfileSetupScreen.kt
-│       ├── HealthProfileSetupState.kt
-│       ├── HealthProfileSetupEvent.kt
-│       ├── HealthProfileSetupEffect.kt
-│       ├── HealthProfileSetupViewModel.kt
-│       ├── FamilyProfileSetupScreen.kt
-│       ├── FamilyProfileSetupState.kt
-│       ├── FamilyProfileSetupEvent.kt
-│       ├── FamilyProfileSetupEffect.kt
-│       └── FamilyProfileSetupViewModel.kt
+│       ├── state/
+│       │   ├── HealthProfileSetupState.kt
+│       │   ├── HealthProfileSetupEvent.kt
+│       │   ├── HealthProfileSetupEffect.kt
+│       │   ├── FamilyProfileSetupState.kt
+│       │   ├── FamilyProfileSetupEvent.kt
+│       │   └── FamilyProfileSetupEffect.kt
+│       ├── view/
+│       │   ├── HealthProfileSetupScreen.kt
+│       │   └── FamilyProfileSetupScreen.kt
+│       └── viewmodel/
+│           ├── HealthProfileSetupViewModel.kt
+│           └── FamilyProfileSetupViewModel.kt
 ├── home/
-│   ├── HomeScreen.kt
-│   ├── HomeState.kt
-│   ├── HomeEvent.kt
-│   ├── HomeEffect.kt
-│   ├── HomeViewModel.kt
-│   └── components/
-│       ├── HomeFeedCategoryRow.kt
-│       ├── FeedProductCard.kt
-│       └── ProfileSwitcher.kt
+│   ├── state/
+│   │   ├── HomeState.kt
+│   │   ├── HomeEvent.kt
+│   │   └── HomeEffect.kt
+│   ├── view/
+│   │   ├── HomeScreen.kt
+│   │   └── components/
+│   │       ├── HomeFeedCategoryRow.kt
+│   │       ├── FeedProductCard.kt
+│   │       └── ProfileSwitcher.kt
+│   └── viewmodel/
+│       └── HomeViewModel.kt
 ├── scan/
 │   ├── camera/
-│   │   ├── CameraScanScreen.kt
-│   │   ├── CameraScanState.kt
-│   │   ├── CameraScanEvent.kt
-│   │   ├── CameraScanEffect.kt
-│   │   ├── CameraScanViewModel.kt
-│   │   └── components/
-│   │       ├── CameraPreview.kt
-│   │       └── ScanFrameOverlay.kt
+│   │   ├── state/
+│   │   │   ├── CameraScanState.kt
+│   │   │   ├── CameraScanEvent.kt
+│   │   │   └── CameraScanEffect.kt
+│   │   ├── view/
+│   │   │   ├── CameraScanScreen.kt
+│   │   │   └── components/
+│   │   │       ├── CameraPreview.kt
+│   │   │       └── ScanFrameOverlay.kt
+│   │   └── viewmodel/
+│   │       └── CameraScanViewModel.kt
 │   ├── processing/
-│   │   ├── ScanProcessingScreen.kt
-│   │   ├── ScanProcessingState.kt
-│   │   ├── ScanProcessingEvent.kt
-│   │   ├── ScanProcessingEffect.kt
-│   │   └── ScanProcessingViewModel.kt
+│   │   ├── state/
+│   │   │   ├── ScanProcessingState.kt
+│   │   │   ├── ScanProcessingEvent.kt
+│   │   │   └── ScanProcessingEffect.kt
+│   │   ├── view/
+│   │   │   └── ScanProcessingScreen.kt
+│   │   └── viewmodel/
+│   │       └── ScanProcessingViewModel.kt
 │   └── result/
-│       ├── ScanResultScreen.kt
-│       ├── ScanResultState.kt
-│       ├── ScanResultEvent.kt
-│       ├── ScanResultEffect.kt
-│       ├── ScanResultViewModel.kt
-│       └── components/
-│           ├── VerdictHeader.kt
-│           ├── ProfileVerdictCard.kt
-│           ├── IngredientChipRow.kt
-│           └── SafeAlternativeCard.kt
+│       ├── state/
+│       │   ├── ScanResultState.kt
+│       │   ├── ScanResultEvent.kt
+│       │   └── ScanResultEffect.kt
+│       ├── view/
+│       │   ├── ScanResultScreen.kt
+│       │   └── components/
+│       │       ├── VerdictHeader.kt
+│       │       ├── ProfileVerdictCard.kt
+│       │       ├── IngredientChipRow.kt
+│       │       └── SafeAlternativeCard.kt
+│       └── viewmodel/
+│           └── ScanResultViewModel.kt
 ├── nutrigpt/
-│   ├── NutriGptScreen.kt
-│   ├── NutriGptState.kt
-│   ├── NutriGptEvent.kt
-│   ├── NutriGptEffect.kt
-│   ├── NutriGptViewModel.kt
-│   └── components/
-│       ├── ChatBubble.kt
-│       └── QuickQuestionChips.kt
+│   ├── state/
+│   │   ├── NutriGptState.kt
+│   │   ├── NutriGptEvent.kt
+│   │   └── NutriGptEffect.kt
+│   ├── view/
+│   │   ├── NutriGptScreen.kt
+│   │   └── components/
+│   │       ├── ChatBubble.kt
+│   │       └── QuickQuestionChips.kt
+│   └── viewmodel/
+│       └── NutriGptViewModel.kt
 ├── ingredient_detail/
-│   ├── IngredientDetailScreen.kt
-│   ├── IngredientDetailState.kt
-│   ├── IngredientDetailEvent.kt
-│   ├── IngredientDetailEffect.kt
-│   └── IngredientDetailViewModel.kt
+│   ├── state/
+│   │   ├── IngredientDetailState.kt
+│   │   ├── IngredientDetailEvent.kt
+│   │   └── IngredientDetailEffect.kt
+│   ├── view/
+│   │   └── IngredientDetailScreen.kt
+│   └── viewmodel/
+│       └── IngredientDetailViewModel.kt
 ├── receipt/
 │   ├── capture/
-│   │   ├── ReceiptCaptureScreen.kt
-│   │   ├── ReceiptCaptureState.kt
-│   │   ├── ReceiptCaptureEvent.kt
-│   │   ├── ReceiptCaptureEffect.kt
-│   │   └── ReceiptCaptureViewModel.kt
+│   │   ├── state/
+│   │   │   ├── ReceiptCaptureState.kt
+│   │   │   ├── ReceiptCaptureEvent.kt
+│   │   │   └── ReceiptCaptureEffect.kt
+│   │   ├── view/
+│   │   │   └── ReceiptCaptureScreen.kt
+│   │   └── viewmodel/
+│   │       └── ReceiptCaptureViewModel.kt
 │   └── result/
-│       ├── ReceiptResultScreen.kt
-│       ├── ReceiptResultState.kt
-│       ├── ReceiptResultEvent.kt
-│       ├── ReceiptResultEffect.kt
-│       └── ReceiptResultViewModel.kt
+│       ├── state/
+│       │   ├── ReceiptResultState.kt
+│       │   ├── ReceiptResultEvent.kt
+│       │   └── ReceiptResultEffect.kt
+│       ├── view/
+│       │   └── ReceiptResultScreen.kt
+│       └── viewmodel/
+│           └── ReceiptResultViewModel.kt
 ├── history/
-│   ├── ScanHistoryScreen.kt
-│   ├── ScanHistoryState.kt
-│   ├── ScanHistoryEvent.kt
-│   ├── ScanHistoryEffect.kt
-│   ├── ScanHistoryViewModel.kt
-│   └── components/
-│       └── ScanHistoryCard.kt
+│   ├── state/
+│   │   ├── ScanHistoryState.kt
+│   │   ├── ScanHistoryEvent.kt
+│   │   └── ScanHistoryEffect.kt
+│   ├── view/
+│   │   ├── ScanHistoryScreen.kt
+│   │   └── components/
+│   │       └── ScanHistoryCard.kt
+│   └── viewmodel/
+│       └── ScanHistoryViewModel.kt
 ├── report/
 │   ├── list/
-│   │   ├── ReportListScreen.kt
-│   │   ├── ReportListState.kt
-│   │   ├── ReportListEvent.kt
-│   │   ├── ReportListEffect.kt
-│   │   └── ReportListViewModel.kt
+│   │   ├── state/
+│   │   │   ├── ReportListState.kt
+│   │   │   ├── ReportListEvent.kt
+│   │   │   └── ReportListEffect.kt
+│   │   ├── view/
+│   │   │   └── ReportListScreen.kt
+│   │   └── viewmodel/
+│   │       └── ReportListViewModel.kt
 │   └── detail/
-│       ├── ReportDetailScreen.kt
-│       ├── ReportDetailState.kt
-│       ├── ReportDetailEvent.kt
-│       ├── ReportDetailEffect.kt
-│       └── ReportDetailViewModel.kt
+│       ├── state/
+│       │   ├── ReportDetailState.kt
+│       │   ├── ReportDetailEvent.kt
+│       │   └── ReportDetailEffect.kt
+│       ├── view/
+│       │   └── ReportDetailScreen.kt
+│       └── viewmodel/
+│           └── ReportDetailViewModel.kt
 ├── shopping/
 │   ├── list/
-│   │   ├── ShoppingListScreen.kt
-│   │   ├── ShoppingListState.kt
-│   │   ├── ShoppingListEvent.kt
-│   │   ├── ShoppingListEffect.kt
-│   │   ├── ShoppingListViewModel.kt
-│   │   └── components/
-│   │       └── ShoppingItemRow.kt
+│   │   ├── state/
+│   │   │   ├── ShoppingListState.kt
+│   │   │   ├── ShoppingListEvent.kt
+│   │   │   └── ShoppingListEffect.kt
+│   │   ├── view/
+│   │   │   ├── ShoppingListScreen.kt
+│   │   │   └── components/
+│   │   │       └── ShoppingItemRow.kt
+│   │   └── viewmodel/
+│   │       └── ShoppingListViewModel.kt
 │   └── alternative/
-│       ├── SmartAlternativeSheet.kt
-│       ├── SmartAlternativeState.kt
-│       ├── SmartAlternativeEvent.kt
-│       ├── SmartAlternativeEffect.kt
-│       └── SmartAlternativeViewModel.kt
+│       ├── state/
+│       │   ├── SmartAlternativeState.kt
+│       │   ├── SmartAlternativeEvent.kt
+│       │   └── SmartAlternativeEffect.kt
+│       ├── view/
+│       │   └── SmartAlternativeSheet.kt
+│       └── viewmodel/
+│           └── SmartAlternativeViewModel.kt
 └── settings/
     ├── profile/
-    │   ├── UserProfileScreen.kt
-    │   ├── UserProfileState.kt
-    │   ├── UserProfileEvent.kt
-    │   ├── UserProfileEffect.kt
-    │   └── UserProfileViewModel.kt
+    │   ├── state/
+    │   │   ├── UserProfileState.kt
+    │   │   ├── UserProfileEvent.kt
+    │   │   └── UserProfileEffect.kt
+    │   ├── view/
+    │   │   └── UserProfileScreen.kt
+    │   └── viewmodel/
+    │       └── UserProfileViewModel.kt
     ├── family/
-    │   ├── ManageFamilyScreen.kt
-    │   ├── ManageFamilyState.kt
-    │   ├── ManageFamilyEvent.kt
-    │   ├── ManageFamilyEffect.kt
-    │   └── ManageFamilyViewModel.kt
+    │   ├── state/
+    │   │   ├── ManageFamilyState.kt
+    │   │   ├── ManageFamilyEvent.kt
+    │   │   └── ManageFamilyEffect.kt
+    │   ├── view/
+    │   │   └── ManageFamilyScreen.kt
+    │   └── viewmodel/
+    │       └── ManageFamilyViewModel.kt
     ├── conditions/
-    │   ├── EditConditionsScreen.kt
-    │   ├── EditConditionsState.kt
-    │   ├── EditConditionsEvent.kt
-    │   ├── EditConditionsEffect.kt
-    │   └── EditConditionsViewModel.kt
+    │   ├── state/
+    │   │   ├── EditConditionsState.kt
+    │   │   ├── EditConditionsEvent.kt
+    │   │   └── EditConditionsEffect.kt
+    │   ├── view/
+    │   │   └── EditConditionsScreen.kt
+    │   └── viewmodel/
+    │       └── EditConditionsViewModel.kt
     ├── notifications/
-    │   ├── NotificationSettingsScreen.kt
-    │   ├── NotificationSettingsState.kt
-    │   ├── NotificationSettingsEvent.kt
-    │   ├── NotificationSettingsEffect.kt
-    │   └── NotificationSettingsViewModel.kt
+    │   ├── state/
+    │   │   ├── NotificationSettingsState.kt
+    │   │   ├── NotificationSettingsEvent.kt
+    │   │   └── NotificationSettingsEffect.kt
+    │   ├── view/
+    │   │   └── NotificationSettingsScreen.kt
+    │   └── viewmodel/
+    │       └── NotificationSettingsViewModel.kt
     └── app/
-        ├── AppSettingsScreen.kt
-        ├── AppSettingsState.kt
-        ├── AppSettingsEvent.kt
-        ├── AppSettingsEffect.kt
-        └── AppSettingsViewModel.kt
+        ├── state/
+        │   ├── AppSettingsState.kt
+        │   ├── AppSettingsEvent.kt
+        │   └── AppSettingsEffect.kt
+        ├── view/
+        │   └── AppSettingsScreen.kt
+        └── viewmodel/
+            └── AppSettingsViewModel.kt
 ```
 
 ---

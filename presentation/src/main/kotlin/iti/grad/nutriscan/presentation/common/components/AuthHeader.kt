@@ -1,5 +1,6 @@
-package iti.grad.nutriscan.presentation.auth.register.components
+package iti.grad.nutriscan.presentation.common.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,15 +23,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
+import iti.grad.nutriscan.presentation.common.theme.Teal200
 import iti.grad.presentation.R
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Header: full-width teal panel, bottom corners rounded 32dp
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun RegisterHeader(isDark: Boolean) {
+fun AuthHeader(@StringRes titleResId: Int) {
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -41,14 +43,14 @@ fun RegisterHeader(isDark: Boolean) {
                 .height(29.dp)
                 .align(Alignment.BottomCenter)
                 .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                .background(AppTheme.colors.Teal1000)
+                .background(MaterialTheme.colorScheme.primary)
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = AppTheme.colors.Teal1000,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                 )
                 .padding(top = 84.dp, bottom = 48.dp),
@@ -62,19 +64,18 @@ fun RegisterHeader(isDark: Boolean) {
                 Image(
                     painter = painterResource(R.drawable.nutriscan_light),
                     contentDescription = "NutriScan",
-                    colorFilter = ColorFilter.tint(AppTheme.colors.OnPrimary),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
                     modifier = Modifier
                         .width(183.dp)
                         .height(34.dp)
                 )
-                // "Sign Up For Free!" — Teal200 on teal bg
                 Text(
-                    text = stringResource(R.string.signup_title),
+                    text = stringResource(titleResId),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 35.sp,
-                    color = AppTheme.colors.Teal200
+                    color = Teal200
                 )
             }
         }
