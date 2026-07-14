@@ -1,6 +1,9 @@
 package iti.grad.nutriscan.presentation.auth.register
 
 import app.cash.turbine.test
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.viewmodel.RegisterViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
