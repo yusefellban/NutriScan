@@ -26,9 +26,9 @@ import iti.grad.presentation.R
 fun SocialLoginRow(
     onSocialClick: (SocialMediaProvider) -> Unit
 ) {
-    // Border color and tint from material color scheme
-    val borderColor = MaterialTheme.colorScheme.outline
-    val iconTint    = MaterialTheme.colorScheme.onSurface
+    // Border color and tint from semantic AppColors
+    val borderColor = AppTheme.colors.SocialButtonBorder
+    val iconTint    = AppTheme.colors.SocialButtonIconTint
 
     Row(
         modifier = Modifier.fillMaxWidth(),
