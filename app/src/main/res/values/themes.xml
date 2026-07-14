@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.NutriScan" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Base application theme. -->
+    <style name="Theme.NutriScan" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- We use Jetpack Compose for the UI, so this theme is only for app launch. -->
+    </style>
 </resources>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">NutriScan</string>
+    <string name="signup_title">Sign Up For Free!</string>
+    <string name="email_label">Email Address</string>
+    <string name="email_hint">Enter your email address...</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">****************</string>
+    <string name="confirm_password_label">Password Confirmation</string>
+    <string name="error_password_mismatch">ERROR: Passwords do not match!</string>
+    <string name="error_invalid_email">ERROR: Invalid email format.</string>
+    <string name="error_empty_field">ERROR: Field cannot be empty.</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="prompt_have_account">Already have an account? Sign In.</string>
+    <string name="name_label">Name</string>
+    <string name="name_hint">Enter your name...</string>
+</resources>

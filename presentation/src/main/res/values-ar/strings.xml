@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">نيوتري سكان</string>
+    <string name="signup_title">سجل مجاناً!</string>
+    <string name="email_label">البريد الإلكتروني</string>
+    <string name="email_hint">أدخل بريدك الإلكتروني...</string>
+    <string name="password_label">كلمة المرور</string>
+    <string name="password_hint">****************</string>
+    <string name="confirm_password_label">تأكيد كلمة المرور</string>
+    <string name="error_password_mismatch">خطأ: كلمات المرور غير متطابقة!</string>
+    <string name="error_invalid_email">خطأ: صيغة البريد الإلكتروني غير صحيحة.</string>
+    <string name="error_empty_field">خطأ: لا يمكن ترك الحقل فارغاً.</string>
+    <string name="action_sign_up">تسجيل حساب</string>
+    <string name="prompt_have_account">لديك حساب بالفعل؟ تسجيل الدخول.</string>
+</resources>
