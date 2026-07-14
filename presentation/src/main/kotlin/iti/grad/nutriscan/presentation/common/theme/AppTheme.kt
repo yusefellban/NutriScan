@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -23,33 +24,6 @@ val LocalAppColors = staticCompositionLocalOf { lightColors() }
 val LocalAppTypography = staticCompositionLocalOf { AppTypography }
 val LocalAppShapes = staticCompositionLocalOf { AppShapes() }
 
-private val DarkColors = darkColorScheme(
-    primary = Teal1000,
-    onPrimary = White,
-    background = Teal1600,
-    onBackground = Teal400,
-    surface = Teal1400,
-    onSurface = Teal400,
-    onSurfaceVariant = Teal600,
-    secondary = Teal500,
-    outline = Teal700,
-    error = Color(0xFFFA4D5E), // Hygieia Red/50
-    onError = White
-)
-
-private val LightColors = lightColorScheme(
-    primary = Teal1000,
-    onPrimary = White,
-    background = Teal100,
-    onBackground = Gray800,
-    surface = White,
-    onSurface = Teal1000,
-    onSurfaceVariant = Teal1000,
-    secondary = Gray1000,
-    outline = Teal400,
-    error = Color(0xFFFA4D5E), // Hygieia Red/50
-    onError = White
-)
 
 object AppTheme {
     val colors: AppColors
@@ -116,8 +90,7 @@ fun AppTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColors
-        else -> LightColors
+        else -> materialColorScheme
     }
     
     val view = LocalView.current

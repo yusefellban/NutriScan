@@ -25,7 +25,6 @@ junitJupiter = "5.10.2"
 mockk = "1.13.10"
 kotlinxCoroutines = "1.8.1"
 turbine = "1.1.0"
-navigationCompose = "2.8.9"
 splashscreen = "1.0.1"
 
 [libraries]
@@ -64,7 +63,6 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 [plugins]

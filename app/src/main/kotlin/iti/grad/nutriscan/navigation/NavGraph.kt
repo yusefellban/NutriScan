@@ -8,16 +8,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
+import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: Any = LoginRoute
+    startDestination: Any = SplashRoute
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable<SplashRoute> {
+            SplashScreen(
+                onNavigateToHome = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable<LoginRoute> {
             LoginScreen(
                 onNavigateToHome = {

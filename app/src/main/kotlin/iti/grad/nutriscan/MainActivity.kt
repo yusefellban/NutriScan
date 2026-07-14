@@ -20,7 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
-import iti.grad.nutriscan.navigation.NutriScanNavGraph
+
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.navigation.AppNavGraph
 
@@ -131,12 +131,6 @@ fun ThemeShowcase(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // 3. Set Compose content — Starting Window is dismissed instantly when Compose draws
-        setContent {
-            AppTheme {
-                NutriScanNavGraph()
-            }
-        }
     }
 }
 
