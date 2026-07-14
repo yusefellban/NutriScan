@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register
+package iti.grad.nutriscan.presentation.auth.register.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor() : ViewModel() {

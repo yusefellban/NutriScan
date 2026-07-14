@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.register
+package iti.grad.nutriscan.presentation.auth.register.state
 
 sealed interface RegisterEvent {
     data class EmailChanged(val value: String) : RegisterEvent

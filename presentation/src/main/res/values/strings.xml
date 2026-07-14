@@ -13,4 +13,7 @@
     <string name="prompt_have_account">Already have an account? Sign In.</string>
     <string name="name_label">Name</string>
     <string name="name_hint">Enter your name...</string>
+    <string name="login_title">Welcome Back!</string>
+    <string name="action_sign_in">Sign In</string>
+    <string name="prompt_no_account">Don\'t have an account? Sign Up.</string>
 </resources>
