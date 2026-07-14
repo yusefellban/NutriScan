@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.common.theme.Teal200
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ fun AuthHeader(@StringRes titleResId: Int) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 35.sp,
-                    color = Teal200
+                    color = AppTheme.colors.Teal200
                 )
             }
         }

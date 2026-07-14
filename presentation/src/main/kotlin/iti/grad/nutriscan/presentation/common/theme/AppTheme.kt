@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +23,18 @@ import androidx.core.view.WindowCompat
 val LocalAppColors = staticCompositionLocalOf { lightColors() }
 val LocalAppTypography = staticCompositionLocalOf { AppTypography }
 val LocalAppShapes = staticCompositionLocalOf { AppShapes() }
+
+private val Teal100 = Color(0xFFE8FAFA)
+private val Teal400 = Color(0xFFA3E9EC)
+private val Teal500 = Color(0xFF75DEE3)
+private val Teal600 = Color(0xFF47D3D9)
+private val Teal700 = Color(0xFF2FC5CC)
+private val Teal1000 = Color(0xFF13A4AB)
+private val Teal1400 = Color(0xFF0B5F65)
+private val Teal1600 = Color(0xFF0F474A)
+private val Gray800 = Color(0xFF777777)
+private val Gray1000 = Color(0xFF6A6A6A)
+private val White = Color(0xFFFFFFFF)
 
 private val DarkColors = darkColorScheme(
     primary = Teal1000,
@@ -78,39 +91,6 @@ fun AppTheme(
     val typography = AppTypography
     val shapes = AppShapes()
 
-    // Material color scheme — used as a safety net for Material3 components
-    // (prevents default purple ripples/selection handles bleeding through).
-    // Status bar / navigation bar colors are handled by enableEdgeToEdge() in
-    // MainActivity — no deprecated window.statusBarColor calls here.
-    val materialColorScheme = if (darkTheme) {
-        darkColorScheme(
-            primary = colors.Primary,
-            secondary = colors.PrimaryVariant,
-            tertiary = colors.Accent,
-            background = colors.Background,
-            surface = colors.Surface,
-            error = colors.Error,
-            onPrimary = colors.OnPrimary,
-            onBackground = colors.TextPrimary,
-            onSurface = colors.TextPrimary,
-            onError = colors.Background,
-        )
-    } else {
-        lightColorScheme(
-            primary = colors.Primary,
-            secondary = colors.PrimaryVariant,
-            tertiary = colors.Accent,
-            background = colors.Background,
-            surface = colors.Surface,
-            error = colors.Error,
-            onPrimary = colors.OnPrimary,
-            onBackground = colors.TextPrimary,
-            onSurface = colors.TextPrimary,
-            onError = colors.OnPrimary,
-        )
-    }
-
-    
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
