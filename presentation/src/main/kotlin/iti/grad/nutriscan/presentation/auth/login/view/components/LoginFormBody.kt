@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
-import iti.grad.nutriscan.presentation.common.components.AuthActionButton
+import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AuthBottomPrompt
 import iti.grad.nutriscan.presentation.common.components.AuthDivider
 import iti.grad.nutriscan.presentation.common.components.FigmaInputField
@@ -29,7 +29,7 @@ fun LoginFormBody(
     val inputContainerBg = MaterialTheme.colorScheme.surface
     val inputLabelColor  = MaterialTheme.colorScheme.onSurfaceVariant
     val inputTextColor   = MaterialTheme.colorScheme.onSurface
-    val dividerColor     = MaterialTheme.colorScheme.outline
+    val dividerColor     = AppTheme.colors.AuthDividerColor
     val promptTextColor  = MaterialTheme.colorScheme.onBackground
 
     Column(
@@ -74,7 +74,7 @@ fun LoginFormBody(
     Spacer(modifier = Modifier.height(28.dp))
 
         // ── Sign In Button ─────────────────────────────────────────────────
-        AuthActionButton(
+        AppButton(
             textResId = R.string.action_sign_in,
             isLoading = state.isLoading,
             onClick = { onEvent(LoginEvent.SignInClicked) }
