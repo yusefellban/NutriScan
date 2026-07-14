@@ -63,6 +63,9 @@ data class AppColors(
     val SocialButtonBorder: Color,
     val SocialButtonIconTint: Color,
 
+    // --- Auth Divider ---
+    val AuthDividerColor: Color,
+
     // --- Splash specific ---
     /** The starting background color for the Compose splash. Matches the Starting Window exactly. */
     val SplashBackground: Color,
@@ -125,6 +128,8 @@ fun lightColors() = AppColors(
     // Social Buttons
     SocialButtonBorder = Color(0xFF777777),   // Gray800
     SocialButtonIconTint = Color(0xFF0F474A), // Teal1600
+    // Auth Divider
+    AuthDividerColor = Color(0xFF777777),     // Gray800
     // Splash
     SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
     SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
@@ -185,6 +190,8 @@ fun darkColors() = AppColors(
     // Social Buttons
     SocialButtonBorder = Color(0xFF75DEE3),   // Teal500
     SocialButtonIconTint = Color(0xFFA3E9EC), // Teal400
+    // Auth Divider
+    AuthDividerColor = Color(0xFF75DEE3),     // Teal500
     // Splash — starts on the dark teal starting window color
     SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
     SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode

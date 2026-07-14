@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
-import iti.grad.nutriscan.presentation.common.components.AuthActionButton
+import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AuthBottomPrompt
 import iti.grad.nutriscan.presentation.common.components.FigmaInputField
 import androidx.compose.material3.MaterialTheme
@@ -111,7 +111,7 @@ fun RegisterFormBody(
     Spacer(modifier = Modifier.height(24.dp))
 
     // ── Sign Up Button ─────────────────────────────────────────────────────
-    AuthActionButton(
+    AppButton(
         textResId = R.string.action_sign_up,
         isLoading = state.isLoading,
         onClick = { onEvent(RegisterEvent.SignUpClicked) }

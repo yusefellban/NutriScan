@@ -405,7 +405,7 @@ presentation/src/main/kotlin/ iti.grad.nutriscan.presentation/
 │   │   ├── LoadingShimmer.kt
 │   │   ├── FigmaInputField.kt           ← Shared auth input field
 │   │   ├── AuthHeader.kt                ← Shared auth header (logo + title)
-│   │   ├── AuthActionButton.kt          ← Shared auth primary button with glow
+│   │   ├── AppButton.kt                 ← Shared primary button with puffed 3D glow
 │   │   ├── AuthBottomPrompt.kt          ← Shared "Already have account?" / "Don't have account?" prompt
 │   │   ├── AuthDivider.kt               ← "── OR ──" divider
 │   │   └── SocialLoginRow.kt            ← Facebook / Google / Instagram row
