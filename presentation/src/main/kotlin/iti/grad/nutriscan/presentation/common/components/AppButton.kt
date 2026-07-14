@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,8 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
@@ -31,7 +33,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 class PuffedShape(
     private val puffHeight: Dp = 5.dp,
@@ -145,37 +146,49 @@ fun AppButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 22.dp)
-            // Custom Teal Shadow (elevation mimics the SwiftUI shadow radius/y-offset)
-            .shadow(
-                elevation = 15.dp,
-                shape = puffedShape,
-                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                clip = false
-            )
-            .clip(puffedShape)
-            .background(MaterialTheme.colorScheme.primary)
-            .height(62.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(24.dp)
-            )
-        } else {
-            Text(
-                text = stringResource(textResId),
-                fontFamily = LexendDeca,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+        // Glow ellipse beneath the button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 17.dp)
+                .height(7.dp)
+                .align(Alignment.BottomCenter)
+                .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(50)
+                )
+        )
+
+        // Puffed button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(puffedShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .height(62.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Text(
+                    text = stringResource(textResId),
+                    fontFamily = LexendDeca,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
