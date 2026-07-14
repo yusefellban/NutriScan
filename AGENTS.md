@@ -1094,18 +1094,6 @@ dependencies {
 
 ```kotlin
 // app/navigation/Route.kt
-// ── Graph roots ───────────────────────────────────────────────────────────
-@Serializable data object OnboardingGraph
-@Serializable data object AuthGraph
-@Serializable data object HomeGraph
-@Serializable data object ScanGraph
-@Serializable data object ReceiptGraph
-@Serializable data object HistoryGraph
-@Serializable data object NutriGptGraph
-@Serializable data object ReportGraph
-@Serializable data object ShoppingGraph
-@Serializable data object SettingsGraph
-
 // ── Screen routes ─────────────────────────────────────────────────────────
 @Serializable data object SplashRoute
 @Serializable data object OnboardingCarouselRoute
@@ -1137,182 +1125,152 @@ dependencies {
 ```kotlin
 // app/navigation/NavGraph.kt
 @Composable
-fun AppNavHost(navController: NavHostController = rememberNavController()) {
-    NavHost(navController = navController, startDestination = SplashRoute) {
+fun AppNavGraph(
+    navController: NavHostController = rememberNavController(),
+    startDestination: Any = SplashRoute
+) {
+    NavHost(navController = navController, startDestination = startDestination) {
 
-        // ════════════════════════════════════════════════════════════════
-        // SPLASH
-        // ════════════════════════════════════════════════════════════════
         composable<SplashRoute> {
             SplashScreen(
-                onNavigateToOnboarding = {
+                onNavigateToHome = {
                     navController.navigate(OnboardingCarouselRoute) {
                         popUpTo<SplashRoute> { inclusive = true }
                     }
-                },
-                onNavigateToHome = {
-                    navController.navigate(HomeGraph) {
-                        popUpTo<SplashRoute> { inclusive = true }
-                    }
-                },
+                }
             )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // ONBOARDING GRAPH
-        // ════════════════════════════════════════════════════════════════
-        navigation<OnboardingGraph>(startDestination = OnboardingCarouselRoute) {
-
-            composable<OnboardingCarouselRoute> {
-                OnboardingCarouselScreen(
-                    onGetStarted = { navController.navigate(AuthGraph) },
-                )
-            }
+        composable<OnboardingCarouselRoute> {
+            OnboardingCarouselScreen(
+                onGetStarted = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo<OnboardingCarouselRoute> { inclusive = true }
+                    }
+                }
+            )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // AUTH GRAPH
-        // ════════════════════════════════════════════════════════════════
-        navigation<AuthGraph>(startDestination = LoginRoute) {
-
-            composable<LoginRoute> {
-                LoginScreen(
-                    onLoginSuccess    = {
-                        navController.navigate(HomeGraph) {
-                            popUpTo<AuthGraph> { inclusive = true }
-                        }
-                    },
-                    onNewUserDetected = { navController.navigate(HealthProfileSetupRoute) },
-                    onNavigateToRegister = { navController.navigate(RegisterRoute) },
-                )
-            }
-
-            composable<RegisterRoute> {
-                RegisterScreen(
-                    onNavigateBack         = { navController.popBackStack() },
-                    onRegisterSuccess      = { navController.navigate(HealthProfileSetupRoute) },
-                )
-            }
-
-            composable<HealthProfileSetupRoute> {
-                HealthProfileSetupScreen(
-                    onProfileSaved         = { navController.navigate(FamilyProfileSetupRoute) },
-                )
-            }
-
-            composable<FamilyProfileSetupRoute> {
-                FamilyProfileSetupScreen(
-                    onComplete             = {
-                        navController.navigate(HomeGraph) {
-                            popUpTo<AuthGraph> { inclusive = true }
-                        }
-                    },
-                )
-            }
+        composable<LoginRoute> {
+            LoginScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToRegister = { navController.navigate(RegisterRoute) },
+            )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // HOME GRAPH
-        // ════════════════════════════════════════════════════════════════
-        navigation<HomeGraph>(startDestination = HomeRoute) {
-
-            composable<HomeRoute> {
-                HomeScreen(
-                    onNavigateToScan    = { navController.navigate(CameraScanRoute) },
-                    onNavigateToReceipt = { navController.navigate(ReceiptCaptureRoute) },
-                    onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                    onNavigateToProfile = { navController.navigate(UserProfileRoute) },
-                )
-            }
+        composable<RegisterRoute> {
+            RegisterScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToSignIn = { navController.navigateUp() }
+            )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // SCAN GRAPH
-        // ════════════════════════════════════════════════════════════════
-        navigation<ScanGraph>(startDestination = CameraScanRoute) {
-
-            composable<CameraScanRoute> {
-                CameraScanScreen(
-                    onNavigateBack         = { navController.popBackStack() },
-                    onImageCaptured        = { uri -> navController.navigate(ScanProcessingRoute(uri)) },
-                )
-            }
-
-            composable<ScanProcessingRoute> { backStackEntry ->
-                val route = backStackEntry.toRoute<ScanProcessingRoute>()
-                ScanProcessingScreen(
-                    imageUri               = route.imageUri,
-                    onAnalysisComplete     = { uri ->
-                        navController.navigate(ScanResultRoute(uri)) {
-                            popUpTo<ScanProcessingRoute> { inclusive = true }
-                        }
-                    },
-                    onAnalysisFailed       = { navController.popBackStack() },
-                )
-            }
-
-            composable<ScanResultRoute> { backStackEntry ->
-                val route = backStackEntry.toRoute<ScanResultRoute>()
-                ScanResultScreen(
-                    onNavigateBack                = { navController.popBackStack() },
-                    onNavigateToCameraScreen      = {
-                        navController.navigate(CameraScanRoute) {
-                            popUpTo<ScanResultRoute> { inclusive = true }
-                        }
-                    },
-                    onNavigateToNutriGpt          = { scanResultId ->
-                        navController.navigate(NutriGptRoute(scanResultId))
-                    },
-                    onNavigateToIngredientDetail  = { name ->
-                        navController.navigate(IngredientDetailRoute(name))
-                    },
-                )
-            }
-
-            composable<NutriGptRoute> { backStackEntry ->
-                val route = backStackEntry.toRoute<NutriGptRoute>()
-                NutriGptScreen(
-                    scanResultId   = route.scanResultId,
-                    onNavigateBack = { navController.popBackStack() },
-                )
-            }
-
-            composable<IngredientDetailRoute> { backStackEntry ->
-                val route = backStackEntry.toRoute<IngredientDetailRoute>()
-                IngredientDetailScreen(
-                    ingredientName = route.ingredientName,
-                    onNavigateBack = { navController.popBackStack() },
-                )
-            }
+        composable<HealthProfileSetupRoute> {
+            HealthProfileSetupScreen(
+                onProfileSaved = { navController.navigate(FamilyProfileSetupRoute) }
+            )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // RECEIPT GRAPH
-        // ════════════════════════════════════════════════════════════════
-        navigation<ReceiptGraph>(startDestination = ReceiptCaptureRoute) {
-
-            composable<ReceiptCaptureRoute> {
-                ReceiptCaptureScreen(
-                    onNavigateBack       = { navController.popBackStack() },
-                    onReceiptCaptured    = { uri -> navController.navigate(ReceiptResultRoute(uri)) },
-                )
-            }
-
-            composable<ReceiptResultRoute> { backStackEntry ->
-                val route = backStackEntry.toRoute<ReceiptResultRoute>()
-                ReceiptResultScreen(
-                    receiptImageUri             = route.receiptImageUri,
-                    onNavigateBack              = { navController.popBackStack() },
-                    onNavigateToIngredientDetail = { name ->
-                        navController.navigate(IngredientDetailRoute(name))
-                    },
-                )
-            }
+        composable<FamilyProfileSetupRoute> {
+            FamilyProfileSetupScreen(
+                onComplete = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
+                    }
+                }
+            )
         }
 
-        // ════════════════════════════════════════════════════════════════
-        // HISTORY / REPORT / SHOPPING / SETTINGS — follow same pattern
-        // ════════════════════════════════════════════════════════════════
+        composable<HomeRoute> {
+            HomeScreen(
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToReceipt = { navController.navigate(ReceiptCaptureRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) }
+            )
+        }
+
+        composable<CameraScanRoute> {
+            CameraScanScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onImageCaptured = { uri -> navController.navigate(ScanProcessingRoute(uri)) }
+            )
+        }
+
+        composable<ScanProcessingRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ScanProcessingRoute>()
+            ScanProcessingScreen(
+                imageUri = route.imageUri,
+                onAnalysisComplete = { uri ->
+                    navController.navigate(ScanResultRoute(uri)) {
+                        popUpTo<ScanProcessingRoute> { inclusive = true }
+                    }
+                },
+                onAnalysisFailed = { navController.popBackStack() }
+            )
+        }
+
+        composable<ScanResultRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ScanResultRoute>()
+            ScanResultScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToCameraScreen = {
+                    navController.navigate(CameraScanRoute) {
+                        popUpTo<ScanResultRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToNutriGpt = { scanResultId ->
+                    navController.navigate(NutriGptRoute(scanResultId))
+                },
+                onNavigateToIngredientDetail = { name ->
+                    navController.navigate(IngredientDetailRoute(name))
+                }
+            )
+        }
+
+        composable<NutriGptRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<NutriGptRoute>()
+            NutriGptScreen(
+                scanResultId = route.scanResultId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<IngredientDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<IngredientDetailRoute>()
+            IngredientDetailScreen(
+                ingredientName = route.ingredientName,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<ReceiptCaptureRoute> {
+            ReceiptCaptureScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onReceiptCaptured = { uri -> navController.navigate(ReceiptResultRoute(uri)) }
+            )
+        }
+
+        composable<ReceiptResultRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ReceiptResultRoute>()
+            ReceiptResultScreen(
+                receiptImageUri = route.receiptImageUri,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToIngredientDetail = { name ->
+                    navController.navigate(IngredientDetailRoute(name))
+                }
+            )
+        }
+
+        // Remaining routes (history, shopping, settings, etc.) follow the same flat pattern.
     }
 }
 ```
@@ -1325,8 +1283,8 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 | Navigation files                                  | Exactly two: `Route.kt` and `NavGraph.kt` — no others                              |
 | Argument passing                                  | IDs and primitive strings only via typed route — never pass domain objects          |
 | NavController in ViewModel                        | NEVER — emit `Effect` → collect in screen → call navController                     |
-| Cross-graph navigation                            | Navigate to the graph root (e.g. `navController.navigate(SettingsGraph)`)           |
-| Back-stack clearing on auth success               | `popUpTo<AuthGraph> { inclusive = true }` when entering `HomeGraph`                 |
+| Flat Single Graph                                 | Define all routes in a single flat AppNavGraph. Nested graphs are forbidden.        |
+| Back-stack clearing on auth success               | `popUpTo<LoginRoute> { inclusive = true }` when entering `HomeRoute`                |
 | Scan processing back-stack                        | `popUpTo<ScanProcessingRoute> { inclusive = true }` when navigating to Result       |
 | Image URIs in routes                              | Pass as `String` in the route data class — never pass `Uri` directly               |
 
