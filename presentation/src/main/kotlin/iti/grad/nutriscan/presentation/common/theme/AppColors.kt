@@ -78,6 +78,11 @@ data class AppColors(
     val HealthSubtitleColor: Color,
     val GreetingTitleColor: Color,
     val WaterDropIconTint: Color,
+    val HistoryItemTitleColor: Color,
+    val VerdictGreenBadgeColor: Color,
+    val VerdictCyanBadgeColor: Color,
+    val VerdictRedWarningIconTint: Color,
+    val HistoryItemDateColor: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -141,11 +146,16 @@ fun lightColors() = AppColors(
     SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
     SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
     BottomNavBarBackground = Color(0xFF17B8BE), // Teal800
-    VerdictRedBackground = Color(0xFFD32F2F).copy(alpha = 0.15f),
+    VerdictRedBackground = Color(0xFFD32F2F).copy(alpha = 0.12f),
     VerdictRedText = Color(0xFFD32F2F),
     HealthSubtitleColor = Color(0xFF0B5F65), // PrimaryVariant
     GreetingTitleColor = Color(0xFF17B8BE), // Teal800
     WaterDropIconTint = Color(0xFF0B5F65), // PrimaryVariant
+    HistoryItemTitleColor = Color(0xFF0B5F65), // PrimaryVariant
+    VerdictGreenBadgeColor = Color(0xFF13A4AB), // Primary
+    VerdictCyanBadgeColor = Color(0xFF13A4AB), // Primary
+    VerdictRedWarningIconTint = Color(0xFFF9A825), // VerdictYellow
+    HistoryItemDateColor = Color(0xFF898989), // Gray700
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -209,9 +219,14 @@ fun darkColors() = AppColors(
     SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
     SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode
     BottomNavBarBackground = Color(0xFF0B5F65), // Surface in dark mode
-    VerdictRedBackground = Color(0xFFFF80AB), // Pink
+    VerdictRedBackground = Color(0xFFFF80AB), // Solid pink in dark mode
     VerdictRedText = Color(0xFFFFFFFF), // White for contrast
     HealthSubtitleColor = Color(0xFFA3E9EC), // OnPrimary in dark mode
     GreetingTitleColor = Color(0xFF2FC5CC), // PrimaryVariant in dark mode
     WaterDropIconTint = Color(0xFF81C784), // VerdictGreen in dark mode
+    HistoryItemTitleColor = Color(0xFFE8FAFA), // TextPrimary in dark mode
+    VerdictGreenBadgeColor = Color(0xFF81C784), // VerdictGreen in dark mode
+    VerdictCyanBadgeColor = Color(0xFF2FC5CC), // PrimaryVariant in dark mode
+    VerdictRedWarningIconTint = Color(0xFFFFCA28), // VerdictYellow in dark mode
+    HistoryItemDateColor = Color(0xFFA3E9EC), // Teal400
 )

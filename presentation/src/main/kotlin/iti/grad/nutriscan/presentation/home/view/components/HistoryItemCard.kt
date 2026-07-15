@@ -92,13 +92,13 @@ fun HistoryItemCard(
             Text(
                 text = item.productName,
                 style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.TextPrimary,
+                color = AppTheme.colors.HistoryItemTitleColor,
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = item.scanDate,
                 style = AppTheme.typography.bodyMedium,
-                color = AppTheme.colors.Teal1200,
+                color = AppTheme.colors.HistoryItemDateColor,
             )
         }
 
@@ -113,8 +113,8 @@ private fun VerdictBadge(
     modifier: Modifier = Modifier,
 ) {
     val (badgeColor, iconResId) = when (item.verdictType) {
-        VerdictType.GREEN -> AppTheme.colors.VerdictGreen to R.drawable.ic_verified
-        VerdictType.CYAN -> AppTheme.colors.PrimaryVariant to R.drawable.ic_verified
+        VerdictType.GREEN -> AppTheme.colors.VerdictGreenBadgeColor to R.drawable.ic_verified
+        VerdictType.CYAN -> AppTheme.colors.VerdictCyanBadgeColor to R.drawable.ic_verified
         VerdictType.YELLOW -> AppTheme.colors.VerdictYellow to R.drawable.ic_solid_warning
         VerdictType.RED -> AppTheme.colors.VerdictRed to R.drawable.ic_solid_warning
     }
@@ -126,7 +126,7 @@ private fun VerdictBadge(
         Icon(
             painter = painterResource(iconResId),
             contentDescription = null,
-            tint = badgeColor,
+            tint = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedWarningIconTint else badgeColor,
             modifier = Modifier.size(22.dp),
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -138,6 +138,7 @@ private fun VerdictBadge(
                     else badgeColor.copy(alpha = 0.15f)
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = stringResource(item.verdictLabelResId),
@@ -145,6 +146,7 @@ private fun VerdictBadge(
                 fontWeight = FontWeight.Bold,
                 color = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedText else badgeColor,
                 fontSize = 11.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }
     }
