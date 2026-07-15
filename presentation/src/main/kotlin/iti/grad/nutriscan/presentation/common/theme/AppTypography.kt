@@ -50,7 +50,7 @@ val AppTypography = Typography(
     headlineMedium = TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
+        fontSize = 24.sp,
         lineHeight = 28.sp
     ),
     headlineSmall = TextStyle(
@@ -67,14 +67,14 @@ val AppTypography = Typography(
     ),
     titleMedium = TextStyle(
         fontFamily = LexendDeca,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
         lineHeight = 24.sp
     ),
     titleSmall = TextStyle(
         fontFamily = LexendDeca,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         lineHeight = 20.sp
     ),
     bodyLarge = TextStyle(

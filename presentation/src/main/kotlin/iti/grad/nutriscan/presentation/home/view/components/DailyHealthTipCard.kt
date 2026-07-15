@@ -43,11 +43,11 @@ fun DailyHealthTipCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .shadow(
-                elevation = 32.dp,
+            .customShadow(
                 shape = RoundedCornerShape(22.dp),
-                spotColor = Color.Transparent,
-                ambientColor = AppTheme.colors.Teal200
+                color = AppTheme.colors.Teal200.copy(alpha = 0.2f),
+                blurRadius = 0f,
+                offsetY = 0f
             )
             .border(
                 width = 1.dp,
@@ -71,7 +71,7 @@ fun DailyHealthTipCard(
                 )
             }
             .padding(vertical = 20.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        // verticalAlignment = Alignment.CenterVertically,
     ) {
         // Water drop icon in circle
         Box(
@@ -94,13 +94,13 @@ fun DailyHealthTipCard(
         Column {
             Text(
                 text = stringResource(R.string.home_daily_tip_title),
-                style = AppTheme.typography.titleMedium,
+                style = AppTheme.typography.titleSmall,
                 color = AppTheme.colors.Teal800,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.home_daily_tip_body),
-                style = AppTheme.typography.titleMedium,
+                style = AppTheme.typography.titleSmall,
                 color = AppTheme.colors.PrimaryVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

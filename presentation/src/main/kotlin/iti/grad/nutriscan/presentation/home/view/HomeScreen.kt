@@ -126,7 +126,7 @@ private fun HomeFeedContent(
                 .fillMaxSize()
                 .background(AppTheme.colors.Background)
                 .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             // ── Greeting Header ──
             item {
@@ -134,6 +134,7 @@ private fun HomeFeedContent(
                     userName = state.userName,
                     onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
                 )
+                Spacer(modifier = Modifier.height(6.dp))
             }
 
             // ── Daily Health Tip ──
@@ -143,7 +144,7 @@ private fun HomeFeedContent(
 
             // ── Scan Ready Card ──
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 ScanReadyCard(
                     onClick = { onEvent(HomeEvent.ScanCardClicked) },
                 )
@@ -151,7 +152,7 @@ private fun HomeFeedContent(
 
             // ── Recent History Header ──
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -176,6 +177,7 @@ private fun HomeFeedContent(
                         ),
                     )
                 }
+                Spacer(modifier = Modifier.height(6.dp))
             }
 
             // ── History Items ──

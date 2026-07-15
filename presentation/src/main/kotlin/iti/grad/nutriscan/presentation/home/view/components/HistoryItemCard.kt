@@ -46,11 +46,11 @@ fun HistoryItemCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .shadow(
-                elevation = 24.dp,
+            .customShadow(
                 shape = RoundedCornerShape(22.dp),
-                ambientColor = AppTheme.colors.Primary.copy(alpha = 0.6f),
-                spotColor = AppTheme.colors.Primary.copy(alpha = 0.6f)
+                color = AppTheme.colors.Primary.copy(alpha = 0.2f),
+                blurRadius = 60f,
+                offsetY = 0f
             )
             .clip(RoundedCornerShape(22.dp))
             .background(AppTheme.colors.Surface)
@@ -69,14 +69,14 @@ fun HistoryItemCard(
                 contentDescription = null,
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(68.dp)
                     .clip(CircleShape)
                     .background(AppTheme.colors.Divider)
             )
         } else {
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(68.dp)
                     .clip(CircleShape)
                     .background(AppTheme.colors.Divider),
                 contentAlignment = Alignment.Center,
@@ -85,7 +85,7 @@ fun HistoryItemCard(
             }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.dp))
 
         // Product name + date
         Column(modifier = Modifier.weight(1f)) {

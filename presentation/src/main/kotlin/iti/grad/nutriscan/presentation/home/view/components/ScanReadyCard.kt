@@ -45,11 +45,11 @@ fun ScanReadyCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .shadow(
-                elevation = 40.dp,
+            .customShadow(
                 shape = RoundedCornerShape(21.dp),
-                spotColor = AppTheme.colors.Teal700.copy(alpha = 0.7f),
-                ambientColor = AppTheme.colors.Teal700.copy(alpha = 0.7f),
+                color = AppTheme.colors.Teal700.copy(alpha = 0.3f),
+                blurRadius = 100f,
+                offsetY = 0f
             )
             .background(AppTheme.colors.Surface, RoundedCornerShape(21.dp))
             .drawBehind {
@@ -57,9 +57,9 @@ fun ScanReadyCard(
                     color = borderColor,
                     cornerRadius = CornerRadius(21.dp.toPx()),
                     style = Stroke(
-                        width = 4.dp.toPx(),
+                        width = 2.dp.toPx(),
                         pathEffect = PathEffect.dashPathEffect(
-                            intervals = floatArrayOf(15.dp.toPx(), 10.dp.toPx()),
+                            intervals = floatArrayOf(7.5f.dp.toPx(), 5.dp.toPx()),
                             phase = 0f,
                         ),
                     ),

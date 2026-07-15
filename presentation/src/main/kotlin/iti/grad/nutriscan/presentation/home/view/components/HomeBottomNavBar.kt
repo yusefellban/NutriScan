@@ -12,17 +12,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,23 +44,26 @@ fun HomeBottomNavBar(
     onTabClick: (BottomNavTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val curveShape = BottomNavCurveShape(cornerRadius = 60f, cutoutRadius = 140f)
+    val fabShape = RoundedCornerShape(16.dp)
+
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        // Background bar
+        // Background bar with custom top shadow
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .shadow(
-                    elevation = 100.dp,
-                    shape = BottomNavCurveShape(cornerRadius = 60f, cutoutRadius = 140f),
-                    ambientColor = AppTheme.colors.Primary.copy(alpha = 0.8f),
-                    spotColor = Color.Transparent
+                .customShadow(
+                    shape = curveShape,
+                    color = AppTheme.colors.Primary.copy(alpha = 0.5f),
+                    blurRadius = 70f,
+                    offsetY = -10f
                 )
-                .clip(BottomNavCurveShape(cornerRadius = 60f, cutoutRadius = 140f))
-                .background(AppTheme.colors.Primary)
+                .clip(curveShape)
+                .background(AppTheme.colors.Teal800)
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -100,18 +106,12 @@ fun HomeBottomNavBar(
             }
         }
 
-        // Floating center Scan FAB
+        // Floating center Scan FAB with custom top shadow
         Box(
             modifier = Modifier
-                .offset(y = (-40).dp)
+                .offset(y = (-44).dp)
                 .size(64.dp)
-                .shadow(
-                    elevation = 140.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    spotColor = Color.Transparent,
-                    ambientColor = AppTheme.colors.Primary.copy(alpha = 0.6f)
-                )
-                .clip(RoundedCornerShape(16.dp))
+                .clip(fabShape)
                 .background(AppTheme.colors.PrimaryVariant)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -159,3 +159,4 @@ private fun NavBarItem(
         )
     }
 }
+
