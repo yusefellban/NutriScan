@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.components.AuthActionButton
+import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.onboarding.carousel.state.OnboardingCarouselEffect
@@ -169,7 +169,7 @@ fun OnboardingCarouselScreen(
             R.string.onboarding_next
         }
 
-        AuthActionButton(
+        AppButton (
             textResId = buttonTextRes,
             isLoading = false,
             onClick = {

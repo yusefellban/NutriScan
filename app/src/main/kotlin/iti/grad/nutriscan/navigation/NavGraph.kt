@@ -32,9 +32,9 @@ fun AppNavGraph(
         // 1. Splash Screen
         composable<SplashRoute> {
             SplashScreen(
-                onNavigateToHome = {
-                    navController.navigate(OnboardingCarouselRoute)
-                },
+//                onNavigateToHome = {
+//                    navController.navigate(OnboardingCarouselRoute)
+//                },
                 onNavigateToOnboarding = {
                     navController.navigate(OnboardingRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
