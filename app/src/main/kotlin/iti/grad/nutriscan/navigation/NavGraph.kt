@@ -15,8 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
+import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
-import iti.grad.nutriscan.presentation.home.HomeScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -134,7 +134,26 @@ fun AppNavGraph(
 
         // 7. Home Screen
         composable<HomeRoute> {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToScan = {
+                    navController.navigate(CameraScanRoute)
+                },
+                onNavigateToHistory = {
+                    navController.navigate(ScanHistoryRoute)
+                },
+                onNavigateToShopping = {
+                    navController.navigate(ShoppingListRoute)
+                },
+                onNavigateToProfile = {
+                    navController.navigate(UserProfileRoute)
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(NotificationSettingsRoute)
+                },
+                onNavigateToScanResult = { scanId ->
+                    navController.navigate(ScanResultRoute(scanId))
+                },
+            )
         }
 
         // 8. Camera Scan (Placeholder)

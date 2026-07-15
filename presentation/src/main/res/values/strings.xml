@@ -16,6 +16,26 @@
     <string name="login_title">Welcome Back!</string>
     <string name="action_sign_in">Sign In</string>
     <string name="prompt_no_account">Don\'t have an account? Sign Up.</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">Hello, %1$s!</string>
+    <string name="home_subtitle">Your Health Comes First</string>
+    <string name="home_daily_tip_title">Daily Health Tip</string>
+    <string name="home_daily_tip_body">Stay hydrated! Drink at least\n8 glasses of water today.</string>
+    <string name="home_ready_to_scan">Ready to scan?</string>
+    <string name="home_scan_subtitle">Check nutritional facts instantly</string>
+    <string name="home_recent_history">Recent History</string>
+    <string name="home_view_all">View All</string>
+    <string name="verdict_healthy">HEALTHY</string>
+    <string name="verdict_probiotic">PROBIOTIC</string>
+    <string name="verdict_high_sugar">HIGH\nSUGAR</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_scan">Scan</string>
+    <string name="nav_shopping">Shopping</string>
+    <string name="nav_profile">Profile</string>
     <string name="forgot_password_title">Forgot Password?</string>
     <string name="forgot_password_subtitle">Then let\'s submit password reset.</string>
     <string name="reset_method_email">Send via Email</string>
