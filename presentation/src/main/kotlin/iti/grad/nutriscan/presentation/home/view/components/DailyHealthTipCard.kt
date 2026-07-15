@@ -78,7 +78,7 @@ fun DailyHealthTipCard(
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.Teal200),
+                .background(Color(0xFFD4F1F2)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(

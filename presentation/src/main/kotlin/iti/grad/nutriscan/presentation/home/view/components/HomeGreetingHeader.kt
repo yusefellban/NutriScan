@@ -76,8 +76,6 @@ fun HomeGreetingHeader(
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .clip(CircleShape)
-                .background(AppTheme.colors.Teal100)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

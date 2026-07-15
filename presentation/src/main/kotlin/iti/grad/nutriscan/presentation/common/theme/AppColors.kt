@@ -137,18 +137,18 @@ fun lightColors() = AppColors(
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
 fun darkColors() = AppColors(
-    // Teal palette — unchanged (brand colors don't shift in dark mode)
+    // Teal palette — customized to invert hardcoded component usage in dark mode
     Teal100 = Color(0xFFE8FAFA),
-    Teal200 = Color(0xFFD4F1F2),
+    Teal200 = Color(0xFF2FC5CC), // Mapped to Teal700 to provide glowing shadows/badges
     Teal300 = Color(0xFFCAF2F4),
     Teal400 = Color(0xFFA3E9EC),
     Teal500 = Color(0xFF75DEE3),
     Teal600 = Color(0xFF47D3D9),
     Teal700 = Color(0xFF2FC5CC),
-    Teal800 = Color(0xFF17B8BE),
+    Teal800 = Color(0xFFE8FAFA), // Mapped to Teal100 for primary headers
     Teal900 = Color(0xFF15AEB4),
     Teal1000 = Color(0xFF13A4AB),
-    Teal1200 = Color(0xFF11939A),
+    Teal1200 = Color(0xFFA3E9EC), // Mapped to Teal400 for secondary text
     Teal1300 = Color(0xFF108188),
     Teal1400 = Color(0xFF0B5F65),
     Teal1500 = Color(0xFF0A545A),
@@ -170,20 +170,20 @@ fun darkColors() = AppColors(
     Gray1500 = Color(0xFF535051),
     Gray1600 = Color(0xFF393C3C),
     // Semantic — inverted for dark
-    Primary = Color(0xFF2FC5CC),            // Teal700 — slightly lighter for dark surfaces
-    PrimaryVariant = Color(0xFF13A4AB),     // Teal1000
+    Primary = Color(0xFF0B5F65),            // Teal1400 — for Nav bar and cards
+    PrimaryVariant = Color(0xFF2FC5CC),     // Teal700 — for Scan FAB and accented text
     Accent = Color(0xFF75DEE3),             // Teal500
-    Background = Color(0xFF0F1A1A),         // Very dark teal-tinted black
-    Surface = Color(0xFF162222),            // Dark teal-tinted surface
-    SurfaceVariant = Color(0xFF1D2E2E),     // Slightly lighter dark surface
-    OnPrimary = Color(0xFF0F1A1A),          // Dark text on teal buttons
+    Background = Color(0xFF0F474A),         // Teal1600 — background
+    Surface = Color(0xFF0B5F65),            // Teal1400 — surface
+    SurfaceVariant = Color(0xFF0A545A),     // Teal1500 — surface variant
+    OnPrimary = Color(0xFFA3E9EC),          // Teal400 — light icons
     TextPrimary = Color(0xFFE8FAFA),        // Teal100 — very light text
     TextSecondary = Color(0xFFA6A5A5),      // Gray600
-    Divider = Color(0xFF1D2E2E),
+    Divider = Color(0xFF0F474A),
     // Verdicts — slightly lighter for dark backgrounds
-    VerdictGreen = Color(0xFF4CAF50),
+    VerdictGreen = Color(0xFF81C784),
     VerdictYellow = Color(0xFFFFCA28),
-    VerdictRed = Color(0xFFEF5350),
+    VerdictRed = Color(0xFFFF80AB),
     Warning = Color(0xFFFFAD33),
     Error = Color(0xFFFF6B7A),
     ErrorBackground = Color(0xFF2A1215),

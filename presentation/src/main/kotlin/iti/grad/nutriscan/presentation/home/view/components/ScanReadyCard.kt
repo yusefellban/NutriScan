@@ -88,6 +88,7 @@ fun ScanReadyCard(
             fontWeight = FontWeight.Bold,
             color = AppTheme.colors.PrimaryVariant,
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.home_scan_subtitle),
             style = AppTheme.typography.titleSmall,

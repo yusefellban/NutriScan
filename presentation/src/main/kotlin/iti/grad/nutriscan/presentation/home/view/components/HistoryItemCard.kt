@@ -92,7 +92,7 @@ fun HistoryItemCard(
             Text(
                 text = item.productName,
                 style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.PrimaryVariant,
+                color = AppTheme.colors.TextPrimary,
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
@@ -114,7 +114,7 @@ private fun VerdictBadge(
 ) {
     val (badgeColor, iconResId) = when (item.verdictType) {
         VerdictType.GREEN -> AppTheme.colors.VerdictGreen to R.drawable.ic_verified
-        VerdictType.CYAN -> AppTheme.colors.Primary to R.drawable.ic_verified
+        VerdictType.CYAN -> AppTheme.colors.PrimaryVariant to R.drawable.ic_verified
         VerdictType.YELLOW -> AppTheme.colors.VerdictYellow to R.drawable.ic_solid_warning
         VerdictType.RED -> AppTheme.colors.VerdictRed to R.drawable.ic_solid_warning
     }
