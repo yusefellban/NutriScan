@@ -30,4 +30,15 @@
     <string name="password_sent_title">Password Sent!</string>
     <string name="password_sent_subtitle">We\'ve sent the password to %1$s</string>
     <string name="action_resend_code">Resend code</string>
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Scan Food Labels Instantly</string>
+    <string name="onboarding_desc_1">Point your camera at any food label and let AI read even the smallest Arabic and English ingredients in seconds.</string>
+    <string name="onboarding_title_2">Know What\'s Safe for You</string>
+    <string name="onboarding_desc_2">Get a personalized safety rating based on your allergies and health conditions, with simple explanations you can trust.</string>
+    <string name="onboarding_title_3">Shop with Confidence</string>
+    <string name="onboarding_desc_3">Discover healthier alternatives, avoid hidden risks, and make smarter food choices every time you shop.</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_lets_start">Let\'s Start</string>
+    <string name="onboarding_skip">SKIP</string>
+    <string name="onboarding_back">BACK</string>
 </resources>

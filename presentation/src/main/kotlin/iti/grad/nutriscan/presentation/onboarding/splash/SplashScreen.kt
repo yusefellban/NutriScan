@@ -48,7 +48,7 @@ import android.app.Activity
  *                • White logo: alpha 1→0, scale 1.0→0.9                (1200ms)
  *                • Teal logo:  alpha 0→1, scale 0.9→1.0                (1200ms)
  * t = ~1700ms  background animation settles → AnimationCompleted event sent
- * t = ~2000ms  ViewModel grace delay → NavigateToHome effect emitted
+ * t = ~2000ms  ViewModel checks onboarding state → NavigateToOnboarding or NavigateToLogin
  * ```
  *
  * ## Theme Awareness
@@ -56,11 +56,13 @@ import android.app.Activity
  * [Color.White] used as the initial logo tint before the theme kicks in — which
  * matches the Starting Window (always a teal background in both light and dark).
  *
- * @param onNavigateToHome Lambda invoked when [SplashEffect.NavigateToHome] is received.
+ * @param onNavigateToOnboarding Lambda invoked when [SplashEffect.NavigateToOnboarding] is received.
+ * @param onNavigateToLogin Lambda invoked when [SplashEffect.NavigateToLogin] is received.
  */
 @Composable
 fun SplashScreen(
-    onNavigateToHome: () -> Unit,
+    onNavigateToOnboarding: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -176,7 +178,8 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                SplashEffect.NavigateToHome -> onNavigateToHome()
+                SplashEffect.NavigateToOnboarding -> onNavigateToOnboarding()
+                SplashEffect.NavigateToLogin -> onNavigateToLogin()
             }
         }
     }
@@ -252,7 +255,7 @@ private fun LogoImage(tint: Color) {
 @Composable
 private fun SplashLightPreview() {
     AppTheme(darkTheme = false) {
-        SplashScreen(onNavigateToHome = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {})
     }
 }
 
@@ -260,6 +263,6 @@ private fun SplashLightPreview() {
 @Composable
 private fun SplashDarkPreview() {
     AppTheme(darkTheme = true) {
-        SplashScreen(onNavigateToHome = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {})
     }
 }
