@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
@@ -81,6 +82,7 @@ fun OnboardingPageContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        val colors = AppTheme.colors
         Text(
             text = stringResource(id = titleRes),
             fontFamily = PlusJakartaSans,
@@ -88,7 +90,7 @@ fun OnboardingPageContent(
             fontSize = 28.sp,
             lineHeight = 36.sp,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
+            color = colors.TextPrimary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -114,7 +116,7 @@ fun OnboardingPageContent(
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    color = colors.TextSecondary
                 )
             }
         }

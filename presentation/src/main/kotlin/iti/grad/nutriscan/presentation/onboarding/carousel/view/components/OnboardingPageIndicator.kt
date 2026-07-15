@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,10 +30,11 @@ fun OnboardingPageIndicator(
                 targetValue = if (isSelected) 28.dp else 8.dp,
                 label = "indicator_width"
             )
+            val colors = AppTheme.colors
             val color = if (isSelected) {
-                MaterialTheme.colorScheme.primary
+                colors.Primary
             } else {
-                MaterialTheme.colorScheme.outline
+                colors.Divider
             }
             Box(
                 modifier = Modifier

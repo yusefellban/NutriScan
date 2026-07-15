@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.onboarding.carousel.view
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.components.AuthActionButton
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.onboarding.carousel.state.OnboardingCarouselEffect
 import iti.grad.nutriscan.presentation.onboarding.carousel.state.OnboardingCarouselEvent
@@ -64,11 +66,20 @@ fun OnboardingCarouselScreen(
         }
     }
 
-    val images = listOf(
-        R.drawable.onboarding_1,
-        R.drawable.onboarding_2,
-        R.drawable.onboarding_3
-    )
+    val isDark = isSystemInDarkTheme()
+    val images = if (isDark) {
+        listOf(
+            R.drawable.onboarding_dark_1,
+            R.drawable.onboarding_dark_2,
+            R.drawable.onboarding_dark_3
+        )
+    } else {
+        listOf(
+            R.drawable.onboarding_1,
+            R.drawable.onboarding_2,
+            R.drawable.onboarding_3
+        )
+    }
 
     val titles = listOf(
         R.string.onboarding_title_1,
@@ -82,10 +93,12 @@ fun OnboardingCarouselScreen(
         R.string.onboarding_desc_3
     )
 
+    val colors = AppTheme.colors
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(colors.Background)
             .statusBarsPadding()
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -107,7 +120,7 @@ fun OnboardingCarouselScreen(
                     fontFamily = LexendDeca,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    color = colors.TextSecondary,
                     modifier = Modifier.clickable {
                         viewModel.onEvent(OnboardingCarouselEvent.BackClicked)
                     }
@@ -122,7 +135,7 @@ fun OnboardingCarouselScreen(
                     fontFamily = LexendDeca,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    color = colors.TextSecondary,
                     modifier = Modifier.clickable {
                         viewModel.onEvent(OnboardingCarouselEvent.SkipClicked)
                     }
