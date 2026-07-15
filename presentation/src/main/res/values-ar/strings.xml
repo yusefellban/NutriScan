@@ -16,4 +16,18 @@
     <string name="login_title">مرحباً بعودتك!</string>
     <string name="action_sign_in">تسجيل الدخول</string>
     <string name="prompt_no_account">ليس لديك حساب؟ سجل الآن.</string>
+    <string name="forgot_password_title">نسيت كلمة المرور؟</string>
+    <string name="forgot_password_subtitle">دعنا نقدم طلب إعادة تعيين كلمة المرور.</string>
+    <string name="reset_method_email">إرسال عبر البريد</string>
+    <string name="reset_method_email_desc">إعادة تعيين كلمة المرور عبر البريد الإلكتروني.</string>
+    <string name="reset_method_2fa">إرسال عبر المصادقة الثنائية</string>
+    <string name="reset_method_2fa_desc">إعادة تعيين كلمة المرور عبر المصادقة الثنائية.</string>
+    <string name="reset_method_gauth">إرسال عبر Google Auth</string>
+    <string name="reset_method_gauth_desc">إعادة تعيين كلمة المرور عبر G-Auth.</string>
+    <string name="reset_method_sms">إرسال عبر رسالة نصية</string>
+    <string name="reset_method_sms_desc">إعادة تعيين كلمة المرور عبر رسالة نصية.</string>
+    <string name="action_reset_password">إعادة تعيين كلمة المرور</string>
+    <string name="password_sent_title">تم الإرسال!</string>
+    <string name="password_sent_subtitle">لقد أرسلنا كلمة المرور إلى %1$s</string>
+    <string name="action_resend_code">إعادة إرسال الرمز</string>
 </resources>

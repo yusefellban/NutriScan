@@ -16,4 +16,18 @@
     <string name="login_title">Welcome Back!</string>
     <string name="action_sign_in">Sign In</string>
     <string name="prompt_no_account">Don\'t have an account? Sign Up.</string>
+    <string name="forgot_password_title">Forgot Password?</string>
+    <string name="forgot_password_subtitle">Then let\'s submit password reset.</string>
+    <string name="reset_method_email">Send via Email</string>
+    <string name="reset_method_email_desc">Reset password via email.</string>
+    <string name="reset_method_2fa">Send via 2FA</string>
+    <string name="reset_method_2fa_desc">Reset password via 2FA.</string>
+    <string name="reset_method_gauth">Send via Google Auth</string>
+    <string name="reset_method_gauth_desc">Reset password via G-Auth.</string>
+    <string name="reset_method_sms">Send via SMS</string>
+    <string name="reset_method_sms_desc">Reset password via SMS.</string>
+    <string name="action_reset_password">Reset Password</string>
+    <string name="password_sent_title">Password Sent!</string>
+    <string name="password_sent_subtitle">We\'ve sent the password to %1$s</string>
+    <string name="action_resend_code">Resend code</string>
 </resources>

@@ -71,6 +71,13 @@ data class AppColors(
     val SplashBackground: Color,
     /** The final background color after the splash animation completes. */
     val SplashBackgroundEnd: Color,
+
+    // --- Forgot Password / Auth ---
+    val MethodCardBackground: Color,
+    val MethodCardIconBgUnselected: Color,
+    val MethodCardIconTintUnselected: Color,
+    val AuthDialogBackground: Color,
+    val AuthDialogSubtitle: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -133,6 +140,12 @@ fun lightColors() = AppColors(
     // Splash
     SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
     SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
+    // Forgot Password / Auth
+    MethodCardBackground = Color(0xFFFFFFFF), // White
+    MethodCardIconBgUnselected = Color(0xFFE8FAFA), // Teal100
+    MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
+    AuthDialogBackground = Color(0xFFFFFFFF), // Surface
+    AuthDialogSubtitle = Color(0xFF777777), // Gray800
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -195,4 +208,10 @@ fun darkColors() = AppColors(
     // Splash — starts on the dark teal starting window color
     SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
     SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode
+    // Forgot Password / Auth
+    MethodCardBackground = Color(0xFF0B5F65), // Teal1400
+    MethodCardIconBgUnselected = Color(0xFF108188), // Teal1300
+    MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
+    AuthDialogBackground = Color(0xFF0A545A), // Teal1500
+    AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
 )

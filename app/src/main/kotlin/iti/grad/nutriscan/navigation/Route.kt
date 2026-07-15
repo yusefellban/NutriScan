@@ -15,3 +15,6 @@ object RegisterRoute
 
 @Serializable
 object HomeRoute
+
+@Serializable
+object ForgotPasswordRoute
