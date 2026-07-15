@@ -87,7 +87,16 @@ fun AppNavGraph(
             )
         }
 
-        // 4. Register Screen
+        // 4. Forgot Password Screen
+        composable<ForgotPasswordRoute> {
+            ForgotPasswordScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
                 onNavigateToHome = {
@@ -326,13 +335,6 @@ private fun PlaceholderScreen(
             Button(onClick = onNext) {
                 Text(buttonText)
             }
-        }
-        composable<ForgotPasswordRoute> {
-            ForgotPasswordScreen(
-                onNavigateBack = {
-                    navController.navigateUp()
-                }
-            )
         }
     }
 }
