@@ -16,4 +16,24 @@
     <string name="login_title">مرحباً بعودتك!</string>
     <string name="action_sign_in">تسجيل الدخول</string>
     <string name="prompt_no_account">ليس لديك حساب؟ سجل الآن.</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">مرحباً، %1$s!</string>
+    <string name="home_subtitle">صحتك تأتي أولاً</string>
+    <string name="home_daily_tip_title">نصيحة صحية يومية</string>
+    <string name="home_daily_tip_body">حافظ على ترطيب جسمك! اشرب على الأقل\n٨ أكواب من الماء يومياً.</string>
+    <string name="home_ready_to_scan">جاهز للمسح؟</string>
+    <string name="home_scan_subtitle">تحقق من الحقائق الغذائية فوراً</string>
+    <string name="home_recent_history">السجل الأخير</string>
+    <string name="home_view_all">عرض الكل</string>
+    <string name="verdict_healthy">صحي</string>
+    <string name="verdict_probiotic">بروبيوتيك</string>
+    <string name="verdict_high_sugar">سكر\nعالي</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_history">السجل</string>
+    <string name="nav_scan">مسح</string>
+    <string name="nav_shopping">التسوق</string>
+    <string name="nav_profile">الملف الشخصي</string>
 </resources>
