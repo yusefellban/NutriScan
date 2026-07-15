@@ -30,6 +30,9 @@ object HomeRoute
 object CameraScanRoute
 
 @Serializable
+object ForgotPasswordRoute
+
+@Serializable
 data class ScanProcessingRoute(val imageUri: String)
 
 @Serializable

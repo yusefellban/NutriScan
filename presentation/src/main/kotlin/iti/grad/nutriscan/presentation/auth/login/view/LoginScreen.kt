@@ -37,7 +37,8 @@ import kotlinx.coroutines.flow.collectLatest
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -48,6 +49,7 @@ fun LoginScreen(
             when (effect) {
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
+                is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
                 is LoginEffect.ShowSnackbar -> {
                     val message = effect.messageStr
                         ?: effect.messageResId?.let { context.getString(it) }

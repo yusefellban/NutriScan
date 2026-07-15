@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.home.HomeScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
@@ -79,11 +80,23 @@ fun AppNavGraph(
                 },
                 onNavigateToRegister = {
                     navController.navigate(RegisterRoute)
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigate(ForgotPasswordRoute)
                 }
             )
         }
 
-        // 4. Register Screen
+        // 4. Forgot Password Screen
+        composable<ForgotPasswordRoute> {
+            ForgotPasswordScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
                 onNavigateToHome = {

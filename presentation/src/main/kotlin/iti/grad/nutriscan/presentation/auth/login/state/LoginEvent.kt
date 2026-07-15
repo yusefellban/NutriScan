@@ -9,4 +9,5 @@ sealed interface LoginEvent {
     data object SignInClicked : LoginEvent
     data class SocialLoginClicked(val provider: SocialMediaProvider) : LoginEvent
     data object SignUpClicked : LoginEvent
+    data object ForgotPasswordClicked : LoginEvent
 }
