@@ -16,6 +16,8 @@ import androidx.navigation.toRoute
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
+import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
@@ -31,11 +33,28 @@ fun AppNavGraph(
         // 1. Splash Screen
         composable<SplashRoute> {
             SplashScreen(
-                onNavigateToHome = {
-                    navController.navigate(OnboardingCarouselRoute) {
+//                onNavigateToHome = {
+//                    navController.navigate(OnboardingCarouselRoute)
+//                },
+                onNavigateToOnboarding = {
+                    navController.navigate(OnboardingRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
-                }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable<OnboardingRoute> {
+            OnboardingCarouselScreen(
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(OnboardingRoute) { inclusive = true }
+                    }
+                },
             )
         }
 
@@ -61,11 +80,23 @@ fun AppNavGraph(
                 },
                 onNavigateToRegister = {
                     navController.navigate(RegisterRoute)
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigate(ForgotPasswordRoute)
                 }
             )
         }
 
-        // 4. Register Screen
+        // 4. Forgot Password Screen
+        composable<ForgotPasswordRoute> {
+            ForgotPasswordScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
                 onNavigateToHome = {

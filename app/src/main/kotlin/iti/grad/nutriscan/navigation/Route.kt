@@ -12,6 +12,9 @@ object OnboardingCarouselRoute
 object LoginRoute
 
 @Serializable
+object OnboardingRoute
+
+@Serializable
 object RegisterRoute
 
 @Serializable
@@ -25,6 +28,9 @@ object HomeRoute
 
 @Serializable
 object CameraScanRoute
+
+@Serializable
+object ForgotPasswordRoute
 
 @Serializable
 data class ScanProcessingRoute(val imageUri: String)

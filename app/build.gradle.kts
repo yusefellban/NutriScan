@@ -62,6 +62,8 @@ dependencies {
     
     implementation(project(":presentation"))
     implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation(libs.androidx.datastore.preferences)
     
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

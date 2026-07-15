@@ -83,6 +83,12 @@ data class AppColors(
     val VerdictCyanBadgeColor: Color,
     val VerdictRedWarningIconTint: Color,
     val HistoryItemDateColor: Color,
+    // --- Forgot Password / Auth ---
+    val MethodCardBackground: Color,
+    val MethodCardIconBgUnselected: Color,
+    val MethodCardIconTintUnselected: Color,
+    val AuthDialogBackground: Color,
+    val AuthDialogSubtitle: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -156,6 +162,12 @@ fun lightColors() = AppColors(
     VerdictCyanBadgeColor = Color(0xFF13A4AB), // Primary
     VerdictRedWarningIconTint = Color(0xFFF9A825), // VerdictYellow
     HistoryItemDateColor = Color(0xFF898989), // Gray700
+    // Forgot Password / Auth
+    MethodCardBackground = Color(0xFFFFFFFF), // White
+    MethodCardIconBgUnselected = Color(0xFFE8FAFA), // Teal100
+    MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
+    AuthDialogBackground = Color(0xFFFFFFFF), // Surface
+    AuthDialogSubtitle = Color(0xFF777777), // Gray800
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -229,4 +241,10 @@ fun darkColors() = AppColors(
     VerdictCyanBadgeColor = Color(0xFF2FC5CC), // PrimaryVariant in dark mode
     VerdictRedWarningIconTint = Color(0xFFFFCA28), // VerdictYellow in dark mode
     HistoryItemDateColor = Color(0xFFA3E9EC), // Teal400
+    // Forgot Password / Auth
+    MethodCardBackground = Color(0xFF0B5F65), // Teal1400
+    MethodCardIconBgUnselected = Color(0xFF108188), // Teal1300
+    MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
+    AuthDialogBackground = Color(0xFF0A545A), // Teal1500
+    AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
 )

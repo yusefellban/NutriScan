@@ -36,4 +36,29 @@
     <string name="nav_scan">مسح</string>
     <string name="nav_shopping">التسوق</string>
     <string name="nav_profile">الملف الشخصي</string>
+    <string name="forgot_password_title">نسيت كلمة المرور؟</string>
+    <string name="forgot_password_subtitle">دعنا نقدم طلب إعادة تعيين كلمة المرور.</string>
+    <string name="reset_method_email">إرسال عبر البريد</string>
+    <string name="reset_method_email_desc">إعادة تعيين كلمة المرور عبر البريد الإلكتروني.</string>
+    <string name="reset_method_2fa">إرسال عبر المصادقة الثنائية</string>
+    <string name="reset_method_2fa_desc">إعادة تعيين كلمة المرور عبر المصادقة الثنائية.</string>
+    <string name="reset_method_gauth">إرسال عبر Google Auth</string>
+    <string name="reset_method_gauth_desc">إعادة تعيين كلمة المرور عبر G-Auth.</string>
+    <string name="reset_method_sms">إرسال عبر رسالة نصية</string>
+    <string name="reset_method_sms_desc">إعادة تعيين كلمة المرور عبر رسالة نصية.</string>
+    <string name="action_reset_password">إعادة تعيين كلمة المرور</string>
+    <string name="password_sent_title">تم الإرسال!</string>
+    <string name="password_sent_subtitle">لقد أرسلنا كلمة المرور إلى %1$s</string>
+    <string name="action_resend_code">إعادة إرسال الرمز</string>
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">افحص ملصقات الطعام فوراً</string>
+    <string name="onboarding_desc_1">وجه كاميرتك نحو أي ملصق طعام ودع الذكاء الاصطناعي يقرأ حتى أصغر المكونات باللغتين العربية والإنجليزية في ثوانٍ.</string>
+    <string name="onboarding_title_2">اعرف ما هو آمن لك</string>
+    <string name="onboarding_desc_2">احصل على تقييم سلامة مخصص بناءً على حساسية طعامك وحالتك الصحية، مع تفسيرات بسيطة يمكنك الوثوق بها.</string>
+    <string name="onboarding_title_3">تسوق بثقة</string>
+    <string name="onboarding_desc_3">اكتشف بدائل أكثر صحة، وتجنب المخاطر الخفية، واتخذ خيارات غذائية أكثر ذكاءً في كل مرة تتسوق فيها.</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_lets_start">ابدأ الآن</string>
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_back">رجوع</string>
 </resources>

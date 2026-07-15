@@ -42,6 +42,9 @@ class LoginViewModel @Inject constructor() : ViewModel() {
             is LoginEvent.SignUpClicked -> {
                 viewModelScope.launch { _effect.send(LoginEffect.NavigateToRegister) }
             }
+            is LoginEvent.ForgotPasswordClicked -> {
+                viewModelScope.launch { _effect.send(LoginEffect.NavigateToForgotPassword) }
+            }
         }
     }
 
