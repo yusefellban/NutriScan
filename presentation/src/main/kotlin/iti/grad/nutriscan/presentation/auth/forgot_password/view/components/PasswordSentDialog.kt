@@ -80,8 +80,8 @@ fun PasswordSentDialog(
                         painter = painterResource(R.drawable.ic_password_sent),
                         contentDescription = stringResource(R.string.password_sent_title),
                         modifier = Modifier
-                            .width(220.dp)
-                            .height(200.dp)
+                            .width(260.dp)
+                            .height(240.dp)
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
