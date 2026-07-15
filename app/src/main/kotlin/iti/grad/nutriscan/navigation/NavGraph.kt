@@ -16,6 +16,7 @@ import androidx.navigation.toRoute
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.HomeScreen
+import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
@@ -32,10 +33,27 @@ fun AppNavGraph(
         composable<SplashRoute> {
             SplashScreen(
                 onNavigateToHome = {
-                    navController.navigate(OnboardingCarouselRoute) {
+                    navController.navigate(OnboardingCarouselRoute)
+                },
+                onNavigateToOnboarding = {
+                    navController.navigate(OnboardingRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
-                }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable<OnboardingRoute> {
+            OnboardingCarouselScreen(
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(OnboardingRoute) { inclusive = true }
+                    }
+                },
             )
         }
 
