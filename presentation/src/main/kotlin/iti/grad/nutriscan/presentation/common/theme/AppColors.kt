@@ -69,8 +69,15 @@ data class AppColors(
     // --- Splash specific ---
     /** The starting background color for the Compose splash. Matches the Starting Window exactly. */
     val SplashBackground: Color,
-    /** The final background color after the splash animation completes. */
     val SplashBackgroundEnd: Color,
+
+    // --- Specific Overrides ---
+    val BottomNavBarBackground: Color,
+    val VerdictRedBackground: Color,
+    val VerdictRedText: Color,
+    val HealthSubtitleColor: Color,
+    val GreetingTitleColor: Color,
+    val WaterDropIconTint: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -133,6 +140,12 @@ fun lightColors() = AppColors(
     // Splash
     SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
     SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
+    BottomNavBarBackground = Color(0xFF17B8BE), // Teal800
+    VerdictRedBackground = Color(0xFFD32F2F).copy(alpha = 0.15f),
+    VerdictRedText = Color(0xFFD32F2F),
+    HealthSubtitleColor = Color(0xFF0B5F65), // PrimaryVariant
+    GreetingTitleColor = Color(0xFF17B8BE), // Teal800
+    WaterDropIconTint = Color(0xFF0B5F65), // PrimaryVariant
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -195,4 +208,10 @@ fun darkColors() = AppColors(
     // Splash — starts on the dark teal starting window color
     SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
     SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode
+    BottomNavBarBackground = Color(0xFF0B5F65), // Surface in dark mode
+    VerdictRedBackground = Color(0xFFFF80AB), // Pink
+    VerdictRedText = Color(0xFFFFFFFF), // White for contrast
+    HealthSubtitleColor = Color(0xFFA3E9EC), // OnPrimary in dark mode
+    GreetingTitleColor = Color(0xFF2FC5CC), // PrimaryVariant in dark mode
+    WaterDropIconTint = Color(0xFF81C784), // VerdictGreen in dark mode
 )

@@ -63,12 +63,12 @@ fun HomeGreetingHeader(
             Text(
                 text = stringResource(R.string.home_greeting, userName),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.Teal800,
+                color = AppTheme.colors.GreetingTitleColor,
             )
             Text(
                 text = stringResource(R.string.home_subtitle),
                 style = AppTheme.typography.titleSmall,
-                color = AppTheme.colors.PrimaryVariant,
+                color = AppTheme.colors.HealthSubtitleColor,
             )
         }
 

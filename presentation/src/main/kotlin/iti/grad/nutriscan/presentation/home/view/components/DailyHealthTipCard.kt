@@ -84,7 +84,7 @@ fun DailyHealthTipCard(
             Icon(
                 painter = painterResource(R.drawable.ic_water_dot),
                 contentDescription = null,
-                tint = AppTheme.colors.PrimaryVariant,
+                tint = AppTheme.colors.WaterDropIconTint,
                 modifier = Modifier.size(24.dp),
             )
         }

@@ -133,14 +133,17 @@ private fun VerdictBadge(
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(badgeColor.copy(alpha = 0.15f))
+                .background(
+                    if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedBackground 
+                    else badgeColor.copy(alpha = 0.15f)
+                )
                 .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
             Text(
                 text = stringResource(item.verdictLabelResId),
                 style = AppTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
-                color = badgeColor,
+                color = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedText else badgeColor,
                 fontSize = 11.sp,
             )
         }

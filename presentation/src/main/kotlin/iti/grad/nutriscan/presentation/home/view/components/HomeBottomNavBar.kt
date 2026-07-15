@@ -63,7 +63,7 @@ fun HomeBottomNavBar(
                     offsetY = -10f
                 )
                 .clip(curveShape)
-                .background(AppTheme.colors.Teal800)
+                .background(AppTheme.colors.BottomNavBarBackground)
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,

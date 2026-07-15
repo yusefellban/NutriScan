@@ -78,7 +78,7 @@ fun ScanReadyCard(
         Icon(
             painter = painterResource(R.drawable.ic_qr_scan),
             contentDescription = stringResource(R.string.home_ready_to_scan),
-            tint = AppTheme.colors.PrimaryVariant,
+            tint = AppTheme.colors.HealthSubtitleColor,
             modifier = Modifier.size(48.dp),
         )
         Spacer(modifier = Modifier.height(14.dp))
@@ -86,7 +86,7 @@ fun ScanReadyCard(
             text = stringResource(R.string.home_ready_to_scan),
             style = AppTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = AppTheme.colors.PrimaryVariant,
+            color = AppTheme.colors.HealthSubtitleColor,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
