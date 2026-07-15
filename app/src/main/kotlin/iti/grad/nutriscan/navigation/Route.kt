@@ -11,6 +11,9 @@ object SplashRoute
 object LoginRoute
 
 @Serializable
+object OnboardingRoute
+
+@Serializable
 object RegisterRoute
 
 @Serializable
