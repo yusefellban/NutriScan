@@ -76,6 +76,7 @@ fun OtherInputChip(
     val borderColor = AppTheme.colors.OtherChipBorder
     val textColor = AppTheme.colors.OtherChipText
     val backgroundColor = AppTheme.colors.OtherChipBackground
+    val textUnselectedColor = AppTheme.colors.OtherChipTextUnselected
     
     val focusRequester = remember { FocusRequester() }
 
@@ -166,7 +167,7 @@ fun OtherInputChip(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 ),
-                color = activeColor
+                color = textUnselectedColor
             )
         }
     }

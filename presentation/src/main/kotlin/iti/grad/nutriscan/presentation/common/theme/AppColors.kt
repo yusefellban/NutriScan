@@ -106,6 +106,7 @@ data class AppColors(
     val OtherChipBorder: Color,
     val OtherChipText: Color,
     val OtherChipBackground: Color,
+    val OtherChipTextUnselected: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -202,6 +203,7 @@ fun lightColors() = AppColors(
     OtherChipBorder = Color(0xFFD6D6D5), // Gray400
     OtherChipText = Color(0xFF3E3E3E), // Gray1400
     OtherChipBackground = Color(0xFFFFFFFF), // White
+    OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -298,4 +300,5 @@ fun darkColors() = AppColors(
     OtherChipBorder = Color(0xFF108188), // Teal1300
     OtherChipText = Color(0xFF2FC5CC), // Teal700
     OtherChipBackground = Color(0xFF0B5F65), // Teal1400
+    OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
 )
