@@ -89,6 +89,24 @@ data class AppColors(
     val MethodCardIconTintUnselected: Color,
     val AuthDialogBackground: Color,
     val AuthDialogSubtitle: Color,
+
+    // --- Profile Setup ---
+    val ProfileSetupTitle: Color,
+    val ProfileSetupSubtitle: Color,
+    val ProfileSetupSectionTitle: Color,
+
+    // --- Chips ---
+    val ChipBackgroundSelected: Color,
+    val ChipBackgroundUnselected: Color,
+    val ChipBorderSelected: Color,
+    val ChipBorderUnselected: Color,
+    val ChipTextSelected: Color,
+    val ChipTextUnselected: Color,
+    val OtherChipActive: Color,
+    val OtherChipBorder: Color,
+    val OtherChipText: Color,
+    val OtherChipBackground: Color,
+    val OtherChipTextUnselected: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -168,6 +186,24 @@ fun lightColors() = AppColors(
     MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
     AuthDialogBackground = Color(0xFFFFFFFF), // Surface
     AuthDialogSubtitle = Color(0xFF777777), // Gray800
+    
+    // Profile Setup
+    ProfileSetupTitle = Color(0xFF13A4AB), // Teal1000
+    ProfileSetupSubtitle = Color(0xFF777777), // Gray800
+    ProfileSetupSectionTitle = Color(0xFF545454), // Gray1300
+    
+    // Chips
+    ChipBackgroundSelected = Color(0xFFC0C0C0), // Gray500
+    ChipBackgroundUnselected = Color(0xFFFFFFFF), // White
+    ChipBorderSelected = Color(0xFF898989), // Gray700
+    ChipBorderUnselected = Color(0xFFC0C0C0), // Gray500
+    ChipTextSelected = Color(0xFF3E3E3E), // Gray1400
+    ChipTextUnselected = Color(0xFF3E3E3E), // Gray1400
+    OtherChipActive = Color(0xFF13A4AB), // Teal1000
+    OtherChipBorder = Color(0xFFD6D6D5), // Gray400
+    OtherChipText = Color(0xFF3E3E3E), // Gray1400
+    OtherChipBackground = Color(0xFFFFFFFF), // White
+    OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -247,4 +283,22 @@ fun darkColors() = AppColors(
     MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
     AuthDialogBackground = Color(0xFF0A545A), // Teal1500
     AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
+
+    // Profile Setup
+    ProfileSetupTitle = Color(0xFFE8FAFA), // Teal100
+    ProfileSetupSubtitle = Color(0xFFCAF2F4), // Teal300
+    ProfileSetupSectionTitle = Color(0xFF75DEE3), // Teal500
+    
+    // Chips
+    ChipBackgroundSelected = Color(0xFF13A4AB), // Teal1000
+    ChipBackgroundUnselected = Color(0xFF0B5F65), // Teal1400
+    ChipBorderSelected = Color(0xFF75DEE3), // Teal500
+    ChipBorderUnselected = Color(0xFF108188), // Teal1300
+    ChipTextSelected = Color(0xFF0F474A), // Teal1600
+    ChipTextUnselected = Color(0xFF2FC5CC), // Teal700
+    OtherChipActive = Color(0xFF2FC5CC), // Teal700
+    OtherChipBorder = Color(0xFF108188), // Teal1300
+    OtherChipText = Color(0xFF2FC5CC), // Teal700
+    OtherChipBackground = Color(0xFF0B5F65), // Teal1400
+    OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
 )
