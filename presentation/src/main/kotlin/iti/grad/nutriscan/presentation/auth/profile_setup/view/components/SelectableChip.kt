@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.isSystemInDarkTheme
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
 @Composable
@@ -28,21 +29,21 @@ fun SelectableChip(
     val isDark = isSystemInDarkTheme()
     
     val backgroundColor = if (isSelected) {
-        if (isDark) Color(0xFF13A4AB) else Color(0xFFC0C0C0)
+        AppTheme.colors.ChipBackgroundSelected
     } else {
-        if (isDark) Color(0xFF0B5F65) else Color(0xFFFFFFFF)
+        AppTheme.colors.ChipBackgroundUnselected
     }
     
     val borderColor = if (isSelected) {
-        if (isDark) Color(0xFF75DEE3) else Color(0xFF898989)
+        AppTheme.colors.ChipBorderSelected
     } else {
-        if (isDark) Color(0xFF108188) else Color(0xFFC0C0C0)
+        AppTheme.colors.ChipBorderUnselected
     }
     
     val textColor = if (isSelected) {
-        if (isDark) Color(0xFF0F474A) else Color(0xFF3E3E3E)
+        AppTheme.colors.ChipTextSelected
     } else {
-        if (isDark) Color(0xFF2FC5CC) else Color(0xFF3E3E3E)
+        AppTheme.colors.ChipTextUnselected
     }
 
     Box(
@@ -60,9 +61,10 @@ fun SelectableChip(
     ) {
         Text(
             text = text,
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
+            style = AppTheme.typography.labelLarge.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp
+            ),
             color = textColor
         )
     }

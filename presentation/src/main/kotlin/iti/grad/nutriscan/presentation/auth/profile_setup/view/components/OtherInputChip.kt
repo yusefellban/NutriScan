@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.isSystemInDarkTheme
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
 fun Modifier.dashedBorder(
@@ -71,10 +72,10 @@ fun OtherInputChip(
 ) {
     val isDark = isSystemInDarkTheme()
     
-    val activeColor = if (isDark) Color(0xFF2FC5CC) else Color(0xFF13A4AB)
-    val borderColor = if (isDark) Color(0xFF108188) else Color(0xFFD6D6D5)
-    val textColor = if (isDark) Color(0xFF2FC5CC) else Color(0xFF3E3E3E)
-    val backgroundColor = if (isDark) Color(0xFF0B5F65) else Color(0xFFFFFFFF)
+    val activeColor = AppTheme.colors.OtherChipActive
+    val borderColor = AppTheme.colors.OtherChipBorder
+    val textColor = AppTheme.colors.OtherChipText
+    val backgroundColor = AppTheme.colors.OtherChipBackground
     
     val focusRequester = remember { FocusRequester() }
 
@@ -106,8 +107,7 @@ fun OtherInputChip(
                 keyboardActions = KeyboardActions(
                     onDone = { onSubmit() }
                 ),
-                textStyle = TextStyle(
-                    fontFamily = PlusJakartaSans,
+                textStyle = AppTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     color = textColor
@@ -117,9 +117,10 @@ fun OtherInputChip(
                     if (inputValue.isEmpty()) {
                         Text(
                             text = placeholder,
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
+                            style = AppTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
                             color = textColor.copy(alpha = 0.5f)
                         )
                     }
@@ -161,9 +162,10 @@ fun OtherInputChip(
         ) {
             Text(
                 text = placeholder,
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
+                style = AppTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                ),
                 color = activeColor
             )
         }

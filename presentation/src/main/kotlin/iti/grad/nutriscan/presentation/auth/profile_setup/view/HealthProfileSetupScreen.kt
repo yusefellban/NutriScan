@@ -100,19 +100,13 @@ private fun HealthProfileSetupScreenContent(
     val edgeRes = if (isDark) R.drawable.edge_dark else R.drawable.edge_light
     val heartRes = if (isDark) R.drawable.heart_dark else R.drawable.hearts_light
 
-    // Colors matching Figma requirements
-    val titleColor = if (isDark) Color(0xFFE8FAFA) else Color(0xFF13A4AB)
-    val subtitleColor = if (isDark) Color(0xFFCAF2F4) else Color(0xFF777777)
-    val sectionTitleColor = if (isDark) Color(0xFF75DEE3) else Color(0xFF545454)
-    val backgroundColor = if (isDark) Color(0xFF0F474A) else Color(0xFFFFFFFF)
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 AppSnackbar(message = data.visuals.message)
             }
         },
-        containerColor = backgroundColor
+        containerColor = AppTheme.colors.Background
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -149,11 +143,8 @@ private fun HealthProfileSetupScreenContent(
                 // Title
                 Text(
                     text = stringResource(R.string.profile_setup_title),
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp,
-                    lineHeight = 35.sp,
-                    color = titleColor
+                    style = AppTheme.typography.displaySmall.copy(lineHeight = 35.sp),
+                    color = AppTheme.colors.ProfileSetupTitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -161,11 +152,8 @@ private fun HealthProfileSetupScreenContent(
                 // Subtitle
                 Text(
                     text = stringResource(R.string.profile_setup_subtitle),
-                    fontFamily = LexendDeca,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                    lineHeight = 18.sp,
-                    color = subtitleColor
+                    style = AppTheme.typography.bodyMedium.copy(lineHeight = 18.sp),
+                    color = AppTheme.colors.ProfileSetupSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -173,11 +161,8 @@ private fun HealthProfileSetupScreenContent(
                 // Chronic Conditions Section Title
                 Text(
                     text = stringResource(R.string.profile_setup_chronic_conditions),
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp,
-                    lineHeight = 30.sp,
-                    color = sectionTitleColor
+                    style = AppTheme.typography.headlineMedium.copy(lineHeight = 30.sp),
+                    color = AppTheme.colors.ProfileSetupSectionTitle
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -213,11 +198,8 @@ private fun HealthProfileSetupScreenContent(
                 // Allergies Section Title
                 Text(
                     text = stringResource(R.string.profile_setup_allergies),
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp,
-                    lineHeight = 30.sp,
-                    color = sectionTitleColor
+                    style = AppTheme.typography.headlineMedium.copy(lineHeight = 30.sp),
+                    color = AppTheme.colors.ProfileSetupSectionTitle
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
