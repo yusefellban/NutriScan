@@ -61,4 +61,18 @@
     <string name="onboarding_lets_start">ابدأ الآن</string>
     <string name="onboarding_skip">تخطي</string>
     <string name="onboarding_back">رجوع</string>
+    <!-- Health Profile Setup -->
+    <string name="profile_setup_title">إعداد ملفك الصحي</string>
+    <string name="profile_setup_subtitle">ساعدنا في تخصيص NutriScan ليناسب احتياجاتك الغذائية وحالتك الصحية الخاصة.</string>
+    <string name="profile_setup_chronic_conditions">الأمراض المزمنة</string>
+    <string name="profile_setup_diabetes">السكري</string>
+    <string name="profile_setup_hypertension">ضغط الدم المرتفع</string>
+    <string name="profile_setup_celiac">الداء البطني</string>
+    <string name="profile_setup_allergies">الحساسية</string>
+    <string name="profile_setup_peanuts">الفول السوداني</string>
+    <string name="profile_setup_gluten">الجلوتين</string>
+    <string name="profile_setup_dairy">منتجات الألبان</string>
+    <string name="profile_setup_other">+ أخرى</string>
+    <string name="profile_setup_custom_input_hint">اكتب خياراً مخصصاً...</string>
+    <string name="action_save">حفظ</string>
 </resources>

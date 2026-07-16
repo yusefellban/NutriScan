@@ -61,4 +61,18 @@
     <string name="onboarding_lets_start">Let\'s Start</string>
     <string name="onboarding_skip">SKIP</string>
     <string name="onboarding_back">BACK</string>
+    <!-- Health Profile Setup -->
+    <string name="profile_setup_title">Setup Your Health Profile</string>
+    <string name="profile_setup_subtitle">Help us tailor NutriScan to your specific dietary needs and health conditions.</string>
+    <string name="profile_setup_chronic_conditions">Chronic Conditions</string>
+    <string name="profile_setup_diabetes">Diabetes</string>
+    <string name="profile_setup_hypertension">Hypertension</string>
+    <string name="profile_setup_celiac">Celiac Disease</string>
+    <string name="profile_setup_allergies">Allergies</string>
+    <string name="profile_setup_peanuts">Peanuts</string>
+    <string name="profile_setup_gluten">Gluten</string>
+    <string name="profile_setup_dairy">Dairy</string>
+    <string name="profile_setup_other">+ Other</string>
+    <string name="profile_setup_custom_input_hint">Type custom option...</string>
+    <string name="action_save">Save</string>
 </resources>

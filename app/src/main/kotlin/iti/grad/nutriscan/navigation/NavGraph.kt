@@ -18,6 +18,7 @@ import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
+import iti.grad.nutriscan.presentation.onboarding.profile_setup.view.HealthProfileSetupScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
@@ -100,8 +101,8 @@ fun AppNavGraph(
         composable<RegisterRoute> {
             RegisterScreen(
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(LoginRoute) { inclusive = true }
+                    navController.navigate(HealthProfileSetupRoute) {
+                        popUpTo(RegisterRoute) { inclusive = true }
                     }
                 },
                 onNavigateToSignIn = {
@@ -110,14 +111,15 @@ fun AppNavGraph(
             )
         }
 
-        // 5. Health Profile Setup (Placeholder)
+        // 5. Health Profile Setup
         composable<HealthProfileSetupRoute> {
-            PlaceholderScreen(
-                title = "Health Profile Setup",
-                buttonText = "Save Profile"
-            ) {
-                navController.navigate(FamilyProfileSetupRoute)
-            }
+            HealthProfileSetupScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(HealthProfileSetupRoute) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // 6. Family Profile Setup (Placeholder)
