@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.onboarding.profile_setup.state
+package iti.grad.nutriscan.presentation.auth.profile_setup.state
 
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList

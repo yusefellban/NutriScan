@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.onboarding.profile_setup.state
+package iti.grad.nutriscan.presentation.auth.profile_setup.state
 
 sealed interface HealthProfileSetupEvent {
     data class ToggleCondition(val condition: String) : HealthProfileSetupEvent

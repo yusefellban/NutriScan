@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.onboarding.profile_setup.view.components
+package iti.grad.nutriscan.presentation.auth.profile_setup.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,23 +39,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.isSystemInDarkTheme
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
 fun Modifier.dashedBorder(
     width: Dp,
-    color: Color,
-    cornerRadius: Dp
+    color: Color
 ) = drawBehind {
     val strokeWidthPx = width.toPx()
     val stroke = Stroke(
         width = strokeWidthPx,
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 12f), 0f)
     )
+    val radius = size.height / 2f
     drawRoundRect(
         color = color,
         style = stroke,
-        cornerRadius = CornerRadius(cornerRadius.toPx())
+        cornerRadius = CornerRadius(radius, radius)
     )
 }
 
@@ -71,8 +70,12 @@ fun OtherInputChip(
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
-    val activeColor = if (isDark) AppTheme.colors.PrimaryVariant else AppTheme.colors.Primary
-    val textColor = AppTheme.colors.TextPrimary
+    
+    val activeColor = if (isDark) Color(0xFF2FC5CC) else Color(0xFF13A4AB)
+    val borderColor = if (isDark) Color(0xFF108188) else Color(0xFFD6D6D5)
+    val textColor = if (isDark) Color(0xFF2FC5CC) else Color(0xFF3E3E3E)
+    val backgroundColor = if (isDark) Color(0xFF0B5F65) else Color(0xFFFFFFFF)
+    
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(isEditing) {
@@ -84,10 +87,10 @@ fun OtherInputChip(
     if (isEditing) {
         Row(
             modifier = modifier
-                .clip(RoundedCornerShape(10.dp))
-                .background(AppTheme.colors.Surface)
-                .dashedBorder(1.dp, activeColor, 10.dp)
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .clip(CircleShape)
+                .background(backgroundColor)
+                .dashedBorder(1.dp, borderColor)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BasicTextField(
@@ -149,9 +152,9 @@ fun OtherInputChip(
     } else {
         Box(
             modifier = modifier
-                .clip(RoundedCornerShape(10.dp))
+                .clip(CircleShape)
                 .background(Color.Transparent)
-                .dashedBorder(1.dp, activeColor, 10.dp)
+                .dashedBorder(1.dp, borderColor)
                 .clickable(onClick = onStartEditing)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             contentAlignment = Alignment.Center

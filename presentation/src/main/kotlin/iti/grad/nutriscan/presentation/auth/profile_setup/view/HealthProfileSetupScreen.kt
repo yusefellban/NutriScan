@@ -1,7 +1,8 @@
-package iti.grad.nutriscan.presentation.onboarding.profile_setup.view
+package iti.grad.nutriscan.presentation.auth.profile_setup.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +10,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -26,6 +33,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,12 +50,12 @@ import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupEffect
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupEvent
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupState
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.view.components.OtherInputChip
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.view.components.SelectableChip
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.viewmodel.HealthProfileSetupViewModel
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEffect
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEvent
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupState
+import iti.grad.nutriscan.presentation.auth.profile_setup.view.components.OtherInputChip
+import iti.grad.nutriscan.presentation.auth.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.auth.profile_setup.viewmodel.HealthProfileSetupViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 
@@ -79,7 +89,6 @@ fun HealthProfileSetupScreen(
     )
 }
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun HealthProfileSetupScreenContent(
@@ -91,30 +100,40 @@ private fun HealthProfileSetupScreenContent(
     val edgeRes = if (isDark) R.drawable.edge_dark else R.drawable.edge_light
     val heartRes = if (isDark) R.drawable.heart_dark else R.drawable.hearts_light
 
+    // Colors matching Figma requirements
+    val titleColor = if (isDark) Color(0xFFE8FAFA) else Color(0xFF13A4AB)
+    val subtitleColor = if (isDark) Color(0xFFCAF2F4) else Color(0xFF777777)
+    val sectionTitleColor = if (isDark) Color(0xFF75DEE3) else Color(0xFF545454)
+    val backgroundColor = if (isDark) Color(0xFF0F474A) else Color(0xFFFFFFFF)
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 AppSnackbar(message = data.visuals.message)
             }
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = backgroundColor
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Background SVG Decorations
+            // Heart background SVG decoration in top-left
+            Image(
+                painter = painterResource(heartRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .absolutePadding(left = 22.dp, top = 21.dp)
+                    .size(width = 150.dp, height = 228.dp)
+            )
+
+            // Edge background SVG decoration in top-right
             Image(
                 painter = painterResource(edgeRes),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.TopEnd)
-            )
-
-            Image(
-                painter = painterResource(heartRes),
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.BottomStart)
             )
 
             // Scrollable Content
@@ -124,7 +143,8 @@ private fun HealthProfileSetupScreenContent(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)
             ) {
-                Spacer(modifier = Modifier.height(72.dp))
+                // Downward spacing shift to avoid top status bar overlap
+                Spacer(modifier = Modifier.height(185.dp))
 
                 // Title
                 Text(
@@ -133,7 +153,7 @@ private fun HealthProfileSetupScreenContent(
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 35.sp,
-                    color = AppTheme.colors.TextPrimary
+                    color = titleColor
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -143,20 +163,21 @@ private fun HealthProfileSetupScreenContent(
                     text = stringResource(R.string.profile_setup_subtitle),
                     fontFamily = LexendDeca,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 15.sp,
-                    lineHeight = 22.sp,
-                    color = AppTheme.colors.TextSecondary
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp,
+                    color = subtitleColor
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
 
-                // Chronic Conditions Title
+                // Chronic Conditions Section Title
                 Text(
                     text = stringResource(R.string.profile_setup_chronic_conditions),
                     fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = AppTheme.colors.TextPrimary
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp,
+                    color = sectionTitleColor
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -189,13 +210,14 @@ private fun HealthProfileSetupScreenContent(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Allergies Title
+                // Allergies Section Title
                 Text(
                     text = stringResource(R.string.profile_setup_allergies),
                     fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = AppTheme.colors.TextPrimary
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp,
+                    color = sectionTitleColor
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -226,16 +248,23 @@ private fun HealthProfileSetupScreenContent(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(48.dp))
+                // Spacing to keep content clear of the bottom Save button
+                Spacer(modifier = Modifier.height(120.dp))
+            }
 
-                // Save Action Button
+            // Save Action Button container bottom-aligned
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 36.dp)
+            ) {
                 AppButton(
                     textResId = R.string.action_save,
                     isLoading = state.isLoading,
-                    onClick = { onEvent(HealthProfileSetupEvent.SaveProfile) }
+                    onClick = {
+                        onEvent(HealthProfileSetupEvent.SaveProfile)
+                    }
                 )
-
-                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
@@ -284,4 +313,3 @@ private fun HealthProfileSetupDarkPreview() {
         )
     }
 }
-

@@ -18,7 +18,7 @@ import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.view.HealthProfileSetupScreen
+import iti.grad.nutriscan.presentation.auth.profile_setup.view.HealthProfileSetupScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 

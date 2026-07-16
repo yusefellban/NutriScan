@@ -1,12 +1,12 @@
-package iti.grad.nutriscan.presentation.onboarding.profile_setup.viewmodel
+package iti.grad.nutriscan.presentation.auth.profile_setup.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupEffect
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupEvent
-import iti.grad.nutriscan.presentation.onboarding.profile_setup.state.HealthProfileSetupState
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEffect
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEvent
+import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
