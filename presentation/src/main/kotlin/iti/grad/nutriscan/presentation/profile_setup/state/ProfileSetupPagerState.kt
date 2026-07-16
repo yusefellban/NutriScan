@@ -1,11 +1,16 @@
-package iti.grad.nutriscan.presentation.auth.profile_setup.state
+package iti.grad.nutriscan.presentation.profile_setup.state
 
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
-data class HealthProfileSetupState(
+data class ProfileSetupPagerState(
+    // Pager navigation
+    val currentPage: Int = 0,
+    val pageCount: Int = 5,
+
+    // Health Profile fields (migrated from HealthProfileSetupState)
     val chronicConditions: ImmutableList<String> = persistentListOf(
         "Diabetes",
         "Hypertension",

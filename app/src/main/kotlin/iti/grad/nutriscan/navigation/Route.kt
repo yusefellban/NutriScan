@@ -18,7 +18,7 @@ object OnboardingRoute
 object RegisterRoute
 
 @Serializable
-object HealthProfileSetupRoute
+object ProfileSetupPagerRoute
 
 @Serializable
 object FamilyProfileSetupRoute
