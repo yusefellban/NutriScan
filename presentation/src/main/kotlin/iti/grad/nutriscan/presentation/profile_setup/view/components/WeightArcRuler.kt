@@ -98,8 +98,7 @@ fun WeightArcRuler(
 
             for (w in startWeight..endWeight) {
                 val deltaKg = w - currentWeightDouble
-                val angleRad = centerAngleRad + Math.toRadians(deltaKg * degreesPerKg).toFloat()
-
+                val angleRad = centerAngleRad - Math.toRadians(deltaKg * degreesPerKg).toFloat()
                 val tickBaseX = centerX + radius * cos(angleRad)
                 val tickBaseY = arcCenterY - radius * sin(angleRad)
 
@@ -109,7 +108,6 @@ fun WeightArcRuler(
                 val waveFactor = fraction * fraction
 
                 val isMajor = w % 10 == 0
-//                val baseTickLength = if (isMajor) 28.dp.toPx() else 14.dp.toPx()
                 val baseTickLength = if (isMajor) 42.dp.toPx() else 24.dp.toPx()
 
                 val tickLength = baseTickLength * (0.7f + 0.3f * waveFactor)
@@ -121,7 +119,6 @@ fun WeightArcRuler(
                 // Radial tick direction (pointing inward toward arc center)
                 val dirX = cos(angleRad)
                 val dirY = -sin(angleRad)
-
                 drawLine(
                     color = tickColor,
                     start = Offset(tickBaseX, tickBaseY),
