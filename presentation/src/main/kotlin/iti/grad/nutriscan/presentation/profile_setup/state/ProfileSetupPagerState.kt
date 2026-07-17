@@ -4,11 +4,18 @@ import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+enum class Gender {
+    FEMALE, MALE
+}
+
 @Immutable
 data class ProfileSetupPagerState(
     // Pager navigation
     val currentPage: Int = 0,
     val pageCount: Int = 5,
+
+    // Page 1: Gender
+    val selectedGender: Gender? = null,
 
     // Health Profile fields (migrated from HealthProfileSetupState)
     val chronicConditions: ImmutableList<String> = persistentListOf(

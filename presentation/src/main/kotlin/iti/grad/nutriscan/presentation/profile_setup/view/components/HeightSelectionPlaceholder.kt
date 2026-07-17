@@ -57,7 +57,7 @@ fun HeightSelectionPlaceholder(
             fontWeight = FontWeight.Normal,
             fontSize = 14.sp,
             lineHeight = 20.sp,
-            color = AppTheme.colors.TextSecondary
+            color = AppTheme.colors.ProfileSetupSubtitle
         )
 
         Spacer(modifier = Modifier.height(48.dp))

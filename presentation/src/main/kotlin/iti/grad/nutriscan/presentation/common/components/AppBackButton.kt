@@ -24,8 +24,8 @@ import iti.grad.presentation.R
 fun AppBackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconTint: Color = AppTheme.colors.OnPrimary,
-    borderColor: Color = AppTheme.colors.OnPrimary
+    iconTint: Color = AppTheme.colors.Teal1000,
+    borderColor: Color = AppTheme.colors.Teal1000
 ) {
     Box(
         modifier = modifier

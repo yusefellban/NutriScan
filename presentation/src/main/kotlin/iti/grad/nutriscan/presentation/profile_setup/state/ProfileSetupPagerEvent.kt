@@ -6,6 +6,9 @@ sealed interface ProfileSetupPagerEvent {
     data object BackClicked : ProfileSetupPagerEvent
     data class PageChanged(val page: Int) : ProfileSetupPagerEvent
 
+    // Page 1: Gender
+    data class SelectGender(val gender: Gender) : ProfileSetupPagerEvent
+
     // Health Profile events (migrated from HealthProfileSetupEvent)
     data class ToggleCondition(val condition: String) : ProfileSetupPagerEvent
     data class ToggleAllergy(val allergy: String) : ProfileSetupPagerEvent

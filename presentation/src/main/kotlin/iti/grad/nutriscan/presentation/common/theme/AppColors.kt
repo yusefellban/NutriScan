@@ -107,6 +107,20 @@ data class AppColors(
     val OtherChipText: Color,
     val OtherChipBackground: Color,
     val OtherChipTextUnselected: Color,
+
+    // --- Gender Selection ---
+    val GenderFemaleCardBackground: Color,
+    val GenderFemaleCardText: Color,
+    val GenderMaleCardBackground: Color,
+    val GenderMaleCardText: Color,
+
+    // --- Page Indicator ---
+    val PageIndicatorCurrent: Color,
+    val PageIndicatorTotal: Color,
+
+    // --- Progress Button ---
+    val ProgressTrackColor: Color,
+    val ProgressFillColor: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -189,7 +203,7 @@ fun lightColors() = AppColors(
     
     // Profile Setup
     ProfileSetupTitle = Color(0xFF13A4AB), // Teal1000
-    ProfileSetupSubtitle = Color(0xFF777777), // Gray800
+    ProfileSetupSubtitle = Color(0xFF898989), // Gray700
     ProfileSetupSectionTitle = Color(0xFF545454), // Gray1300
     
     // Chips
@@ -204,6 +218,20 @@ fun lightColors() = AppColors(
     OtherChipText = Color(0xFF3E3E3E), // Gray1400
     OtherChipBackground = Color(0xFFFFFFFF), // White
     OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
+    
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFFFDE8E8), // Red100 equivalent
+    GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -286,7 +314,7 @@ fun darkColors() = AppColors(
 
     // Profile Setup
     ProfileSetupTitle = Color(0xFFE8FAFA), // Teal100
-    ProfileSetupSubtitle = Color(0xFFCAF2F4), // Teal300
+    ProfileSetupSubtitle = Color(0xFF108188), // Teal1300
     ProfileSetupSectionTitle = Color(0xFF75DEE3), // Teal500
     
     // Chips
@@ -301,4 +329,18 @@ fun darkColors() = AppColors(
     OtherChipText = Color(0xFF2FC5CC), // Teal700
     OtherChipBackground = Color(0xFF0B5F65), // Teal1400
     OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
+
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
+    GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 )

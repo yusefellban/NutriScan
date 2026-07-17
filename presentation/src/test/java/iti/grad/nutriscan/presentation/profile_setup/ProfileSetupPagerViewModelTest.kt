@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
+import iti.grad.nutriscan.presentation.profile_setup.state.Gender
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
 import iti.grad.nutriscan.presentation.profile_setup.viewmodel.ProfileSetupPagerViewModel
@@ -106,6 +107,19 @@ class ProfileSetupPagerViewModelTest {
         fun `PageChanged updates currentPage in state`() {
             viewModel.onEvent(ProfileSetupPagerEvent.PageChanged(3))
             Assertions.assertEquals(3, viewModel.state.value.currentPage)
+        }
+
+        @Test
+        fun `SelectGender FEMALE updates selectedGender in state`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectGender(Gender.FEMALE))
+            Assertions.assertEquals(Gender.FEMALE, viewModel.state.value.selectedGender)
+        }
+
+        @Test
+        fun `SelectGender MALE replaces previously selected FEMALE`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectGender(Gender.FEMALE))
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectGender(Gender.MALE))
+            Assertions.assertEquals(Gender.MALE, viewModel.state.value.selectedGender)
         }
     }
 
