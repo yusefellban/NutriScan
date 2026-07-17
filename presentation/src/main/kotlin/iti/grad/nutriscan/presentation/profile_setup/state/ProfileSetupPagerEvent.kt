@@ -9,6 +9,9 @@ sealed interface ProfileSetupPagerEvent {
     // Page 1: Gender
     data class SelectGender(val gender: Gender) : ProfileSetupPagerEvent
 
+    // Page 2: Date of Birth
+    data class SelectDateOfBirth(val dateMillis: Long) : ProfileSetupPagerEvent
+
     // Health Profile events (migrated from HealthProfileSetupEvent)
     data class ToggleCondition(val condition: String) : ProfileSetupPagerEvent
     data class ToggleAllergy(val allergy: String) : ProfileSetupPagerEvent

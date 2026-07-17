@@ -85,6 +85,8 @@
     <string name="profile_setup_dob_title_prefix">"تاريخ "</string>
     <string name="profile_setup_dob_title_highlight">ميلادك</string>
     <string name="profile_setup_dob_subtitle">عمرك يساعدنا في تقديم إرشادات غذائية وصحية أكثر دقة.</string>
+    <string name="profile_setup_dob_years">سنة</string>
+    <string name="profile_setup_dob_date_hint">يوم/شهر/سنة</string>
     <string name="profile_setup_height_title_prefix">"ما هو "</string>
     <string name="profile_setup_height_title_highlight">طولك</string>
     <string name="profile_setup_height_title_suffix">؟</string>

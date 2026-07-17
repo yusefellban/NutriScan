@@ -17,6 +17,9 @@ data class ProfileSetupPagerState(
     // Page 1: Gender
     val selectedGender: Gender? = null,
 
+    // Page 2: Date of Birth
+    val selectedDateOfBirthMillis: Long? = null,
+
     // Health Profile fields (migrated from HealthProfileSetupState)
     val chronicConditions: ImmutableList<String> = persistentListOf(
         "Diabetes",

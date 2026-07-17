@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,41 +24,27 @@ import iti.grad.presentation.R
 
 @Composable
 fun HeightSelectionPlaceholder(
+    currentPage: Int,
+    pageCount: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title with highlighted word
-        Text(
-            text = buildAnnotatedString {
-                append(stringResource(R.string.profile_setup_height_title_prefix))
-                withStyle(SpanStyle(color = AppTheme.colors.Primary, fontWeight = FontWeight.Bold)) {
-                    append(stringResource(R.string.profile_setup_height_title_highlight))
-                }
-                append(stringResource(R.string.profile_setup_height_title_suffix))
-            },
-            fontFamily = LexendDeca,
-            fontWeight = FontWeight.Medium,
-            fontSize = 24.sp,
-            lineHeight = 32.sp,
-            color = AppTheme.colors.TextPrimary
-        )
+        Spacer(modifier = Modifier.height(104.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Subtitle
-        Text(
-            text = stringResource(R.string.profile_setup_height_subtitle),
-            fontFamily = LexendDeca,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            color = AppTheme.colors.ProfileSetupSubtitle
+        // Title + Subtitle
+        ProfileSetupHeader(
+            prefixRes = R.string.profile_setup_height_title_prefix,
+            highlightRes = R.string.profile_setup_height_title_highlight,
+            suffixRes = R.string.profile_setup_height_title_suffix,
+            subtitleRes = R.string.profile_setup_height_subtitle,
+            currentPage = currentPage,
+            pageCount = pageCount
         )
 
         Spacer(modifier = Modifier.height(48.dp))

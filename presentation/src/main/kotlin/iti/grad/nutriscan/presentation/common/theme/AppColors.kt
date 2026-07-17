@@ -118,6 +118,15 @@ data class AppColors(
     val PageIndicatorCurrent: Color,
     val PageIndicatorTotal: Color,
 
+    // --- Date of Birth ---
+    val DobCardBackground: Color,
+    val DobAgeBadgeBackground: Color,
+    val DobAgeBadgeText: Color,
+    val DobCardText: Color,
+    val DobInputBorder: Color,
+    val DobInputText: Color,
+    val DobCalendarIcon: Color,
+
     // --- Progress Button ---
     val ProgressTrackColor: Color,
     val ProgressFillColor: Color,
@@ -229,6 +238,15 @@ fun lightColors() = AppColors(
     PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
     PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
 
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFFE5E5E4), // Gray300
+    DobInputText = Color(0xFFA6A5A5), // Gray600
+    DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
+
     // Progress Button
     ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
     ProgressFillColor = Color(0xFF13A4AB), // Teal1000
@@ -339,6 +357,15 @@ fun darkColors() = AppColors(
     // Page Indicator
     PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
     PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFF169098), // Teal1200
+    DobInputText = Color(0xFF169098), // Teal1200
+    DobCalendarIcon = Color(0xFF169098), // Teal1200
 
     // Progress Button
     ProgressTrackColor = Color(0xFF0B5F65), // Teal1400

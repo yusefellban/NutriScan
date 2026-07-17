@@ -85,6 +85,8 @@
     <string name="profile_setup_dob_title_prefix">"Your "</string>
     <string name="profile_setup_dob_title_highlight">Date of birth</string>
     <string name="profile_setup_dob_subtitle">Your age helps us provide more accurate nutrition and health guidance.</string>
+    <string name="profile_setup_dob_years">Years</string>
+    <string name="profile_setup_dob_date_hint">DD/MM/YYYY</string>
     <string name="profile_setup_height_title_prefix">"How "</string>
     <string name="profile_setup_height_title_highlight">tall</string>
     <string name="profile_setup_height_title_suffix">" are you?"</string>

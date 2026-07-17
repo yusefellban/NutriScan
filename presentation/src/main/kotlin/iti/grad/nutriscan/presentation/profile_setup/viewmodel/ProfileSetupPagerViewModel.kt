@@ -42,6 +42,11 @@ class ProfileSetupPagerViewModel @Inject constructor(
                 it.copy(selectedGender = event.gender)
             }
 
+            // Page 2: Date of Birth
+            is ProfileSetupPagerEvent.SelectDateOfBirth -> _state.update {
+                it.copy(selectedDateOfBirthMillis = event.dateMillis)
+            }
+
             // Health Profile events
             is ProfileSetupPagerEvent.ToggleCondition -> toggleCondition(event.condition)
             is ProfileSetupPagerEvent.ToggleAllergy -> toggleAllergy(event.allergy)

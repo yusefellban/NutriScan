@@ -28,7 +28,7 @@ import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
-import iti.grad.nutriscan.presentation.profile_setup.view.components.DateOfBirthPlaceholder
+import iti.grad.nutriscan.presentation.profile_setup.view.components.DateOfBirthPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.GenderSelectionPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfileContent
 import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPlaceholder
@@ -87,12 +87,12 @@ fun ProfileSetupPagerScreen(
                 AppSnackbar(message = data.visuals.message)
             }
         },
-        containerColor = AppTheme.colors.Background
+        containerColor = AppTheme.colors.Background,
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0)
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
         ) {
             // Pager fills the ENTIRE screen
             HorizontalPager(
@@ -103,11 +103,24 @@ fun ProfileSetupPagerScreen(
                 when (page) {
                     0 -> GenderSelectionPage(
                         selectedGender = state.selectedGender,
+                        currentPage = state.currentPage,
+                        pageCount = state.pageCount - 1,
                         onEvent = viewModel::onEvent
                     )
-                    1 -> DateOfBirthPlaceholder()
-                    2 -> HeightSelectionPlaceholder()
-                    3 -> WeightSelectionPlaceholder()
+                    1 -> DateOfBirthPage(
+                        selectedDateMillis = state.selectedDateOfBirthMillis,
+                        currentPage = state.currentPage,
+                        pageCount = state.pageCount - 1,
+                        onEvent = viewModel::onEvent
+                    )
+                    2 -> HeightSelectionPlaceholder(
+                        currentPage = state.currentPage,
+                        pageCount = state.pageCount - 1
+                    )
+                    3 -> WeightSelectionPlaceholder(
+                        currentPage = state.currentPage,
+                        pageCount = state.pageCount - 1
+                    )
                     4 -> HealthProfileContent(
                         state = state,
                         onEvent = viewModel::onEvent
@@ -127,18 +140,6 @@ fun ProfileSetupPagerScreen(
                         .statusBarsPadding()
                         .padding(start = 24.dp, top = 24.dp)
                         .align(Alignment.TopStart)
-                )
-            }
-
-            // Page indicator — overlaid top-center (only on pages 0–3)
-            if (!isHealthProfilePage) {
-                ProfileSetupPageIndicator(
-                    currentPage = state.currentPage,
-                    pageCount = state.pageCount - 1,
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(top = 80.dp)
-                        .align(Alignment.TopCenter)
                 )
             }
 

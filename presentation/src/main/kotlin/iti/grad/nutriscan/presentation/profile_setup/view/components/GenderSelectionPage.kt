@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -50,6 +51,8 @@ import iti.grad.presentation.R
 @Composable
 fun GenderSelectionPage(
     selectedGender: Gender?,
+    currentPage: Int,
+    pageCount: Int,
     onEvent: (ProfileSetupPagerEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -58,40 +61,20 @@ fun GenderSelectionPage(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top spacing to clear back button / status bar
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(modifier = Modifier.height(104.dp))
 
-        // Title with highlighted word
-        Text(
-            text = buildAnnotatedString {
-                append(stringResource(R.string.profile_setup_gender_title_prefix))
-                withStyle(SpanStyle(color = AppTheme.colors.Teal1000, fontWeight = FontWeight.Bold)) {
-                    append(stringResource(R.string.profile_setup_gender_title_highlight))
-                    append(stringResource(R.string.profile_setup_gender_title_suffix))
-                }
-            },
-            fontFamily = LexendDeca,
-            fontWeight = FontWeight.Bold,
-            fontSize = 26.sp,
-            lineHeight = 34.sp,
-            color = AppTheme.colors.TextPrimary,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Subtitle
-        Text(
-            text = stringResource(R.string.profile_setup_gender_subtitle),
-            fontFamily = LexendDeca,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            color = AppTheme.colors.ProfileSetupSubtitle,
-            textAlign = TextAlign.Center
+        // Title + Subtitle
+        ProfileSetupHeader(
+            prefixRes = R.string.profile_setup_gender_title_prefix,
+            highlightRes = R.string.profile_setup_gender_title_highlight,
+            suffixRes = R.string.profile_setup_gender_title_suffix,
+            subtitleRes = R.string.profile_setup_gender_subtitle,
+            currentPage = currentPage,
+            pageCount = pageCount
         )
 
         Spacer(modifier = Modifier.height(48.dp))
