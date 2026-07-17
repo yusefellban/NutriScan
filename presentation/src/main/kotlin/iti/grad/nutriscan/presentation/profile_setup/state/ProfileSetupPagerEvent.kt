@@ -15,6 +15,9 @@ sealed interface ProfileSetupPagerEvent {
     // Page 3: Height
     data class SelectHeight(val heightCm: Int) : ProfileSetupPagerEvent
 
+    // Page 4: Weight
+    data class SelectWeight(val weightKg: Int) : ProfileSetupPagerEvent
+
     // Health Profile events (migrated from HealthProfileSetupEvent)
     data class ToggleCondition(val condition: String) : ProfileSetupPagerEvent
     data class ToggleAllergy(val allergy: String) : ProfileSetupPagerEvent

@@ -34,7 +34,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfi
 import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.ProfileSetupPageIndicator
 import iti.grad.nutriscan.presentation.profile_setup.view.components.ProgressNextButton
-import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPlaceholder
+import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPage
 import iti.grad.nutriscan.presentation.profile_setup.viewmodel.ProfileSetupPagerViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -119,9 +119,11 @@ fun ProfileSetupPagerScreen(
                         pageCount = state.pageCount - 1,
                         onEvent = viewModel::onEvent
                     )
-                    3 -> WeightSelectionPlaceholder(
+                    3 -> WeightSelectionPage(
+                        selectedWeightKg = state.selectedWeightKg,
                         currentPage = state.currentPage,
-                        pageCount = state.pageCount - 1
+                        pageCount = state.pageCount - 1,
+                        onEvent = viewModel::onEvent
                     )
                     4 -> HealthProfileContent(
                         state = state,

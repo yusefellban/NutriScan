@@ -52,6 +52,11 @@ class ProfileSetupPagerViewModel @Inject constructor(
                 it.copy(selectedHeightCm = event.heightCm)
             }
 
+            // Page 4: Weight
+            is ProfileSetupPagerEvent.SelectWeight -> _state.update {
+                it.copy(selectedWeightKg = event.weightKg)
+            }
+
             // Health Profile events
             is ProfileSetupPagerEvent.ToggleCondition -> toggleCondition(event.condition)
             is ProfileSetupPagerEvent.ToggleAllergy -> toggleAllergy(event.allergy)

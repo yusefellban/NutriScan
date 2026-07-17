@@ -150,6 +150,31 @@ class ProfileSetupPagerViewModelTest {
         }
     }
 
+    // ── Weight Selection ────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("Weight Selection")
+    inner class WeightSelection {
+
+        @Test
+        fun `initial state has default selectedWeightKg as 60`() {
+            Assertions.assertEquals(60, viewModel.state.value.selectedWeightKg)
+        }
+
+        @Test
+        fun `SelectWeight updates selectedWeightKg in state`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(75))
+            Assertions.assertEquals(75, viewModel.state.value.selectedWeightKg)
+        }
+
+        @Test
+        fun `SelectWeight replaces previously selected weight`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(80))
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(55))
+            Assertions.assertEquals(55, viewModel.state.value.selectedWeightKg)
+        }
+    }
+
     // ── Health Profile: Conditions ───────────────────────────────────────
 
     @Nested
