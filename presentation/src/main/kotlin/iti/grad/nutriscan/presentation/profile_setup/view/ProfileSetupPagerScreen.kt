@@ -31,7 +31,7 @@ import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEven
 import iti.grad.nutriscan.presentation.profile_setup.view.components.DateOfBirthPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.GenderSelectionPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfileContent
-import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPlaceholder
+import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPage
 import iti.grad.nutriscan.presentation.profile_setup.view.components.ProfileSetupPageIndicator
 import iti.grad.nutriscan.presentation.profile_setup.view.components.ProgressNextButton
 import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPlaceholder
@@ -113,9 +113,11 @@ fun ProfileSetupPagerScreen(
                         pageCount = state.pageCount - 1,
                         onEvent = viewModel::onEvent
                     )
-                    2 -> HeightSelectionPlaceholder(
+                    2 -> HeightSelectionPage(
+                        selectedHeightCm = state.selectedHeightCm,
                         currentPage = state.currentPage,
-                        pageCount = state.pageCount - 1
+                        pageCount = state.pageCount - 1,
+                        onEvent = viewModel::onEvent
                     )
                     3 -> WeightSelectionPlaceholder(
                         currentPage = state.currentPage,

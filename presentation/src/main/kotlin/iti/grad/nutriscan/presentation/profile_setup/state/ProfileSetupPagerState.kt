@@ -20,6 +20,9 @@ data class ProfileSetupPagerState(
     // Page 2: Date of Birth
     val selectedDateOfBirthMillis: Long? = null,
 
+    // Page 3: Height
+    val selectedHeightCm: Int = 170,
+
     // Health Profile fields (migrated from HealthProfileSetupState)
     val chronicConditions: ImmutableList<String> = persistentListOf(
         "Diabetes",

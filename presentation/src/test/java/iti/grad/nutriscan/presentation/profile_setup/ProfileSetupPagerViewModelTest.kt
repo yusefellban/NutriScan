@@ -123,6 +123,33 @@ class ProfileSetupPagerViewModelTest {
         }
     }
 
+    // ── Height & DOB Selection ──────────────────────────────────────────
+
+    @Nested
+    @DisplayName("Height and DOB Selection")
+    inner class HeightAndDobSelection {
+
+        @Test
+        fun `initial state has default selectedHeightCm as 170`() {
+            val state = viewModel.state.value
+            Assertions.assertEquals(170, state.selectedHeightCm)
+            Assertions.assertNull(state.selectedDateOfBirthMillis)
+        }
+
+        @Test
+        fun `SelectHeight updates selectedHeightCm in state`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectHeight(183))
+            Assertions.assertEquals(183, viewModel.state.value.selectedHeightCm)
+        }
+
+        @Test
+        fun `SelectDateOfBirth updates selectedDateOfBirthMillis in state`() {
+            val millis = 1069542000000L // 23/11/2003
+            viewModel.onEvent(ProfileSetupPagerEvent.SelectDateOfBirth(millis))
+            Assertions.assertEquals(millis, viewModel.state.value.selectedDateOfBirthMillis)
+        }
+    }
+
     // ── Health Profile: Conditions ───────────────────────────────────────
 
     @Nested

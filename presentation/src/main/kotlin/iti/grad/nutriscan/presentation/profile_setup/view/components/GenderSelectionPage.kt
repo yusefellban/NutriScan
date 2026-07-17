@@ -27,16 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -46,6 +41,7 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.profile_setup.state.Gender
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
+import iti.grad.nutriscan.presentation.home.view.components.customShadow
 import iti.grad.presentation.R
 
 @Composable
@@ -65,7 +61,7 @@ fun GenderSelectionPage(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(104.dp))
+        Spacer(modifier = Modifier.height(170.dp))
 
         // Title + Subtitle
         ProfileSetupHeader(
@@ -161,11 +157,17 @@ private fun GenderCard(
         label = "text_size"
     )
 
-    val cardElevation by animateDpAsState(
-        targetValue = if (isSelected) 32.dp else 0.dp,
-        animationSpec = tween(300),
-        label = "card_elevation"
-    )
+    val shadowColor = if (isSelected) {
+        if (gender == Gender.FEMALE) AppTheme.colors.ShadowFemaleSelected else AppTheme.colors.ShadowMaleSelected
+    } else {
+        AppTheme.colors.ShadowUnselected
+    }
+    val isDark = isSystemInDarkTheme()
+    val shadowBlur = if (isDark) {
+        if (isSelected) 20f else 8f
+    } else {
+        if (isSelected) 80f else 32f
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -189,11 +191,11 @@ private fun GenderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(cardHeight)
-                .shadow(
-                    elevation = cardElevation,
+                .customShadow(
                     shape = RoundedCornerShape(20.dp),
-                    spotColor = cardColor,
-                    ambientColor = cardColor
+                    color = shadowColor,
+                    blurRadius = shadowBlur,
+                    offsetY = 0f
                 )
                 .clip(RoundedCornerShape(20.dp))
                 .background(cardColor)

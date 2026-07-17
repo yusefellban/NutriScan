@@ -127,9 +127,27 @@ data class AppColors(
     val DobInputText: Color,
     val DobCalendarIcon: Color,
 
+    // --- Height Selection ---
+    val HeightSelectedCardBackground: Color,
+    val HeightSelectedCardText: Color,
+    val HeightSelectedCardUnitText: Color,
+    val HeightUnselectedCardBackground: Color,
+    val HeightUnselectedCardText: Color,
+    val HeightUnselectedCardUnitText: Color,
+    val HeightRulerMajorTick: Color,
+    val HeightRulerMinorTick: Color,
+    val HeightRulerText: Color,
+
     // --- Progress Button ---
     val ProgressTrackColor: Color,
     val ProgressFillColor: Color,
+
+    // --- Shadow Colors ---
+    val ShadowSelected: Color,
+    val ShadowUnselected: Color,
+    val ShadowFemaleSelected: Color,
+    val ShadowMaleSelected: Color,
+    val ShadowDobActive: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -247,9 +265,27 @@ fun lightColors() = AppColors(
     DobInputText = Color(0xFFA6A5A5), // Gray600
     DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
 
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
+    HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
+    HeightUnselectedCardText = Color(0xFF5F5F5F), // Gray1200 (Darker Gray)
+    HeightUnselectedCardUnitText = Color(0xFF898989), // Gray700
+    HeightRulerMajorTick = Color(0xFF13A4AB), // Teal1000
+    HeightRulerMinorTick = Color(0xFFCAF2F4), // Teal300
+    HeightRulerText = Color(0xFF13A4AB), // Teal1000
+
     // Progress Button
     ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
     ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
+    ShadowUnselected = Color(0x3313A4AB), // Teal1000/Primary 20% alpha
+    ShadowFemaleSelected = Color(0x6613A4AB),
+    ShadowMaleSelected = Color(0x6613A4AB),
+    ShadowDobActive = Color(0x6613A4AB),
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -367,7 +403,25 @@ fun darkColors() = AppColors(
     DobInputText = Color(0xFF169098), // Teal1200
     DobCalendarIcon = Color(0xFF169098), // Teal1200
 
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
+    HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
+    HeightUnselectedCardText = Color(0xFF2FC5CC), // Teal700
+    HeightUnselectedCardUnitText = Color(0xFFCAF2F4), // Teal300
+    HeightRulerMajorTick = Color(0xFF75DEE3), // Teal500
+    HeightRulerMinorTick = Color(0xFF0B5F65), // Teal1400
+    HeightRulerText = Color(0xFF75DEE3), // Teal500
+
     // Progress Button
     ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
     ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
+    ShadowUnselected = Color(0x33FFFFFF), // Soft white glow 20% alpha
+    ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
+    ShadowMaleSelected = Color(0x9975DEE3),
+    ShadowDobActive = Color(0x9975DEE3),
 )

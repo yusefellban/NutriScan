@@ -56,9 +56,9 @@ fun ProfileSetupHeader(
             append(stringResource(prefixRes))
             withStyle(SpanStyle(color = AppTheme.colors.Teal1000, fontWeight = FontWeight.Bold)) {
                 append(stringResource(highlightRes))
-                if (suffixRes != null) {
-                    append(stringResource(suffixRes))
-                }
+            }
+            if (suffixRes != null) {
+                append(stringResource(suffixRes))
             }
         },
         fontFamily = LexendDeca,
