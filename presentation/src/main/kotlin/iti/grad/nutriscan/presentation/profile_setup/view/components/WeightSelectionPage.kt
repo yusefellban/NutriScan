@@ -175,7 +175,7 @@ fun WeightSelectionPage(
         Spacer(modifier = Modifier.height(24.dp))
 
         val currentWeightDouble = pagerState.currentPage + minWeight + pagerState.currentPageOffsetFraction.toDouble()
-
+        Spacer(modifier = Modifier.height(24.dp))
         WeightArcRuler(
             currentWeightDouble = currentWeightDouble,
             minWeight = minWeight,

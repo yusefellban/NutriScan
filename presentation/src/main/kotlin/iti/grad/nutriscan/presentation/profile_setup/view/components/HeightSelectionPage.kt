@@ -179,7 +179,7 @@ fun HeightSelectionPage(
             )
         }
 
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         // Custom Ruler Canvas
         val currentHeightDouble = pagerState.currentPage + minHeight + pagerState.currentPageOffsetFraction.toDouble()
