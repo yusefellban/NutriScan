@@ -75,4 +75,24 @@
     <string name="profile_setup_other">+ أخرى</string>
     <string name="profile_setup_custom_input_hint">اكتب خياراً مخصصاً...</string>
     <string name="action_save">حفظ</string>
+    <!-- Profile Setup Pager -->
+    <string name="profile_setup_gender_title_prefix">"ما هو "</string>
+    <string name="profile_setup_gender_title_highlight">جنسك</string>
+    <string name="profile_setup_gender_title_suffix">؟</string>
+    <string name="profile_setup_gender_subtitle">سنستخدم هذا لتخصيص تجربتك في NutriScan.</string>
+    <string name="profile_setup_gender_female">أنثى</string>
+    <string name="profile_setup_gender_male">ذكر</string>
+    <string name="profile_setup_dob_title_prefix">"تاريخ "</string>
+    <string name="profile_setup_dob_title_highlight">ميلادك</string>
+    <string name="profile_setup_dob_subtitle">عمرك يساعدنا في تقديم إرشادات غذائية وصحية أكثر دقة.</string>
+    <string name="profile_setup_dob_years">سنة</string>
+    <string name="profile_setup_dob_date_hint">يوم/شهر/سنة</string>
+    <string name="profile_setup_height_title_prefix">"ما هو "</string>
+    <string name="profile_setup_height_title_highlight">طولك</string>
+    <string name="profile_setup_height_title_suffix">؟</string>
+    <string name="profile_setup_height_subtitle">سنستخدم طولك لتخصيص رؤى التغذية وحسابات السعرات الحرارية.</string>
+    <string name="profile_setup_weight_title_prefix">"وزنك "</string>
+    <string name="profile_setup_weight_title_highlight">الحالي</string>
+    <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
+    <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
 </resources>

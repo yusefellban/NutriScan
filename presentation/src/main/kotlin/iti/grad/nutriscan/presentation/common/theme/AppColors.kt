@@ -107,6 +107,47 @@ data class AppColors(
     val OtherChipText: Color,
     val OtherChipBackground: Color,
     val OtherChipTextUnselected: Color,
+
+    // --- Gender Selection ---
+    val GenderFemaleCardBackground: Color,
+    val GenderFemaleCardText: Color,
+    val GenderMaleCardBackground: Color,
+    val GenderMaleCardText: Color,
+
+    // --- Page Indicator ---
+    val PageIndicatorCurrent: Color,
+    val PageIndicatorTotal: Color,
+
+    // --- Date of Birth ---
+    val DobCardBackground: Color,
+    val DobAgeBadgeBackground: Color,
+    val DobAgeBadgeText: Color,
+    val DobCardText: Color,
+    val DobInputBorder: Color,
+    val DobInputText: Color,
+    val DobCalendarIcon: Color,
+
+    // --- Height Selection ---
+    val HeightSelectedCardBackground: Color,
+    val HeightSelectedCardText: Color,
+    val HeightSelectedCardUnitText: Color,
+    val HeightUnselectedCardBackground: Color,
+    val HeightUnselectedCardText: Color,
+    val HeightUnselectedCardUnitText: Color,
+    val HeightRulerMajorTick: Color,
+    val HeightRulerMinorTick: Color,
+    val HeightRulerText: Color,
+
+    // --- Progress Button ---
+    val ProgressTrackColor: Color,
+    val ProgressFillColor: Color,
+
+    // --- Shadow Colors ---
+    val ShadowSelected: Color,
+    val ShadowUnselected: Color,
+    val ShadowFemaleSelected: Color,
+    val ShadowMaleSelected: Color,
+    val ShadowDobActive: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -189,7 +230,7 @@ fun lightColors() = AppColors(
     
     // Profile Setup
     ProfileSetupTitle = Color(0xFF13A4AB), // Teal1000
-    ProfileSetupSubtitle = Color(0xFF777777), // Gray800
+    ProfileSetupSubtitle = Color(0xFF898989), // Gray700
     ProfileSetupSectionTitle = Color(0xFF545454), // Gray1300
     
     // Chips
@@ -204,6 +245,47 @@ fun lightColors() = AppColors(
     OtherChipText = Color(0xFF3E3E3E), // Gray1400
     OtherChipBackground = Color(0xFFFFFFFF), // White
     OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
+    
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
+    GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
+
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFFE5E5E4), // Gray300
+    DobInputText = Color(0xFFA6A5A5), // Gray600
+    DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
+
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
+    HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
+    HeightUnselectedCardText = Color(0xFF5F5F5F), // Gray1200 (Darker Gray)
+    HeightUnselectedCardUnitText = Color(0xFF898989), // Gray700
+    HeightRulerMajorTick = Color(0xFF13A4AB), // Teal1000
+    HeightRulerMinorTick = Color(0xFFCAF2F4), // Teal300
+    HeightRulerText = Color(0xFF13A4AB), // Teal1000
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
+    ShadowUnselected = Color(0x3313A4AB), // Teal1000/Primary 20% alpha
+    ShadowFemaleSelected = Color(0x6613A4AB),
+    ShadowMaleSelected = Color(0x6613A4AB),
+    ShadowDobActive = Color(0x6613A4AB),
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -286,7 +368,7 @@ fun darkColors() = AppColors(
 
     // Profile Setup
     ProfileSetupTitle = Color(0xFFE8FAFA), // Teal100
-    ProfileSetupSubtitle = Color(0xFFCAF2F4), // Teal300
+    ProfileSetupSubtitle = Color(0xFF108188), // Teal1300
     ProfileSetupSectionTitle = Color(0xFF75DEE3), // Teal500
     
     // Chips
@@ -301,4 +383,45 @@ fun darkColors() = AppColors(
     OtherChipText = Color(0xFF2FC5CC), // Teal700
     OtherChipBackground = Color(0xFF0B5F65), // Teal1400
     OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
+
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
+    GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFF169098), // Teal1200
+    DobInputText = Color(0xFF169098), // Teal1200
+    DobCalendarIcon = Color(0xFF169098), // Teal1200
+
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
+    HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
+    HeightUnselectedCardText = Color(0xFF2FC5CC), // Teal700
+    HeightUnselectedCardUnitText = Color(0xFFCAF2F4), // Teal300
+    HeightRulerMajorTick = Color(0xFF75DEE3), // Teal500
+    HeightRulerMinorTick = Color(0xFF0B5F65), // Teal1400
+    HeightRulerText = Color(0xFF75DEE3), // Teal500
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
+    ShadowUnselected = Color(0x33FFFFFF), // Soft white glow 20% alpha
+    ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
+    ShadowMaleSelected = Color(0x9975DEE3),
+    ShadowDobActive = Color(0x9975DEE3),
 )

@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.ui)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.coil3.svg)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

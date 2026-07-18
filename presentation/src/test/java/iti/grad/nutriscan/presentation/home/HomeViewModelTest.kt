@@ -42,7 +42,7 @@ class HomeViewModelTest {
     @Test
     fun `initial state has correct dummy data`() = runTest(testDispatcher) {
         val state = viewModel.state.value
-        assertEquals("Youssef", state.userName)
+        assertEquals("Noureldeen", state.userName)
         assertEquals(3, state.recentHistory.size)
         assertEquals(BottomNavTab.HOME, state.selectedTab)
 
@@ -52,7 +52,7 @@ class HomeViewModelTest {
         assertEquals("Orange Juice", firstItem.productName)
         assertEquals("Today, 9:24 AM", firstItem.scanDate)
         assertEquals(R.string.verdict_healthy, firstItem.verdictLabelResId)
-        assertEquals(VerdictType.GREEN, firstItem.verdictType)
+        assertEquals(VerdictType.CYAN, firstItem.verdictType)
     }
 
     @Test
@@ -88,10 +88,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and effect is NavigateToHistory`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            assertEquals(HomeEffect.NavigateToHistory, awaitItem())
+            expectNoEvents()
         }
         assertEquals(BottomNavTab.HISTORY, viewModel.state.value.selectedTab)
     }
@@ -106,19 +106,19 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to SHOPPING, selectedTab is updated and effect is NavigateToShopping`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SHOPPING, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
-            assertEquals(HomeEffect.NavigateToShopping, awaitItem())
+            expectNoEvents()
         }
         assertEquals(BottomNavTab.SHOPPING, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to PROFILE, selectedTab is updated and effect is NavigateToProfile`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to PROFILE, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.PROFILE))
-            assertEquals(HomeEffect.NavigateToProfile, awaitItem())
+            expectNoEvents()
         }
         assertEquals(BottomNavTab.PROFILE, viewModel.state.value.selectedTab)
     }

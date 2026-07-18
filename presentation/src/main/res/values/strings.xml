@@ -75,4 +75,24 @@
     <string name="profile_setup_other">+ Other</string>
     <string name="profile_setup_custom_input_hint">Type custom option...</string>
     <string name="action_save">Save</string>
+    <!-- Profile Setup Pager -->
+    <string name="profile_setup_gender_title_prefix">"What is Your "</string>
+    <string name="profile_setup_gender_title_highlight">Gender</string>
+    <string name="profile_setup_gender_title_suffix">?</string>
+    <string name="profile_setup_gender_subtitle">We\'ll use this information to personalize your NutriScan experience.</string>
+    <string name="profile_setup_gender_female">Female</string>
+    <string name="profile_setup_gender_male">Male</string>
+    <string name="profile_setup_dob_title_prefix">"Your "</string>
+    <string name="profile_setup_dob_title_highlight">Date of birth</string>
+    <string name="profile_setup_dob_subtitle">Your age helps us provide more accurate nutrition and health guidance.</string>
+    <string name="profile_setup_dob_years">Years</string>
+    <string name="profile_setup_dob_date_hint">DD/MM/YYYY</string>
+    <string name="profile_setup_height_title_prefix">"How "</string>
+    <string name="profile_setup_height_title_highlight">tall</string>
+    <string name="profile_setup_height_title_suffix">" are you?"</string>
+    <string name="profile_setup_height_subtitle">We\'ll use your height to personalize your nutrition insights and calorie calculations.</string>
+    <string name="profile_setup_weight_title_prefix">"Your current "</string>
+    <string name="profile_setup_weight_title_highlight">weight</string>
+    <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
+    <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
 </resources>
