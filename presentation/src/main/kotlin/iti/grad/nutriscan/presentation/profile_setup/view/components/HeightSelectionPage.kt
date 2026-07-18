@@ -134,13 +134,14 @@ fun HeightSelectionPage(
             .background(AppTheme.colors.Background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(170.dp))
+        Spacer(modifier = Modifier.height(152.dp))
 
         // Title + Subtitle
         ProfileSetupHeader(
             prefixRes = R.string.profile_setup_height_title_prefix,
             highlightRes = R.string.profile_setup_height_title_highlight,
             suffixRes = R.string.profile_setup_height_title_suffix,
+            isSuffixHighlighted = false,
             subtitleRes = R.string.profile_setup_height_subtitle,
             currentPage = currentPage,
             pageCount = pageCount,

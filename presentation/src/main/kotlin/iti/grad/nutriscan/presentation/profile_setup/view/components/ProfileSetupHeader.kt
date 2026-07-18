@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -33,12 +34,13 @@ fun ProfileSetupHeader(
     highlightRes: Int,
     subtitleRes: Int,
     suffixRes: Int? = null,
+    isSuffixHighlighted: Boolean = true,
     currentPage: Int? = null,
     pageCount: Int? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
         // Optional Page Indicator
@@ -56,8 +58,11 @@ fun ProfileSetupHeader(
             append(stringResource(prefixRes))
             withStyle(SpanStyle(color = AppTheme.colors.Teal1000, fontWeight = FontWeight.Bold)) {
                 append(stringResource(highlightRes))
+                if (isSuffixHighlighted && suffixRes != null) {
+                    append(stringResource(suffixRes))
+                }
             }
-            if (suffixRes != null) {
+            if (!isSuffixHighlighted && suffixRes != null) {
                 append(stringResource(suffixRes))
             }
         },

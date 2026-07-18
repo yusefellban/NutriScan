@@ -61,7 +61,7 @@ fun GenderSelectionPage(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(170.dp))
+        Spacer(modifier = Modifier.height(152.dp))
 
         // Title + Subtitle
         ProfileSetupHeader(
@@ -223,10 +223,18 @@ private fun GenderCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Label
+                val textStyle = if (isSelected) {
+                    androidx.compose.ui.text.TextStyle(
+                        fontFamily = LexendDeca,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                } else {
+                    AppTheme.typography.headlineSmall
+                }
+
                 Text(
                     text = label,
-                    fontFamily = LexendDeca,
-                    fontWeight = FontWeight.SemiBold,
+                    style = textStyle,
                     fontSize = textSize.sp,
                     color = labelColor
                 )

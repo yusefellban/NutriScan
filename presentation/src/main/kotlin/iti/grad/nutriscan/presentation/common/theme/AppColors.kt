@@ -247,7 +247,7 @@ fun lightColors() = AppColors(
     OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
     
     // Gender Selection
-    GenderFemaleCardBackground = Color(0xFFFDE8E8), // Red100 equivalent
+    GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
     GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
     GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
     GenderMaleCardText = Color(0xFF0F474A), // Teal1600

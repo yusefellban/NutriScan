@@ -129,7 +129,7 @@ fun WeightSelectionPage(
             .background(AppTheme.colors.Background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(170.dp))
+        Spacer(modifier = Modifier.height(152.dp))
 
         ProfileSetupHeader(
             prefixRes = R.string.profile_setup_weight_title_prefix,

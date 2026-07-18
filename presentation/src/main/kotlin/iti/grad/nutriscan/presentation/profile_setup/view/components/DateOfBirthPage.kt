@@ -69,7 +69,7 @@ fun DateOfBirthPage(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(170.dp))
+        Spacer(modifier = Modifier.height(152.dp))
 
         // Title + Subtitle
         ProfileSetupHeader(
