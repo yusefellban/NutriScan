@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
 import iti.grad.nutriscan.presentation.home.state.VerdictType

@@ -21,6 +21,7 @@ import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarous
 import iti.grad.nutriscan.presentation.auth.profile_setup.view.HealthProfileSetupScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -280,14 +281,24 @@ fun AppNavGraph(
             }
         }
 
-        // 19. User Profile (Placeholder)
+        // 19. User Profile
         composable<UserProfileRoute> {
-            PlaceholderScreen(
-                title = "User Profile",
-                buttonText = "Manage Family"
-            ) {
-                navController.navigate(ManageFamilyRoute)
-            }
+            UserProfileScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(HomeRoute) { inclusive = false }
+                    }
+                },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToEditProfile = { /* TODO: no dedicated edit-profile screen yet */ },
+                onNavigateToFamilyMemberDetail = { memberId ->
+                    navController.navigate(EditConditionsRoute(memberId))
+                },
+                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
+                onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
+            )
         }
 
         // 20. Manage Family (Placeholder)

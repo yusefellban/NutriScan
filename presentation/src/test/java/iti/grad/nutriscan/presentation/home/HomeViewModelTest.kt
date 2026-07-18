@@ -1,7 +1,7 @@
 package iti.grad.nutriscan.presentation.home
 
 import app.cash.turbine.test
-import iti.grad.nutriscan.presentation.home.state.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.VerdictType
@@ -42,7 +42,7 @@ class HomeViewModelTest {
     @Test
     fun `initial state has correct dummy data`() = runTest(testDispatcher) {
         val state = viewModel.state.value
-        assertEquals("Youssef", state.userName)
+        assertEquals("Noureldeen", state.userName)
         assertEquals(3, state.recentHistory.size)
         assertEquals(BottomNavTab.HOME, state.selectedTab)
 
@@ -52,7 +52,7 @@ class HomeViewModelTest {
         assertEquals("Orange Juice", firstItem.productName)
         assertEquals("Today, 9:24 AM", firstItem.scanDate)
         assertEquals(R.string.verdict_healthy, firstItem.verdictLabelResId)
-        assertEquals(VerdictType.GREEN, firstItem.verdictType)
+        assertEquals(VerdictType.CYAN, firstItem.verdictType)
     }
 
     @Test
@@ -88,39 +88,41 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and effect is NavigateToHistory`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to HISTORY, effect is NavigateToHistory and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
             assertEquals(HomeEffect.NavigateToHistory, awaitItem())
         }
-        assertEquals(BottomNavTab.HISTORY, viewModel.state.value.selectedTab)
+        // Home is the only tab rendered inline; the retained ViewModel must keep
+        // highlighting HOME so returning here doesn't show a stale tab.
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to SCAN, selectedTab is updated and effect is NavigateToScan`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SCAN, effect is NavigateToScan and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SCAN))
             assertEquals(HomeEffect.NavigateToScan, awaitItem())
         }
-        assertEquals(BottomNavTab.SCAN, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to SHOPPING, selectedTab is updated and effect is NavigateToShopping`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SHOPPING, effect is NavigateToShopping and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
             assertEquals(HomeEffect.NavigateToShopping, awaitItem())
         }
-        assertEquals(BottomNavTab.SHOPPING, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to PROFILE, selectedTab is updated and effect is NavigateToProfile`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to PROFILE, effect is NavigateToProfile and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.PROFILE))
             assertEquals(HomeEffect.NavigateToProfile, awaitItem())
         }
-        assertEquals(BottomNavTab.PROFILE, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test

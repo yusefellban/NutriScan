@@ -107,6 +107,20 @@ data class AppColors(
     val OtherChipText: Color,
     val OtherChipBackground: Color,
     val OtherChipTextUnselected: Color,
+
+    // --- User Profile Screen ---
+    val ProfileHeaderBackground: Color,
+    val ProfileHeaderAccent: Color,
+    val ProfileSheetBackground: Color,
+    val ProfileFamilyBoxBackground: Color,
+    val ProfileMenuRowBackground: Color,
+    val ProfileMenuIconBackground: Color,
+    val ProfileMemberCardBackground: Color,
+    val ProfileMemberCardBorder: Color,
+    val ProfileAddCardBackground: Color,
+    val ProfileAddIconBackground: Color,
+    val ProfileAddIconTint: Color,
+    val ProfileStreakBadgeBackground: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -204,6 +218,20 @@ fun lightColors() = AppColors(
     OtherChipText = Color(0xFF3E3E3E), // Gray1400
     OtherChipBackground = Color(0xFFFFFFFF), // White
     OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
+
+    // User Profile Screen
+    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — primary teal, same in both themes
+    ProfileHeaderAccent = Color(0xFF11939A), // Teal1200
+    ProfileSheetBackground = Color(0xFFFFFFFF), // White
+    ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White
+    ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
+    ProfileMenuIconBackground = Color(0xFFC0C0C0), // Gray500
+    ProfileMemberCardBackground = Color(0xFFD4F1F2), // Teal200 — light teal/cyan tint
+    ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
+    ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
+    ProfileAddIconBackground = Color(0xFFFFFFFF), // White
+    ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
+    ProfileStreakBadgeBackground = Color(0xFF11939A), // Fixed teal, same in both themes
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -301,4 +329,18 @@ fun darkColors() = AppColors(
     OtherChipText = Color(0xFF2FC5CC), // Teal700
     OtherChipBackground = Color(0xFF0B5F65), // Teal1400
     OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
+
+    // User Profile Screen
+    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — primary teal, same in both themes
+    ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400
+    ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — base/recessed
+    ProfileFamilyBoxBackground = Color(0xFF0F474A), // Teal1600 — base, matches sheet
+    ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500 — elevated
+    ProfileMenuIconBackground = Color(0xFF11939A), // Fixed teal, not the Teal1600 base
+    ProfileMemberCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
+    ProfileMemberCardBorder = Color(0xFF75DEE3), // Teal500 — thin light teal border
+    ProfileAddCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
+    ProfileAddIconBackground = Color(0xFF2FC5CC), // Teal700 — light teal rounded box
+    ProfileAddIconTint = Color(0xFFFFFFFF), // White "+" icon
+    ProfileStreakBadgeBackground = Color(0xFF11939A), // Fixed teal — NOT the Teal1200 dark remap
 )

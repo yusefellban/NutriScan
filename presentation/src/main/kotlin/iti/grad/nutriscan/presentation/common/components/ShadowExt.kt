@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.home.view.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind

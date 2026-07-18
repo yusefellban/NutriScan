@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.home.state
 
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
