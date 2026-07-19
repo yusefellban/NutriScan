@@ -44,8 +44,8 @@ fun AddMemberCard(
 
     Column(
         modifier = modifier
-            .width(112.dp)
-            .height(96.dp)
+            .width(90.dp)
+            .height(95.dp)
             // No border mentioned in the new specs, so removing it
             .clip(RoundedCornerShape(outerBorderRadius))
             .background(AppTheme.colors.ProfileAddCardBackground)
@@ -63,6 +63,7 @@ fun AddMemberCard(
             contentDescription = null,
             tint = AppTheme.colors.ProfileAddIconTint,
             modifier = Modifier
+
                 .size(32.dp) // Reduced size
                 .clip(RoundedCornerShape(innerBorderRadius))
                 .background(AppTheme.colors.ProfileAddIconBackground)
