@@ -121,6 +121,10 @@ data class AppColors(
     val ProfileAddIconBackground: Color,
     val ProfileAddIconTint: Color,
     val ProfileStreakBadgeBackground: Color,
+    val ProfileHeaderEdge: Color,
+    val ProfileShowDetailsBackground: Color,
+    val ProfileMenuLabel: Color,
+    val ProfileMenuChevron: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -219,19 +223,23 @@ fun lightColors() = AppColors(
     OtherChipBackground = Color(0xFFFFFFFF), // White
     OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
 
-    // User Profile Screen
-    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — primary teal, same in both themes
-    ProfileHeaderAccent = Color(0xFF11939A), // Teal1200
-    ProfileSheetBackground = Color(0xFFFFFFFF), // White
-    ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White
+    // User Profile Screen — light values match the Figma light spec
+    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — screen bg behind header
+    ProfileHeaderAccent = Color(0xFF11939A), // Teal1200 — avatar ring
+    ProfileSheetBackground = Color(0xFFFFFFFF), // White — main sheet
+    ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White — dashed container fill
     ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
-    ProfileMenuIconBackground = Color(0xFFC0C0C0), // Gray500
-    ProfileMemberCardBackground = Color(0xFFD4F1F2), // Teal200 — light teal/cyan tint
+    ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
+    ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
     ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
     ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
     ProfileAddIconBackground = Color(0xFFFFFFFF), // White
     ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
-    ProfileStreakBadgeBackground = Color(0xFF11939A), // Fixed teal, same in both themes
+    ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+    ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
+    ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+    ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
+    ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -330,17 +338,21 @@ fun darkColors() = AppColors(
     OtherChipBackground = Color(0xFF0B5F65), // Teal1400
     OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
 
-    // User Profile Screen
-    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — primary teal, same in both themes
-    ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400
-    ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — base/recessed
-    ProfileFamilyBoxBackground = Color(0xFF0F474A), // Teal1600 — base, matches sheet
-    ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500 — elevated
-    ProfileMenuIconBackground = Color(0xFF11939A), // Fixed teal, not the Teal1600 base
-    ProfileMemberCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
-    ProfileMemberCardBorder = Color(0xFF75DEE3), // Teal500 — thin light teal border
+    // User Profile Screen — dark values match the Figma dark spec
+    ProfileHeaderBackground = Color(0xFF0A545A), // Teal1500 — screen bg behind header
+    ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400 — avatar ring
+    ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — main sheet
+    ProfileFamilyBoxBackground = Color(0xFF0A545A), // Teal1500 — dashed container fill
+    ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500
+    ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
+    ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
+    ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
     ProfileAddCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
     ProfileAddIconBackground = Color(0xFF2FC5CC), // Teal700 — light teal rounded box
     ProfileAddIconTint = Color(0xFFFFFFFF), // White "+" icon
-    ProfileStreakBadgeBackground = Color(0xFF11939A), // Fixed teal — NOT the Teal1200 dark remap
+    ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+    ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
+    ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+    ProfileMenuLabel = Color(0xFF11939A), // Teal1200
+    ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
 )

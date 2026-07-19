@@ -65,7 +65,7 @@ fun ProfileMenuRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.Teal1200,
+            color = AppTheme.colors.ProfileMenuLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
@@ -74,7 +74,7 @@ fun ProfileMenuRow(
         Icon(
             painter = painterResource(R.drawable.ic_arrow_right),
             contentDescription = null,
-            tint = AppTheme.colors.Teal1000,
+            tint = AppTheme.colors.ProfileMenuChevron,
             modifier = Modifier.size(24.dp),
         )
     }

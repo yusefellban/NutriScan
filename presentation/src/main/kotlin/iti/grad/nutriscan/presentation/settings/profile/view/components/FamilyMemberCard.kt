@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -104,7 +103,7 @@ fun FamilyMemberCard(
             Text(
                 text = member.name,
                 style = AppTheme.typography.bodySmall,
-                color = AppTheme.colors.Teal1200,
+                color = AppTheme.colors.Teal1000,
                 textAlign = TextAlign.Start,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -118,13 +117,13 @@ fun FamilyMemberCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(AppTheme.colors.Teal1000)
+                .background(AppTheme.colors.ProfileShowDetailsBackground)
                 .padding(vertical = 6.dp),
         ) {
             Text(
                 text = stringResource(R.string.user_profile_show_details),
                 style = AppTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = AppTheme.colors.Teal100,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
