@@ -22,6 +22,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScree
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -293,12 +294,19 @@ fun AppNavGraph(
                 onNavigateToScan = { navController.navigate(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
-                onNavigateToEditProfile = { /* TODO: no dedicated edit-profile screen yet */ },
+                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
                     navController.navigate(EditConditionsRoute(memberId))
                 },
                 onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
+            )
+        }
+
+        // 19b. Edit Profile
+        composable<EditProfileRoute> {
+            EditProfileScreen(
+                onNavigateBack = { navController.navigateUp() }
             )
         }
 

@@ -112,4 +112,12 @@
     <string name="profile_setup_weight_title_highlight">weight</string>
     <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
     <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_name_hint">Name</string>
+    <string name="edit_profile_username_hint">Username</string>
+    <string name="edit_profile_email_hint">Email</string>
+    <string name="edit_profile_password_hint">Password</string>
+    <string name="edit_profile_confirm_title">Save Profile Changes?</string>
+    <string name="edit_profile_confirm_message">Are you sure you want to modify your health profile? This will update future food safety scan verdicts.</string>
 </resources>

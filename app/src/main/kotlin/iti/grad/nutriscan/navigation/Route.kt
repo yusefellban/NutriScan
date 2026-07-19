@@ -66,6 +66,9 @@ object ShoppingListRoute
 object UserProfileRoute
 
 @Serializable
+object EditProfileRoute
+
+@Serializable
 object ManageFamilyRoute
 
 @Serializable
