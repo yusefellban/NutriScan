@@ -12,7 +12,6 @@ import iti.grad.nutriscan.domain.settings.usecase.SetThemeModeUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
-import iti.grad.presentation.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,11 +42,11 @@ class AppSettingsViewModel @Inject constructor(
     fun onEvent(event: AppSettingsEvent) {
         when (event) {
             AppSettingsEvent.BackClicked -> navigate(AppSettingsEffect.NavigateBack)
-            AppSettingsEvent.ProfileSettingsClicked -> navigate(AppSettingsEffect.NavigateToUserProfile)
+            AppSettingsEvent.ProfileSettingsClicked -> navigate(AppSettingsEffect.NavigateToEditProfile)
             is AppSettingsEvent.ThemeModeSelected -> selectThemeMode(event.mode)
             is AppSettingsEvent.LanguageSelected -> selectLanguage(event.language)
-            AppSettingsEvent.TermsAndConditionsClicked -> showComingSoon()
-            AppSettingsEvent.HelpClicked -> showComingSoon()
+            AppSettingsEvent.TermsAndConditionsClicked -> navigate(AppSettingsEffect.NavigateToTermsAndConditions)
+            AppSettingsEvent.HelpClicked -> navigate(AppSettingsEffect.NavigateToHelp)
             AppSettingsEvent.LogoutClicked -> _state.update { it.copy(showLogoutConfirmDialog = true) }
             AppSettingsEvent.LogoutDismissed -> _state.update { it.copy(showLogoutConfirmDialog = false) }
             AppSettingsEvent.LogoutConfirmed -> confirmLogout()
@@ -78,10 +77,6 @@ class AppSettingsViewModel @Inject constructor(
     private fun confirmLogout() {
         _state.update { it.copy(showLogoutConfirmDialog = false) }
         navigate(AppSettingsEffect.NavigateToLogin)
-    }
-
-    private fun showComingSoon() {
-        navigate(AppSettingsEffect.ShowSnackbarRes(R.string.profile_setup_placeholder_coming_soon))
     }
 
     private fun navigate(effect: AppSettingsEffect) {

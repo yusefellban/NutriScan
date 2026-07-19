@@ -14,6 +14,7 @@ kotlin {
 
 dependencies {
     implementation(libs.javax.inject)
+    implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

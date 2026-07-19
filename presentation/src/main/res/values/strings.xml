@@ -129,4 +129,8 @@
     <string name="app_settings_lang_ar">Ar</string>
     <string name="app_settings_logout_confirm_title">Log out?</string>
     <string name="app_settings_logout_confirm_message">Are you sure you want to log out of NutriScan?</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">Edit Profile</string>
+    <string name="action_go_back">Go Back</string>
 </resources>

@@ -49,7 +49,7 @@ fun AppSettingsHeader(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 72.dp),
+                .padding(top = 88.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(

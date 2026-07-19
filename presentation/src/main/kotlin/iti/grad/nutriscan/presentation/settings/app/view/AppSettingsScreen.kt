@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.settings.app.view
 
+import android.app.Activity
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
@@ -15,12 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -32,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.domain.settings.model.AppLanguage
 import iti.grad.nutriscan.domain.settings.model.ThemeMode
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
@@ -50,27 +47,29 @@ import kotlinx.coroutines.flow.collectLatest
 fun AppSettingsScreen(
     viewModel: AppSettingsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
-    onNavigateToUserProfile: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToTermsAndConditions: () -> Unit = {},
+    onNavigateToHelp: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is AppSettingsEffect.NavigateBack -> onNavigateBack()
-                is AppSettingsEffect.NavigateToUserProfile -> onNavigateToUserProfile()
+                is AppSettingsEffect.NavigateToEditProfile -> onNavigateToEditProfile()
+                is AppSettingsEffect.NavigateToTermsAndConditions -> onNavigateToTermsAndConditions()
+                is AppSettingsEffect.NavigateToHelp -> onNavigateToHelp()
                 is AppSettingsEffect.NavigateToLogin -> onNavigateToLogin()
                 is AppSettingsEffect.ApplyLocale -> {
                     val languageTag = if (effect.language == AppLanguage.AR) "ar" else "en"
                     AppCompatDelegate.setApplicationLocales(
                         LocaleListCompat.wrap(LocaleList.forLanguageTags(languageTag))
                     )
+                    (context as? Activity)?.recreate()
                 }
-                is AppSettingsEffect.ShowSnackbarRes ->
-                    snackbarHostState.showSnackbar(context.getString(effect.messageResId))
             }
         }
     }
@@ -78,7 +77,6 @@ fun AppSettingsScreen(
     AppSettingsContent(
         state = state,
         onEvent = viewModel::onEvent,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -86,7 +84,6 @@ fun AppSettingsScreen(
 private fun AppSettingsContent(
     state: AppSettingsState,
     onEvent: (AppSettingsEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
 ) {
     val themeOptions = listOf(
         stringResource(R.string.app_settings_theme_system),
@@ -101,7 +98,6 @@ private fun AppSettingsContent(
     Scaffold(
         containerColor = AppTheme.colors.Background,
         contentWindowInsets = WindowInsets(0),
-        snackbarHost = { SnackbarHost(snackbarHostState) { AppSnackbar(message = it.visuals.message) } },
     ) { innerPadding ->
         Column(
             modifier = Modifier

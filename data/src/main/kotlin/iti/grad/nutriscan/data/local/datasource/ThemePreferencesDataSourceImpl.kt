@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -25,6 +26,12 @@ class ThemePreferencesDataSourceImpl @Inject constructor(
     override suspend fun setThemeMode(mode: String) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = mode
+        }
+    }
+
+    override fun observeThemeMode(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.THEME_MODE] ?: "SYSTEM"
         }
     }
 }

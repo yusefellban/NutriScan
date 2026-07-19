@@ -13,7 +13,6 @@ import iti.grad.nutriscan.domain.settings.usecase.SetThemeModeUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
-import iti.grad.presentation.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -135,37 +134,32 @@ class AppSettingsViewModelTest {
         }
 
         @Test
-        fun `ProfileSettingsClicked emits NavigateToUserProfile`() = runTest {
+        fun `ProfileSettingsClicked emits NavigateToEditProfile`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(AppSettingsEvent.ProfileSettingsClicked)
                 testScheduler.advanceUntilIdle()
 
-                Assertions.assertTrue(awaitItem() is AppSettingsEffect.NavigateToUserProfile)
+                Assertions.assertTrue(awaitItem() is AppSettingsEffect.NavigateToEditProfile)
             }
         }
 
         @Test
-        fun `TermsAndConditionsClicked emits ShowSnackbarRes`() = runTest {
+        fun `TermsAndConditionsClicked emits NavigateToTermsAndConditions`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(AppSettingsEvent.TermsAndConditionsClicked)
                 testScheduler.advanceUntilIdle()
 
-                val effect = awaitItem()
-                Assertions.assertTrue(effect is AppSettingsEffect.ShowSnackbarRes)
-                Assertions.assertEquals(
-                    R.string.profile_setup_placeholder_coming_soon,
-                    (effect as AppSettingsEffect.ShowSnackbarRes).messageResId,
-                )
+                Assertions.assertTrue(awaitItem() is AppSettingsEffect.NavigateToTermsAndConditions)
             }
         }
 
         @Test
-        fun `HelpClicked emits ShowSnackbarRes`() = runTest {
+        fun `HelpClicked emits NavigateToHelp`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(AppSettingsEvent.HelpClicked)
                 testScheduler.advanceUntilIdle()
 
-                Assertions.assertTrue(awaitItem() is AppSettingsEffect.ShowSnackbarRes)
+                Assertions.assertTrue(awaitItem() is AppSettingsEffect.NavigateToHelp)
             }
         }
     }

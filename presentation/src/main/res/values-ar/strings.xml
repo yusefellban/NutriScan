@@ -129,4 +129,8 @@
     <string name="app_settings_lang_ar">Ar</string>
     <string name="app_settings_logout_confirm_title">تسجيل الخروج؟</string>
     <string name="app_settings_logout_confirm_message">هل أنت متأكد أنك تريد تسجيل الخروج من نيوتري سكان؟</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
+    <string name="action_go_back">رجوع</string>
 </resources>
