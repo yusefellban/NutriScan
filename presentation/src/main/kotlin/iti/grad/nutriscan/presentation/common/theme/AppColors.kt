@@ -3,8 +3,52 @@ package iti.grad.nutriscan.presentation.common.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Colors for the most recently added screens (User Profile, App Settings).
+ *
+ * Kept as a separate nested object rather than flat fields on [AppColors]:
+ * a single Kotlin data class constructor call with ~150+ [Color] parameters
+ * triggers a real D8/ART bug (`VerifyError: Rejecting invocation, expected N
+ * argument registers, method signature has M or more`) that crashes the app
+ * at startup. Splitting the newest additions into their own small
+ * constructor call keeps every existing `AppTheme.colors.X` call site
+ * unchanged via the forwarding properties on [AppColors] below.
+ */
 @Immutable
-data class AppColors(
+internal data class AppColorsExtension(
+    // --- User Profile Screen ---
+    val ProfileHeaderBackground: Color,
+    val ProfileHeaderAccent: Color,
+    val ProfileSheetBackground: Color,
+    val ProfileFamilyBoxBackground: Color,
+    val ProfileMenuRowBackground: Color,
+    val ProfileMenuIconBackground: Color,
+    val ProfileMemberCardBackground: Color,
+    val ProfileMemberCardBorder: Color,
+    val ProfileAddCardBackground: Color,
+    val ProfileAddIconBackground: Color,
+    val ProfileAddIconTint: Color,
+    val ProfileStreakBadgeBackground: Color,
+    val ProfileHeaderEdge: Color,
+    val ProfileShowDetailsBackground: Color,
+    val ProfileMenuLabel: Color,
+    val ProfileMenuChevron: Color,
+
+    // --- App Settings ---
+    val AppSettingsCardBackground: Color,
+    val AppSettingsIconContainerBackground: Color,
+    val AppSettingsRowLabel: Color,
+    val AppSettingsToggleContainerBackground: Color,
+    val AppSettingsToggleChipSelectedBackground: Color,
+    val AppSettingsToggleTextUnselected: Color,
+    val AppSettingsToggleTextSelected: Color,
+    val AppSettingsLogoutAccent: Color,
+    val AppSettingsLogoutIconBackground: Color,
+)
+
+@Immutable
+@ConsistentCopyVisibility
+data class AppColors internal constructor(
     // --- Teal Palette ---
     val Teal100: Color,
     val Teal200: Color,
@@ -149,35 +193,38 @@ data class AppColors(
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
 
-    // --- User Profile Screen ---
-    val ProfileHeaderBackground: Color,
-    val ProfileHeaderAccent: Color,
-    val ProfileSheetBackground: Color,
-    val ProfileFamilyBoxBackground: Color,
-    val ProfileMenuRowBackground: Color,
-    val ProfileMenuIconBackground: Color,
-    val ProfileMemberCardBackground: Color,
-    val ProfileMemberCardBorder: Color,
-    val ProfileAddCardBackground: Color,
-    val ProfileAddIconBackground: Color,
-    val ProfileAddIconTint: Color,
-    val ProfileStreakBadgeBackground: Color,
-    val ProfileHeaderEdge: Color,
-    val ProfileShowDetailsBackground: Color,
-    val ProfileMenuLabel: Color,
-    val ProfileMenuChevron: Color,
+    // --- User Profile Screen / App Settings ---
+    // See AppColorsExtension's kdoc: kept out of this constructor to avoid
+    // a D8 VerifyError crash from having too many constructor parameters.
+    private val extension: AppColorsExtension,
+) {
+    val ProfileHeaderBackground: Color get() = extension.ProfileHeaderBackground
+    val ProfileHeaderAccent: Color get() = extension.ProfileHeaderAccent
+    val ProfileSheetBackground: Color get() = extension.ProfileSheetBackground
+    val ProfileFamilyBoxBackground: Color get() = extension.ProfileFamilyBoxBackground
+    val ProfileMenuRowBackground: Color get() = extension.ProfileMenuRowBackground
+    val ProfileMenuIconBackground: Color get() = extension.ProfileMenuIconBackground
+    val ProfileMemberCardBackground: Color get() = extension.ProfileMemberCardBackground
+    val ProfileMemberCardBorder: Color get() = extension.ProfileMemberCardBorder
+    val ProfileAddCardBackground: Color get() = extension.ProfileAddCardBackground
+    val ProfileAddIconBackground: Color get() = extension.ProfileAddIconBackground
+    val ProfileAddIconTint: Color get() = extension.ProfileAddIconTint
+    val ProfileStreakBadgeBackground: Color get() = extension.ProfileStreakBadgeBackground
+    val ProfileHeaderEdge: Color get() = extension.ProfileHeaderEdge
+    val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
+    val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
+    val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
 
-    // --- App Settings ---
-    val AppSettingsCardBackground: Color,
-    val AppSettingsIconContainerBackground: Color,
-    val AppSettingsRowLabel: Color,
-    val AppSettingsToggleContainerBackground: Color,
-    val AppSettingsToggleChipSelectedBackground: Color,
-    val AppSettingsToggleTextUnselected: Color,
-    val AppSettingsToggleTextSelected: Color,
-    val AppSettingsLogoutAccent: Color,
-    val AppSettingsLogoutIconBackground: Color,
-)
+    val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
+    val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
+    val AppSettingsRowLabel: Color get() = extension.AppSettingsRowLabel
+    val AppSettingsToggleContainerBackground: Color get() = extension.AppSettingsToggleContainerBackground
+    val AppSettingsToggleChipSelectedBackground: Color get() = extension.AppSettingsToggleChipSelectedBackground
+    val AppSettingsToggleTextUnselected: Color get() = extension.AppSettingsToggleTextUnselected
+    val AppSettingsToggleTextSelected: Color get() = extension.AppSettingsToggleTextSelected
+    val AppSettingsLogoutAccent: Color get() = extension.AppSettingsLogoutAccent
+    val AppSettingsLogoutIconBackground: Color get() = extension.AppSettingsLogoutIconBackground
+}
 
 /** Light theme color palette. All teal values kept identical to original. */
 fun lightColors() = AppColors(
@@ -256,12 +303,12 @@ fun lightColors() = AppColors(
     MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
     AuthDialogBackground = Color(0xFFFFFFFF), // Surface
     AuthDialogSubtitle = Color(0xFF777777), // Gray800
-    
+
     // Profile Setup
     ProfileSetupTitle = Color(0xFF13A4AB), // Teal1000
     ProfileSetupSubtitle = Color(0xFF898989), // Gray700
     ProfileSetupSectionTitle = Color(0xFF545454), // Gray1300
-    
+
     // Chips
     ChipBackgroundSelected = Color(0xFFC0C0C0), // Gray500
     ChipBackgroundUnselected = Color(0xFFFFFFFF), // White
@@ -316,34 +363,36 @@ fun lightColors() = AppColors(
     ShadowMaleSelected = Color(0x6613A4AB),
     ShadowDobActive = Color(0x6613A4AB),
 
-    // User Profile Screen — light values match the Figma light spec
-    ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — screen bg behind header
-    ProfileHeaderAccent = Color(0xFF11939A), // Teal1200 — avatar ring
-    ProfileSheetBackground = Color(0xFFFFFFFF), // White — main sheet
-    ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White — dashed container fill
-    ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
-    ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
-    ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
-    ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-    ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
-    ProfileAddIconBackground = Color(0xFFFFFFFF), // White
-    ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
-    ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
-    ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
-    ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
-    ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
-    ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
+    extension = AppColorsExtension(
+        // User Profile Screen — light values match the Figma light spec
+        ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — screen bg behind header
+        ProfileHeaderAccent = Color(0xFF11939A), // Teal1200 — avatar ring
+        ProfileSheetBackground = Color(0xFFFFFFFF), // White — main sheet
+        ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White — dashed container fill
+        ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
+        ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
+        ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
+        ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
+        ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
+        ProfileAddIconBackground = Color(0xFFFFFFFF), // White
+        ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
+        ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+        ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
+        ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+        ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
+        ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
 
-    // App Settings
-    AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
-    AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
-    AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
-    AppSettingsToggleContainerBackground = Color(0xFFE5E5E4), // Gray300
-    AppSettingsToggleChipSelectedBackground = Color(0xFFFFFFFF), // White
-    AppSettingsToggleTextUnselected = Color(0xFF777777), // Gray800
-    AppSettingsToggleTextSelected = Color(0xFF3E3E3E), // Gray1400 (matches ChipTextSelected)
-    AppSettingsLogoutAccent = Color(0xFFFA4D5E),
-    AppSettingsLogoutIconBackground = Color(0xFFFFF1F3), // ErrorBackground (light)
+        // App Settings
+        AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
+        AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
+        AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
+        AppSettingsToggleContainerBackground = Color(0xFFE5E5E4), // Gray300
+        AppSettingsToggleChipSelectedBackground = Color(0xFFFFFFFF), // White
+        AppSettingsToggleTextUnselected = Color(0xFF777777), // Gray800
+        AppSettingsToggleTextSelected = Color(0xFF3E3E3E), // Gray1400 (matches ChipTextSelected)
+        AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+        AppSettingsLogoutIconBackground = Color(0xFFFFF1F3), // ErrorBackground (light)
+    ),
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -428,7 +477,7 @@ fun darkColors() = AppColors(
     ProfileSetupTitle = Color(0xFFE8FAFA), // Teal100
     ProfileSetupSubtitle = Color(0xFF108188), // Teal1300
     ProfileSetupSectionTitle = Color(0xFF75DEE3), // Teal500
-    
+
     // Chips
     ChipBackgroundSelected = Color(0xFF13A4AB), // Teal1000
     ChipBackgroundUnselected = Color(0xFF0B5F65), // Teal1400
@@ -483,35 +532,37 @@ fun darkColors() = AppColors(
     ShadowMaleSelected = Color(0x9975DEE3),
     ShadowDobActive = Color(0x9975DEE3),
 
-    // User Profile Screen — dark values match the Figma dark spec
-    ProfileHeaderBackground = Color(0xFF0A545A), // Teal1500 — screen bg behind header
-    ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400 — avatar ring
-    ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — main sheet
-    ProfileFamilyBoxBackground = Color(0xFF0A545A), // Teal1500 — dashed container fill
-    ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500
-    ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
-    ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
-    ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-    ProfileAddCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
-    ProfileAddIconBackground = Color(0xFF2FC5CC), // Teal700 — light teal rounded box
-    ProfileAddIconTint = Color(0xFFFFFFFF), // White "+" icon
-    ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
-    ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
-    ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
-    ProfileMenuLabel = Color(0xFF11939A), // Teal1200
-    ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
+    extension = AppColorsExtension(
+        // User Profile Screen — dark values match the Figma dark spec
+        ProfileHeaderBackground = Color(0xFF0A545A), // Teal1500 — screen bg behind header
+        ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400 — avatar ring
+        ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — main sheet
+        ProfileFamilyBoxBackground = Color(0xFF0A545A), // Teal1500 — dashed container fill
+        ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500
+        ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
+        ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
+        ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
+        ProfileAddCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
+        ProfileAddIconBackground = Color(0xFF2FC5CC), // Teal700 — light teal rounded box
+        ProfileAddIconTint = Color(0xFFFFFFFF), // White "+" icon
+        ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+        ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
+        ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+        ProfileMenuLabel = Color(0xFF11939A), // Teal1200
+        ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
 
-    // App Settings
-    AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
-    // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
-    AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600
-    // Teal1200 is remapped to 0xFFA3E9EC in this palette for secondary text — cannot reuse for this
-    AppSettingsRowLabel = Color(0xFF11939A), // Teal1200 (light) literal
-    AppSettingsToggleContainerBackground = Color(0xFF0F474A), // Teal1600
-    AppSettingsToggleChipSelectedBackground = Color(0xFF13A4AB), // Teal1000
-    AppSettingsToggleTextUnselected = Color(0xFFA3E9EC), // Teal400
-    AppSettingsToggleTextSelected = Color(0xFFA3E9EC), // Teal400 — same as unselected, differentiated by chip bg
-    // Error is remapped to 0xFFFF6B7A in this palette — spec requires the same red in both themes here
-    AppSettingsLogoutAccent = Color(0xFFFA4D5E),
-    AppSettingsLogoutIconBackground = Color(0xFF0A545A), // Teal1500 — ErrorBackground dark value doesn't fit here
+        // App Settings
+        AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
+        // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
+        AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600
+        // Teal1200 is remapped to 0xFFA3E9EC in this palette for secondary text — cannot reuse for this
+        AppSettingsRowLabel = Color(0xFF11939A), // Teal1200 (light) literal
+        AppSettingsToggleContainerBackground = Color(0xFF0F474A), // Teal1600
+        AppSettingsToggleChipSelectedBackground = Color(0xFF13A4AB), // Teal1000
+        AppSettingsToggleTextUnselected = Color(0xFFA3E9EC), // Teal400
+        AppSettingsToggleTextSelected = Color(0xFFA3E9EC), // Teal400 — same as unselected, differentiated by chip bg
+        // Error is remapped to 0xFFFF6B7A in this palette — spec requires the same red in both themes here
+        AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+        AppSettingsLogoutIconBackground = Color(0xFF0A545A), // Teal1500 — ErrorBackground dark value doesn't fit here
+    ),
 )
