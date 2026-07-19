@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.dashedBorder
@@ -49,34 +53,36 @@ fun FamilyMembersSection(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // No end padding here: the box should reach the screen's true
-        // trailing edge (its ancestor Column no longer reserves one), so the
-        // dashed border never closes on the right — it reads as "more to
-        // scroll" rather than a sealed box with a margin.
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .clip(RoundedCornerShape(22.dp))
-                .background(AppTheme.colors.ProfileFamilyBoxBackground)
-                .dashedBorder(width = 2.dp, color = AppTheme.colors.Teal500, cornerRadius = 22.dp)
-                .padding(16.dp),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                contentPadding = PaddingValues(end = 4.dp),
+        // A leading Spacer (not padding) guarantees the visible left inset —
+        // the dashed box itself still overruns the right edge (clipped by
+        // the sheet) so its dashes read as continuing off-screen there.
+        Row {
+            Spacer(modifier = Modifier.width(24.dp))
+            Box(
+                modifier = Modifier
+                    .requiredWidth((LocalConfiguration.current.screenWidthDp + 56).dp)
+                    .height(128.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(AppTheme.colors.ProfileFamilyBoxBackground)
+                    .dashedBorder(width = 2.dp, color = AppTheme.colors.Teal500, cornerRadius = 22.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                contentAlignment = Alignment.CenterStart,
             ) {
-                items(items = familyMembers, key = { it.id }) { member ->
-                    FamilyMemberCard(
-                        member = member,
-                        onShowDetailsClick = { onMemberDetailClick(member.id) },
-                        onLongPress = { onMemberLongPress(member.id) },
-                    )
-                }
-                item(key = "add_member_card") {
-                    AddMemberCard(onClick = onAddMemberClick)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    contentPadding = PaddingValues(start = 12.dp, end = 4.dp),
+                ) {
+                    items(items = familyMembers, key = { it.id }) { member ->
+                        FamilyMemberCard(
+                            member = member,
+                            onShowDetailsClick = { onMemberDetailClick(member.id) },
+                            onLongPress = { onMemberLongPress(member.id) },
+                        )
+                    }
+                    item(key = "add_member_card") {
+                        AddMemberCard(onClick = onAddMemberClick)
+                    }
                 }
             }
         }

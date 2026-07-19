@@ -51,7 +51,7 @@ fun FamilyMemberCard(
     Column(
         modifier = modifier
             .width(112.dp)
-            .height(112.dp)
+            .height(96.dp)
             .border(
                 width = 1.5.dp,
                 color = AppTheme.colors.ProfileMemberCardBorder,
@@ -66,7 +66,7 @@ fun FamilyMemberCard(
                 onLongClick = onLongPress,
             )
             .padding(10.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -110,8 +110,6 @@ fun FamilyMemberCard(
                 modifier = Modifier.weight(1f),
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier

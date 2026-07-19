@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.profile.view.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -40,16 +41,21 @@ fun AddMemberCard(
 ) {
     Column(
         modifier = modifier
-            .width(120.dp)
-            .height(112.dp)
+            .width(112.dp)
+            .height(96.dp)
+            .border(
+                width = 1.5.dp,
+                color = AppTheme.colors.ProfileMemberCardBorder,
+                shape = RoundedCornerShape(16.dp),
+            )
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.ProfileAddCardBackground)
+            .background(AppTheme.colors.ProfileMemberCardBackground)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick,
             )
-            .padding(14.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -58,15 +64,15 @@ fun AddMemberCard(
             contentDescription = null,
             tint = AppTheme.colors.ProfileAddIconTint,
             modifier = Modifier
-                .size(36.dp)
+                .size(28.dp)
                 .clip(CircleShape)
                 .background(AppTheme.colors.ProfileAddIconBackground)
-                .padding(7.dp),
+                .padding(6.dp),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = stringResource(R.string.user_profile_add_member),
-            style = AppTheme.typography.labelLarge,
+            style = AppTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = AppTheme.colors.TextPrimary,
             textAlign = TextAlign.Center,
