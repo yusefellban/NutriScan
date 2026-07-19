@@ -41,7 +41,7 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.profile_setup.state.Gender
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
-import iti.grad.nutriscan.presentation.home.view.components.customShadow
+import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.presentation.R
 
 @Composable
