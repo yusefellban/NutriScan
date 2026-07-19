@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.profile_setup.view.components
+package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,13 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.isSystemInDarkTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
 @Composable
 fun SelectableChip(
@@ -26,20 +23,18 @@ fun SelectableChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
-    
     val backgroundColor = if (isSelected) {
         AppTheme.colors.ChipBackgroundSelected
     } else {
         AppTheme.colors.ChipBackgroundUnselected
     }
-    
+
     val borderColor = if (isSelected) {
         AppTheme.colors.ChipBorderSelected
     } else {
         AppTheme.colors.ChipBorderUnselected
     }
-    
+
     val textColor = if (isSelected) {
         AppTheme.colors.ChipTextSelected
     } else {

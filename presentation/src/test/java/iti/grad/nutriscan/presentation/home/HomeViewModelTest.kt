@@ -88,10 +88,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, effect is NavigateToHistory and selectedTab stays HOME`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            assertEquals(HomeEffect.NavigateToHistory, awaitItem())
+            expectNoEvents()
         }
         // Home is the only tab rendered inline; the retained ViewModel must keep
         // highlighting HOME so returning here doesn't show a stale tab.
@@ -108,19 +108,19 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to SHOPPING, effect is NavigateToShopping and selectedTab stays HOME`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SHOPPING, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
-            assertEquals(HomeEffect.NavigateToShopping, awaitItem())
+            expectNoEvents()
         }
         assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to PROFILE, effect is NavigateToProfile and selectedTab stays HOME`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to PROFILE, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.PROFILE))
-            assertEquals(HomeEffect.NavigateToProfile, awaitItem())
+            expectNoEvents()
         }
         assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }

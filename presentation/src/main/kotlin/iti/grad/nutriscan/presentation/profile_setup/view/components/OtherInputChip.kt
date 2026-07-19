@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.auth.profile_setup.view.components
+package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.isSystemInDarkTheme
 import iti.grad.nutriscan.presentation.common.components.dashedBorder
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 
 @Composable
 fun OtherInputChip(
@@ -49,14 +48,12 @@ fun OtherInputChip(
     placeholder: String,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
-    
     val activeColor = AppTheme.colors.OtherChipActive
     val borderColor = AppTheme.colors.OtherChipBorder
     val textColor = AppTheme.colors.OtherChipText
     val backgroundColor = AppTheme.colors.OtherChipBackground
     val textUnselectedColor = AppTheme.colors.OtherChipTextUnselected
-    
+
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(isEditing) {
@@ -107,9 +104,9 @@ fun OtherInputChip(
                     innerTextField()
                 }
             )
-            
+
             Spacer(modifier = Modifier.width(6.dp))
-            
+
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = "Confirm",
@@ -118,9 +115,9 @@ fun OtherInputChip(
                     .size(18.dp)
                     .clickable { onSubmit() }
             )
-            
+
             Spacer(modifier = Modifier.width(4.dp))
-            
+
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Cancel",

@@ -1,12 +1,12 @@
-package iti.grad.nutriscan.presentation.auth.profile_setup.viewmodel
+package iti.grad.nutriscan.presentation.profile_setup.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
-import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEffect
-import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupEvent
-import iti.grad.nutriscan.presentation.auth.profile_setup.state.HealthProfileSetupState
+import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
+import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
+import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,41 +18,92 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HealthProfileSetupViewModel @Inject constructor(
+class ProfileSetupPagerViewModel @Inject constructor(
     private val completeOnboardingUseCase: CompleteOnboardingUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(HealthProfileSetupState())
-    val state: StateFlow<HealthProfileSetupState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(ProfileSetupPagerState())
+    val state: StateFlow<ProfileSetupPagerState> = _state.asStateFlow()
 
-    private val _effect = Channel<HealthProfileSetupEffect>(Channel.BUFFERED)
+    private val _effect = Channel<ProfileSetupPagerEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    fun onEvent(event: HealthProfileSetupEvent) {
+    fun onEvent(event: ProfileSetupPagerEvent) {
         when (event) {
-            is HealthProfileSetupEvent.ToggleCondition -> toggleCondition(event.condition)
-            is HealthProfileSetupEvent.ToggleAllergy -> toggleAllergy(event.allergy)
-            HealthProfileSetupEvent.StartAddCustomCondition -> _state.update {
+            // Pager navigation
+            ProfileSetupPagerEvent.NextClicked -> handleNextClicked()
+            ProfileSetupPagerEvent.BackClicked -> handleBackClicked()
+            is ProfileSetupPagerEvent.PageChanged -> _state.update {
+                it.copy(currentPage = event.page)
+            }
+
+            // Page 1: Gender
+            is ProfileSetupPagerEvent.SelectGender -> _state.update {
+                it.copy(selectedGender = event.gender)
+            }
+
+            // Page 2: Date of Birth
+            is ProfileSetupPagerEvent.SelectDateOfBirth -> _state.update {
+                it.copy(selectedDateOfBirthMillis = event.dateMillis)
+            }
+
+            // Page 3: Height
+            is ProfileSetupPagerEvent.SelectHeight -> _state.update {
+                it.copy(selectedHeightCm = event.heightCm)
+            }
+
+            // Page 4: Weight
+            is ProfileSetupPagerEvent.SelectWeight -> _state.update {
+                it.copy(selectedWeightKg = event.weightKg)
+            }
+
+            // Health Profile events
+            is ProfileSetupPagerEvent.ToggleCondition -> toggleCondition(event.condition)
+            is ProfileSetupPagerEvent.ToggleAllergy -> toggleAllergy(event.allergy)
+            ProfileSetupPagerEvent.StartAddCustomCondition -> _state.update {
                 it.copy(isAddingCustomCondition = true, customConditionInput = "")
             }
-            is HealthProfileSetupEvent.UpdateCustomConditionInput -> _state.update {
+            is ProfileSetupPagerEvent.UpdateCustomConditionInput -> _state.update {
                 it.copy(customConditionInput = event.input)
             }
-            HealthProfileSetupEvent.SubmitCustomCondition -> submitCustomCondition()
-            HealthProfileSetupEvent.CancelAddCustomCondition -> _state.update {
+            ProfileSetupPagerEvent.SubmitCustomCondition -> submitCustomCondition()
+            ProfileSetupPagerEvent.CancelAddCustomCondition -> _state.update {
                 it.copy(isAddingCustomCondition = false, customConditionInput = "")
             }
-            HealthProfileSetupEvent.StartAddCustomAllergy -> _state.update {
+            ProfileSetupPagerEvent.StartAddCustomAllergy -> _state.update {
                 it.copy(isAddingCustomAllergy = true, customAllergyInput = "")
             }
-            is HealthProfileSetupEvent.UpdateCustomAllergyInput -> _state.update {
+            is ProfileSetupPagerEvent.UpdateCustomAllergyInput -> _state.update {
                 it.copy(customAllergyInput = event.input)
             }
-            HealthProfileSetupEvent.SubmitCustomAllergy -> submitCustomAllergy()
-            HealthProfileSetupEvent.CancelAddCustomAllergy -> _state.update {
+            ProfileSetupPagerEvent.SubmitCustomAllergy -> submitCustomAllergy()
+            ProfileSetupPagerEvent.CancelAddCustomAllergy -> _state.update {
                 it.copy(isAddingCustomAllergy = false, customAllergyInput = "")
             }
-            HealthProfileSetupEvent.SaveProfile -> saveProfile()
+            ProfileSetupPagerEvent.SaveProfile -> saveProfile()
+        }
+    }
+
+    private fun handleNextClicked() {
+        val currentPage = _state.value.currentPage
+        val lastPage = _state.value.pageCount - 1
+        if (currentPage < lastPage) {
+            viewModelScope.launch {
+                _effect.send(ProfileSetupPagerEffect.ScrollToPage(currentPage + 1))
+            }
+        }
+    }
+
+    private fun handleBackClicked() {
+        val currentPage = _state.value.currentPage
+        if (currentPage > 0) {
+            viewModelScope.launch {
+                _effect.send(ProfileSetupPagerEffect.ScrollToPage(currentPage - 1))
+            }
+        } else {
+            viewModelScope.launch {
+                _effect.send(ProfileSetupPagerEffect.NavigateBack)
+            }
         }
     }
 
@@ -139,9 +190,13 @@ class HealthProfileSetupViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             try {
                 completeOnboardingUseCase()
-                _effect.send(HealthProfileSetupEffect.NavigateToHome)
+                _effect.send(ProfileSetupPagerEffect.NavigateToHome)
             } catch (e: Exception) {
-                _effect.send(HealthProfileSetupEffect.ShowSnackbar(messageStr = e.message ?: "Failed to save profile"))
+                _effect.send(
+                    ProfileSetupPagerEffect.ShowSnackbar(
+                        messageStr = e.message ?: "Failed to save profile"
+                    )
+                )
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

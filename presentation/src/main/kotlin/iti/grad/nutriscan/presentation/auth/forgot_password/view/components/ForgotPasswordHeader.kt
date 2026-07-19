@@ -26,8 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -62,27 +64,12 @@ fun ForgotPasswordHeader(
                 .padding(top = 48.dp, bottom = 48.dp)
         ) {
             // ── Back button ──────────────────────────────────────────────
-            Box(
+            AppBackButton(
+                onClick = onBackClick,
                 modifier = Modifier
                     .padding(start = 24.dp, top = 4.dp)
-                    .size(48.dp)
-                    .border(width = 1.dp, color = Color.White, shape = RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onBackClick
-                    )
-                    .align(Alignment.TopStart),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_back),
-                    contentDescription = stringResource(R.string.app_name),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
+                    .align(Alignment.TopStart)
+            )
 
             // ── Title + Subtitle ─────────────────────────────────────────
             Column(
