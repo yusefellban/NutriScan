@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -31,7 +31,7 @@ import iti.grad.presentation.R
  */
 @Composable
 fun SettingsActionRow(
-    icon: ImageVector,
+    icon: Painter,
     label: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -65,7 +65,7 @@ fun SettingsActionRow(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 contentDescription = null,
                 tint = AppTheme.colors.Teal1000,
                 modifier = Modifier.size(22.dp),

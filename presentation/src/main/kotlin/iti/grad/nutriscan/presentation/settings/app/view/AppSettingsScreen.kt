@@ -5,16 +5,15 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,7 +22,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
@@ -99,6 +100,7 @@ private fun AppSettingsContent(
 
     Scaffold(
         containerColor = AppTheme.colors.Background,
+        contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(snackbarHostState) { AppSnackbar(message = it.visuals.message) } },
     ) { innerPadding ->
         Column(
@@ -106,7 +108,8 @@ private fun AppSettingsContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(AppTheme.colors.Background)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .navigationBarsPadding(),
         ) {
             AppSettingsHeader(onBackClick = { onEvent(AppSettingsEvent.BackClicked) })
 
@@ -115,13 +118,13 @@ private fun AppSettingsContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 SettingsActionRow(
-                    icon = Icons.Filled.Person,
+                    icon = painterResource(R.drawable.edit_profile),
                     label = stringResource(R.string.app_settings_profile_settings),
                     onClick = { onEvent(AppSettingsEvent.ProfileSettingsClicked) },
                 )
 
                 SettingsToggleRow(
-                    icon = Icons.Filled.Palette,
+                    icon = painterResource(R.drawable.fluent_dark_theme_24_regular),
                     label = stringResource(R.string.app_settings_appearance),
                     options = themeOptions,
                     selectedIndex = state.selectedThemeMode.ordinal,
@@ -131,7 +134,7 @@ private fun AppSettingsContent(
                 )
 
                 SettingsToggleRow(
-                    icon = Icons.Filled.Language,
+                    icon = rememberVectorPainter(Icons.Filled.Language),
                     label = stringResource(R.string.app_settings_language),
                     options = languageOptions,
                     selectedIndex = state.selectedLanguage.ordinal,
@@ -141,13 +144,13 @@ private fun AppSettingsContent(
                 )
 
                 SettingsActionRow(
-                    icon = Icons.Filled.Description,
+                    icon = rememberVectorPainter(Icons.Filled.Description),
                     label = stringResource(R.string.app_settings_terms_and_conditions),
                     onClick = { onEvent(AppSettingsEvent.TermsAndConditionsClicked) },
                 )
 
                 SettingsActionRow(
-                    icon = Icons.Filled.HelpOutline,
+                    icon = painterResource(R.drawable.material_symbols_help_outline),
                     label = stringResource(R.string.app_settings_help),
                     onClick = { onEvent(AppSettingsEvent.HelpClicked) },
                 )

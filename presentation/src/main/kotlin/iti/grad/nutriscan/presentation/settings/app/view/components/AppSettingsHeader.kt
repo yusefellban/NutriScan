@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +31,12 @@ fun AppSettingsHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(242.dp)
             .background(
                 color = AppTheme.colors.Teal1000,
                 shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
             )
+            .statusBarsPadding()
+            .height(242.dp)
             .padding(start = 24.dp, end = 24.dp, top = 24.dp),
     ) {
         AppBackButton(

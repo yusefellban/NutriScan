@@ -2,11 +2,11 @@ package iti.grad.nutriscan.presentation.settings.app.view.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 
 @Composable
 fun SettingsToggleRow(
-    icon: ImageVector,
+    icon: Painter,
     label: String,
     options: List<String>,
     selectedIndex: Int,
