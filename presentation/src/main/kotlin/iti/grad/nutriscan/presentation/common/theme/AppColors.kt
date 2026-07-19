@@ -120,6 +120,7 @@ data class AppColors(
     val ProfileAddCardBackground: Color,
     val ProfileAddIconBackground: Color,
     val ProfileAddIconTint: Color,
+    val ProfileAddText: Color,
     val ProfileStreakBadgeBackground: Color,
     val ProfileHeaderEdge: Color,
     val ProfileShowDetailsBackground: Color,
@@ -232,9 +233,10 @@ fun lightColors() = AppColors(
     ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
     ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
     ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-    ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
+    ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100
     ProfileAddIconBackground = Color(0xFFFFFFFF), // White
-    ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
+    ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000
+    ProfileAddText = Color(0xFF0F474A), // Teal1600
     ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
     ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
     ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
@@ -347,9 +349,10 @@ fun darkColors() = AppColors(
     ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
     ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
     ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-    ProfileAddCardBackground = Color(0xFF0A545A), // Teal1500 — elevated deep teal
-    ProfileAddIconBackground = Color(0xFF2FC5CC), // Teal700 — light teal rounded box
-    ProfileAddIconTint = Color(0xFFFFFFFF), // White "+" icon
+    ProfileAddCardBackground = Color(0xFF0F474A), // Teal1600
+    ProfileAddIconBackground = Color(0xFFE8FAFA), // Teal100
+    ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000
+    ProfileAddText = Color(0xFFE8FAFA), // Teal100
     ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
     ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
     ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes

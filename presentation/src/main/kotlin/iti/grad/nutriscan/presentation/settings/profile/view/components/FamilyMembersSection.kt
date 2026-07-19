@@ -20,10 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import iti.grad.nutriscan.presentation.common.components.dashedBorder
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
@@ -53,36 +56,46 @@ fun FamilyMembersSection(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // A leading Spacer (not padding) guarantees the visible left inset —
-        // the dashed box itself still overruns the right edge (clipped by
+        val dashedBorderColor = AppTheme.colors.Teal500
+        // The dashed box itself overruns the right edge (clipped by
         // the sheet) so its dashes read as continuing off-screen there.
-        Row {
-            Spacer(modifier = Modifier.width(24.dp))
-            Box(
-                modifier = Modifier
-                    .requiredWidth((LocalConfiguration.current.screenWidthDp + 56).dp)
-                    .height(128.dp)
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(AppTheme.colors.ProfileFamilyBoxBackground)
-                    .dashedBorder(width = 2.dp, color = AppTheme.colors.Teal500, cornerRadius = 22.dp)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.CenterStart,
+        Box(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .requiredWidth((LocalConfiguration.current.screenWidthDp).dp)
+                .height(128.dp)
+                .background(AppTheme.colors.ProfileFamilyBoxBackground, RoundedCornerShape(22.dp))
+                .drawBehind {
+                    drawRoundRect(
+                        color = dashedBorderColor,
+                        cornerRadius = CornerRadius(22.dp.toPx()),
+                        style = Stroke(
+                            width = 2.dp.toPx(),
+                            pathEffect = PathEffect.dashPathEffect(
+                                intervals = floatArrayOf(7.5f.dp.toPx(), 5.dp.toPx()),
+                                phase = 0f,
+                            ),
+                        ),
+                    )
+                }
+                .clip(RoundedCornerShape(22.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                contentPadding = PaddingValues(start = 12.dp, end = 4.dp),
             ) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    contentPadding = PaddingValues(start = 12.dp, end = 4.dp),
-                ) {
-                    items(items = familyMembers, key = { it.id }) { member ->
-                        FamilyMemberCard(
-                            member = member,
-                            onShowDetailsClick = { onMemberDetailClick(member.id) },
-                            onLongPress = { onMemberLongPress(member.id) },
-                        )
-                    }
-                    item(key = "add_member_card") {
-                        AddMemberCard(onClick = onAddMemberClick)
-                    }
+                items(items = familyMembers, key = { it.id }) { member ->
+                    FamilyMemberCard(
+                        member = member,
+                        onShowDetailsClick = { onMemberDetailClick(member.id) },
+                        onLongPress = { onMemberLongPress(member.id) },
+                    )
+                }
+                item(key = "add_member_card") {
+                    AddMemberCard(onClick = onAddMemberClick)
                 }
             }
         }
