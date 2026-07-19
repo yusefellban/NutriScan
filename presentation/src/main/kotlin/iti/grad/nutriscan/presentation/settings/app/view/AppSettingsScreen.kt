@@ -1,8 +1,5 @@
 package iti.grad.nutriscan.presentation.settings.app.view
 
-import android.app.Activity
-import android.os.LocaleList
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,11 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.domain.settings.model.AppLanguage
@@ -53,7 +48,6 @@ fun AppSettingsScreen(
     onNavigateToLogin: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -63,13 +57,6 @@ fun AppSettingsScreen(
                 is AppSettingsEffect.NavigateToTermsAndConditions -> onNavigateToTermsAndConditions()
                 is AppSettingsEffect.NavigateToHelp -> onNavigateToHelp()
                 is AppSettingsEffect.NavigateToLogin -> onNavigateToLogin()
-                is AppSettingsEffect.ApplyLocale -> {
-                    val languageTag = if (effect.language == AppLanguage.AR) "ar" else "en"
-                    AppCompatDelegate.setApplicationLocales(
-                        LocaleListCompat.wrap(LocaleList.forLanguageTags(languageTag))
-                    )
-                    (context as? Activity)?.recreate()
-                }
             }
         }
     }

@@ -1,5 +1,7 @@
 package iti.grad.nutriscan
 
+import android.content.ContextWrapper
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,20 +16,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 
+import iti.grad.nutriscan.domain.settings.model.AppLanguage
 import iti.grad.nutriscan.domain.settings.model.ThemeMode
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.navigation.AppNavGraph
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -49,13 +58,37 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.LIGHT -> false
                 ThemeMode.SYSTEM, null -> isSystemInDarkTheme()
             }
-            AppTheme(darkTheme = darkTheme) {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AppNavGraph()
+
+            val language by mainActivityViewModel.language.collectAsStateWithLifecycle()
+            val locale = if (language == AppLanguage.AR) Locale("ar") else Locale("en")
+            val baseContext = LocalContext.current
+            val localizedContext = remember(locale) {
+                Locale.setDefault(locale)
+                val configuration = Configuration(baseContext.resources.configuration).apply {
+                    setLocale(locale)
+                }
+                // Wrap (not replace) the Activity context: Hilt's hiltViewModel() walks the
+                // ContextWrapper chain looking for the Activity, so the base context must stay
+                // the real Activity. Only resources are swapped for the localized ones.
+                val configContext = baseContext.createConfigurationContext(configuration)
+                object : ContextWrapper(baseContext) {
+                    override fun getResources() = configContext.resources
+                }
+            }
+            val layoutDirection = if (language == AppLanguage.AR) LayoutDirection.Rtl else LayoutDirection.Ltr
+
+            CompositionLocalProvider(
+                LocalContext provides localizedContext,
+                LocalLayoutDirection provides layoutDirection,
+            ) {
+                AppTheme(darkTheme = darkTheme) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        containerColor = MaterialTheme.colorScheme.background
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            AppNavGraph()
+                        }
                     }
                 }
             }

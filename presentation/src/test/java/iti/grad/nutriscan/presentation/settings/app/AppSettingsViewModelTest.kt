@@ -104,18 +104,12 @@ class AppSettingsViewModelTest {
     inner class LanguageSelection {
 
         @Test
-        fun `LanguageSelected updates state, persists, and emits ApplyLocale`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(AppSettingsEvent.LanguageSelected(AppLanguage.AR))
-                testScheduler.advanceUntilIdle()
+        fun `LanguageSelected updates state and persists via use case`() = runTest {
+            viewModel.onEvent(AppSettingsEvent.LanguageSelected(AppLanguage.AR))
+            testScheduler.advanceUntilIdle()
 
-                Assertions.assertEquals(AppLanguage.AR, viewModel.state.value.selectedLanguage)
-                coVerify { setLanguageUseCase(AppLanguage.AR) }
-
-                val effect = awaitItem()
-                Assertions.assertTrue(effect is AppSettingsEffect.ApplyLocale)
-                Assertions.assertEquals(AppLanguage.AR, (effect as AppSettingsEffect.ApplyLocale).language)
-            }
+            Assertions.assertEquals(AppLanguage.AR, viewModel.state.value.selectedLanguage)
+            coVerify { setLanguageUseCase(AppLanguage.AR) }
         }
     }
 

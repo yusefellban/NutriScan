@@ -68,10 +68,7 @@ class AppSettingsViewModel @Inject constructor(
 
     private fun selectLanguage(language: AppLanguage) {
         _state.update { it.copy(selectedLanguage = language) }
-        viewModelScope.launch {
-            setLanguageUseCase(language)
-            _effect.send(AppSettingsEffect.ApplyLocale(language))
-        }
+        viewModelScope.launch { setLanguageUseCase(language) }
     }
 
     private fun confirmLogout() {
