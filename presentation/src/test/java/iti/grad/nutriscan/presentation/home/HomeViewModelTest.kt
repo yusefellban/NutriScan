@@ -1,7 +1,7 @@
 package iti.grad.nutriscan.presentation.home
 
 import app.cash.turbine.test
-import iti.grad.nutriscan.presentation.home.state.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.VerdictType
@@ -93,16 +93,18 @@ class HomeViewModelTest {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
             expectNoEvents()
         }
-        assertEquals(BottomNavTab.HISTORY, viewModel.state.value.selectedTab)
+        // Home is the only tab rendered inline; the retained ViewModel must keep
+        // highlighting HOME so returning here doesn't show a stale tab.
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
-    fun `when BottomNavTabClicked to SCAN, selectedTab is updated and effect is NavigateToScan`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SCAN, effect is NavigateToScan and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SCAN))
             assertEquals(HomeEffect.NavigateToScan, awaitItem())
         }
-        assertEquals(BottomNavTab.SCAN, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
@@ -111,7 +113,7 @@ class HomeViewModelTest {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
             expectNoEvents()
         }
-        assertEquals(BottomNavTab.SHOPPING, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test
@@ -120,7 +122,7 @@ class HomeViewModelTest {
             viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.PROFILE))
             expectNoEvents()
         }
-        assertEquals(BottomNavTab.PROFILE, viewModel.state.value.selectedTab)
+        assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
 
     @Test

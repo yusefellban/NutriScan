@@ -3,7 +3,7 @@ package iti.grad.nutriscan.presentation.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.presentation.home.state.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
@@ -44,9 +44,17 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 HomeEffect.NavigateToScanResult(event.itemId)
             )
             is HomeEvent.BottomNavTabClicked -> {
-                _state.value = _state.value.copy(selectedTab = event.tab)
-                if (event.tab == BottomNavTab.SCAN) {
-                    emitEffect(HomeEffect.NavigateToScan)
+                // Home is the only tab rendered inline; every other tab is a
+                // separate destination, so `selectedTab` is intentionally left
+                // at HOME — mutating it here would leave this screen's retained
+                // ViewModel stuck highlighting the wrong tab when the user
+                // navigates back.
+                when (event.tab) {
+                    BottomNavTab.HOME -> Unit
+                    BottomNavTab.HISTORY -> emitEffect(HomeEffect.NavigateToHistory)
+                    BottomNavTab.SCAN -> emitEffect(HomeEffect.NavigateToScan)
+                    BottomNavTab.SHOPPING -> emitEffect(HomeEffect.NavigateToShopping)
+                    BottomNavTab.PROFILE -> emitEffect(HomeEffect.NavigateToProfile)
                 }
             }
         }

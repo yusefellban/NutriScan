@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.home.view.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,16 +30,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.home.state.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.presentation.R
 
 /**
  * Custom bottom navigation bar with a floating center Scan button.
  *
- * All icons come from drawable resources. All colors from [AppTheme.colors].
+ * Shared by every screen that shows the app-level bottom navigation
+ * (Home, Profile, etc). All icons come from drawable resources. All colors
+ * from [AppTheme.colors].
  */
 @Composable
-fun HomeBottomNavBar(
+fun AppBottomNavBar(
     selectedTab: BottomNavTab,
     onTabClick: (BottomNavTab) -> Unit,
     modifier: Modifier = Modifier,

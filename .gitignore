@@ -42,3 +42,8 @@ google-services.json
 
 #Android Profiling
 *.hprof
+
+#Agent tooling
+.agents/
+.claude/
+skills-lock.json
