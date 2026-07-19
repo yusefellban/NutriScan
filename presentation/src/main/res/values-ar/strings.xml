@@ -112,4 +112,21 @@
     <string name="user_profile_settings">الإعدادات</string>
     <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
     <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
+
+    <!-- App Settings -->
+    <string name="app_settings_title">إعدادات التطبيق</string>
+    <string name="app_settings_subtitle">غيّر إعدادات التطبيق هنا</string>
+    <string name="app_settings_profile_settings">إعدادات الملف الشخصي</string>
+    <string name="app_settings_appearance">المظهر</string>
+    <string name="app_settings_language">اللغة</string>
+    <string name="app_settings_terms_and_conditions">الشروط والأحكام</string>
+    <string name="app_settings_help">مساعدة</string>
+    <string name="app_settings_logout">تسجيل الخروج</string>
+    <string name="app_settings_theme_system">النظام</string>
+    <string name="app_settings_theme_dark">داكن</string>
+    <string name="app_settings_theme_light">فاتح</string>
+    <string name="app_settings_lang_en">En</string>
+    <string name="app_settings_lang_ar">Ar</string>
+    <string name="app_settings_logout_confirm_title">تسجيل الخروج؟</string>
+    <string name="app_settings_logout_confirm_message">هل أنت متأكد أنك تريد تسجيل الخروج من نيوتري سكان؟</string>
 </resources>

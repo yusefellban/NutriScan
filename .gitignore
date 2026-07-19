@@ -47,3 +47,6 @@ google-services.json
 .agents/
 .claude/
 skills-lock.json
+
+#IDE Java/Kotlin build output
+bin/

@@ -22,6 +22,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScree
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
+import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 
 @Composable
 fun AppNavGraph(
@@ -335,12 +336,15 @@ fun AppNavGraph(
 
         // 23. App Settings (Placeholder)
         composable<AppSettingsRoute> {
-            PlaceholderScreen(
-                title = "App Settings",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+            AppSettingsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToUserProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }

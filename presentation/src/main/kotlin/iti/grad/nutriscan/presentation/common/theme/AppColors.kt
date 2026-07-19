@@ -166,6 +166,17 @@ data class AppColors(
     val ProfileShowDetailsBackground: Color,
     val ProfileMenuLabel: Color,
     val ProfileMenuChevron: Color,
+
+    // --- App Settings ---
+    val AppSettingsCardBackground: Color,
+    val AppSettingsIconContainerBackground: Color,
+    val AppSettingsRowLabel: Color,
+    val AppSettingsToggleContainerBackground: Color,
+    val AppSettingsToggleChipSelectedBackground: Color,
+    val AppSettingsToggleTextUnselected: Color,
+    val AppSettingsToggleTextSelected: Color,
+    val AppSettingsLogoutAccent: Color,
+    val AppSettingsLogoutIconBackground: Color,
 )
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -322,6 +333,17 @@ fun lightColors() = AppColors(
     ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
     ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
     ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
+
+    // App Settings
+    AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
+    AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
+    AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
+    AppSettingsToggleContainerBackground = Color(0xFFE5E5E4), // Gray300
+    AppSettingsToggleChipSelectedBackground = Color(0xFFFFFFFF), // White
+    AppSettingsToggleTextUnselected = Color(0xFF777777), // Gray800
+    AppSettingsToggleTextSelected = Color(0xFF3E3E3E), // Gray1400 (matches ChipTextSelected)
+    AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+    AppSettingsLogoutIconBackground = Color(0xFFFFF1F3), // ErrorBackground (light)
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -478,4 +500,18 @@ fun darkColors() = AppColors(
     ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
     ProfileMenuLabel = Color(0xFF11939A), // Teal1200
     ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
+
+    // App Settings
+    AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
+    // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
+    AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600
+    // Teal1200 is remapped to 0xFFA3E9EC in this palette for secondary text — cannot reuse for this
+    AppSettingsRowLabel = Color(0xFF11939A), // Teal1200 (light) literal
+    AppSettingsToggleContainerBackground = Color(0xFF0F474A), // Teal1600
+    AppSettingsToggleChipSelectedBackground = Color(0xFF13A4AB), // Teal1000
+    AppSettingsToggleTextUnselected = Color(0xFFA3E9EC), // Teal400
+    AppSettingsToggleTextSelected = Color(0xFFA3E9EC), // Teal400 — same as unselected, differentiated by chip bg
+    // Error is remapped to 0xFFFF6B7A in this palette — spec requires the same red in both themes here
+    AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+    AppSettingsLogoutIconBackground = Color(0xFF0A545A), // Teal1500 — ErrorBackground dark value doesn't fit here
 )
