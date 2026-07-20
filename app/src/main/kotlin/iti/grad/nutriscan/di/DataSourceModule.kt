@@ -15,6 +15,8 @@ import iti.grad.nutriscan.data.local.datasource.IOnboardingPreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.OnboardingPreferencesDataSourceImpl
 import iti.grad.nutriscan.data.local.datasource.IThemePreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.ThemePreferencesDataSourceImpl
+import iti.grad.nutriscan.data.local.datasource.AuthTokenLocalDataSourceImpl
+import iti.grad.nutriscan.data.local.datasource.IAuthTokenLocalDataSource
 import iti.grad.nutriscan.data.local.datasource.ILanguagePreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.LanguagePreferencesDataSourceImpl
 import iti.grad.nutriscan.data.remote.datasource.AuthRemoteDataSourceImpl
@@ -48,6 +50,12 @@ abstract class DataSourceModule {
     abstract fun bindAuthRemoteDataSource(
         impl: AuthRemoteDataSourceImpl
     ): IAuthRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthTokenLocalDataSource(
+        impl: AuthTokenLocalDataSourceImpl
+    ): IAuthTokenLocalDataSource
 
     companion object {
         @Provides

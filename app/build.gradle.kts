@@ -23,7 +23,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://api.nutriscan.ai/v1/\"")
+        buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://nutriscan.dev/v1/\"")
+        buildConfigField("String", "KEYCLOAK_BASE_URL", "\"https://auth.nutriscan.dev/\"")
+
+        manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"
     }
 
     buildTypes {
@@ -83,4 +86,6 @@ dependencies {
 
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    
+    implementation("net.openid:appauth:0.11.1")
 }

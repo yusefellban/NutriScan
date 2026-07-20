@@ -30,6 +30,9 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.core.splashscreen)
+
+    implementation("net.openid:appauth:0.11.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.ui)
     implementation(libs.material)

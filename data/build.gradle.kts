@@ -47,4 +47,6 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     implementation(libs.androidx.datastore.preferences)
+
+    implementation("net.openid:appauth:0.11.1")
 }

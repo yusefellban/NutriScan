@@ -1,5 +1,8 @@
 package iti.grad.nutriscan.presentation.auth.login.view
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import iti.grad.nutriscan.domain.auth.model.AuthTokens
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
@@ -32,6 +36,14 @@ import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
+import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.ResponseTypeValues
+import net.openid.appauth.TokenResponse
+import net.openid.appauth.TokenRequest
 
 @Composable
 fun LoginScreen(
@@ -43,6 +55,36 @@ fun LoginScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val authService = remember { AuthorizationService(context) }
+    
+    val authLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data = result.data ?: return@rememberLauncherForActivityResult
+        val response = AuthorizationResponse.fromIntent(data)
+        val ex = AuthorizationException.fromIntent(data)
+        
+        if (response != null) {
+            authService.performTokenRequest(response.createTokenExchangeRequest()) { tokenResponse, tokenEx ->
+                if (tokenResponse != null) {
+                    val authTokens = AuthTokens(
+                        accessToken = tokenResponse.accessToken ?: "",
+                        refreshToken = tokenResponse.refreshToken,
+                        idToken = tokenResponse.idToken,
+                        expiresIn = if (tokenResponse.accessTokenExpirationTime != null) {
+                            (tokenResponse.accessTokenExpirationTime!! - System.currentTimeMillis()) / 1000
+                        } else null,
+                        refreshExpiresIn = null 
+                    )
+                    viewModel.onEvent(LoginEvent.GoogleLoginSuccess(authTokens))
+                } else {
+                    viewModel.onEvent(LoginEvent.GoogleLoginFailure(tokenEx?.errorDescription ?: tokenEx?.message ?: "Token exchange failed"))
+                }
+            }
+        } else {
+            viewModel.onEvent(LoginEvent.GoogleLoginFailure(ex?.errorDescription ?: ex?.message ?: "Authorization failed"))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -50,6 +92,23 @@ fun LoginScreen(
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
                 is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
+                is LoginEffect.LaunchGoogleLogin -> {
+                    val serviceConfig = AuthorizationServiceConfiguration(
+                        Uri.parse(effect.config.authorizationEndpoint),
+                        Uri.parse(effect.config.tokenEndpoint)
+                    )
+                    val authRequest = AuthorizationRequest.Builder(
+                        serviceConfig,
+                        effect.config.clientId,
+                        ResponseTypeValues.CODE,
+                        Uri.parse(effect.config.redirectUri)
+                    ).setScopes("openid", "profile", "email")
+                     .setAdditionalParameters(mapOf("kc_idp_hint" to "google"))
+                     .build()
+                     
+                    val intent = authService.getAuthorizationRequestIntent(authRequest)
+                    authLauncher.launch(intent)
+                }
                 is LoginEffect.ShowSnackbar -> {
                     val message = effect.messageStr
                         ?: effect.messageResId?.let { context.getString(it) }
