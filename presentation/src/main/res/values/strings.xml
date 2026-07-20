@@ -140,4 +140,17 @@
     <!-- Placeholder Screens -->
     <string name="placeholder_edit_profile_title">Edit Profile</string>
     <string name="action_go_back">Go Back</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">Verify Your Email</string>
+    <string name="email_verification_subtitle">Confirm it\'s you to start scanning.</string>
+    <string name="email_verification_sent_to">A verification link was sent to:</string>
+    <string name="email_verification_instructions">Please check your email and click the verification link to activate your account. After verifying, you can sign in below.</string>
+    <string name="email_verification_go_to_sign_in">Go to Sign In</string>
+    <string name="email_verification_didnt_receive">Didn\'t receive it?</string>
+    <string name="email_verification_resend">Resend Verification Email.</string>
+    <string name="email_verification_resend_success">Verification email sent successfully!</string>
+    <string name="email_verification_resend_error">Failed to resend verification email. Please try again.</string>
+    <string name="register_error_email_taken">This email is already registered. Please sign in or use a different email.</string>
+    <string name="register_error_generic">Registration failed. Please try again.</string>
 </resources>

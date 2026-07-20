@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.BuildConfig
+import iti.grad.nutriscan.data.remote.api.AuthApiService
 import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.ErrorInterceptor
 import kotlinx.serialization.json.Json
@@ -65,5 +66,11 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
     }
 }

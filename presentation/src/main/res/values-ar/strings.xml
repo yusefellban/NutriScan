@@ -140,4 +140,17 @@
     <!-- Placeholder Screens -->
     <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
     <string name="action_go_back">رجوع</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">تحقق من بريدك الإلكتروني</string>
+    <string name="email_verification_subtitle">تأكد من هويتك لبدء المسح.</string>
+    <string name="email_verification_sent_to">تم إرسال رابط التحقق إلى:</string>
+    <string name="email_verification_instructions">يرجى التحقق من بريدك الإلكتروني والنقر على رابط التحقق لتفعيل حسابك. بعد التحقق، يمكنك تسجيل الدخول أدناه.</string>
+    <string name="email_verification_go_to_sign_in">انتقل إلى تسجيل الدخول</string>
+    <string name="email_verification_didnt_receive">لم تستلمه؟</string>
+    <string name="email_verification_resend">إعادة إرسال بريد التحقق.</string>
+    <string name="email_verification_resend_success">تم إرسال بريد التحقق بنجاح!</string>
+    <string name="email_verification_resend_error">فشل إعادة إرسال بريد التحقق. يرجى المحاولة مرة أخرى.</string>
+    <string name="register_error_email_taken">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.</string>
+    <string name="register_error_generic">فشل التسجيل. يرجى المحاولة مرة أخرى.</string>
 </resources>

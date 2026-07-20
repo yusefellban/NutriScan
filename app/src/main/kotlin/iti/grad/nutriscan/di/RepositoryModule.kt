@@ -10,6 +10,8 @@ import iti.grad.nutriscan.domain.settings.repository.IThemeRepository
 import iti.grad.nutriscan.data.repository.ThemeRepositoryImpl
 import iti.grad.nutriscan.domain.settings.repository.ILanguageRepository
 import iti.grad.nutriscan.data.repository.LanguageRepositoryImpl
+import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.data.repository.AuthRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindLanguageRepository(
         impl: LanguageRepositoryImpl
     ): ILanguageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        impl: AuthRepositoryImpl
+    ): IAuthRepository
 }

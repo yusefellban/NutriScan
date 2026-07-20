@@ -66,9 +66,6 @@ object ShoppingListRoute
 object UserProfileRoute
 
 @Serializable
-object EditProfileRoute
-
-@Serializable
 object ManageFamilyRoute
 
 @Serializable
@@ -88,3 +85,6 @@ object TermsAndConditionsRoute
 
 @Serializable
 object HelpRoute
+
+@Serializable
+data class EmailVerificationRoute(val email: String)

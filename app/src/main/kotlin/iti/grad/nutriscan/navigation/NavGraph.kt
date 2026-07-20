@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
@@ -105,12 +106,27 @@ fun AppNavGraph(
         // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
-                onNavigateToHome = {
-                    navController.navigate(ProfileSetupPagerRoute) {
+                onNavigateToEmailVerification = { email ->
+                    navController.navigate(EmailVerificationRoute(email)) {
                         popUpTo(RegisterRoute) { inclusive = true }
                     }
                 },
                 onNavigateToSignIn = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5b. Email Verification Screen
+        composable<EmailVerificationRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<EmailVerificationRoute>()
+            EmailVerificationScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(EmailVerificationRoute(route.email)) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
                     navController.navigateUp()
                 }
             )
@@ -359,15 +375,7 @@ fun AppNavGraph(
             )
         }
 
-        // 24. Edit Profile (Placeholder)
-        composable<EditProfileRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.placeholder_edit_profile_title),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
-        }
+
 
         // 25. Terms and Conditions (Placeholder)
         composable<TermsAndConditionsRoute> {

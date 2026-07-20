@@ -3,9 +3,9 @@ package iti.grad.nutriscan.presentation.auth.register.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.auth.usecase.RegisterUseCase
 import iti.grad.presentation.R
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +18,9 @@ import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor() : ViewModel() {
+class RegisterViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterState())
     val state: StateFlow<RegisterState> = _state.asStateFlow()
@@ -72,10 +74,19 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
         
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            // Simulate network/domain UseCase delay
-            delay(1500)
-            _state.update { it.copy(isLoading = false) }
-            _effect.send(RegisterEffect.NavigateToHome)
+            registerUseCase(currentState.email, currentState.password)
+                .onSuccess {
+                    _state.update { it.copy(isLoading = false) }
+                    _effect.send(RegisterEffect.NavigateToEmailVerification(currentState.email))
+                }
+                .onFailure { throwable ->
+                    _state.update { it.copy(isLoading = false) }
+                    _effect.send(
+                        RegisterEffect.ShowSnackbar(
+                            messageStr = throwable.message ?: "Registration failed. Please try again."
+                        )
+                    )
+                }
         }
     }
 

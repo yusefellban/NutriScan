@@ -75,7 +75,7 @@ import iti.grad.nutriscan.presentation.auth.register.viewmodel.RegisterViewModel
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),
-    onNavigateToHome: () -> Unit,
+    onNavigateToEmailVerification: (String) -> Unit,
     onNavigateToSignIn: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,9 +84,12 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is RegisterEffect.NavigateToHome -> onNavigateToHome()
+                is RegisterEffect.NavigateToEmailVerification -> onNavigateToEmailVerification(effect.email)
                 is RegisterEffect.NavigateToSignIn -> onNavigateToSignIn()
-                is RegisterEffect.ShowSnackbar -> snackbarHostState.showSnackbar("Error occurred")
+                is RegisterEffect.ShowSnackbar -> {
+                    val message = effect.messageStr ?: "Error occurred"
+                    snackbarHostState.showSnackbar(message)
+                }
             }
         }
     }
