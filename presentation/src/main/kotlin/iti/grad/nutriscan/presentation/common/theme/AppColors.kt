@@ -35,6 +35,50 @@ internal data class AppColorsExtension(
     val ProfileMenuLabel: Color,
     val ProfileMenuChevron: Color,
 
+    // --- Edit Profile Input Fields ---
+    val EditProfileInputBackground: Color,
+    val EditProfileInputBorder: Color,
+
+    // --- Gender Selection ---
+    val GenderFemaleCardBackground: Color,
+    val GenderFemaleCardText: Color,
+    val GenderMaleCardBackground: Color,
+    val GenderMaleCardText: Color,
+
+    // --- Page Indicator ---
+    val PageIndicatorCurrent: Color,
+    val PageIndicatorTotal: Color,
+
+    // --- Date of Birth ---
+    val DobCardBackground: Color,
+    val DobAgeBadgeBackground: Color,
+    val DobAgeBadgeText: Color,
+    val DobCardText: Color,
+    val DobInputBorder: Color,
+    val DobInputText: Color,
+    val DobCalendarIcon: Color,
+
+    // --- Height Selection ---
+    val HeightSelectedCardBackground: Color,
+    val HeightSelectedCardText: Color,
+    val HeightSelectedCardUnitText: Color,
+    val HeightUnselectedCardBackground: Color,
+    val HeightUnselectedCardText: Color,
+    val HeightUnselectedCardUnitText: Color,
+    val HeightRulerMajorTick: Color,
+    val HeightRulerMinorTick: Color,
+    val HeightRulerText: Color,
+
+    // --- Progress Button ---
+    val ProgressTrackColor: Color,
+    val ProgressFillColor: Color,
+
+    // --- Shadow Colors ---
+    val ShadowSelected: Color,
+    val ShadowUnselected: Color,
+    val ShadowFemaleSelected: Color,
+    val ShadowMaleSelected: Color,
+    val ShadowDobActive: Color,
     // --- App Settings ---
     val AppSettingsCardBackground: Color,
     val AppSettingsIconContainerBackground: Color,
@@ -216,6 +260,8 @@ data class AppColors internal constructor(
     val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
     val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
     val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
+    val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
+    val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
 
     val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
     val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
@@ -385,6 +431,50 @@ fun lightColors() = AppColors(
         ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
         ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
 
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFFFFFFFF), // White / Background
+        EditProfileInputBorder = Color(0xFFE5E5E4), // Gray300 / Divider
+
+        // Gender Selection
+        GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
+        GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
+        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+        GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+        // Page Indicator
+        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+        PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
+
+        // Date of Birth
+        DobCardBackground = Color(0xFF75DEE3), // Teal500
+        DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+        DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+        DobCardText = Color(0xFF0F474A), // Teal1600
+        DobInputBorder = Color(0xFFE5E5E4), // Gray300
+        DobInputText = Color(0xFFA6A5A5), // Gray600
+        DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
+
+        // Height Selection
+        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+        HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+        HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
+        HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
+        HeightUnselectedCardText = Color(0xFF5F5F5F), // Gray1200 (Darker Gray)
+        HeightUnselectedCardUnitText = Color(0xFF898989), // Gray700
+        HeightRulerMajorTick = Color(0xFF13A4AB), // Teal1000
+        HeightRulerMinorTick = Color(0xFFCAF2F4), // Teal300
+        HeightRulerText = Color(0xFF13A4AB), // Teal1000
+
+        // Progress Button
+        ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
+        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+        // Shadows
+        ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
+        ShadowUnselected = Color(0x3313A4AB), // Teal1000/Primary 20% alpha
+        ShadowFemaleSelected = Color(0x6613A4AB),
+        ShadowMaleSelected = Color(0x6613A4AB),
+        ShadowDobActive = Color(0x6613A4AB),
         // App Settings
         AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
         AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
@@ -555,6 +645,50 @@ fun darkColors() = AppColors(
         ProfileMenuLabel = Color(0xFF11939A), // Teal1200
         ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
 
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFF0A545A), // Teal1500 / SurfaceVariant
+        EditProfileInputBorder = Color(0xFF108188), // Teal1300 / OtherChipBorder
+
+        // Gender Selection
+        GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
+        GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
+        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+        GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+        // Page Indicator
+        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+        PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+        // Date of Birth
+        DobCardBackground = Color(0xFF75DEE3), // Teal500
+        DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+        DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+        DobCardText = Color(0xFF0F474A), // Teal1600
+        DobInputBorder = Color(0xFF169098), // Teal1200
+        DobInputText = Color(0xFF169098), // Teal1200
+        DobCalendarIcon = Color(0xFF169098), // Teal1200
+
+        // Height Selection
+        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+        HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+        HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
+        HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
+        HeightUnselectedCardText = Color(0xFF2FC5CC), // Teal700
+        HeightUnselectedCardUnitText = Color(0xFFCAF2F4), // Teal300
+        HeightRulerMajorTick = Color(0xFF75DEE3), // Teal500
+        HeightRulerMinorTick = Color(0xFF0B5F65), // Teal1400
+        HeightRulerText = Color(0xFF75DEE3), // Teal500
+
+        // Progress Button
+        ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
+        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+        // Shadows
+        ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
+        ShadowUnselected = Color(0x33FFFFFF), // Soft white glow 20% alpha
+        ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
+        ShadowMaleSelected = Color(0x9975DEE3),
+        ShadowDobActive = Color(0x9975DEE3),
         // App Settings
         AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
         // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this

@@ -23,6 +23,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScree
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.presentation.R
 
@@ -302,6 +303,13 @@ fun AppNavGraph(
                 },
                 onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
+            )
+        }
+
+        // 19b. Edit Profile
+        composable<EditProfileRoute> {
+            EditProfileScreen(
+                onNavigateBack = { navController.navigateUp() }
             )
         }
 

@@ -96,6 +96,13 @@
     <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
     <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
 
+    <!-- Edit Profile -->
+    <string name="edit_profile_name_hint">الاسم</string>
+    <string name="edit_profile_username_hint">اسم المستخدم</string>
+    <string name="edit_profile_email_hint">البريد الإلكتروني</string>
+    <string name="edit_profile_password_hint">كلمة المرور</string>
+    <string name="edit_profile_confirm_title">حفظ تغييرات الملف الشخصي؟</string>
+    <string name="edit_profile_confirm_message">هل أنت متأكد من رغبتك في تعديل ملفك الصحي؟ سيؤدي ذلك إلى تحديث قرارات فحص سلامة الغذاء المستقبلية.</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_remove">إزالة</string>
 
