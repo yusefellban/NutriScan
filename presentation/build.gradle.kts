@@ -55,6 +55,12 @@ dependencies {
     implementation(libs.coil3.network)
     implementation(libs.coil3.svg)
 
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")

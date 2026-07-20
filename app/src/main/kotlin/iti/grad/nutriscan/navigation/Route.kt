@@ -33,7 +33,10 @@ object CameraScanRoute
 object ForgotPasswordRoute
 
 @Serializable
-data class ScanProcessingRoute(val imageUri: String)
+data class ScanProcessingRoute(
+    val barcode: String,
+    val imageUri: String? = null,
+)
 
 @Serializable
 data class ScanResultRoute(val imageUri: String)

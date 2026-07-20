@@ -140,4 +140,15 @@
     <!-- Placeholder Screens -->
     <string name="placeholder_edit_profile_title">Edit Profile</string>
     <string name="action_go_back">Go Back</string>
+
+    <!-- Camera Scan Screen -->
+    <string name="scan_status_processing">Processing</string>
+    <string name="scan_product_unknown">Scanned product</string>
+    <string name="scan_brand_unknown">Unknown brand</string>
+    <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
+    <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
+    <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
+    <string name="scan_add_to_list_content_description">Add product to list</string>
+    <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
 </resources>

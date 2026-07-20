@@ -25,6 +25,7 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -164,25 +165,30 @@ fun AppNavGraph(
             )
         }
 
-        // 8. Camera Scan (Placeholder)
+        // 8. Camera Scan
         composable<CameraScanRoute> {
-            PlaceholderScreen(
-                title = "Camera Scan",
-                buttonText = "Capture & Process"
-            ) {
-                navController.navigate(ScanProcessingRoute("content://media/external/images/media/dummy"))
-            }
+            CameraScanScreen(
+                onNavigateToProcessing = { barcode ->
+                    navController.navigate(ScanProcessingRoute(barcode = barcode)) {
+                        popUpTo<CameraScanRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToHome = { navController.navigate(HomeRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) }
+            )
         }
 
         // 9. Scan Processing (Placeholder)
         composable<ScanProcessingRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ScanProcessingRoute>()
             PlaceholderScreen(
-                title = "Scan Processing\nImage URI: ${route.imageUri}",
+                title = "Scan Processing\nCode: ${route.barcode}",
                 buttonText = "View Results"
             ) {
-                navController.navigate(ScanResultRoute(route.imageUri)) {
-                    popUpTo(ScanProcessingRoute(route.imageUri)) { inclusive = true }
+                navController.navigate(ScanResultRoute(route.imageUri ?: "")) {
+                    popUpTo(ScanProcessingRoute(barcode = route.barcode, imageUri = route.imageUri)) { inclusive = true }
                 }
             }
         }
@@ -357,16 +363,6 @@ fun AppNavGraph(
                     }
                 },
             )
-        }
-
-        // 24. Edit Profile (Placeholder)
-        composable<EditProfileRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.placeholder_edit_profile_title),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
         }
 
         // 25. Terms and Conditions (Placeholder)
