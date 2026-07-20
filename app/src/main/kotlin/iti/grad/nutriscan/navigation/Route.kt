@@ -79,3 +79,12 @@ object NotificationSettingsRoute
 
 @Serializable
 object AppSettingsRoute
+
+@Serializable
+object EditProfileRoute
+
+@Serializable
+object TermsAndConditionsRoute
+
+@Serializable
+object HelpRoute

@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,6 +24,8 @@ import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
+import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.presentation.R
 
 @Composable
 fun AppNavGraph(
@@ -341,11 +344,46 @@ fun AppNavGraph(
             }
         }
 
-        // 23. App Settings (Placeholder)
+        // 23. App Settings
         composable<AppSettingsRoute> {
+            AppSettingsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
+                onNavigateToTermsAndConditions = { navController.navigate(TermsAndConditionsRoute) },
+                onNavigateToHelp = { navController.navigate(HelpRoute) },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        // 24. Edit Profile (Placeholder)
+        composable<EditProfileRoute> {
             PlaceholderScreen(
-                title = "App Settings",
-                buttonText = "Go Back"
+                title = stringResource(R.string.placeholder_edit_profile_title),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 25. Terms and Conditions (Placeholder)
+        composable<TermsAndConditionsRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.app_settings_terms_and_conditions),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 26. Help (Placeholder)
+        composable<HelpRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.app_settings_help),
+                buttonText = stringResource(R.string.action_go_back),
             ) {
                 navController.navigateUp()
             }
