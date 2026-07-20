@@ -2,7 +2,6 @@ package iti.grad.nutriscan.presentation.settings.profile.edit.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,22 +41,9 @@ fun EditProfileInputField(
     modifier: Modifier = Modifier,
     isPassword: Boolean = false
 ) {
-    val isDark = isSystemInDarkTheme()
-
-    val containerBg = if (isDark) {
-        AppTheme.colors.SurfaceVariant
-    } else {
-        AppTheme.colors.Background
-    }
-
-    val borderColor = if (isDark) {
-        AppTheme.colors.OtherChipBorder
-    } else {
-        AppTheme.colors.Divider
-    }
-
+    val containerBg = AppTheme.colors.EditProfileInputBackground
+    val borderColor = AppTheme.colors.EditProfileInputBorder
     val textColor = AppTheme.colors.TextPrimary
-
     val iconTint = AppTheme.colors.ProfileSetupSubtitle
     val hintColor = AppTheme.colors.ProfileSetupSubtitle
 

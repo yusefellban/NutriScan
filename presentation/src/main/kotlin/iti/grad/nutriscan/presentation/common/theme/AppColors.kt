@@ -32,6 +32,10 @@ internal data class AppColorsExtension(
     val ProfileMenuLabel: Color,
     val ProfileMenuChevron: Color,
 
+    // --- Edit Profile Input Fields ---
+    val EditProfileInputBackground: Color,
+    val EditProfileInputBorder: Color,
+
     // --- Gender Selection ---
     val GenderFemaleCardBackground: Color,
     val GenderFemaleCardText: Color,
@@ -200,6 +204,8 @@ data class AppColors internal constructor(
     val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
     val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
     val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
+    val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
+    val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
 
     // --- Gender Selection ---
     val GenderFemaleCardBackground: Color get() = extension.GenderFemaleCardBackground
@@ -359,6 +365,10 @@ fun lightColors() = AppColors(
         ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
         ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
 
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFFFFFFFF), // White / Background
+        EditProfileInputBorder = Color(0xFFE5E5E4), // Gray300 / Divider
+
         // Gender Selection
         GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
         GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
@@ -517,6 +527,10 @@ fun darkColors() = AppColors(
         ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
         ProfileMenuLabel = Color(0xFF11939A), // Teal1200
         ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
+
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFF0A545A), // Teal1500 / SurfaceVariant
+        EditProfileInputBorder = Color(0xFF108188), // Teal1300 / OtherChipBorder
 
         // Gender Selection
         GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
