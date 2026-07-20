@@ -15,6 +15,7 @@ import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.TokenRequest
 import net.openid.appauth.TokenResponse
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -27,28 +28,33 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(email: String, password: String): Result<Unit> {
         return try {
             val request = RegisterRequestDto(
-                firstName = "",
-                lastName = "",
+                firstName = "string",
+                lastName = "string",
                 email = email,
-                username = email.substringBefore("@"),
+                username = email,
                 password = password,
-                dateOfBirth = "",
-                gender = "",
-                heightCm = 0.0,
-                weightKg = 0.0,
+                dateOfBirth = "2000-01-01",
+                gender = "MALE",
+                heightCm = 170.0,
+                weightKg = 70.0,
                 allergies = emptyList(),
                 diseases = emptyList()
             )
 
+            Timber.d("Registration attempt for email: $email, username: $email")
             val response = remoteDataSource.register(request)
 
             if (response.isSuccessful) {
+                Timber.d("Registration successful for email: $email")
                 Result.success(Unit)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
+                val rawError = response.errorBody()?.string()
+                Timber.e("Registration failed with code: ${response.code()}, errorBody: $rawError")
+                val errorMessage = parseErrorMessage(rawError)
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
+            Timber.e(e, "Exception during registration")
             Result.failure(e)
         }
     }

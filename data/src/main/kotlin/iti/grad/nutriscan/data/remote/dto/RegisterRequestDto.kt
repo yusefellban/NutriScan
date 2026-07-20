@@ -13,18 +13,6 @@ data class RegisterRequestDto(
     val gender: String,
     val heightCm: Double,
     val weightKg: Double,
-    val allergies: List<AllergyItemDto>,
-    val diseases: List<DiseaseItemDto>
-)
-
-@Serializable
-data class AllergyItemDto(
-    val id: Int,
-    val name: String
-)
-
-@Serializable
-data class DiseaseItemDto(
-    val id: Int,
-    val name: String
+    val allergies: List<Int>,
+    val diseases: List<Int>
 )

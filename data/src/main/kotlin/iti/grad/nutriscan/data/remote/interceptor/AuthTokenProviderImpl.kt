@@ -29,19 +29,28 @@ class AuthTokenProviderImpl @Inject constructor(
 
         if (!authState.isAuthorized) return null
 
-        return suspendCancellableCoroutine { continuation ->
-            val authService = AuthorizationService(context)
-            
-            authState.performActionWithFreshTokens(authService) { accessToken, _, ex ->
-                if (ex != null) {
-                    // Refresh failed, token is invalid.
-                    continuation.resume(null)
-                } else {
-                    continuation.resume(accessToken)
-                }
+        return try {
+            suspendCancellableCoroutine { continuation ->
+                val authService = AuthorizationService(context)
                 
-                authService.dispose()
+                try {
+                    authState.performActionWithFreshTokens(authService) { accessToken, _, ex ->
+                        if (ex != null) {
+                            // Refresh failed, token is invalid.
+                            continuation.resume(null)
+                        } else {
+                            continuation.resume(accessToken)
+                        }
+                        
+                        authService.dispose()
+                    }
+                } catch (e: IllegalStateException) {
+                    authService.dispose()
+                    continuation.resume(null)
+                }
             }
+        } catch (e: Exception) {
+            null
         }
     }
 }

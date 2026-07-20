@@ -49,4 +49,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation("net.openid:appauth:0.11.1")
+    implementation(libs.timber)
 }
