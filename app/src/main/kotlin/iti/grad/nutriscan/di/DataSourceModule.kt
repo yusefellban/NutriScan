@@ -13,6 +13,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.data.local.datasource.IOnboardingPreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.OnboardingPreferencesDataSourceImpl
+import iti.grad.nutriscan.data.local.datasource.IThemePreferencesDataSource
+import iti.grad.nutriscan.data.local.datasource.ThemePreferencesDataSourceImpl
+import iti.grad.nutriscan.data.local.datasource.ILanguagePreferencesDataSource
+import iti.grad.nutriscan.data.local.datasource.LanguagePreferencesDataSourceImpl
 import javax.inject.Singleton
 
 @Module
@@ -24,6 +28,18 @@ abstract class DataSourceModule {
     abstract fun bindOnboardingPreferencesDataSource(
         impl: OnboardingPreferencesDataSourceImpl
     ): IOnboardingPreferencesDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindThemePreferencesDataSource(
+        impl: ThemePreferencesDataSourceImpl
+    ): IThemePreferencesDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindLanguagePreferencesDataSource(
+        impl: LanguagePreferencesDataSourceImpl
+    ): ILanguagePreferencesDataSource
 
     companion object {
         @Provides

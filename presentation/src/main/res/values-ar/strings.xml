@@ -75,23 +75,6 @@
     <string name="profile_setup_other">+ أخرى</string>
     <string name="profile_setup_custom_input_hint">اكتب خياراً مخصصاً...</string>
     <string name="action_save">حفظ</string>
-    <string name="action_cancel">إلغاء</string>
-    <string name="action_remove">إزالة</string>
-
-    <!-- User Profile Screen -->
-    <string name="user_profile_day_streak">%1$d يوم متتالي</string>
-    <string name="user_profile_edit_description">تعديل الملف الشخصي</string>
-    <string name="user_profile_avatar_description">الصورة الشخصية</string>
-    <string name="user_profile_family_members">أفراد الأسرة</string>
-    <string name="user_profile_add_member">إضافة فرد</string>
-    <string name="user_profile_show_details">عرض التفاصيل</string>
-    <string name="user_profile_member_avatar_description">صورة %1$s</string>
-    <string name="user_profile_scan_history">سجل المسح</string>
-    <string name="user_profile_notifications">الإشعارات</string>
-    <string name="user_profile_settings">الإعدادات</string>
-    <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
-    <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
-
     <!-- Profile Setup Pager -->
     <string name="profile_setup_gender_title_prefix">"ما هو "</string>
     <string name="profile_setup_gender_title_highlight">جنسك</string>
@@ -112,4 +95,42 @@
     <string name="profile_setup_weight_title_highlight">الحالي</string>
     <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
     <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
+
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_remove">إزالة</string>
+
+    <!-- User Profile Screen -->
+    <string name="user_profile_day_streak">%1$d يوم متتالي</string>
+    <string name="user_profile_edit_description">تعديل الملف الشخصي</string>
+    <string name="user_profile_avatar_description">الصورة الشخصية</string>
+    <string name="user_profile_family_members">أفراد الأسرة</string>
+    <string name="user_profile_add_member">إضافة فرد</string>
+    <string name="user_profile_show_details">عرض التفاصيل</string>
+    <string name="user_profile_member_avatar_description">صورة %1$s</string>
+    <string name="user_profile_scan_history">سجل المسح</string>
+    <string name="user_profile_notifications">الإشعارات</string>
+    <string name="user_profile_settings">الإعدادات</string>
+    <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
+    <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
+
+    <!-- App Settings -->
+    <string name="app_settings_title">إعدادات التطبيق</string>
+    <string name="app_settings_subtitle">غيّر إعدادات التطبيق هنا</string>
+    <string name="app_settings_profile_settings">إعدادات الملف الشخصي</string>
+    <string name="app_settings_appearance">المظهر</string>
+    <string name="app_settings_language">اللغة</string>
+    <string name="app_settings_terms_and_conditions">الشروط والأحكام</string>
+    <string name="app_settings_help">مساعدة</string>
+    <string name="app_settings_logout">تسجيل الخروج</string>
+    <string name="app_settings_theme_system">النظام</string>
+    <string name="app_settings_theme_dark">داكن</string>
+    <string name="app_settings_theme_light">فاتح</string>
+    <string name="app_settings_lang_en">En</string>
+    <string name="app_settings_lang_ar">Ar</string>
+    <string name="app_settings_logout_confirm_title">تسجيل الخروج؟</string>
+    <string name="app_settings_logout_confirm_message">هل أنت متأكد أنك تريد تسجيل الخروج من نيوتري سكان؟</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
+    <string name="action_go_back">رجوع</string>
 </resources>

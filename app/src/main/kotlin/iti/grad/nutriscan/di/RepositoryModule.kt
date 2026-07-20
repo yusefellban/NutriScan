@@ -6,6 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.domain.onboarding.repository.IOnboardingRepository
 import iti.grad.nutriscan.data.repository.OnboardingRepositoryImpl
+import iti.grad.nutriscan.domain.settings.repository.IThemeRepository
+import iti.grad.nutriscan.data.repository.ThemeRepositoryImpl
+import iti.grad.nutriscan.domain.settings.repository.ILanguageRepository
+import iti.grad.nutriscan.data.repository.LanguageRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -17,4 +21,16 @@ abstract class RepositoryModule {
     abstract fun bindOnboardingRepository(
         impl: OnboardingRepositoryImpl
     ): IOnboardingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindThemeRepository(
+        impl: ThemeRepositoryImpl
+    ): IThemeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLanguageRepository(
+        impl: LanguageRepositoryImpl
+    ): ILanguageRepository
 }
