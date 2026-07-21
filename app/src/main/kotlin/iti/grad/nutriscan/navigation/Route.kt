@@ -9,7 +9,7 @@ object SplashRoute
 object OnboardingCarouselRoute
 
 @Serializable
-object LoginRoute
+data class LoginRoute(val isFromRegistration: Boolean = false)
 
 @Serializable
 object OnboardingRoute
