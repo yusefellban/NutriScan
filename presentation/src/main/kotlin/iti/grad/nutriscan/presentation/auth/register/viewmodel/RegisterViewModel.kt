@@ -82,7 +82,7 @@ class RegisterViewModel @Inject constructor(
                 .onFailure { throwable ->
                     _state.update { it.copy(isLoading = false) }
                     _effect.send(
-                        RegisterEffect.ShowSnackbar(
+                        RegisterEffect.ShowErrorDialog(
                             messageStr = throwable.message ?: "Registration failed. Please try again."
                         )
                     )

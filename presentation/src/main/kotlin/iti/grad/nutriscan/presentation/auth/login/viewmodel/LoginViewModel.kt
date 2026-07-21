@@ -49,7 +49,7 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.GoogleLoginSuccess -> handleGoogleLoginSuccess(event)
             is LoginEvent.GoogleLoginFailure -> {
                 viewModelScope.launch {
-                    _effect.send(LoginEffect.ShowSnackbar(messageStr = event.error))
+                    _effect.send(LoginEffect.ShowErrorDialog(messageStr = event.error))
                 }
             }
             is LoginEvent.SignUpClicked -> {
@@ -86,7 +86,7 @@ class LoginViewModel @Inject constructor(
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
                 _state.update { it.copy(genericErrorMessage = error.message) }
-                _effect.send(LoginEffect.ShowSnackbar(messageStr = error.message ?: "Login failed"))
+                _effect.send(LoginEffect.ShowErrorDialog(messageStr = error.message ?: "Login failed"))
             }
         }
     }
@@ -97,7 +97,7 @@ class LoginViewModel @Inject constructor(
                 val config = getOidcAuthConfigUseCase()
                 _effect.send(LoginEffect.LaunchGoogleLogin(config))
             } else {
-                _effect.send(LoginEffect.ShowSnackbar(messageStr = "${event.provider.name} login not implemented yet"))
+                _effect.send(LoginEffect.ShowErrorDialog(messageStr = "${event.provider.name} login not implemented yet"))
             }
         }
     }
@@ -111,7 +111,7 @@ class LoginViewModel @Inject constructor(
             result.onSuccess {
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _effect.send(LoginEffect.ShowSnackbar(messageStr = "Failed to save Google login tokens: ${error.message}"))
+                _effect.send(LoginEffect.ShowErrorDialog(messageStr = "Failed to save Google login tokens: ${error.message}"))
             }
         }
     }

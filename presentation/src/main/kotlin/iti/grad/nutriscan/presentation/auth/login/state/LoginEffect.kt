@@ -8,8 +8,5 @@ sealed interface LoginEffect {
     data object NavigateToRegister : LoginEffect
     data object NavigateToForgotPassword : LoginEffect
     data class LaunchGoogleLogin(val config: OidcAuthConfig) : LoginEffect
-    data class ShowSnackbar(
-        @StringRes val messageResId: Int? = null,
-        val messageStr: String? = null
-    ) : LoginEffect
+    data class ShowErrorDialog(val messageStr: String) : LoginEffect
 }

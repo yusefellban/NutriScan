@@ -35,7 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -64,7 +66,7 @@ import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.AuthHeader
 import iti.grad.nutriscan.presentation.auth.register.view.components.RegisterFormBody
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
@@ -79,27 +81,29 @@ fun RegisterScreen(
     onNavigateToSignIn: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is RegisterEffect.NavigateToEmailVerification -> onNavigateToEmailVerification(effect.email)
                 is RegisterEffect.NavigateToSignIn -> onNavigateToSignIn()
-                is RegisterEffect.ShowSnackbar -> {
-                    val message = effect.messageStr ?: "Error occurred"
-                    snackbarHostState.showSnackbar(message)
+                is RegisterEffect.ShowErrorDialog -> {
+                    errorDialogMessage = effect.messageStr
                 }
             }
         }
     }
 
+    errorDialogMessage?.let { msg ->
+        AppErrorDialog(
+            title = "Registration Failed",
+            message = msg,
+            onDismiss = { errorDialogMessage = null }
+        )
+    }
+
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
-            }
-        },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(

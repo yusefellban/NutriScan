@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -30,7 +32,7 @@ import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
 import iti.grad.nutriscan.presentation.auth.login.view.components.LoginFormBody
 import iti.grad.nutriscan.presentation.auth.login.viewmodel.LoginViewModel
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.AuthHeader
 import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -53,7 +55,7 @@ fun LoginScreen(
     onNavigateToForgotPassword: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val authService = remember { AuthorizationService(context) }
     
@@ -109,35 +111,33 @@ fun LoginScreen(
                     val intent = authService.getAuthorizationRequestIntent(authRequest)
                     authLauncher.launch(intent)
                 }
-                is LoginEffect.ShowSnackbar -> {
-                    val message = effect.messageStr
-                        ?: effect.messageResId?.let { context.getString(it) }
-                        ?: ""
-                    snackbarHostState.showSnackbar(message = message)
+                is LoginEffect.ShowErrorDialog -> {
+                    errorDialogMessage = effect.messageStr
                 }
             }
         }
     }
 
+    errorDialogMessage?.let { msg ->
+        AppErrorDialog(
+            title = "Login Failed",
+            message = msg,
+            onDismiss = { errorDialogMessage = null }
+        )
+    }
+
     LoginScreenContent(
         state = state,
-        onEvent = viewModel::onEvent,
-        snackbarHostState = snackbarHostState
+        onEvent = viewModel::onEvent
     )
 }
 
 @Composable
 private fun LoginScreenContent(
     state: LoginState,
-    onEvent: (LoginEvent) -> Unit,
-    snackbarHostState: SnackbarHostState
+    onEvent: (LoginEvent) -> Unit
 ) {
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
-            }
-        },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
