@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -171,9 +174,22 @@ class ProfileSetupPagerViewModel @Inject constructor(
     private fun saveProfile() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+            val currentState = _state.value
+
+            val dobString = currentState.selectedDateOfBirthMillis?.let { millis ->
+                Instant.ofEpochMilli(millis)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE)
+            }
+
             updateHealthProfileUseCase(
-                diseaseIds = _state.value.selectedDiseaseIds,
-                allergyIds = _state.value.selectedAllergyIds
+                diseaseIds = currentState.selectedDiseaseIds,
+                allergyIds = currentState.selectedAllergyIds,
+                gender = currentState.selectedGender?.name,
+                dateOfBirth = dobString,
+                heightCm = currentState.selectedHeightCm.toDouble(),
+                weightKg = currentState.selectedWeightKg.toDouble()
             )
                 .onSuccess {
                     completeOnboardingUseCase()
