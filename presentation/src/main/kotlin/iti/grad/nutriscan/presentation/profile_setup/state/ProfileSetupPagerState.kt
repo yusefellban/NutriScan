@@ -1,6 +1,8 @@
 package iti.grad.nutriscan.presentation.profile_setup.state
 
 import androidx.compose.runtime.Immutable
+import iti.grad.nutriscan.domain.allergy.model.Allergy
+import iti.grad.nutriscan.domain.disease.model.Disease
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -27,21 +29,17 @@ data class ProfileSetupPagerState(
     val selectedWeightKg: Int = 60,
 
     // Health Profile fields (migrated from HealthProfileSetupState)
-    val chronicConditions: ImmutableList<String> = persistentListOf(
-        "Diabetes",
-        "Hypertension",
-        "Celiac Disease"
-    ),
-    val selectedChronicConditions: ImmutableList<String> = persistentListOf(),
-    val allergies: ImmutableList<String> = persistentListOf(
-        "Peanuts",
-        "Gluten",
-        "Dairy"
-    ),
-    val selectedAllergies: ImmutableList<String> = persistentListOf(),
-    val isAddingCustomCondition: Boolean = false,
-    val isAddingCustomAllergy: Boolean = false,
-    val customConditionInput: String = "",
-    val customAllergyInput: String = "",
+    // Diseases are fetched from the backend (GET /v1/diseases)
+    val diseases: ImmutableList<Disease> = persistentListOf(),
+    val selectedDiseaseIds: ImmutableList<Int> = persistentListOf(),
+    val isDiseasesLoading: Boolean = false,
+    val diseasesErrorMessage: String? = null,
+
+    // Allergies are fetched from the backend (GET /v1/allergies)
+    val allergies: ImmutableList<Allergy> = persistentListOf(),
+    val selectedAllergyIds: ImmutableList<Int> = persistentListOf(),
+    val isAllergiesLoading: Boolean = false,
+    val allergiesErrorMessage: String? = null,
+
     val isLoading: Boolean = false
 )

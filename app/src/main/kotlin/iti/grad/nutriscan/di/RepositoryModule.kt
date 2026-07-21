@@ -12,6 +12,12 @@ import iti.grad.nutriscan.domain.settings.repository.ILanguageRepository
 import iti.grad.nutriscan.data.repository.LanguageRepositoryImpl
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.data.repository.AuthRepositoryImpl
+import iti.grad.nutriscan.domain.disease.repository.IDiseaseRepository
+import iti.grad.nutriscan.data.repository.DiseaseRepositoryImpl
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.data.repository.UserRepositoryImpl
+import iti.grad.nutriscan.domain.allergy.repository.IAllergyRepository
+import iti.grad.nutriscan.data.repository.AllergyRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -41,4 +47,22 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryImpl
     ): IAuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDiseaseRepository(
+        impl: DiseaseRepositoryImpl
+    ): IDiseaseRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(
+        impl: UserRepositoryImpl
+    ): IUserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAllergyRepository(
+        impl: AllergyRepositoryImpl
+    ): IAllergyRepository
 }

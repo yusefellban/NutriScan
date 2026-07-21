@@ -95,6 +95,8 @@
     <string name="profile_setup_weight_title_highlight">weight</string>
     <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
     <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
+    <string name="profile_setup_load_error">Something went wrong while loading. Please try again.</string>
+    <string name="action_retry">Retry</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_name_hint">Name</string>

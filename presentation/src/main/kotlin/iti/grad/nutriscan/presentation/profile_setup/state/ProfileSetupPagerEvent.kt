@@ -19,18 +19,11 @@ sealed interface ProfileSetupPagerEvent {
     data class SelectWeight(val weightKg: Int) : ProfileSetupPagerEvent
 
     // Health Profile events (migrated from HealthProfileSetupEvent)
-    data class ToggleCondition(val condition: String) : ProfileSetupPagerEvent
-    data class ToggleAllergy(val allergy: String) : ProfileSetupPagerEvent
+    data class ToggleDisease(val diseaseId: Int) : ProfileSetupPagerEvent
+    data object RetryLoadDiseases : ProfileSetupPagerEvent
 
-    data object StartAddCustomCondition : ProfileSetupPagerEvent
-    data class UpdateCustomConditionInput(val input: String) : ProfileSetupPagerEvent
-    data object SubmitCustomCondition : ProfileSetupPagerEvent
-    data object CancelAddCustomCondition : ProfileSetupPagerEvent
-
-    data object StartAddCustomAllergy : ProfileSetupPagerEvent
-    data class UpdateCustomAllergyInput(val input: String) : ProfileSetupPagerEvent
-    data object SubmitCustomAllergy : ProfileSetupPagerEvent
-    data object CancelAddCustomAllergy : ProfileSetupPagerEvent
+    data class ToggleAllergy(val allergyId: Int) : ProfileSetupPagerEvent
+    data object RetryLoadAllergies : ProfileSetupPagerEvent
 
     data object SaveProfile : ProfileSetupPagerEvent
 }
