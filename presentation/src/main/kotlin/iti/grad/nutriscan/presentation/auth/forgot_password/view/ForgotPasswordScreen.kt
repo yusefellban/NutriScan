@@ -17,6 +17,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -28,6 +30,8 @@ import iti.grad.nutriscan.presentation.auth.forgot_password.state.ResetMethod
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ForgotPasswordHeader
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.PasswordSentDialog
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ResetMethodCard
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.EmailInputDialog
+import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
@@ -42,11 +46,15 @@ fun ForgotPasswordScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is ForgotPasswordEffect.NavigateBack -> onNavigateBack()
+                is ForgotPasswordEffect.ShowErrorDialog -> {
+                    errorDialogMessage = effect.messageStr
+                }
                 is ForgotPasswordEffect.ShowSnackbar -> {
                     val message = effect.messageStr
                         ?: effect.messageResId?.let { context.getString(it) }
@@ -55,6 +63,14 @@ fun ForgotPasswordScreen(
                 }
             }
         }
+    }
+
+    if (errorDialogMessage != null) {
+        AppErrorDialog(
+            title = "Error",
+            message = errorDialogMessage!!,
+            onDismiss = { errorDialogMessage = null }
+        )
     }
 
     ForgotPasswordScreenContent(
@@ -148,6 +164,17 @@ private fun ForgotPasswordScreenContent(
             isLoading = state.isLoading,
             onResendCode = { onEvent(ForgotPasswordEvent.ResendCodeClicked) },
             onDismiss = { onEvent(ForgotPasswordEvent.DismissPasswordSentDialog) }
+        )
+    }
+
+    // ── Email Input dialog overlay ───────────────────────────────────────
+    if (state.showEmailInputDialog) {
+        EmailInputDialog(
+            email = state.email,
+            onEmailChange = { onEvent(ForgotPasswordEvent.EmailChanged(it)) },
+            errorResId = state.emailErrorResId,
+            onSend = { onEvent(ForgotPasswordEvent.SendResetLink) },
+            onDismiss = { onEvent(ForgotPasswordEvent.DismissEmailInputDialog) }
         )
     }
 }

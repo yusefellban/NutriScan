@@ -9,4 +9,5 @@ interface IAuthRepository {
     suspend fun loginWithEmail(email: String, password: String): Result<Unit>
     suspend fun getOidcConfig(): OidcAuthConfig
     suspend fun saveTokens(authTokens: AuthTokens): Result<Unit>
+    suspend fun forgotPassword(email: String): Result<Unit>
 }

@@ -4,6 +4,8 @@ import iti.grad.nutriscan.data.remote.dto.RegisterRequestDto
 import iti.grad.nutriscan.data.remote.dto.RegisterResponseDto
 import iti.grad.nutriscan.data.remote.dto.ResendVerificationRequestDto
 import iti.grad.nutriscan.data.remote.dto.ResendVerificationResponseDto
+import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
+import iti.grad.nutriscan.data.remote.dto.MessageResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -19,4 +21,9 @@ interface AuthApiService {
     suspend fun resendVerification(
         @Body request: ResendVerificationRequestDto
     ): Response<ResendVerificationResponseDto>
+
+    @POST("v1/auth/forgot-password")
+    suspend fun forgotPassword(
+        @Body request: ForgotPasswordRequestDto
+    ): Response<MessageResponseDto>
 }

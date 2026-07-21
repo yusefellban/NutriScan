@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.RegisterRequestDto
 import iti.grad.nutriscan.data.remote.dto.ResendVerificationRequestDto
+import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
 import iti.grad.nutriscan.domain.auth.model.AuthTokens
 import iti.grad.nutriscan.domain.auth.model.OidcAuthConfig
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
@@ -133,6 +134,22 @@ class AuthRepositoryImpl @Inject constructor(
             
             authTokenLocalDataSource.saveAuthState(authState.jsonSerializeString())
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun forgotPassword(email: String): Result<Unit> {
+        return try {
+            val request = ForgotPasswordRequestDto(email = email)
+            val response = remoteDataSource.forgotPassword(request)
+
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val errorMessage = parseErrorMessage(response.errorBody()?.string())
+                Result.failure(Exception(errorMessage))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -5,6 +5,8 @@ import iti.grad.nutriscan.data.remote.dto.RegisterRequestDto
 import iti.grad.nutriscan.data.remote.dto.RegisterResponseDto
 import iti.grad.nutriscan.data.remote.dto.ResendVerificationRequestDto
 import iti.grad.nutriscan.data.remote.dto.ResendVerificationResponseDto
+import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
+import iti.grad.nutriscan.data.remote.dto.MessageResponseDto
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -22,5 +24,11 @@ class AuthRemoteDataSourceImpl @Inject constructor(
         request: ResendVerificationRequestDto
     ): Response<ResendVerificationResponseDto> {
         return authApiService.resendVerification(request)
+    }
+
+    override suspend fun forgotPassword(
+        request: ForgotPasswordRequestDto
+    ): Response<MessageResponseDto> {
+        return authApiService.forgotPassword(request)
     }
 }
