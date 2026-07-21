@@ -95,6 +95,8 @@
     <string name="profile_setup_weight_title_highlight">الحالي</string>
     <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
     <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
+    <string name="profile_setup_load_error">حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</string>
+    <string name="action_retry">إعادة المحاولة</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_name_hint">الاسم</string>

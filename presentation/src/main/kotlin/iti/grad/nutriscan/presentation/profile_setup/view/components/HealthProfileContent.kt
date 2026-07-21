@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.domain.allergy.model.Allergy
+import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
@@ -89,7 +93,7 @@ fun HealthProfileContent(
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // Chronic Conditions Section Title
+            // Chronic Conditions (Diseases) Section Title
             Text(
                 text = stringResource(R.string.profile_setup_chronic_conditions),
                 style = AppTheme.typography.headlineMedium.copy(lineHeight = 30.sp),
@@ -98,31 +102,14 @@ fun HealthProfileContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Chronic Conditions FlowRow
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                state.chronicConditions.forEach { condition ->
-                    val isSelected = state.selectedChronicConditions.contains(condition)
-                    SelectableChip(
-                        text = getConditionDisplayName(condition),
-                        isSelected = isSelected,
-                        onClick = { onEvent(ProfileSetupPagerEvent.ToggleCondition(condition)) }
-                    )
-                }
-
-                OtherInputChip(
-                    isEditing = state.isAddingCustomCondition,
-                    inputValue = state.customConditionInput,
-                    onValueChange = { onEvent(ProfileSetupPagerEvent.UpdateCustomConditionInput(it)) },
-                    onStartEditing = { onEvent(ProfileSetupPagerEvent.StartAddCustomCondition) },
-                    onSubmit = { onEvent(ProfileSetupPagerEvent.SubmitCustomCondition) },
-                    onCancel = { onEvent(ProfileSetupPagerEvent.CancelAddCustomCondition) },
-                    placeholder = stringResource(R.string.profile_setup_other)
-                )
-            }
+            DiseasesSection(
+                diseases = state.diseases,
+                selectedDiseaseIds = state.selectedDiseaseIds,
+                isLoading = state.isDiseasesLoading,
+                errorMessage = state.diseasesErrorMessage,
+                onToggle = { onEvent(ProfileSetupPagerEvent.ToggleDisease(it)) },
+                onRetry = { onEvent(ProfileSetupPagerEvent.RetryLoadDiseases) }
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -135,31 +122,14 @@ fun HealthProfileContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Allergies FlowRow
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                state.allergies.forEach { allergy ->
-                    val isSelected = state.selectedAllergies.contains(allergy)
-                    SelectableChip(
-                        text = getAllergyDisplayName(allergy),
-                        isSelected = isSelected,
-                        onClick = { onEvent(ProfileSetupPagerEvent.ToggleAllergy(allergy)) }
-                    )
-                }
-
-                OtherInputChip(
-                    isEditing = state.isAddingCustomAllergy,
-                    inputValue = state.customAllergyInput,
-                    onValueChange = { onEvent(ProfileSetupPagerEvent.UpdateCustomAllergyInput(it)) },
-                    onStartEditing = { onEvent(ProfileSetupPagerEvent.StartAddCustomAllergy) },
-                    onSubmit = { onEvent(ProfileSetupPagerEvent.SubmitCustomAllergy) },
-                    onCancel = { onEvent(ProfileSetupPagerEvent.CancelAddCustomAllergy) },
-                    placeholder = stringResource(R.string.profile_setup_other)
-                )
-            }
+            AllergiesSection(
+                allergies = state.allergies,
+                selectedAllergyIds = state.selectedAllergyIds,
+                isLoading = state.isAllergiesLoading,
+                errorMessage = state.allergiesErrorMessage,
+                onToggle = { onEvent(ProfileSetupPagerEvent.ToggleAllergy(it)) },
+                onRetry = { onEvent(ProfileSetupPagerEvent.RetryLoadAllergies) }
+            )
 
             // Spacing to keep content clear of the bottom Save button
             Spacer(modifier = Modifier.height(120.dp))
@@ -182,22 +152,89 @@ fun HealthProfileContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun getConditionDisplayName(condition: String): String {
-    return when (condition) {
-        "Diabetes" -> stringResource(R.string.profile_setup_diabetes)
-        "Hypertension" -> stringResource(R.string.profile_setup_hypertension)
-        "Celiac Disease" -> stringResource(R.string.profile_setup_celiac)
-        else -> condition
+private fun DiseasesSection(
+    diseases: List<Disease>,
+    selectedDiseaseIds: List<Int>,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onToggle: (Int) -> Unit,
+    onRetry: () -> Unit
+) {
+    when {
+        isLoading -> LoadingRow()
+        errorMessage != null -> ErrorRow(onRetry = onRetry)
+        else -> FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            diseases.forEach { disease ->
+                val isSelected = selectedDiseaseIds.contains(disease.id)
+                SelectableChip(
+                    text = disease.name,
+                    isSelected = isSelected,
+                    onClick = { onToggle(disease.id) }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AllergiesSection(
+    allergies: List<Allergy>,
+    selectedAllergyIds: List<Int>,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onToggle: (Int) -> Unit,
+    onRetry: () -> Unit
+) {
+    when {
+        isLoading -> LoadingRow()
+        errorMessage != null -> ErrorRow(onRetry = onRetry)
+        else -> FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            allergies.forEach { allergy ->
+                val isSelected = selectedAllergyIds.contains(allergy.id)
+                SelectableChip(
+                    text = allergy.name,
+                    isSelected = isSelected,
+                    onClick = { onToggle(allergy.id) }
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun getAllergyDisplayName(allergy: String): String {
-    return when (allergy) {
-        "Peanuts" -> stringResource(R.string.profile_setup_peanuts)
-        "Gluten" -> stringResource(R.string.profile_setup_gluten)
-        "Dairy" -> stringResource(R.string.profile_setup_dairy)
-        else -> allergy
+private fun LoadingRow() {
+    CircularProgressIndicator(
+        modifier = Modifier.size(24.dp),
+        color = AppTheme.colors.Primary,
+        strokeWidth = 2.dp
+    )
+}
+
+@Composable
+private fun ErrorRow(onRetry: () -> Unit) {
+    Column {
+        Text(
+            text = stringResource(R.string.profile_setup_load_error),
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.colors.Error
+        )
+        TextButton(onClick = onRetry) {
+            Text(
+                text = stringResource(R.string.action_retry),
+                style = AppTheme.typography.labelLarge,
+                color = AppTheme.colors.Primary
+            )
+        }
     }
 }

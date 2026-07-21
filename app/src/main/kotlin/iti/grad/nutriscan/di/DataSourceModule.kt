@@ -19,6 +19,12 @@ import iti.grad.nutriscan.data.local.datasource.ILanguagePreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.LanguagePreferencesDataSourceImpl
 import iti.grad.nutriscan.data.remote.datasource.AuthRemoteDataSourceImpl
 import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
+import iti.grad.nutriscan.data.remote.datasource.DiseaseRemoteDataSourceImpl
+import iti.grad.nutriscan.data.remote.datasource.IDiseaseRemoteDataSource
+import iti.grad.nutriscan.data.remote.datasource.UserRemoteDataSourceImpl
+import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
+import iti.grad.nutriscan.data.remote.datasource.AllergyRemoteDataSourceImpl
+import iti.grad.nutriscan.data.remote.datasource.IAllergyRemoteDataSource
 import javax.inject.Singleton
 
 @Module
@@ -48,6 +54,24 @@ abstract class DataSourceModule {
     abstract fun bindAuthRemoteDataSource(
         impl: AuthRemoteDataSourceImpl
     ): IAuthRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDiseaseRemoteDataSource(
+        impl: DiseaseRemoteDataSourceImpl
+    ): IDiseaseRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRemoteDataSource(
+        impl: UserRemoteDataSourceImpl
+    ): IUserRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAllergyRemoteDataSource(
+        impl: AllergyRemoteDataSourceImpl
+    ): IAllergyRemoteDataSource
 
 
     companion object {

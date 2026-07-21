@@ -5,8 +5,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.BuildConfig
+import iti.grad.nutriscan.data.remote.api.AllergyApiService
 import iti.grad.nutriscan.data.remote.api.AuthApiService
+import iti.grad.nutriscan.data.remote.api.DiseaseApiService
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.UserApiService
 import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.ErrorInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.NutriScanAuthenticator
@@ -91,6 +94,24 @@ object NetworkModule {
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDiseaseApiService(retrofit: Retrofit): DiseaseApiService {
+        return retrofit.create(DiseaseApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApiService(retrofit: Retrofit): UserApiService {
+        return retrofit.create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAllergyApiService(retrofit: Retrofit): AllergyApiService {
+        return retrofit.create(AllergyApiService::class.java)
     }
 
     @Provides
