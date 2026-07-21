@@ -125,7 +125,7 @@ private fun CameraScanContent(
                         modifier = Modifier.fillMaxSize(),
                     )
                     ScanFrameOverlay(
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
                 state.permissionDenied -> {
