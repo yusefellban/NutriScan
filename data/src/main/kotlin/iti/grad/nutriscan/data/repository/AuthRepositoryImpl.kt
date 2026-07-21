@@ -1,8 +1,9 @@
 package iti.grad.nutriscan.data.repository
 
 import android.net.Uri
-import iti.grad.nutriscan.data.local.datasource.IAuthTokenLocalDataSource
+import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
 import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.RegisterRequestDto
@@ -12,17 +13,15 @@ import iti.grad.nutriscan.domain.auth.model.AuthTokens
 import iti.grad.nutriscan.domain.auth.model.OidcAuthConfig
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import kotlinx.serialization.json.Json
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationServiceConfiguration
-import net.openid.appauth.TokenRequest
-import net.openid.appauth.TokenResponse
+
 import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val remoteDataSource: IAuthRemoteDataSource,
     private val keycloakApiService: KeycloakApiService,
-    private val authTokenLocalDataSource: IAuthTokenLocalDataSource,
+    private val tokenRefreshApiService: TokenRefreshApiService,
+    private val tokenManager: TokenManager,
     private val json: Json
 ) : IAuthRepository {
 
@@ -109,30 +108,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun saveTokens(authTokens: AuthTokens): Result<Unit> {
         return try {
-            val config = getOidcConfig()
-            
-            val serviceConfig = AuthorizationServiceConfiguration(
-                Uri.parse(config.authorizationEndpoint),
-                Uri.parse(config.tokenEndpoint)
-            )
-
-            val tokenRequest = TokenRequest.Builder(serviceConfig, config.clientId)
-                .setGrantType("custom") // Not strictly used for token response parsing
-                .build()
-
-            val tokenResponse = TokenResponse.Builder(tokenRequest)
-                .setAccessToken(authTokens.accessToken)
-                .setRefreshToken(authTokens.refreshToken)
-                .setIdToken(authTokens.idToken)
-                .setAccessTokenExpirationTime(
-                    authTokens.expiresIn?.let { System.currentTimeMillis() + (it * 1000) }
-                )
-                .build()
-
-            val authState = AuthState(serviceConfig)
-            authState.update(tokenResponse, null)
-            
-            authTokenLocalDataSource.saveAuthState(authState.jsonSerializeString())
+            val access = authTokens.accessToken ?: throw Exception("Missing access token")
+            val refresh = authTokens.refreshToken ?: throw Exception("Missing refresh token")
+            tokenManager.saveTokens(access, refresh)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -170,6 +148,24 @@ class AuthRepositoryImpl @Inject constructor(
             apiError.message + detailSuffix
         } catch (_: Exception) {
             "An unexpected error occurred."
+        }
+    }
+
+    override suspend fun isLoggedIn(): Boolean {
+        return !tokenManager.getAccessToken().isNullOrBlank()
+    }
+
+    override suspend fun logout(): Result<Unit> {
+        return try {
+            val refreshToken = tokenManager.getRefreshToken()
+            if (refreshToken != null) {
+                tokenRefreshApiService.logout(refreshToken = refreshToken)
+            }
+            tokenManager.clearTokens()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            tokenManager.clearTokens()
+            Result.success(Unit)
         }
     }
 }

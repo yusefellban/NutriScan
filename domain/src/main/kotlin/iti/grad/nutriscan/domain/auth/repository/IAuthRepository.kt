@@ -10,4 +10,6 @@ interface IAuthRepository {
     suspend fun getOidcConfig(): OidcAuthConfig
     suspend fun saveTokens(authTokens: AuthTokens): Result<Unit>
     suspend fun forgotPassword(email: String): Result<Unit>
+    suspend fun isLoggedIn(): Boolean
+    suspend fun logout(): Result<Unit>
 }

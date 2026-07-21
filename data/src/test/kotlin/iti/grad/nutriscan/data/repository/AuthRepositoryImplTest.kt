@@ -1,7 +1,8 @@
 package iti.grad.nutriscan.data.repository
 
-import iti.grad.nutriscan.data.local.datasource.IAuthTokenLocalDataSource
+import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
 import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
 import iti.grad.nutriscan.data.remote.dto.MessageResponseDto
@@ -21,7 +22,8 @@ class AuthRepositoryImplTest {
 
     private lateinit var remoteDataSource: IAuthRemoteDataSource
     private lateinit var keycloakApiService: KeycloakApiService
-    private lateinit var authTokenLocalDataSource: IAuthTokenLocalDataSource
+    private lateinit var tokenRefreshApiService: TokenRefreshApiService
+    private lateinit var tokenManager: TokenManager
     private lateinit var json: Json
     private lateinit var repository: AuthRepositoryImpl
 
@@ -29,12 +31,14 @@ class AuthRepositoryImplTest {
     fun setup() {
         remoteDataSource = mockk()
         keycloakApiService = mockk()
-        authTokenLocalDataSource = mockk()
+        tokenRefreshApiService = mockk(relaxed = true)
+        tokenManager = mockk(relaxed = true)
         json = Json { ignoreUnknownKeys = true }
         repository = AuthRepositoryImpl(
             remoteDataSource,
             keycloakApiService,
-            authTokenLocalDataSource,
+            tokenRefreshApiService,
+            tokenManager,
             json
         )
     }
@@ -78,5 +82,18 @@ class AuthRepositoryImplTest {
 
         assertTrue(result.isSuccess)
         coVerify(exactly = 1) { remoteDataSource.register(request) }
+    }
+
+    @Test
+    fun `logout should call tokenRefreshApiService and clear tokens`() = runTest {
+        val refreshToken = "dummy_refresh_token"
+        coEvery { tokenManager.getRefreshToken() } returns refreshToken
+        coEvery { tokenRefreshApiService.logout(refreshToken = refreshToken) } returns Response.success(Unit)
+
+        val result = repository.logout()
+
+        assertTrue(result.isSuccess)
+        coVerify(exactly = 1) { tokenRefreshApiService.logout(refreshToken = refreshToken) }
+        coVerify(exactly = 1) { tokenManager.clearTokens() }
     }
 }

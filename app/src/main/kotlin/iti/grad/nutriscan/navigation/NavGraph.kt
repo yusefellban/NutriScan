@@ -53,6 +53,11 @@ fun AppNavGraph(
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 },
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                }
             )
         }
         composable<OnboardingRoute> {
