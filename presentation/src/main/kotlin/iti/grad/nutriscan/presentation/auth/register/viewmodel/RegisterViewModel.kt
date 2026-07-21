@@ -17,9 +17,12 @@ import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
 
+import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
+
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterState())
@@ -76,6 +79,8 @@ class RegisterViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             registerUseCase(currentState.email, currentState.password)
                 .onSuccess {
+                    // Automatically trigger verification email after successful registration
+                    resendVerificationEmailUseCase(currentState.email)
                     _state.update { it.copy(isLoading = false) }
                     _effect.send(RegisterEffect.NavigateToEmailVerification(currentState.email))
                 }
