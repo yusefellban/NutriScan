@@ -4,7 +4,10 @@ import androidx.annotation.StringRes
 
 data class ForgotPasswordState(
     val selectedMethod: ResetMethod = ResetMethod.EMAIL,
+    val email: String = "",
+    val emailErrorResId: Int? = null,
     val isLoading: Boolean = false,
+    val showEmailInputDialog: Boolean = false,
     val showPasswordSentDialog: Boolean = false,
     val maskedEmail: String = ""
 )

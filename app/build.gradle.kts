@@ -23,7 +23,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://api.nutriscan.ai/v1/\"")
+        buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://nutriscan.dev/api/\"")
+        buildConfigField("String", "KEYCLOAK_BASE_URL", "\"https://auth.nutriscan.dev/\"")
+
+        manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"
     }
 
     buildTypes {
@@ -44,13 +47,15 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.timber)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -83,4 +88,6 @@ dependencies {
 
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    
+    implementation("net.openid:appauth:0.11.1")
 }

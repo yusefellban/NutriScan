@@ -9,6 +9,7 @@ import iti.grad.nutriscan.domain.settings.usecase.GetLanguageUseCase
 import iti.grad.nutriscan.domain.settings.usecase.GetThemeModeUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetLanguageUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetThemeModeUseCase
+import iti.grad.nutriscan.domain.auth.usecase.LogoutUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
@@ -27,6 +28,7 @@ class AppSettingsViewModel @Inject constructor(
     private val setThemeModeUseCase: SetThemeModeUseCase,
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppSettingsState())
@@ -73,7 +75,10 @@ class AppSettingsViewModel @Inject constructor(
 
     private fun confirmLogout() {
         _state.update { it.copy(showLogoutConfirmDialog = false) }
-        navigate(AppSettingsEffect.NavigateToLogin)
+        viewModelScope.launch {
+            logoutUseCase()
+            navigate(AppSettingsEffect.NavigateToLogin)
+        }
     }
 
     private fun navigate(effect: AppSettingsEffect) {

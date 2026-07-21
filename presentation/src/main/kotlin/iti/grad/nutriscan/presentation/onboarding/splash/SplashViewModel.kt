@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.onboarding.usecase.IsOnboardingCompletedUseCase
+import iti.grad.nutriscan.domain.auth.usecase.CheckIfUserIsLoggedInUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val isOnboardingCompletedUseCase: IsOnboardingCompletedUseCase
+    private val isOnboardingCompletedUseCase: IsOnboardingCompletedUseCase,
+    private val checkIfUserIsLoggedInUseCase: CheckIfUserIsLoggedInUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SplashState)
@@ -32,7 +34,11 @@ class SplashViewModel @Inject constructor(
     private fun onAnimationCompleted() {
         viewModelScope.launch {
             if (isOnboardingCompletedUseCase()) {
-                _effect.send(SplashEffect.NavigateToLogin)
+                if (checkIfUserIsLoggedInUseCase()) {
+                    _effect.send(SplashEffect.NavigateToHome)
+                } else {
+                    _effect.send(SplashEffect.NavigateToLogin)
+                }
             } else {
                 _effect.send(SplashEffect.NavigateToOnboarding)
             }
