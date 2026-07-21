@@ -36,7 +36,7 @@ import iti.grad.presentation.R
 import kotlin.math.abs
 
 /** Height of the visible tab-bar region — matches the iOS `CustomAnimatedTabBar.barHeight`. */
-private val BarHeight = 60.dp
+private val BarHeight = 70.dp
 
 /** How far the floating button's center sits above the bar's top edge. */
 private val FabOffsetY = (-28).dp
