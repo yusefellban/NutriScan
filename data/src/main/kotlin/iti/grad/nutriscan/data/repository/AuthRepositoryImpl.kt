@@ -2,6 +2,7 @@ package iti.grad.nutriscan.data.repository
 
 import android.net.Uri
 import iti.grad.nutriscan.data.local.datasource.TokenManager
+import iti.grad.nutriscan.data.local.util.JwtDecoder
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
 import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
 import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
@@ -110,7 +111,7 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val access = authTokens.accessToken ?: throw Exception("Missing access token")
             val refresh = authTokens.refreshToken ?: throw Exception("Missing refresh token")
-            tokenManager.saveTokens(access, refresh)
+            tokenManager.saveTokens(access, refresh, authTokens.idToken)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -168,4 +169,6 @@ class AuthRepositoryImpl @Inject constructor(
             Result.success(Unit)
         }
     }
+
+    override suspend fun getCurrentUserId(): String? = JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
 }

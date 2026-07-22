@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.common.components
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -43,11 +43,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -56,16 +58,17 @@ import kotlin.math.roundToInt
 fun ProductCard(
     imageUrl: String?,
     productName: String,
-    verdict: ProductVerdict,
+    verdict: ProductVerdict?,
     calories: String,
-    @StringRes swipeHintResId: Int,
     onClick: () -> Unit,
-    onSwipeToAdd: () -> Unit,
     modifier: Modifier = Modifier,
+    swipeAction: ProductCardSwipeAction? = null,
+    /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
+    caloriesOverlayOnImage: Boolean = false,
 ) {
     val density = LocalDensity.current
-    val shadowBlurPx = with(density) { 30.dp.toPx() }
-    val shadowOffsetYPx = with(density) { 15.dp.toPx() }
+    val shadowBlurPx = with(density) { 12.dp.toPx() }
+    val shadowOffsetYPx = with(density) { 6.dp.toPx() }
 
     Box(
         modifier = modifier
@@ -86,82 +89,98 @@ fun ProductCard(
             color = AppTheme.colors.ProductCardBackground
         ) {
         Column {
-            // Product image — inside the card with padding
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = productName,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                     .height(130.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.ic_scanner),
-                placeholder = painterResource(id = R.drawable.ic_scanner)
-            )
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = productName,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(id = R.drawable.ic_scanner),
+                    placeholder = painterResource(id = R.drawable.ic_scanner)
+                )
+
+                if (caloriesOverlayOnImage) {
+                    CaloriesBadge(
+                        calories = calories,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .zIndex(1f)
+                            .padding(6.dp),
+                        background = AppTheme.colors.ProductCardNameText.copy(alpha = 0.55f),
+                        textColor = Color.White,
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
             ) {
-                // Row containing Title+Verdict and Kcal Badge
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = productName,
-                            style = AppTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            ),
-                            color = AppTheme.colors.ProductCardNameText,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        
+                if (caloriesOverlayOnImage) {
+                    Text(
+                        text = productName,
+                        style = AppTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        ),
+                        color = AppTheme.colors.ProductCardNameText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    if (verdict != null) {
                         Spacer(modifier = Modifier.height(4.dp))
-                        
-                        // Verdict badge
                         VerdictBadge(verdict = verdict)
                     }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    // Kcal stacked badge
-                    Box(
-                        modifier = Modifier
-                            .background(AppTheme.colors.ProductCardCaloriesBackground, RoundedCornerShape(4.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                } else {
+                    // Original layout: name+verdict on the left, kcal stacked badge on the right
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = calories,
-                                style = AppTheme.typography.labelSmall.copy(
+                                text = productName,
+                                style = AppTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp
+                                    fontSize = 13.sp
                                 ),
-                                color = AppTheme.colors.ProductCardCaloriesText
+                                color = AppTheme.colors.ProductCardNameText,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                            Text(
-                                text = stringResource(id = R.string.product_card_kcal_unit),
-                                style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                                color = AppTheme.colors.ProductCardCaloriesText
-                            )
+
+                            if (verdict != null) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                VerdictBadge(verdict = verdict)
+                            }
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        CaloriesBadge(
+                            calories = calories,
+                            background = AppTheme.colors.ProductCardCaloriesBackground,
+                            textColor = AppTheme.colors.ProductCardCaloriesText,
+                            cornerRadius = 4.dp,
+                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (swipeAction != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                // Swipe slider row — inside the card
-                SwipeToAddButton(
-                    swipeHintResId = swipeHintResId,
-                    onSwipeToAdd = onSwipeToAdd
-                )
+                    // Swipe slider row — inside the card
+                    SwipeActionButton(swipeAction = swipeAction)
+                }
             }
         }
     }
@@ -169,13 +188,42 @@ fun ProductCard(
 }
 
 @Composable
-private fun SwipeToAddButton(
-    @StringRes swipeHintResId: Int,
-    onSwipeToAdd: () -> Unit,
+private fun CaloriesBadge(
+    calories: String,
+    background: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 6.dp,
 ) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .background(background, RoundedCornerShape(cornerRadius))
+            .padding(horizontal = 6.dp, vertical = 3.dp)
+    ) {
+        Text(
+            text = calories,
+            style = AppTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp
+            ),
+            color = textColor
+        )
+        Text(
+            text = stringResource(id = R.string.product_card_kcal_unit),
+            style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
+            color = textColor
+        )
+    }
+}
+
+@Composable
+private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val isRemove = swipeAction is ProductCardSwipeAction.Remove
+    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.ProductCardSwipeIconBackground
 
     // Track the drag offset
     val offsetX = remember { Animatable(0f) }
@@ -204,7 +252,7 @@ private fun SwipeToAddButton(
     ) {
         // Hint text — fades as button slides over it
         Text(
-            text = stringResource(id = swipeHintResId),
+            text = stringResource(id = swipeAction.hintResId),
             style = AppTheme.typography.bodySmall.copy(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal
@@ -221,7 +269,7 @@ private fun SwipeToAddButton(
             modifier = Modifier
                 .offset { IntOffset(offsetX.value.roundToInt(), 0) }
                 .size(width = buttonWidthDp, height = 32.dp)
-                .background(AppTheme.colors.ProductCardSwipeIconBackground, RoundedCornerShape(50))
+                .background(buttonColor, RoundedCornerShape(50))
                 .draggable(
                     orientation = Orientation.Horizontal,
                     state = rememberDraggableState { delta ->
@@ -234,7 +282,7 @@ private fun SwipeToAddButton(
                     onDragStopped = {
                         // If dragged past 70% of the track → trigger action
                         if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
-                            onSwipeToAdd()
+                            swipeAction.onTriggered()
                         }
                         // Always spring back to start
                         scope.launch {
@@ -244,8 +292,13 @@ private fun SwipeToAddButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
+            val icon = when {
+                isRemove -> R.drawable.ic_trash
+                isRtl -> R.drawable.ic_arrow_left
+                else -> R.drawable.ic_arrow_right
+            }
             Icon(
-                painter = painterResource(id = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right),
+                painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(16.dp)

@@ -129,7 +129,7 @@ class CameraScanViewModel @Inject constructor(
         viewModelScope.launch {
             when (tab) {
                 BottomNavTab.HOME -> _effect.send(CameraScanEffect.NavigateToHome)
-                BottomNavTab.HISTORY -> _effect.send(CameraScanEffect.NavigateToHistory)
+                BottomNavTab.CALORIES -> _effect.send(CameraScanEffect.NavigateToCalories)
                 BottomNavTab.SAVED -> _effect.send(CameraScanEffect.NavigateToSaved)
                 BottomNavTab.PROFILE -> _effect.send(CameraScanEffect.NavigateToProfile)
                 BottomNavTab.SCAN -> Unit

@@ -49,6 +49,7 @@ fun UserProfileScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
     onNavigateToScanHistory: () -> Unit = {},
+    onNavigateToCalories: () -> Unit = {},
     onNavigateToSaved: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToFamilyMemberDetail: (String) -> Unit = {},
@@ -68,7 +69,7 @@ fun UserProfileScreen(
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
                 is UserProfileEffect.NavigateToTab -> when (effect.tab) {
                     BottomNavTab.HOME -> onNavigateToHome()
-                    BottomNavTab.HISTORY -> onNavigateToScanHistory()
+                    BottomNavTab.CALORIES -> onNavigateToCalories()
                     BottomNavTab.SCAN -> onNavigateToScan()
                     BottomNavTab.SAVED -> onNavigateToSaved()
                     BottomNavTab.PROFILE -> Unit

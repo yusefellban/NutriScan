@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,8 +28,23 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
+
+/**
+ * Navigates to a bottom-nav tab destination, popping back to the graph's start destination
+ * (saving its state) and restoring the target tab's own state if it's been visited before.
+ * Keeps exactly one back-stack entry (and one ViewModel instance) per tab, regardless of how
+ * many times the user bounces between tabs — the standard Compose-Navigation bottom-nav pattern.
+ */
+private fun NavHostController.navigateToTab(route: Any) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
 
 @Composable
 fun AppNavGraph(
@@ -174,16 +190,19 @@ fun AppNavGraph(
         composable<HomeRoute> {
             HomeScreen(
                 onNavigateToScan = {
-                    navController.navigate(CameraScanRoute)
+                    navController.navigateToTab(CameraScanRoute)
                 },
                 onNavigateToHistory = {
                     navController.navigate(ScanHistoryRoute)
                 },
+                onNavigateToCalories = {
+                    navController.navigateToTab(CaloriesRoute)
+                },
                 onNavigateToSaved = {
-                    navController.navigate(SavedRoute)
+                    navController.navigateToTab(SavedRoute)
                 },
                 onNavigateToProfile = {
-                    navController.navigate(UserProfileRoute)
+                    navController.navigateToTab(UserProfileRoute)
                 },
                 onNavigateToNotifications = {
                     navController.navigate(NotificationSettingsRoute)
@@ -206,8 +225,8 @@ fun AppNavGraph(
                     navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
                 },
                 onNavigateToHome = { navController.navigate(HomeRoute) },
-                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
                 onNavigateToProfile = { navController.navigate(UserProfileRoute) }
             )
         }
@@ -317,10 +336,10 @@ fun AppNavGraph(
         // 18. Saved Screen
         composable<SavedRoute> {
             SavedScreen(
-                onNavigateToHome = { navController.navigate(HomeRoute) { popUpTo(HomeRoute) { inclusive = true } } },
-                onNavigateToScan = { navController.navigate(CameraScanRoute) },
-                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToHome = { navController.navigateToTab(HomeRoute) },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
                 onNavigateToProductDetail = { /* No-op for now */ }
             )
         }
@@ -329,13 +348,12 @@ fun AppNavGraph(
         composable<UserProfileRoute> {
             UserProfileScreen(
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(HomeRoute) { inclusive = false }
-                    }
+                    navController.navigateToTab(HomeRoute)
                 },
-                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
                     navController.navigate(EditConditionsRoute(memberId))
@@ -419,7 +437,32 @@ fun AppNavGraph(
                 navController.navigateUp()
             }
         }
-        // 27. Product Details Placeholder
+
+        // 27. Calories Dashboard
+        composable<CaloriesRoute> {
+            CaloriesScreen(
+                onNavigateToSavedProducts = { navController.navigateToTab(SavedRoute) },
+                onNavigateToHome = {
+                    navController.navigateToTab(HomeRoute)
+                },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
+                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
+                onNavigateToExercises = { navController.navigate(ExercisesRoute) },
+            )
+        }
+
+        // 28. Exercises (Placeholder)
+        composable<ExercisesRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.exercises_title),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 29. Product Details Placeholder
         composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
             PlaceholderScreen(

@@ -12,4 +12,7 @@ interface IAuthRepository {
     suspend fun forgotPassword(email: String): Result<Unit>
     suspend fun isLoggedIn(): Boolean
     suspend fun logout(): Result<Unit>
+
+    /** Decodes the `sub` claim from the stored ID token. Null if not logged in or undecodable. */
+    suspend fun getCurrentUserId(): String?
 }

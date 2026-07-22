@@ -51,6 +51,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToScan: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
+    onNavigateToCalories: () -> Unit = {},
     onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
@@ -63,6 +64,7 @@ fun HomeScreen(
             when (effect) {
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
+                is HomeEffect.NavigateToCalories -> onNavigateToCalories()
                 is HomeEffect.NavigateToSaved -> onNavigateToSaved()
                 is HomeEffect.NavigateToProfile -> onNavigateToProfile()
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()

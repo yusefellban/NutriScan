@@ -3,9 +3,12 @@ package iti.grad.nutriscan.presentation.profile_setup
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
 import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.Gender
@@ -14,6 +17,7 @@ import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEven
 import iti.grad.nutriscan.presentation.profile_setup.viewmodel.ProfileSetupPagerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -32,21 +36,27 @@ class ProfileSetupPagerViewModelTest {
     private val completeOnboardingUseCase: CompleteOnboardingUseCase = mockk(relaxed = true)
     private val getDiseasesUseCase: GetDiseasesUseCase = mockk()
     private val getAllergiesUseCase: GetAllergiesUseCase = mockk()
+    private val syncDiseasesUseCase: SyncDiseasesUseCase = mockk()
+    private val syncAllergiesUseCase: SyncAllergiesUseCase = mockk()
     private val updateUserProfileUseCase: UpdateUserProfileUseCase = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
+
         // Mock initial data loading
-        coEvery { getDiseasesUseCase() } returns Result.success(emptyList())
-        coEvery { getAllergiesUseCase() } returns Result.success(emptyList())
-        
+        every { getDiseasesUseCase() } returns flowOf(emptyList())
+        every { getAllergiesUseCase() } returns flowOf(emptyList())
+        coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
+        coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
+
         viewModel = ProfileSetupPagerViewModel(
             completeOnboardingUseCase = completeOnboardingUseCase,
             getDiseasesUseCase = getDiseasesUseCase,
             getAllergiesUseCase = getAllergiesUseCase,
+            syncDiseasesUseCase = syncDiseasesUseCase,
+            syncAllergiesUseCase = syncAllergiesUseCase,
             updateUserProfileUseCase = updateUserProfileUseCase
         )
     }
@@ -236,12 +246,20 @@ class ProfileSetupPagerViewModelTest {
 
         @Test
         fun `SaveProfile success calls use cases and emits NavigateToHome`() = runTest {
-            coEvery { 
+            coEvery {
                 updateUserProfileUseCase(
-                    any(), any(), any(), any(), any(), any()
+                    firstName = any(),
+                    lastName = any(),
+                    gender = any(),
+                    dateOfBirth = any(),
+                    heightCm = any(),
+                    weightKg = any(),
+                    diseaseIds = any(),
+                    allergyIds = any(),
+                    avatarUrl = any(),
                 )
             } returns Result.success(Unit)
-            
+
             viewModel.effect.test {
                 viewModel.onEvent(ProfileSetupPagerEvent.SaveProfile)
                 testScheduler.advanceUntilIdle()
@@ -249,14 +267,17 @@ class ProfileSetupPagerViewModelTest {
                 val effect = awaitItem()
                 Assertions.assertTrue(effect is ProfileSetupPagerEffect.NavigateToHome)
                 Assertions.assertFalse(viewModel.state.value.isLoading)
-                coVerify(exactly = 1) { 
+                coVerify(exactly = 1) {
                     updateUserProfileUseCase(
-                        diseaseIds = any(),
-                        allergyIds = any(),
+                        firstName = any(),
+                        lastName = any(),
                         gender = any(),
                         dateOfBirth = any(),
                         heightCm = any(),
-                        weightKg = any()
+                        weightKg = any(),
+                        diseaseIds = any(),
+                        allergyIds = any(),
+                        avatarUrl = any(),
                     )
                 }
                 coVerify(exactly = 1) { completeOnboardingUseCase() }
@@ -266,9 +287,17 @@ class ProfileSetupPagerViewModelTest {
         @Test
         fun `SaveProfile failure emits ShowSnackbar`() = runTest {
             val errorMessage = "Network Error"
-            coEvery { 
+            coEvery {
                 updateUserProfileUseCase(
-                    any(), any(), any(), any(), any(), any()
+                    firstName = any(),
+                    lastName = any(),
+                    gender = any(),
+                    dateOfBirth = any(),
+                    heightCm = any(),
+                    weightKg = any(),
+                    diseaseIds = any(),
+                    allergyIds = any(),
+                    avatarUrl = any(),
                 )
             } returns Result.failure(Exception(errorMessage))
 

@@ -1,6 +1,11 @@
 package iti.grad.nutriscan.presentation.home
 
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import iti.grad.nutriscan.domain.user.model.User
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
@@ -9,6 +14,7 @@ import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
@@ -27,11 +33,16 @@ class HomeViewModelTest {
     private val testDispatcher = StandardTestDispatcher(testScheduler)
 
     private lateinit var viewModel: HomeViewModel
+    private val userData = MutableStateFlow<User?>(null)
+    private val userRepository: IUserRepository = mockk {
+        coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
+        every { getUserData() } returns userData
+    }
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = HomeViewModel()
+        viewModel = HomeViewModel(userRepository)
     }
 
     @AfterEach
@@ -42,7 +53,7 @@ class HomeViewModelTest {
     @Test
     fun `initial state has correct dummy data`() = runTest(testDispatcher) {
         val state = viewModel.state.value
-        assertEquals("Noureldeen", state.userName)
+        assertEquals("", state.userName)
         assertEquals(3, state.recentHistory.size)
         assertEquals(BottomNavTab.HOME, state.selectedTab)
 
@@ -53,6 +64,28 @@ class HomeViewModelTest {
         assertEquals("Today, 9:24 AM", firstItem.scanDate)
         assertEquals(R.string.verdict_healthy, firstItem.verdictLabelResId)
         assertEquals(VerdictType.CYAN, firstItem.verdictType)
+    }
+
+    @Test
+    fun `when repository emits a user, userName and avatarUrl update`() = runTest(testDispatcher) {
+        userData.value = User(
+            id = "1",
+            firstName = "Noureldeen",
+            lastName = null,
+            email = "noureldeen@example.com",
+            gender = null,
+            dateOfBirth = null,
+            heightCm = null,
+            weightKg = null,
+            diseaseIds = emptyList(),
+            allergyIds = emptyList(),
+            avatarUrl = "https://example.com/avatar.png",
+        )
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals("Noureldeen", state.userName)
+        assertEquals("https://example.com/avatar.png", state.avatarUrl)
     }
 
     @Test
@@ -88,10 +121,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to CALORIES, effect is NavigateToCalories and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            expectNoEvents()
+            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
+            assertEquals(HomeEffect.NavigateToCalories, awaitItem())
         }
         // Home is the only tab rendered inline; the retained ViewModel must keep
         // highlighting HOME so returning here doesn't show a stale tab.

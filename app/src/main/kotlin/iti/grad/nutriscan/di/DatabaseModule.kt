@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.data.db.NutriScanDatabase
+import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import javax.inject.Singleton
 
 @Module
@@ -23,6 +24,10 @@ object DatabaseModule {
             "nutriscan_db"
         ).fallbackToDestructiveMigration().build()
     }
+
+    @Provides
+    @Singleton
+    fun provideFoodLogDao(db: NutriScanDatabase): FoodLogDao = db.foodLogDao()
 
     @Provides
     @Singleton

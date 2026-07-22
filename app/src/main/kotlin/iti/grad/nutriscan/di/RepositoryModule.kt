@@ -18,9 +18,13 @@ import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.data.repository.UserRepositoryImpl
 import iti.grad.nutriscan.domain.allergy.repository.IAllergyRepository
 import iti.grad.nutriscan.data.repository.AllergyRepositoryImpl
+import iti.grad.nutriscan.domain.steps.repository.IStepsRepository
+import iti.grad.nutriscan.data.repository.StepsRepositoryImpl
 import javax.inject.Singleton
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
 import iti.grad.nutriscan.data.repository.ScanRepositoryImpl
+import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
+import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -72,4 +76,16 @@ abstract class RepositoryModule {
     abstract fun bindAllergyRepository(
         impl: AllergyRepositoryImpl
     ): IAllergyRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStepsRepository(
+        impl: StepsRepositoryImpl
+    ): IStepsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFoodLogRepository(
+        impl: FoodLogRepositoryImpl
+    ): IFoodLogRepository
 }

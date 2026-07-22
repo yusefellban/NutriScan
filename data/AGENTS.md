@@ -393,6 +393,17 @@ try { ... } catch (e: Exception) { /* empty */ }                          // sil
 Room is the single source of truth for any feature that persists data (Scan History,
 Shopping List, Reports). The UI always collects from Room; remote calls only refresh it.
 
+> **First real reference implementation**: `FoodLogRepositoryImpl`
+> (`data/repository/FoodLogRepositoryImpl.kt`) is the first repository in this
+> codebase to actually follow `runCatchingCancellable` + `@IoDispatcher` end to
+> end (every other repository predates this convention and doesn't fully
+> follow it yet — don't copy those). It has no remote data source yet (the
+> food log is Room-only, "later linked with backend" per its plan doc), so its
+> `channelFlow`/local-then-remote shape is simpler than the aspirational
+> example below — copy *that* shape once a feature actually needs
+> local+remote sync; copy `FoodLogRepositoryImpl` for the dispatcher/error
+> handling conventions regardless.
+
 ```kotlin
 // ✅ CORRECT — channelFlow: local emits immediately; remote refresh is concurrent
 class ScanHistoryRepositoryImpl @Inject constructor(

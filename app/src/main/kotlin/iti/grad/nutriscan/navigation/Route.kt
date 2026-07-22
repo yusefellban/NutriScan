@@ -93,3 +93,9 @@ object HelpRoute
 data class ProductDetailsPlaceholderRoute(val barcode: String)
 @Serializable
 data class EmailVerificationRoute(val email: String)
+
+@Serializable
+object CaloriesRoute
+
+@Serializable
+object ExercisesRoute

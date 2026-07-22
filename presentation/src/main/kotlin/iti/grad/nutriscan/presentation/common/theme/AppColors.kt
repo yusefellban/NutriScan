@@ -106,6 +106,16 @@ internal data class AppColorsExtension(
     val AppSettingsToggleTextSelected: Color,
     val AppSettingsLogoutAccent: Color,
     val AppSettingsLogoutIconBackground: Color,
+
+    // --- Calories Dashboard ---
+    // Teal200/Teal800/Teal1200 above are deliberately remapped to different
+    // raw hex values in darkColors() for other screens' glow effects, so
+    // they can't be reused where the Figma spec pins an exact literal swatch
+    // in both themes. These three are fixed (same value in light and dark).
+    val CaloriesAccentTeal1200: Color,
+    val CaloriesMutedTeal: Color,
+    val CaloriesIconOnAccent: Color,
+    val ExerciseSecondaryText: Color,
 )
 
 @Immutable
@@ -308,6 +318,11 @@ data class AppColors internal constructor(
     val AppSettingsToggleTextSelected: Color get() = extension.AppSettingsToggleTextSelected
     val AppSettingsLogoutAccent: Color get() = extension.AppSettingsLogoutAccent
     val AppSettingsLogoutIconBackground: Color get() = extension.AppSettingsLogoutIconBackground
+
+    val CaloriesAccentTeal1200: Color get() = extension.CaloriesAccentTeal1200
+    val CaloriesMutedTeal: Color get() = extension.CaloriesMutedTeal
+    val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
+    val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -540,6 +555,12 @@ fun lightColors() = AppColors(
         AppSettingsToggleTextSelected = Color(0xFF3E3E3E), // Gray1400 (matches ChipTextSelected)
         AppSettingsLogoutAccent = Color(0xFFFA4D5E),
         AppSettingsLogoutIconBackground = Color(0xFFFFF1F3), // ErrorBackground (light)
+
+        // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
+        CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
+        CaloriesIconOnAccent = Color(0xFFFFFFFF),
+        ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
     ),
 )
 
@@ -776,5 +797,11 @@ fun darkColors() = AppColors(
         // Error is remapped to 0xFFFF6B7A in this palette — spec requires the same red in both themes here
         AppSettingsLogoutAccent = Color(0xFFFA4D5E),
         AppSettingsLogoutIconBackground = Color(0xFF0A545A), // Teal1500 — ErrorBackground dark value doesn't fit here
+
+        // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
+        CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
+        CaloriesIconOnAccent = Color(0xFFFFFFFF),
+        ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value
     ),
 )

@@ -134,10 +134,10 @@ fun AppBottomNavBar(
                 modifier = Modifier.weight(1f),
                 selectedIconResId = R.drawable.ic_fire_solid,
                 unselectedIconResId = R.drawable.ic_fire_outline,
-                contentDescription = stringResource(R.string.nav_history),
-                isSelected = selectedTab == BottomNavTab.HISTORY,
-                onClick = { onTabClick(BottomNavTab.HISTORY) },
-                onPositioned = { center -> tabPositions[BottomNavTab.HISTORY] = center - rowLeftInRoot },
+                contentDescription = stringResource(R.string.nav_calories),
+                isSelected = selectedTab == BottomNavTab.CALORIES,
+                onClick = { onTabClick(BottomNavTab.CALORIES) },
+                onPositioned = { center -> tabPositions[BottomNavTab.CALORIES] = center - rowLeftInRoot },
             )
 
             // Reserved center slot for the Scan tab — its icon renders inside the floating

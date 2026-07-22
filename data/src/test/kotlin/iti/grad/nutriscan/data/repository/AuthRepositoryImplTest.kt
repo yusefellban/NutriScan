@@ -96,4 +96,30 @@ class AuthRepositoryImplTest {
         coVerify(exactly = 1) { tokenRefreshApiService.logout(refreshToken = refreshToken) }
         coVerify(exactly = 1) { tokenManager.clearTokens() }
     }
+
+    @Test
+    fun `getCurrentUserId decodes the sub claim from the stored id token`() = runTest {
+        val token = fakeJwtWithSubject("user-123")
+        coEvery { tokenManager.getIdToken() } returns token
+
+        val userId = repository.getCurrentUserId()
+
+        org.junit.jupiter.api.Assertions.assertEquals("user-123", userId)
+    }
+
+    @Test
+    fun `getCurrentUserId returns null when there is no stored id token`() = runTest {
+        coEvery { tokenManager.getIdToken() } returns null
+
+        val userId = repository.getCurrentUserId()
+
+        org.junit.jupiter.api.Assertions.assertNull(userId)
+    }
+
+    private fun fakeJwtWithSubject(subject: String): String {
+        val encoder = java.util.Base64.getUrlEncoder().withoutPadding()
+        val header = encoder.encodeToString("""{"alg":"none"}""".toByteArray())
+        val payload = encoder.encodeToString("""{"sub":"$subject"}""".toByteArray())
+        return "$header.$payload.fake-signature"
+    }
 }

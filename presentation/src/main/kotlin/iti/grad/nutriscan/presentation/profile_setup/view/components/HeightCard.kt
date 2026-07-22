@@ -1,7 +1,6 @@
 package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -36,7 +35,7 @@ fun HeightCard(
     val textCol = if (isSelected) AppTheme.colors.HeightSelectedCardText else AppTheme.colors.HeightUnselectedCardText
 
     val shadowColor = if (isSelected) AppTheme.colors.ShadowSelected else AppTheme.colors.ShadowUnselected
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val shadowBlur = if (isDark) {
         if (isSelected) 20f else 8f
     } else {

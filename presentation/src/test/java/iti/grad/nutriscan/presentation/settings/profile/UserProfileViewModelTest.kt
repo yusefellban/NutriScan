@@ -1,12 +1,17 @@
 package iti.grad.nutriscan.presentation.settings.profile
 
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.mockk
+import iti.grad.nutriscan.domain.user.model.User
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.viewmodel.UserProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
@@ -26,11 +31,16 @@ class UserProfileViewModelTest {
     private val testDispatcher = StandardTestDispatcher(testScheduler)
 
     private lateinit var viewModel: UserProfileViewModel
+    private val userData = MutableStateFlow<User?>(null)
+    private val userRepository: IUserRepository = mockk {
+        coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
+        coEvery { getUserData() } returns userData
+    }
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = UserProfileViewModel()
+        viewModel = UserProfileViewModel(userRepository)
     }
 
     @AfterEach
@@ -39,13 +49,35 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `initial state has correct dummy data and starts with no family members`() = runTest(testDispatcher) {
+    fun `initial state has empty user name and starts with no family members`() = runTest(testDispatcher) {
         val state = viewModel.state.value
-        assertEquals("Osama Hosam", state.userName)
+        assertEquals("", state.userName)
         assertEquals(15, state.streakDays)
         assertEquals(BottomNavTab.PROFILE, state.selectedTab)
         assertTrue(state.familyMembers.isEmpty())
         assertNull(state.memberPendingDeletion)
+    }
+
+    @Test
+    fun `when repository emits a user, userName and avatarUrl update`() = runTest(testDispatcher) {
+        userData.value = User(
+            id = "1",
+            firstName = "Osama",
+            lastName = "Hosam",
+            email = "osama@example.com",
+            gender = null,
+            dateOfBirth = null,
+            heightCm = null,
+            weightKg = null,
+            diseaseIds = emptyList(),
+            allergyIds = emptyList(),
+            avatarUrl = "https://example.com/avatar.png",
+        )
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals("Osama Hosam", state.userName)
+        assertEquals("https://example.com/avatar.png", state.avatarUrl)
     }
 
     @Test
@@ -169,10 +201,10 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, effect is NavigateToTab HISTORY`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to CALORIES, effect is NavigateToTab CALORIES`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.HISTORY), awaitItem())
+            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
+            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.CALORIES), awaitItem())
         }
     }
 

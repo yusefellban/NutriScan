@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /** Draws a fully-rounded (pill) dashed border, e.g. for "add new" affordances. */
 fun Modifier.dashedBorder(
@@ -30,12 +31,14 @@ fun Modifier.dashedBorder(
 fun Modifier.dashedBorder(
     width: Dp,
     color: Color,
-    cornerRadius: Dp
+    cornerRadius: Dp,
+    dashLength: Dp = 12.dp,
+    gapLength: Dp = 12.dp,
 ) = drawBehind {
     val strokeWidthPx = width.toPx()
     val stroke = Stroke(
         width = strokeWidthPx,
-        pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 12f), 0f)
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength.toPx(), gapLength.toPx()), 0f)
     )
     drawRoundRect(
         color = color,
