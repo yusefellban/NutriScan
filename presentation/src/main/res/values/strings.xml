@@ -95,6 +95,8 @@
     <string name="profile_setup_weight_title_highlight">weight</string>
     <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
     <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
+    <string name="profile_setup_load_error">Something went wrong while loading. Please try again.</string>
+    <string name="action_retry">Retry</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_name_hint">Name</string>
@@ -151,4 +153,16 @@
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
     <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
+    <!-- Email Verification -->
+    <string name="email_verification_title">Verify Your Email</string>
+    <string name="email_verification_subtitle">Confirm it\'s you to start scanning.</string>
+    <string name="email_verification_sent_to">A verification link was sent to:</string>
+    <string name="email_verification_instructions">Please check your email and click the verification link to activate your account. After verifying, you can sign in below.</string>
+    <string name="email_verification_go_to_sign_in">Go to Sign In</string>
+    <string name="email_verification_didnt_receive">Didn\'t receive it?</string>
+    <string name="email_verification_resend">Resend Verification Email.</string>
+    <string name="email_verification_resend_success">Verification email sent successfully!</string>
+    <string name="email_verification_resend_error">Failed to resend verification email. Please try again.</string>
+    <string name="register_error_email_taken">This email is already registered. Please sign in or use a different email.</string>
+    <string name="register_error_generic">Registration failed. Please try again.</string>
 </resources>

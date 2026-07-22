@@ -8,7 +8,8 @@ object Validation {
         if (email.isBlank()) {
             return R.string.error_empty_field
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        if (!email.matches(emailRegex)) {
             return R.string.error_invalid_email
         }
         return null

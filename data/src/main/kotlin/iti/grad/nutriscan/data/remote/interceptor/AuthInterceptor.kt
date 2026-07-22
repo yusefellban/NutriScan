@@ -1,19 +1,15 @@
 package iti.grad.nutriscan.data.remote.interceptor
 
-import kotlinx.coroutines.runBlocking
+import iti.grad.nutriscan.data.local.datasource.TokenManager
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-interface IAuthTokenProvider {
-    suspend fun getToken(): String?
-}
-
 class AuthInterceptor @Inject constructor(
-    private val authTokenProvider: IAuthTokenProvider
+    private val tokenManager: TokenManager
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = runBlocking { authTokenProvider.getToken() }
+        val token = tokenManager.getAccessToken()
         
         val requestBuilder = chain.request().newBuilder()
             .addHeader("Content-Type", "application/json")

@@ -8,6 +8,9 @@ class ErrorInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
         
+        // 400 and 409 are intentionally NOT intercepted here.
+        // They pass through to Retrofit so the repository layer can parse
+        // the JSON error body (e.g., registration: "email already taken").
         when (response.code) {
             401 -> throw UnauthorizedException()
             403 -> throw ForbiddenException()

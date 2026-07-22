@@ -3,7 +3,10 @@ package iti.grad.nutriscan.presentation.profile_setup.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateHealthProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerState
@@ -15,11 +18,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileSetupPagerViewModel @Inject constructor(
-    private val completeOnboardingUseCase: CompleteOnboardingUseCase
+    private val completeOnboardingUseCase: CompleteOnboardingUseCase,
+    private val getDiseasesUseCase: GetDiseasesUseCase,
+    private val getAllergiesUseCase: GetAllergiesUseCase,
+    private val updateHealthProfileUseCase: UpdateHealthProfileUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileSetupPagerState())
@@ -27,6 +36,11 @@ class ProfileSetupPagerViewModel @Inject constructor(
 
     private val _effect = Channel<ProfileSetupPagerEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    init {
+        loadDiseases()
+        loadAllergies()
+    }
 
     fun onEvent(event: ProfileSetupPagerEvent) {
         when (event) {
@@ -58,28 +72,10 @@ class ProfileSetupPagerViewModel @Inject constructor(
             }
 
             // Health Profile events
-            is ProfileSetupPagerEvent.ToggleCondition -> toggleCondition(event.condition)
-            is ProfileSetupPagerEvent.ToggleAllergy -> toggleAllergy(event.allergy)
-            ProfileSetupPagerEvent.StartAddCustomCondition -> _state.update {
-                it.copy(isAddingCustomCondition = true, customConditionInput = "")
-            }
-            is ProfileSetupPagerEvent.UpdateCustomConditionInput -> _state.update {
-                it.copy(customConditionInput = event.input)
-            }
-            ProfileSetupPagerEvent.SubmitCustomCondition -> submitCustomCondition()
-            ProfileSetupPagerEvent.CancelAddCustomCondition -> _state.update {
-                it.copy(isAddingCustomCondition = false, customConditionInput = "")
-            }
-            ProfileSetupPagerEvent.StartAddCustomAllergy -> _state.update {
-                it.copy(isAddingCustomAllergy = true, customAllergyInput = "")
-            }
-            is ProfileSetupPagerEvent.UpdateCustomAllergyInput -> _state.update {
-                it.copy(customAllergyInput = event.input)
-            }
-            ProfileSetupPagerEvent.SubmitCustomAllergy -> submitCustomAllergy()
-            ProfileSetupPagerEvent.CancelAddCustomAllergy -> _state.update {
-                it.copy(isAddingCustomAllergy = false, customAllergyInput = "")
-            }
+            is ProfileSetupPagerEvent.ToggleDisease -> toggleDisease(event.diseaseId)
+            ProfileSetupPagerEvent.RetryLoadDiseases -> loadDiseases()
+            is ProfileSetupPagerEvent.ToggleAllergy -> toggleAllergy(event.allergyId)
+            ProfileSetupPagerEvent.RetryLoadAllergies -> loadAllergies()
             ProfileSetupPagerEvent.SaveProfile -> saveProfile()
         }
     }
@@ -107,99 +103,106 @@ class ProfileSetupPagerViewModel @Inject constructor(
         }
     }
 
-    private fun toggleCondition(condition: String) {
+    private fun loadDiseases() {
+        viewModelScope.launch {
+            _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
+            getDiseasesUseCase()
+                .onSuccess { diseases ->
+                    _state.update {
+                        it.copy(
+                            diseases = diseases.toImmutableList(),
+                            isDiseasesLoading = false
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _state.update {
+                        it.copy(
+                            isDiseasesLoading = false,
+                            diseasesErrorMessage = throwable.message ?: "Failed to load diseases"
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun loadAllergies() {
+        viewModelScope.launch {
+            _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
+            getAllergiesUseCase()
+                .onSuccess { allergies ->
+                    _state.update {
+                        it.copy(
+                            allergies = allergies.toImmutableList(),
+                            isAllergiesLoading = false
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _state.update {
+                        it.copy(
+                            isAllergiesLoading = false,
+                            allergiesErrorMessage = throwable.message ?: "Failed to load allergies"
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun toggleDisease(diseaseId: Int) {
         _state.update { state ->
-            val updatedSelected = if (state.selectedChronicConditions.contains(condition)) {
-                state.selectedChronicConditions.filter { it != condition }
+            val updatedSelected = if (state.selectedDiseaseIds.contains(diseaseId)) {
+                state.selectedDiseaseIds.filter { it != diseaseId }
             } else {
-                state.selectedChronicConditions + condition
+                state.selectedDiseaseIds + diseaseId
             }
-            state.copy(selectedChronicConditions = updatedSelected.toImmutableList())
+            state.copy(selectedDiseaseIds = updatedSelected.toImmutableList())
         }
     }
 
-    private fun toggleAllergy(allergy: String) {
+    private fun toggleAllergy(allergyId: Int) {
         _state.update { state ->
-            val updatedSelected = if (state.selectedAllergies.contains(allergy)) {
-                state.selectedAllergies.filter { it != allergy }
+            val updatedSelected = if (state.selectedAllergyIds.contains(allergyId)) {
+                state.selectedAllergyIds.filter { it != allergyId }
             } else {
-                state.selectedAllergies + allergy
+                state.selectedAllergyIds + allergyId
             }
-            state.copy(selectedAllergies = updatedSelected.toImmutableList())
-        }
-    }
-
-    private fun submitCustomCondition() {
-        val input = _state.value.customConditionInput.trim()
-        if (input.isNotEmpty()) {
-            _state.update { state ->
-                val updatedConditions = if (state.chronicConditions.contains(input)) {
-                    state.chronicConditions
-                } else {
-                    state.chronicConditions + input
-                }
-                val updatedSelected = if (state.selectedChronicConditions.contains(input)) {
-                    state.selectedChronicConditions
-                } else {
-                    state.selectedChronicConditions + input
-                }
-                state.copy(
-                    chronicConditions = updatedConditions.toImmutableList(),
-                    selectedChronicConditions = updatedSelected.toImmutableList(),
-                    isAddingCustomCondition = false,
-                    customConditionInput = ""
-                )
-            }
-        } else {
-            _state.update {
-                it.copy(isAddingCustomCondition = false, customConditionInput = "")
-            }
-        }
-    }
-
-    private fun submitCustomAllergy() {
-        val input = _state.value.customAllergyInput.trim()
-        if (input.isNotEmpty()) {
-            _state.update { state ->
-                val updatedAllergies = if (state.allergies.contains(input)) {
-                    state.allergies
-                } else {
-                    state.allergies + input
-                }
-                val updatedSelected = if (state.selectedAllergies.contains(input)) {
-                    state.selectedAllergies
-                } else {
-                    state.selectedAllergies + input
-                }
-                state.copy(
-                    allergies = updatedAllergies.toImmutableList(),
-                    selectedAllergies = updatedSelected.toImmutableList(),
-                    isAddingCustomAllergy = false,
-                    customAllergyInput = ""
-                )
-            }
-        } else {
-            _state.update {
-                it.copy(isAddingCustomAllergy = false, customAllergyInput = "")
-            }
+            state.copy(selectedAllergyIds = updatedSelected.toImmutableList())
         }
     }
 
     private fun saveProfile() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            try {
-                completeOnboardingUseCase()
-                _effect.send(ProfileSetupPagerEffect.NavigateToHome)
-            } catch (e: Exception) {
-                _effect.send(
-                    ProfileSetupPagerEffect.ShowSnackbar(
-                        messageStr = e.message ?: "Failed to save profile"
-                    )
-                )
-            } finally {
-                _state.update { it.copy(isLoading = false) }
+            val currentState = _state.value
+
+            val dobString = currentState.selectedDateOfBirthMillis?.let { millis ->
+                Instant.ofEpochMilli(millis)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE)
             }
+
+            updateHealthProfileUseCase(
+                diseaseIds = currentState.selectedDiseaseIds,
+                allergyIds = currentState.selectedAllergyIds,
+                gender = currentState.selectedGender?.name,
+                dateOfBirth = dobString,
+                heightCm = currentState.selectedHeightCm.toDouble(),
+                weightKg = currentState.selectedWeightKg.toDouble()
+            )
+                .onSuccess {
+                    completeOnboardingUseCase()
+                    _effect.send(ProfileSetupPagerEffect.NavigateToHome)
+                }
+                .onFailure { throwable ->
+                    _effect.send(
+                        ProfileSetupPagerEffect.ShowSnackbar(
+                            messageStr = throwable.message ?: "Failed to save profile"
+                        )
+                    )
+                }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 }

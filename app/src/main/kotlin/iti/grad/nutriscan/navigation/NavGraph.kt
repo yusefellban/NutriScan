@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
@@ -49,16 +50,21 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToLogin = {
-                    navController.navigate(LoginRoute) {
+                    navController.navigate(LoginRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 },
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                }
             )
         }
         composable<OnboardingRoute> {
             OnboardingCarouselScreen(
                 onNavigateToLogin = {
-                    navController.navigate(LoginRoute) {
+                    navController.navigate(LoginRoute()) {
                         popUpTo(OnboardingRoute) { inclusive = true }
                     }
                 },
@@ -71,18 +77,25 @@ fun AppNavGraph(
                 title = "Onboarding Carousel",
                 buttonText = "Get Started"
             ) {
-                navController.navigate(LoginRoute) {
+                navController.navigate(LoginRoute()) {
                     popUpTo(OnboardingCarouselRoute) { inclusive = true }
                 }
             }
         }
 
         // 3. Login Screen
-        composable<LoginRoute> {
+        composable<LoginRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<LoginRoute>()
             LoginScreen(
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(LoginRoute) { inclusive = true }
+                    if (route.isFromRegistration) {
+                        navController.navigate(ProfileSetupPagerRoute) {
+                            popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
+                        }
                     }
                 },
                 onNavigateToRegister = {
@@ -106,12 +119,27 @@ fun AppNavGraph(
         // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
-                onNavigateToHome = {
-                    navController.navigate(ProfileSetupPagerRoute) {
+                onNavigateToEmailVerification = { email ->
+                    navController.navigate(EmailVerificationRoute(email)) {
                         popUpTo(RegisterRoute) { inclusive = true }
                     }
                 },
                 onNavigateToSignIn = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5b. Email Verification Screen
+        composable<EmailVerificationRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<EmailVerificationRoute>()
+            EmailVerificationScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(LoginRoute(isFromRegistration = true)) {
+                        popUpTo(EmailVerificationRoute(route.email)) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
                     navController.navigateUp()
                 }
             )
@@ -136,7 +164,7 @@ fun AppNavGraph(
                 buttonText = "Complete Setup"
             ) {
                 navController.navigate(HomeRoute) {
-                    popUpTo(LoginRoute) { inclusive = true }
+                    popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
@@ -361,12 +389,14 @@ fun AppNavGraph(
                 onNavigateToTermsAndConditions = { navController.navigate(TermsAndConditionsRoute) },
                 onNavigateToHelp = { navController.navigate(HelpRoute) },
                 onNavigateToLogin = {
-                    navController.navigate(LoginRoute) {
+                    navController.navigate(LoginRoute()) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
             )
         }
+
+
 
         // 25. Terms and Conditions (Placeholder)
         composable<TermsAndConditionsRoute> {

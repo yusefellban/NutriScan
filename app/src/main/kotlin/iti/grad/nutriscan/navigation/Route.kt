@@ -9,7 +9,7 @@ object SplashRoute
 object OnboardingCarouselRoute
 
 @Serializable
-object LoginRoute
+data class LoginRoute(val isFromRegistration: Boolean = false)
 
 @Serializable
 object OnboardingRoute
@@ -69,9 +69,6 @@ object ShoppingListRoute
 object UserProfileRoute
 
 @Serializable
-object EditProfileRoute
-
-@Serializable
 object ManageFamilyRoute
 
 @Serializable
@@ -94,3 +91,5 @@ object HelpRoute
 
 @Serializable
 data class ProductDetailsPlaceholderRoute(val barcode: String)
+@Serializable
+data class EmailVerificationRoute(val email: String)

@@ -10,6 +10,7 @@ import iti.grad.nutriscan.domain.settings.usecase.GetLanguageUseCase
 import iti.grad.nutriscan.domain.settings.usecase.GetThemeModeUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetLanguageUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetThemeModeUseCase
+import iti.grad.nutriscan.domain.auth.usecase.LogoutUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
@@ -34,6 +35,7 @@ class AppSettingsViewModelTest {
     private val setThemeModeUseCase: SetThemeModeUseCase = mockk()
     private val getLanguageUseCase: GetLanguageUseCase = mockk()
     private val setLanguageUseCase: SetLanguageUseCase = mockk()
+    private val logoutUseCase: LogoutUseCase = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
@@ -43,11 +45,13 @@ class AppSettingsViewModelTest {
         coEvery { getLanguageUseCase() } returns AppLanguage.EN
         coEvery { setThemeModeUseCase(any()) } returns Unit
         coEvery { setLanguageUseCase(any()) } returns Unit
+        coEvery { logoutUseCase() } returns Result.success(Unit)
         viewModel = AppSettingsViewModel(
             getThemeModeUseCase,
             setThemeModeUseCase,
             getLanguageUseCase,
             setLanguageUseCase,
+            logoutUseCase,
         )
     }
 
@@ -77,6 +81,7 @@ class AppSettingsViewModelTest {
                 setThemeModeUseCase,
                 getLanguageUseCase,
                 setLanguageUseCase,
+                logoutUseCase,
             )
             testScheduler.advanceUntilIdle()
 
@@ -196,6 +201,7 @@ class AppSettingsViewModelTest {
 
                 Assertions.assertFalse(viewModel.state.value.showLogoutConfirmDialog)
                 Assertions.assertTrue(awaitItem() is AppSettingsEffect.NavigateToLogin)
+                coVerify(exactly = 1) { logoutUseCase() }
             }
         }
     }
