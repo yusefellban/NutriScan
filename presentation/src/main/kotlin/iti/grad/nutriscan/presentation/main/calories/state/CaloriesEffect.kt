@@ -15,4 +15,7 @@ sealed interface CaloriesEffect {
     data object NavigateToShopping : CaloriesEffect
     data object NavigateToProfile : CaloriesEffect
     data class ShowSnackbar(@StringRes val messageResId: Int) : CaloriesEffect
+
+    /** Ask the screen to request the ACTIVITY_RECOGNITION runtime permission (needed to read the step counter). */
+    data object RequestStepsPermission : CaloriesEffect
 }

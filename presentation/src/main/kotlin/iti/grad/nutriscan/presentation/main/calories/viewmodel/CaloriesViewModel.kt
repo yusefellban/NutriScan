@@ -3,11 +3,14 @@ package iti.grad.nutriscan.presentation.main.calories.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
+import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,13 +21,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CaloriesViewModel @Inject constructor() : ViewModel() {
+class CaloriesViewModel @Inject constructor(
+    private val checkStepsPermission: CheckStepsPermissionUseCase,
+    private val observeTodaySteps: ObserveTodayStepsUseCase,
+) : ViewModel() {
 
     private val _state = MutableStateFlow(CaloriesState())
     val state: StateFlow<CaloriesState> = _state.asStateFlow()
 
     private val _effect = Channel<CaloriesEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    private var stepsObservationJob: Job? = null
 
     fun onEvent(event: CaloriesEvent) {
         when (event) {
@@ -34,6 +42,32 @@ class CaloriesViewModel @Inject constructor() : ViewModel() {
             is CaloriesEvent.WaterCupClicked -> toggleWaterCup(event.index)
             is CaloriesEvent.WaterCupLongPressed -> removeWaterCup(event.index)
             is CaloriesEvent.BottomNavTabClicked -> handleTabClick(event.tab)
+            CaloriesEvent.StepsCardClicked -> checkStepsAccess()
+            is CaloriesEvent.StepsPermissionResult -> handleStepsPermissionResult(event.granted)
+        }
+    }
+
+    /** Checks the step-counter permission and either starts live tracking or asks the screen to request it. */
+    private fun checkStepsAccess() {
+        viewModelScope.launch {
+            if (checkStepsPermission()) {
+                handleStepsPermissionResult(granted = true)
+            } else {
+                navigate(CaloriesEffect.RequestStepsPermission)
+            }
+        }
+    }
+
+    private fun handleStepsPermissionResult(granted: Boolean) {
+        _state.update { it.copy(stepsPermissionGranted = granted) }
+        if (granted) startObservingSteps()
+    }
+
+    /** Collects the live sensor-backed steps flow so the gauge updates as the user walks. */
+    private fun startObservingSteps() {
+        if (stepsObservationJob?.isActive == true) return
+        stepsObservationJob = viewModelScope.launch {
+            observeTodaySteps().collect { steps -> _state.update { it.copy(steps = steps) } }
         }
     }
 

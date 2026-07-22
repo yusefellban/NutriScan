@@ -15,4 +15,10 @@ sealed interface CaloriesEvent {
     /** Long-presses the cup at [index] to delete it — only responds if it's the last cup. */
     data class WaterCupLongPressed(val index: Int) : CaloriesEvent
     data class BottomNavTabClicked(val tab: BottomNavTab) : CaloriesEvent
+
+    /** Checks Health Connect availability/permission — dispatched once on screen start, and again on every steps-gauge tap as a retry. */
+    data object StepsCardClicked : CaloriesEvent
+
+    /** Reported back by the screen after the user responds to the Health Connect permission dialog. */
+    data class StepsPermissionResult(val granted: Boolean) : CaloriesEvent
 }

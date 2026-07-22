@@ -1,5 +1,8 @@
 package iti.grad.nutriscan.presentation.main.calories.view
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,6 +65,16 @@ fun CaloriesScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    val stepsPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        viewModel.onEvent(CaloriesEvent.StepsPermissionResult(granted = granted))
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(CaloriesEvent.StepsCardClicked)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
@@ -72,6 +85,10 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                }
+
+                is CaloriesEffect.RequestStepsPermission -> {
+                    stepsPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
                 }
             }
         }
@@ -140,6 +157,7 @@ private fun CaloriesContent(
                     StepsGaugeCard(
                         steps = state.steps,
                         stepsGoal = state.stepsGoal,
+                        onClick = { onEvent(CaloriesEvent.StepsCardClicked) },
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),

@@ -7,8 +7,9 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 data class CaloriesState(
     val tdee: Int = 2350,
     val caloriesGained: Int = 2100,
-    val steps: Int = 10000,
+    val steps: Int = 0,
     val stepsGoal: Int = 10000,
+    val stepsPermissionGranted: Boolean = false,
     val exerciseKcal: Int = 250,
     val exerciseMinutes: Int = 45,
     val waterConsumed: Int = 4,

@@ -328,7 +328,7 @@ LoadingShimmer(modifier, shape)
 ScanHistoryCard(entry, onEvent)
 DashedActionCard(label, onClick, modifier)
 CalorieGoalsCard(tdee, caloriesGained, modifier)
-StepsGaugeCard(steps, stepsGoal, modifier)
+StepsGaugeCard(steps, stepsGoal, onClick, modifier)
 ExerciseCard(exerciseKcal, exerciseMinutes, onAddClick, modifier)
 WaterTrackerCard(waterConsumed, waterGoal, onAddWater, onCupClicked, onCupLongPressed, modifier)
 ```

@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,6 +29,20 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScr
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.presentation.R
+
+/**
+ * Navigates to a bottom-nav tab destination, popping back to the graph's start destination
+ * (saving its state) and restoring the target tab's own state if it's been visited before.
+ * Keeps exactly one back-stack entry (and one ViewModel instance) per tab, regardless of how
+ * many times the user bounces between tabs — the standard Compose-Navigation bottom-nav pattern.
+ */
+private fun NavHostController.navigateToTab(route: Any) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
 
 @Composable
 fun AppNavGraph(
@@ -173,19 +188,19 @@ fun AppNavGraph(
         composable<HomeRoute> {
             HomeScreen(
                 onNavigateToScan = {
-                    navController.navigate(CameraScanRoute)
+                    navController.navigateToTab(CameraScanRoute)
                 },
                 onNavigateToHistory = {
                     navController.navigate(ScanHistoryRoute)
                 },
                 onNavigateToCalories = {
-                    navController.navigate(CaloriesRoute)
+                    navController.navigateToTab(CaloriesRoute)
                 },
                 onNavigateToShopping = {
-                    navController.navigate(ShoppingListRoute)
+                    navController.navigateToTab(ShoppingListRoute)
                 },
                 onNavigateToProfile = {
-                    navController.navigate(UserProfileRoute)
+                    navController.navigateToTab(UserProfileRoute)
                 },
                 onNavigateToNotifications = {
                     navController.navigate(NotificationSettingsRoute)
@@ -322,14 +337,12 @@ fun AppNavGraph(
         composable<UserProfileRoute> {
             UserProfileScreen(
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(HomeRoute) { inclusive = false }
-                    }
+                    navController.navigateToTab(HomeRoute)
                 },
-                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToCalories = { navController.navigate(CaloriesRoute) },
-                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToShopping = { navController.navigateToTab(ShoppingListRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
                     navController.navigate(EditConditionsRoute(memberId))
@@ -419,13 +432,11 @@ fun AppNavGraph(
             CaloriesScreen(
                 onNavigateToSavedProducts = { navController.navigate(SavedProductsRoute) },
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(HomeRoute) { inclusive = false }
-                    }
+                    navController.navigateToTab(HomeRoute)
                 },
-                onNavigateToScan = { navController.navigate(CameraScanRoute) },
-                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
-                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
+                onNavigateToShopping = { navController.navigateToTab(ShoppingListRoute) },
+                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
             )
         }
 
