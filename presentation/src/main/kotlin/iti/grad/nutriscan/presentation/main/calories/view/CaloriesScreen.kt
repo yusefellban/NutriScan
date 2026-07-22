@@ -184,6 +184,7 @@ private fun CaloriesContent(
                                         hintResId = R.string.food_log_swipe_remove_hint,
                                         onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
                                     ),
+                                    caloriesOverlayOnImage = true,
                                     modifier = Modifier
                                         .width(140.dp)
                                         .fillMaxHeight(),

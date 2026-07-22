@@ -7,8 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -60,6 +63,8 @@ fun ProductCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     swipeAction: ProductCardSwipeAction? = null,
+    /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
+    caloriesOverlayOnImage: Boolean = false,
 ) {
     val density = LocalDensity.current
     val shadowBlurPx = with(density) { 12.dp.toPx() }
@@ -84,7 +89,6 @@ fun ProductCard(
             color = AppTheme.colors.ProductCardBackground
         ) {
         Column {
-            // Product image, with the kcal badge layered on top in its top-end corner
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,27 +107,15 @@ fun ProductCard(
                     placeholder = painterResource(id = R.drawable.ic_scanner)
                 )
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .zIndex(1f)
-                        .padding(6.dp)
-                        .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 6.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = calories,
-                        style = AppTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
-                        ),
-                        color = Color.White
-                    )
-                    Text(
-                        text = stringResource(id = R.string.product_card_kcal_unit),
-                        style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                        color = Color.White
+                if (caloriesOverlayOnImage) {
+                    CaloriesBadge(
+                        calories = calories,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .zIndex(1f)
+                            .padding(6.dp),
+                        background = AppTheme.colors.ProductCardNameText.copy(alpha = 0.55f),
+                        textColor = Color.White,
                     )
                 }
             }
@@ -131,20 +123,56 @@ fun ProductCard(
             Column(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
             ) {
-                Text(
-                    text = productName,
-                    style = AppTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    ),
-                    color = AppTheme.colors.ProductCardNameText,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (caloriesOverlayOnImage) {
+                    Text(
+                        text = productName,
+                        style = AppTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        ),
+                        color = AppTheme.colors.ProductCardNameText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                if (verdict != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    VerdictBadge(verdict = verdict)
+                    if (verdict != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        VerdictBadge(verdict = verdict)
+                    }
+                } else {
+                    // Original layout: name+verdict on the left, kcal stacked badge on the right
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = productName,
+                                style = AppTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                ),
+                                color = AppTheme.colors.ProductCardNameText,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            if (verdict != null) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                VerdictBadge(verdict = verdict)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        CaloriesBadge(
+                            calories = calories,
+                            background = AppTheme.colors.ProductCardCaloriesBackground,
+                            textColor = AppTheme.colors.ProductCardCaloriesText,
+                            cornerRadius = 4.dp,
+                        )
+                    }
                 }
 
                 if (swipeAction != null) {
@@ -157,6 +185,36 @@ fun ProductCard(
         }
     }
 }
+}
+
+@Composable
+private fun CaloriesBadge(
+    calories: String,
+    background: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 6.dp,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .background(background, RoundedCornerShape(cornerRadius))
+            .padding(horizontal = 6.dp, vertical = 3.dp)
+    ) {
+        Text(
+            text = calories,
+            style = AppTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp
+            ),
+            color = textColor
+        )
+        Text(
+            text = stringResource(id = R.string.product_card_kcal_unit),
+            style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
+            color = textColor
+        )
+    }
 }
 
 @Composable
