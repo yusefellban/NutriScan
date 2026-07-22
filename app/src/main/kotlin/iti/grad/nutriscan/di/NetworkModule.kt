@@ -27,16 +27,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideAuthTokenProvider(): iti.grad.nutriscan.data.remote.interceptor.IAuthTokenProvider {
-        return object : iti.grad.nutriscan.data.remote.interceptor.IAuthTokenProvider {
-            override suspend fun getToken(): String? = null
-        }
-    }
-
-
     @Provides
     @Singleton
     fun provideJson(): Json {
