@@ -58,11 +58,13 @@ import android.app.Activity
  *
  * @param onNavigateToOnboarding Lambda invoked when [SplashEffect.NavigateToOnboarding] is received.
  * @param onNavigateToLogin Lambda invoked when [SplashEffect.NavigateToLogin] is received.
+ * @param onNavigateToHome Lambda invoked when [SplashEffect.NavigateToHome] is received.
  */
 @Composable
 fun SplashScreen(
     onNavigateToOnboarding: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToHome: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -180,6 +182,7 @@ fun SplashScreen(
             when (effect) {
                 SplashEffect.NavigateToOnboarding -> onNavigateToOnboarding()
                 SplashEffect.NavigateToLogin -> onNavigateToLogin()
+                SplashEffect.NavigateToHome -> onNavigateToHome()
             }
         }
     }
@@ -255,7 +258,7 @@ private fun LogoImage(tint: Color) {
 @Composable
 private fun SplashLightPreview() {
     AppTheme(darkTheme = false) {
-        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {})
     }
 }
 
@@ -263,6 +266,6 @@ private fun SplashLightPreview() {
 @Composable
 private fun SplashDarkPreview() {
     AppTheme(darkTheme = true) {
-        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {})
     }
 }

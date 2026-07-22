@@ -9,7 +9,7 @@ object SplashRoute
 object OnboardingCarouselRoute
 
 @Serializable
-object LoginRoute
+data class LoginRoute(val isFromRegistration: Boolean = false)
 
 @Serializable
 object OnboardingRoute
@@ -18,7 +18,7 @@ object OnboardingRoute
 object RegisterRoute
 
 @Serializable
-object HealthProfileSetupRoute
+object ProfileSetupPagerRoute
 
 @Serializable
 object FamilyProfileSetupRoute
@@ -33,7 +33,10 @@ object CameraScanRoute
 object ForgotPasswordRoute
 
 @Serializable
-data class ScanProcessingRoute(val imageUri: String)
+data class ScanProcessingRoute(
+    val barcode: String,
+    val imageUri: String? = null,
+)
 
 @Serializable
 data class ScanResultRoute(val imageUri: String)
@@ -60,7 +63,7 @@ object ReportListRoute
 data class ReportDetailRoute(val reportId: String)
 
 @Serializable
-object ShoppingListRoute
+object SavedRoute
 
 @Serializable
 object UserProfileRoute
@@ -76,3 +79,17 @@ object NotificationSettingsRoute
 
 @Serializable
 object AppSettingsRoute
+
+@Serializable
+object EditProfileRoute
+
+@Serializable
+object TermsAndConditionsRoute
+
+@Serializable
+object HelpRoute
+
+@Serializable
+data class ProductDetailsPlaceholderRoute(val barcode: String)
+@Serializable
+data class EmailVerificationRoute(val email: String)

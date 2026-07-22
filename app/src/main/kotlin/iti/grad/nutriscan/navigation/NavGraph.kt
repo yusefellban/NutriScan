@@ -7,19 +7,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
+import iti.grad.nutriscan.presentation.saved.view.SavedScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
+import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
+import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
+import iti.grad.presentation.R
 
 @Composable
 fun AppNavGraph(
@@ -42,16 +51,21 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToLogin = {
-                    navController.navigate(LoginRoute) {
+                    navController.navigate(LoginRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 },
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                }
             )
         }
         composable<OnboardingRoute> {
             OnboardingCarouselScreen(
                 onNavigateToLogin = {
-                    navController.navigate(LoginRoute) {
+                    navController.navigate(LoginRoute()) {
                         popUpTo(OnboardingRoute) { inclusive = true }
                     }
                 },
@@ -64,18 +78,25 @@ fun AppNavGraph(
                 title = "Onboarding Carousel",
                 buttonText = "Get Started"
             ) {
-                navController.navigate(LoginRoute) {
+                navController.navigate(LoginRoute()) {
                     popUpTo(OnboardingCarouselRoute) { inclusive = true }
                 }
             }
         }
 
         // 3. Login Screen
-        composable<LoginRoute> {
+        composable<LoginRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<LoginRoute>()
             LoginScreen(
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(LoginRoute) { inclusive = true }
+                    if (route.isFromRegistration) {
+                        navController.navigate(ProfileSetupPagerRoute) {
+                            popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
+                        }
                     }
                 },
                 onNavigateToRegister = {
@@ -99,9 +120,9 @@ fun AppNavGraph(
         // 5. Register Screen
         composable<RegisterRoute> {
             RegisterScreen(
-                onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(LoginRoute) { inclusive = true }
+                onNavigateToEmailVerification = { email ->
+                    navController.navigate(EmailVerificationRoute(email)) {
+                        popUpTo(RegisterRoute) { inclusive = true }
                     }
                 },
                 onNavigateToSignIn = {
@@ -110,14 +131,31 @@ fun AppNavGraph(
             )
         }
 
-        // 5. Health Profile Setup (Placeholder)
-        composable<HealthProfileSetupRoute> {
-            PlaceholderScreen(
-                title = "Health Profile Setup",
-                buttonText = "Save Profile"
-            ) {
-                navController.navigate(FamilyProfileSetupRoute)
-            }
+        // 5b. Email Verification Screen
+        composable<EmailVerificationRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<EmailVerificationRoute>()
+            EmailVerificationScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(LoginRoute(isFromRegistration = true)) {
+                        popUpTo(EmailVerificationRoute(route.email)) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        // 5. Profile Setup Pager
+        composable<ProfileSetupPagerRoute> {
+            ProfileSetupPagerScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(ProfileSetupPagerRoute) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // 6. Family Profile Setup (Placeholder)
@@ -127,7 +165,7 @@ fun AppNavGraph(
                 buttonText = "Complete Setup"
             ) {
                 navController.navigate(HomeRoute) {
-                    popUpTo(LoginRoute) { inclusive = true }
+                    popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
@@ -141,8 +179,8 @@ fun AppNavGraph(
                 onNavigateToHistory = {
                     navController.navigate(ScanHistoryRoute)
                 },
-                onNavigateToShopping = {
-                    navController.navigate(ShoppingListRoute)
+                onNavigateToSaved = {
+                    navController.navigate(SavedRoute)
                 },
                 onNavigateToProfile = {
                     navController.navigate(UserProfileRoute)
@@ -156,25 +194,33 @@ fun AppNavGraph(
             )
         }
 
-        // 8. Camera Scan (Placeholder)
+        // 8. Camera Scan
         composable<CameraScanRoute> {
-            PlaceholderScreen(
-                title = "Camera Scan",
-                buttonText = "Capture & Process"
-            ) {
-                navController.navigate(ScanProcessingRoute("content://media/external/images/media/dummy"))
-            }
+            CameraScanScreen(
+                onNavigateToProcessing = { barcode ->
+                    navController.navigate(ScanProcessingRoute(barcode = barcode)) {
+                        popUpTo<CameraScanRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToProductDetailsPlaceholder = { barcode ->
+                    navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
+                },
+                onNavigateToHome = { navController.navigate(HomeRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) }
+            )
         }
 
         // 9. Scan Processing (Placeholder)
         composable<ScanProcessingRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ScanProcessingRoute>()
             PlaceholderScreen(
-                title = "Scan Processing\nImage URI: ${route.imageUri}",
+                title = "Scan Processing\nCode: ${route.barcode}",
                 buttonText = "View Results"
             ) {
-                navController.navigate(ScanResultRoute(route.imageUri)) {
-                    popUpTo(ScanProcessingRoute(route.imageUri)) { inclusive = true }
+                navController.navigate(ScanResultRoute(route.imageUri ?: "")) {
+                    popUpTo(ScanProcessingRoute(barcode = route.barcode, imageUri = route.imageUri)) { inclusive = true }
                 }
             }
         }
@@ -268,24 +314,42 @@ fun AppNavGraph(
             }
         }
 
-        // 18. Shopping List (Placeholder)
-        composable<ShoppingListRoute> {
-            PlaceholderScreen(
-                title = "Shopping List",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+        // 18. Saved Screen
+        composable<SavedRoute> {
+            SavedScreen(
+                onNavigateToHome = { navController.navigate(HomeRoute) { popUpTo(HomeRoute) { inclusive = true } } },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToProductDetail = { /* No-op for now */ }
+            )
         }
 
-        // 19. User Profile (Placeholder)
+        // 19. User Profile
         composable<UserProfileRoute> {
-            PlaceholderScreen(
-                title = "User Profile",
-                buttonText = "Manage Family"
-            ) {
-                navController.navigate(ManageFamilyRoute)
-            }
+            UserProfileScreen(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(HomeRoute) { inclusive = false }
+                    }
+                },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
+                onNavigateToFamilyMemberDetail = { memberId ->
+                    navController.navigate(EditConditionsRoute(memberId))
+                },
+                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
+                onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
+            )
+        }
+
+        // 19b. Edit Profile
+        composable<EditProfileRoute> {
+            EditProfileScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
 
         // 20. Manage Family (Placeholder)
@@ -319,11 +383,48 @@ fun AppNavGraph(
             }
         }
 
-        // 23. App Settings (Placeholder)
+        // 23. App Settings
         composable<AppSettingsRoute> {
+            AppSettingsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
+                onNavigateToTermsAndConditions = { navController.navigate(TermsAndConditionsRoute) },
+                onNavigateToHelp = { navController.navigate(HelpRoute) },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute()) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+
+
+        // 25. Terms and Conditions (Placeholder)
+        composable<TermsAndConditionsRoute> {
             PlaceholderScreen(
-                title = "App Settings",
-                buttonText = "Go Back"
+                title = stringResource(R.string.app_settings_terms_and_conditions),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 26. Help (Placeholder)
+        composable<HelpRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.app_settings_help),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+        // 27. Product Details Placeholder
+        composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
+            PlaceholderScreen(
+                title = "Product Details\nBarcode: ${route.barcode}",
+                buttonText = "Back to Scan"
             ) {
                 navController.navigateUp()
             }

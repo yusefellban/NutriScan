@@ -3,8 +3,114 @@ package iti.grad.nutriscan.presentation.common.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Colors for the most recently added screens (User Profile, App Settings).
+ *
+ * Kept as a separate nested object rather than flat fields on [AppColors]:
+ * a single Kotlin data class constructor call with ~150+ [Color] parameters
+ * triggers a real D8/ART bug (`VerifyError: Rejecting invocation, expected N
+ * argument registers, method signature has M or more`) that crashes the app
+ * at startup. Splitting the newest additions into their own small
+ * constructor call keeps every existing `AppTheme.colors.X` call site
+ * unchanged via the forwarding properties on [AppColors] below.
+ */
 @Immutable
-data class AppColors(
+internal data class AppColorsExtension(
+    // --- User Profile Screen ---
+    val ProfileHeaderBackground: Color,
+    val ProfileHeaderAccent: Color,
+    val ProfileSheetBackground: Color,
+    val ProfileFamilyBoxBackground: Color,
+    val ProfileMenuRowBackground: Color,
+    val ProfileMenuIconBackground: Color,
+    val ProfileMemberCardBackground: Color,
+    val ProfileMemberCardBorder: Color,
+    val ProfileAddCardBackground: Color,
+    val ProfileAddIconBackground: Color,
+    val ProfileAddIconTint: Color,
+    val ProfileAddText: Color,
+    val ProfileStreakBadgeBackground: Color,
+    val ProfileHeaderEdge: Color,
+    val ProfileShowDetailsBackground: Color,
+    val ProfileMenuLabel: Color,
+    val ProfileMenuChevron: Color,
+
+    // --- Edit Profile Input Fields ---
+    val EditProfileInputBackground: Color,
+    val EditProfileInputBorder: Color,
+
+    // --- Gender Selection ---
+    val GenderFemaleCardBackground: Color,
+    val GenderFemaleCardText: Color,
+    val GenderMaleCardBackground: Color,
+    val GenderMaleCardText: Color,
+
+    // --- Page Indicator ---
+    val PageIndicatorCurrent: Color,
+    val PageIndicatorTotal: Color,
+
+    // --- Date of Birth ---
+    val DobCardBackground: Color,
+    val DobAgeBadgeBackground: Color,
+    val DobAgeBadgeText: Color,
+    val DobCardText: Color,
+    val DobInputBorder: Color,
+    val DobInputText: Color,
+    val DobCalendarIcon: Color,
+
+    // --- Height Selection ---
+    val HeightSelectedCardBackground: Color,
+    val HeightSelectedCardText: Color,
+    val HeightSelectedCardUnitText: Color,
+    val HeightUnselectedCardBackground: Color,
+    val HeightUnselectedCardText: Color,
+    val HeightUnselectedCardUnitText: Color,
+    val HeightRulerMajorTick: Color,
+    val HeightRulerMinorTick: Color,
+    val HeightRulerText: Color,
+
+    // --- Progress Button ---
+    val ProgressTrackColor: Color,
+    val ProgressFillColor: Color,
+
+    // --- Shadow Colors ---
+    val ShadowSelected: Color,
+    val ShadowUnselected: Color,
+    val ShadowFemaleSelected: Color,
+    val ShadowMaleSelected: Color,
+    val ShadowDobActive: Color,
+    
+    // --- Product Card ---
+    val ProductCardBackground: Color,
+    val SavedSearchBarBorder: Color,
+    val SavedSearchIconBackground: Color,
+    val SavedSearchIconTint: Color,
+    val ProductCardNameText: Color,
+    val ProductCardVerdictBackground: Color,
+    val ProductCardVerdictText: Color,
+    val ProductCardCautionText: Color,
+    val ProductCardCaloriesBackground: Color,
+    val ProductCardCaloriesText: Color,
+    val ProductCardSwipeIconBackground: Color,
+    val ProductCardSwipeContainerBackground: Color,
+    val ProductCardSwipeText: Color,
+    val ProductCardShadow: Color,
+    
+    // --- App Settings ---
+    val AppSettingsCardBackground: Color,
+    val AppSettingsIconContainerBackground: Color,
+    val AppSettingsRowLabel: Color,
+    val AppSettingsToggleContainerBackground: Color,
+    val AppSettingsToggleChipSelectedBackground: Color,
+    val AppSettingsToggleTextUnselected: Color,
+    val AppSettingsToggleTextSelected: Color,
+    val AppSettingsLogoutAccent: Color,
+    val AppSettingsLogoutIconBackground: Color,
+)
+
+@Immutable
+@ConsistentCopyVisibility
+data class AppColors internal constructor(
     // --- Teal Palette ---
     val Teal100: Color,
     val Teal200: Color,
@@ -93,7 +199,116 @@ data class AppColors(
     val MethodCardIconTintUnselected: Color,
     val AuthDialogBackground: Color,
     val AuthDialogSubtitle: Color,
-)
+
+    // --- Profile Setup ---
+    val ProfileSetupTitle: Color,
+    val ProfileSetupSubtitle: Color,
+    val ProfileSetupSectionTitle: Color,
+
+    // --- Chips ---
+    val ChipBackgroundSelected: Color,
+    val ChipBackgroundUnselected: Color,
+    val ChipBorderSelected: Color,
+    val ChipBorderUnselected: Color,
+    val ChipTextSelected: Color,
+    val ChipTextUnselected: Color,
+    val OtherChipActive: Color,
+    val OtherChipBorder: Color,
+    val OtherChipText: Color,
+    val OtherChipBackground: Color,
+    val OtherChipTextUnselected: Color,
+
+    // --- Gender Selection ---
+    val GenderFemaleCardBackground: Color,
+    val GenderFemaleCardText: Color,
+    val GenderMaleCardBackground: Color,
+    val GenderMaleCardText: Color,
+
+    // --- Page Indicator ---
+    val PageIndicatorCurrent: Color,
+    val PageIndicatorTotal: Color,
+
+    // --- Date of Birth ---
+    val DobCardBackground: Color,
+    val DobAgeBadgeBackground: Color,
+    val DobAgeBadgeText: Color,
+    val DobCardText: Color,
+    val DobInputBorder: Color,
+    val DobInputText: Color,
+    val DobCalendarIcon: Color,
+
+    // --- Height Selection ---
+    val HeightSelectedCardBackground: Color,
+    val HeightSelectedCardText: Color,
+    val HeightSelectedCardUnitText: Color,
+    val HeightUnselectedCardBackground: Color,
+    val HeightUnselectedCardText: Color,
+    val HeightUnselectedCardUnitText: Color,
+    val HeightRulerMajorTick: Color,
+    val HeightRulerMinorTick: Color,
+    val HeightRulerText: Color,
+
+    // --- Progress Button ---
+    val ProgressTrackColor: Color,
+    val ProgressFillColor: Color,
+
+    // --- Shadow Colors ---
+    val ShadowSelected: Color,
+    val ShadowUnselected: Color,
+    val ShadowFemaleSelected: Color,
+    val ShadowMaleSelected: Color,
+    val ShadowDobActive: Color,
+
+    // --- User Profile Screen / App Settings ---
+    // See AppColorsExtension's kdoc: kept out of this constructor to avoid
+    // a D8 VerifyError crash from having too many constructor parameters.
+    private val extension: AppColorsExtension,
+) {
+    val ProfileHeaderBackground: Color get() = extension.ProfileHeaderBackground
+    val ProfileHeaderAccent: Color get() = extension.ProfileHeaderAccent
+    val ProfileSheetBackground: Color get() = extension.ProfileSheetBackground
+    val ProfileFamilyBoxBackground: Color get() = extension.ProfileFamilyBoxBackground
+    val ProfileMenuRowBackground: Color get() = extension.ProfileMenuRowBackground
+    val ProfileMenuIconBackground: Color get() = extension.ProfileMenuIconBackground
+    val ProfileMemberCardBackground: Color get() = extension.ProfileMemberCardBackground
+    val ProfileMemberCardBorder: Color get() = extension.ProfileMemberCardBorder
+    val ProfileAddCardBackground: Color get() = extension.ProfileAddCardBackground
+    val ProfileAddIconBackground: Color get() = extension.ProfileAddIconBackground
+    val ProfileAddIconTint: Color get() = extension.ProfileAddIconTint
+    val ProfileAddText: Color get() = extension.ProfileAddText
+    val ProfileStreakBadgeBackground: Color get() = extension.ProfileStreakBadgeBackground
+    val ProfileHeaderEdge: Color get() = extension.ProfileHeaderEdge
+    val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
+    val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
+    val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
+    val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
+    val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
+
+    val ProductCardBackground: Color get() = extension.ProductCardBackground
+    val SavedSearchBarBorder: Color get() = extension.SavedSearchBarBorder
+    val SavedSearchIconBackground: Color get() = extension.SavedSearchIconBackground
+    val SavedSearchIconTint: Color get() = extension.SavedSearchIconTint
+    val ProductCardNameText: Color get() = extension.ProductCardNameText
+    val ProductCardVerdictBackground: Color get() = extension.ProductCardVerdictBackground
+    val ProductCardVerdictText: Color get() = extension.ProductCardVerdictText
+    val ProductCardCautionText: Color get() = extension.ProductCardCautionText
+    val ProductCardCaloriesBackground: Color get() = extension.ProductCardCaloriesBackground
+    val ProductCardCaloriesText: Color get() = extension.ProductCardCaloriesText
+    val ProductCardSwipeIconBackground: Color get() = extension.ProductCardSwipeIconBackground
+    val ProductCardSwipeContainerBackground: Color get() = extension.ProductCardSwipeContainerBackground
+    val ProductCardSwipeText: Color get() = extension.ProductCardSwipeText
+    val ProductCardShadow: Color get() = extension.ProductCardShadow
+
+    val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
+    val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
+    val AppSettingsRowLabel: Color get() = extension.AppSettingsRowLabel
+    val AppSettingsToggleContainerBackground: Color get() = extension.AppSettingsToggleContainerBackground
+    val AppSettingsToggleChipSelectedBackground: Color get() = extension.AppSettingsToggleChipSelectedBackground
+    val AppSettingsToggleTextUnselected: Color get() = extension.AppSettingsToggleTextUnselected
+    val AppSettingsToggleTextSelected: Color get() = extension.AppSettingsToggleTextSelected
+    val AppSettingsLogoutAccent: Color get() = extension.AppSettingsLogoutAccent
+    val AppSettingsLogoutIconBackground: Color get() = extension.AppSettingsLogoutIconBackground
+}
 
 /** Light theme color palette. All teal values kept identical to original. */
 fun lightColors() = AppColors(
@@ -174,6 +389,158 @@ fun lightColors() = AppColors(
     MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
     AuthDialogBackground = Color(0xFFFFFFFF), // Surface
     AuthDialogSubtitle = Color(0xFF777777), // Gray800
+
+    // Profile Setup
+    ProfileSetupTitle = Color(0xFF13A4AB), // Teal1000
+    ProfileSetupSubtitle = Color(0xFF898989), // Gray700
+    ProfileSetupSectionTitle = Color(0xFF545454), // Gray1300
+
+    // Chips
+    ChipBackgroundSelected = Color(0xFFC0C0C0), // Gray500
+    ChipBackgroundUnselected = Color(0xFFFFFFFF), // White
+    ChipBorderSelected = Color(0xFF898989), // Gray700
+    ChipBorderUnselected = Color(0xFFC0C0C0), // Gray500
+    ChipTextSelected = Color(0xFF3E3E3E), // Gray1400
+    ChipTextUnselected = Color(0xFF3E3E3E), // Gray1400
+    OtherChipActive = Color(0xFF13A4AB), // Teal1000
+    OtherChipBorder = Color(0xFFD6D6D5), // Gray400
+    OtherChipText = Color(0xFF3E3E3E), // Gray1400
+    OtherChipBackground = Color(0xFFFFFFFF), // White
+    OtherChipTextUnselected = Color(0xFF898989), // Gray700 (grey in light mode)
+
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
+    GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
+
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFFE5E5E4), // Gray300
+    DobInputText = Color(0xFFA6A5A5), // Gray600
+    DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
+
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
+    HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
+    HeightUnselectedCardText = Color(0xFF5F5F5F), // Gray1200 (Darker Gray)
+    HeightUnselectedCardUnitText = Color(0xFF898989), // Gray700
+    HeightRulerMajorTick = Color(0xFF13A4AB), // Teal1000
+    HeightRulerMinorTick = Color(0xFFCAF2F4), // Teal300
+    HeightRulerText = Color(0xFF13A4AB), // Teal1000
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
+    ShadowUnselected = Color(0x3313A4AB), // Teal1000/Primary 20% alpha
+    ShadowFemaleSelected = Color(0x6613A4AB),
+    ShadowMaleSelected = Color(0x6613A4AB),
+    ShadowDobActive = Color(0x6613A4AB),
+
+    extension = AppColorsExtension(
+        // User Profile Screen — light values match the Figma light spec
+        ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — screen bg behind header
+        ProfileHeaderAccent = Color(0xFF11939A), // Teal1200 — avatar ring
+        ProfileSheetBackground = Color(0xFFFFFFFF), // White — main sheet
+        ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White — dashed container fill
+        ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
+        ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
+        ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
+        ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
+        ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
+        ProfileAddIconBackground = Color(0xFFFFFFFF), // White
+        ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
+        ProfileAddText = Color(0xFF0F474A), // Teal1600
+        ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+        ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
+        ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+        ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
+        ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
+
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFFFFFFFF), // White / Background
+        EditProfileInputBorder = Color(0xFFE5E5E4), // Gray300 / Divider
+
+        // Gender Selection
+        GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
+        GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
+        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+        GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+        // Page Indicator
+        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+        PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
+
+        // Date of Birth
+        DobCardBackground = Color(0xFF75DEE3), // Teal500
+        DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+        DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+        DobCardText = Color(0xFF0F474A), // Teal1600
+        DobInputBorder = Color(0xFFE5E5E4), // Gray300
+        DobInputText = Color(0xFFA6A5A5), // Gray600
+        DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
+
+        // Height Selection
+        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+        HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+        HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
+        HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
+        HeightUnselectedCardText = Color(0xFF5F5F5F), // Gray1200 (Darker Gray)
+        HeightUnselectedCardUnitText = Color(0xFF898989), // Gray700
+        HeightRulerMajorTick = Color(0xFF13A4AB), // Teal1000
+        HeightRulerMinorTick = Color(0xFFCAF2F4), // Teal300
+        HeightRulerText = Color(0xFF13A4AB), // Teal1000
+
+        // Progress Button
+        ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
+        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+        // Shadows
+        ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
+        ShadowUnselected = Color(0x3313A4AB), // Teal1000/Primary 20% alpha
+        ShadowFemaleSelected = Color(0x6613A4AB),
+        ShadowMaleSelected = Color(0x6613A4AB),
+        ShadowDobActive = Color(0x6613A4AB),
+        
+        // Product Card
+        ProductCardBackground = Color(0xFFFFFFFF), // White
+        SavedSearchBarBorder = Color(0xFFC0C0C0), // Gray500
+        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
+        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
+        ProductCardNameText = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
+        ProductCardCautionText = Color(0xFF0B5F65), // Teal1400 (matches dark mode surface)
+        ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
+        ProductCardCaloriesText = Color(0xFF2FC5CC), // Teal700
+        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardSwipeContainerBackground = Color(0xFFF1F1F1), // Gray200
+        ProductCardSwipeText = Color(0xFFC0C0C0), // Gray500
+        ProductCardShadow = Color(0x3313A4AB), // Teal1000 20% alpha
+
+        // App Settings
+        AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
+        AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
+        AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
+        AppSettingsToggleContainerBackground = Color(0xFFE5E5E4), // Gray300
+        AppSettingsToggleChipSelectedBackground = Color(0xFFFFFFFF), // White
+        AppSettingsToggleTextUnselected = Color(0xFF777777), // Gray800
+        AppSettingsToggleTextSelected = Color(0xFF3E3E3E), // Gray1400 (matches ChipTextSelected)
+        AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+        AppSettingsLogoutIconBackground = Color(0xFFFFF1F3), // ErrorBackground (light)
+    ),
 )
 
 /** Dark theme color palette. Provides an appropriately dark set of semantic colors. */
@@ -255,4 +622,159 @@ fun darkColors() = AppColors(
     MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
     AuthDialogBackground = Color(0xFF0A545A), // Teal1500
     AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
+
+    // Profile Setup
+    ProfileSetupTitle = Color(0xFFE8FAFA), // Teal100
+    ProfileSetupSubtitle = Color(0xFF108188), // Teal1300
+    ProfileSetupSectionTitle = Color(0xFF75DEE3), // Teal500
+
+    // Chips
+    ChipBackgroundSelected = Color(0xFF13A4AB), // Teal1000
+    ChipBackgroundUnselected = Color(0xFF0B5F65), // Teal1400
+    ChipBorderSelected = Color(0xFF75DEE3), // Teal500
+    ChipBorderUnselected = Color(0xFF108188), // Teal1300
+    ChipTextSelected = Color(0xFF0F474A), // Teal1600
+    ChipTextUnselected = Color(0xFF2FC5CC), // Teal700
+    OtherChipActive = Color(0xFF2FC5CC), // Teal700
+    OtherChipBorder = Color(0xFF108188), // Teal1300
+    OtherChipText = Color(0xFF2FC5CC), // Teal700
+    OtherChipBackground = Color(0xFF0B5F65), // Teal1400
+    OtherChipTextUnselected = Color(0xFF2FC5CC), // Teal700 (stays teal in dark mode)
+
+    // Gender Selection
+    GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
+    GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
+    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+    GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+    // Page Indicator
+    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+    PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+    // Date of Birth
+    DobCardBackground = Color(0xFF75DEE3), // Teal500
+    DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+    DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+    DobCardText = Color(0xFF0F474A), // Teal1600
+    DobInputBorder = Color(0xFF169098), // Teal1200
+    DobInputText = Color(0xFF169098), // Teal1200
+    DobCalendarIcon = Color(0xFF169098), // Teal1200
+
+    // Height Selection
+    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+    HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+    HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
+    HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
+    HeightUnselectedCardText = Color(0xFF2FC5CC), // Teal700
+    HeightUnselectedCardUnitText = Color(0xFFCAF2F4), // Teal300
+    HeightRulerMajorTick = Color(0xFF75DEE3), // Teal500
+    HeightRulerMinorTick = Color(0xFF0B5F65), // Teal1400
+    HeightRulerText = Color(0xFF75DEE3), // Teal500
+
+    // Progress Button
+    ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
+    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+    // Shadows
+    ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
+    ShadowUnselected = Color(0x33FFFFFF), // Soft white glow 20% alpha
+    ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
+    ShadowMaleSelected = Color(0x9975DEE3),
+    ShadowDobActive = Color(0x9975DEE3),
+
+    extension = AppColorsExtension(
+        // User Profile Screen — dark values match the Figma dark spec
+        ProfileHeaderBackground = Color(0xFF0A545A), // Teal1500 — screen bg behind header
+        ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400 — avatar ring
+        ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — main sheet
+        ProfileFamilyBoxBackground = Color(0xFF0A545A), // Teal1500 — dashed container fill
+        ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500
+        ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
+        ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
+        ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
+        ProfileAddCardBackground = Color(0xFF0F474A), // Teal1600
+        ProfileAddIconBackground = Color(0xFFE8FAFA), // Teal100
+        ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000
+        ProfileAddText = Color(0xFFE8FAFA), // Teal100
+        ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
+        ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
+        ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
+        ProfileMenuLabel = Color(0xFF11939A), // Teal1200
+        ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
+
+        // Edit Profile Input Fields
+        EditProfileInputBackground = Color(0xFF0A545A), // Teal1500 / SurfaceVariant
+        EditProfileInputBorder = Color(0xFF108188), // Teal1300 / OtherChipBorder
+
+        // Gender Selection
+        GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
+        GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
+        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
+        GenderMaleCardText = Color(0xFF0F474A), // Teal1600
+
+        // Page Indicator
+        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
+        PageIndicatorTotal = Color(0xFF108188), // Teal1300
+
+        // Date of Birth
+        DobCardBackground = Color(0xFF75DEE3), // Teal500
+        DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
+        DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
+        DobCardText = Color(0xFF0F474A), // Teal1600
+        DobInputBorder = Color(0xFF169098), // Teal1200
+        DobInputText = Color(0xFF169098), // Teal1200
+        DobCalendarIcon = Color(0xFF169098), // Teal1200
+
+        // Height Selection
+        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
+        HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
+        HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
+        HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
+        HeightUnselectedCardText = Color(0xFF2FC5CC), // Teal700
+        HeightUnselectedCardUnitText = Color(0xFFCAF2F4), // Teal300
+        HeightRulerMajorTick = Color(0xFF75DEE3), // Teal500
+        HeightRulerMinorTick = Color(0xFF0B5F65), // Teal1400
+        HeightRulerText = Color(0xFF75DEE3), // Teal500
+
+        // Progress Button
+        ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
+        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
+
+        // Shadows
+        ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
+        ShadowUnselected = Color(0x33FFFFFF), // Soft white glow 20% alpha
+        ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
+        ShadowMaleSelected = Color(0x9975DEE3),
+        ShadowDobActive = Color(0x9975DEE3),
+        
+        // Product Card
+        ProductCardBackground = Color(0xFF0A545A), // Teal1500
+        SavedSearchBarBorder = Color(0xFF0F8389), // Teal1200
+        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
+        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
+        ProductCardNameText = Color(0xFF75DEE3), // Teal500
+        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
+        ProductCardCautionText = Color(0xFF0B5F65), // Teal1400
+        ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
+        ProductCardCaloriesText = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardSwipeContainerBackground = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeText = Color(0xFF108188), // Teal1300
+        ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
+
+        // App Settings
+        AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
+        // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
+        AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600
+        // Teal1200 is remapped to 0xFFA3E9EC in this palette for secondary text — cannot reuse for this
+        AppSettingsRowLabel = Color(0xFF11939A), // Teal1200 (light) literal
+        AppSettingsToggleContainerBackground = Color(0xFF0F474A), // Teal1600
+        AppSettingsToggleChipSelectedBackground = Color(0xFF13A4AB), // Teal1000
+        AppSettingsToggleTextUnselected = Color(0xFFA3E9EC), // Teal400
+        AppSettingsToggleTextSelected = Color(0xFFA3E9EC), // Teal400 — same as unselected, differentiated by chip bg
+        // Error is remapped to 0xFFFF6B7A in this palette — spec requires the same red in both themes here
+        AppSettingsLogoutAccent = Color(0xFFFA4D5E),
+        AppSettingsLogoutIconBackground = Color(0xFF0A545A), // Teal1500 — ErrorBackground dark value doesn't fit here
+    ),
 )

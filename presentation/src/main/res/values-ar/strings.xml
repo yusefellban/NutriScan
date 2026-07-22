@@ -34,7 +34,7 @@
     <string name="nav_home">الرئيسية</string>
     <string name="nav_history">السجل</string>
     <string name="nav_scan">مسح</string>
-    <string name="nav_shopping">التسوق</string>
+    <string name="nav_saved">المحفوظات</string>
     <string name="nav_profile">الملف الشخصي</string>
     <string name="forgot_password_title">نسيت كلمة المرور؟</string>
     <string name="forgot_password_subtitle">دعنا نقدم طلب إعادة تعيين كلمة المرور.</string>
@@ -61,4 +61,110 @@
     <string name="onboarding_lets_start">ابدأ الآن</string>
     <string name="onboarding_skip">تخطي</string>
     <string name="onboarding_back">رجوع</string>
+    <!-- Health Profile Setup -->
+    <string name="profile_setup_title">إعداد ملفك الصحي</string>
+    <string name="profile_setup_subtitle">ساعدنا في تخصيص NutriScan ليناسب احتياجاتك الغذائية وحالتك الصحية الخاصة.</string>
+    <string name="profile_setup_chronic_conditions">الأمراض المزمنة</string>
+    <string name="profile_setup_diabetes">السكري</string>
+    <string name="profile_setup_hypertension">ضغط الدم المرتفع</string>
+    <string name="profile_setup_celiac">الداء البطني</string>
+    <string name="profile_setup_allergies">الحساسية</string>
+    <string name="profile_setup_peanuts">الفول السوداني</string>
+    <string name="profile_setup_gluten">الجلوتين</string>
+    <string name="profile_setup_dairy">منتجات الألبان</string>
+    <string name="profile_setup_other">+ أخرى</string>
+    <string name="profile_setup_custom_input_hint">اكتب خياراً مخصصاً...</string>
+    <string name="action_save">حفظ</string>
+    <!-- Profile Setup Pager -->
+    <string name="profile_setup_gender_title_prefix">"ما هو "</string>
+    <string name="profile_setup_gender_title_highlight">جنسك</string>
+    <string name="profile_setup_gender_title_suffix">؟</string>
+    <string name="profile_setup_gender_subtitle">سنستخدم هذا لتخصيص تجربتك في NutriScan.</string>
+    <string name="profile_setup_gender_female">أنثى</string>
+    <string name="profile_setup_gender_male">ذكر</string>
+    <string name="profile_setup_dob_title_prefix">"تاريخ "</string>
+    <string name="profile_setup_dob_title_highlight">ميلادك</string>
+    <string name="profile_setup_dob_subtitle">عمرك يساعدنا في تقديم إرشادات غذائية وصحية أكثر دقة.</string>
+    <string name="profile_setup_dob_years">سنة</string>
+    <string name="profile_setup_dob_date_hint">يوم/شهر/سنة</string>
+    <string name="profile_setup_height_title_prefix">"ما هو "</string>
+    <string name="profile_setup_height_title_highlight">طولك</string>
+    <string name="profile_setup_height_title_suffix">؟</string>
+    <string name="profile_setup_height_subtitle">سنستخدم طولك لتخصيص رؤى التغذية وحسابات السعرات الحرارية.</string>
+    <string name="profile_setup_weight_title_prefix">"وزنك "</string>
+    <string name="profile_setup_weight_title_highlight">الحالي</string>
+    <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
+    <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
+    <string name="profile_setup_load_error">حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</string>
+    <string name="action_retry">إعادة المحاولة</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_name_hint">الاسم</string>
+    <string name="edit_profile_username_hint">اسم المستخدم</string>
+    <string name="edit_profile_email_hint">البريد الإلكتروني</string>
+    <string name="edit_profile_password_hint">كلمة المرور</string>
+    <string name="edit_profile_confirm_title">حفظ تغييرات الملف الشخصي؟</string>
+    <string name="edit_profile_confirm_message">هل أنت متأكد من رغبتك في تعديل ملفك الصحي؟ سيؤدي ذلك إلى تحديث قرارات فحص سلامة الغذاء المستقبلية.</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_remove">إزالة</string>
+
+    <!-- User Profile Screen -->
+    <string name="user_profile_day_streak">%1$d يوم متتالي</string>
+    <string name="user_profile_edit_description">تعديل الملف الشخصي</string>
+    <string name="user_profile_avatar_description">الصورة الشخصية</string>
+    <string name="user_profile_family_members">أفراد الأسرة</string>
+    <string name="user_profile_add_member">إضافة فرد</string>
+    <string name="user_profile_show_details">عرض التفاصيل</string>
+    <string name="user_profile_member_avatar_description">صورة %1$s</string>
+    <string name="user_profile_scan_history">سجل المسح</string>
+    <string name="user_profile_notifications">الإشعارات</string>
+    <string name="user_profile_settings">الإعدادات</string>
+    <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
+    <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
+
+    <!-- App Settings -->
+    <string name="app_settings_title">إعدادات التطبيق</string>
+    <string name="app_settings_subtitle">غيّر إعدادات التطبيق هنا</string>
+    <string name="app_settings_profile_settings">إعدادات الملف الشخصي</string>
+    <string name="app_settings_appearance">المظهر</string>
+    <string name="app_settings_language">اللغة</string>
+    <string name="app_settings_terms_and_conditions">الشروط والأحكام</string>
+    <string name="app_settings_help">مساعدة</string>
+    <string name="app_settings_logout">تسجيل الخروج</string>
+    <string name="app_settings_theme_system">النظام</string>
+    <string name="app_settings_theme_dark">داكن</string>
+    <string name="app_settings_theme_light">فاتح</string>
+    <string name="app_settings_lang_en">En</string>
+    <string name="app_settings_lang_ar">Ar</string>
+    <string name="app_settings_logout_confirm_title">تسجيل الخروج؟</string>
+    <string name="app_settings_logout_confirm_message">هل أنت متأكد أنك تريد تسجيل الخروج من نيوتري سكان؟</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
+    <string name="action_go_back">رجوع</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">تحقق من بريدك الإلكتروني</string>
+    <string name="email_verification_subtitle">تأكد من هويتك لبدء المسح.</string>
+    <string name="email_verification_sent_to">تم إرسال رابط التحقق إلى:</string>
+    <string name="email_verification_instructions">يرجى التحقق من بريدك الإلكتروني والنقر على رابط التحقق لتفعيل حسابك. بعد التحقق، يمكنك تسجيل الدخول أدناه.</string>
+    <string name="email_verification_go_to_sign_in">انتقل إلى تسجيل الدخول</string>
+    <string name="email_verification_didnt_receive">لم تستلمه؟</string>
+    <string name="email_verification_resend">إعادة إرسال بريد التحقق.</string>
+    <string name="email_verification_resend_success">تم إرسال بريد التحقق بنجاح!</string>
+    <string name="email_verification_resend_error">فشل إعادة إرسال بريد التحقق. يرجى المحاولة مرة أخرى.</string>
+    <string name="register_error_email_taken">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.</string>
+    <string name="register_error_generic">فشل التسجيل. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">المحفوظات</string>
+    <string name="saved_search_hint">ابحث هنا</string>
+    <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
+    <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
+    <string name="product_card_kcal_unit">سعرة</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">آمن</string>
+    <string name="verdict_caution">حذر</string>
+    <string name="verdict_unsafe">غير آمن</string>
 </resources>

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.HistoryItemCard
-import iti.grad.nutriscan.presentation.home.view.components.HomeBottomNavBar
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
@@ -52,7 +51,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToScan: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
-    onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToScanResult: (String) -> Unit = {},
@@ -64,7 +63,7 @@ fun HomeScreen(
             when (effect) {
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
-                is HomeEffect.NavigateToShopping -> onNavigateToShopping()
+                is HomeEffect.NavigateToSaved -> onNavigateToSaved()
                 is HomeEffect.NavigateToProfile -> onNavigateToProfile()
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeEffect.NavigateToScanResult -> onNavigateToScanResult(effect.scanId)
@@ -86,32 +85,15 @@ private fun HomeScreenContent(
     Scaffold(
         containerColor = AppTheme.colors.Background,
         bottomBar = {
-            HomeBottomNavBar(
+            AppBottomNavBar(
                 selectedTab = state.selectedTab,
                 onTabClick = { tab -> onEvent(HomeEvent.BottomNavTabClicked(tab)) },
             )
         },
     ) { innerPadding ->
-        when (state.selectedTab) {
-            iti.grad.nutriscan.presentation.home.state.BottomNavTab.HOME -> {
-                HomeFeedContent(state, onEvent, innerPadding)
-            }
-            else -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .background(AppTheme.colors.Background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Placeholder Screen",
-                        style = AppTheme.typography.headlineMedium,
-                        color = AppTheme.colors.PrimaryVariant
-                    )
-                }
-            }
-        }
+        // Home is the only tab rendered inline — every other bottom-nav tab
+        // navigates to its own destination (see HomeViewModel.onEvent).
+        HomeFeedContent(state, onEvent, innerPadding)
     }
 }
 
@@ -132,6 +114,7 @@ private fun HomeFeedContent(
             item {
                 HomeGreetingHeader(
                     userName = state.userName,
+                    avatarUrl = state.avatarUrl,
                     onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
                 )
                 Spacer(modifier = Modifier.height(6.dp))

@@ -30,7 +30,11 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.core.splashscreen)
+
+    implementation("net.openid:appauth:0.11.1")
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.ui)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -52,6 +56,13 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.coil3.svg)
+
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

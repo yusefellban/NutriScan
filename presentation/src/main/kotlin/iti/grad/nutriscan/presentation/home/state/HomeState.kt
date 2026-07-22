@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.home.state
 
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -11,6 +12,9 @@ import kotlinx.collections.immutable.persistentListOf
  */
 data class HomeState(
     val userName: String = "",
+    val firstName: String = "",
+    val avatarUrl: String? = null,
+    val isLoading: Boolean = false,
     val recentHistory: ImmutableList<HomeHistoryItem> = persistentListOf(),
     val selectedTab: BottomNavTab = BottomNavTab.HOME,
 )
