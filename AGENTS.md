@@ -2393,6 +2393,14 @@ Box(modifier = Modifier.background(AppColors.VerdictRed))
 | Verdict accessibility rule               | §14.5                                               |
 | Shared component catalogue              | §14.3                                               |
 | Localization rules                       | §14.4                                               |
+| Git commit conventions                   | §17.3                                               |
+
+### 17.3 Git Commit Conventions
+
+- **No AI co-author trailer.** Commits made with AI agent assistance must
+  **not** include a `Co-Authored-By:` trailer for the agent (e.g. no
+  `Co-Authored-By: Claude <noreply@anthropic.com>`). Author the commit as
+  the human developer only.
 
 ---
 

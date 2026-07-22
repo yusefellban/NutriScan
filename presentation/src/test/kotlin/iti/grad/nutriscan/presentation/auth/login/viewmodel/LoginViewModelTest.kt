@@ -6,6 +6,7 @@ import io.mockk.mockk
 import iti.grad.nutriscan.domain.auth.usecase.GetOidcAuthConfigUseCase
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,7 @@ class LoginViewModelTest {
     private lateinit var loginWithEmailUseCase: LoginWithEmailUseCase
     private lateinit var getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase
     private lateinit var saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
+    private lateinit var userRepository: IUserRepository
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -35,10 +37,13 @@ class LoginViewModelTest {
         loginWithEmailUseCase = mockk()
         getOidcAuthConfigUseCase = mockk()
         saveGoogleLoginTokensUseCase = mockk()
+        userRepository = mockk()
+        coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
         viewModel = LoginViewModel(
             loginWithEmailUseCase,
             getOidcAuthConfigUseCase,
-            saveGoogleLoginTokensUseCase
+            saveGoogleLoginTokensUseCase,
+            userRepository,
         )
     }
 

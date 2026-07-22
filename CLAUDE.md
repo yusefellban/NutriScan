@@ -27,6 +27,8 @@ detailed on purpose; this file is just the pointer and the TL;DR.
 - **`AppTheme.colors` / `AppTheme.typography` / `AppTheme.shapes` only** —
   never a hardcoded `Color(0xFF...)`, raw `sp`/`dp` text style, or ad-hoc
   corner radius in a Composable.
+- **No AI co-author trailer on commits** (§17.3) — commits made with AI
+  agent assistance must not include a `Co-Authored-By:` line for the agent.
 
 ## Where to look for precedent
 

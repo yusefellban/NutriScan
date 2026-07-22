@@ -14,8 +14,10 @@ import iti.grad.nutriscan.domain.auth.usecase.LogoutUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -36,6 +38,7 @@ class AppSettingsViewModelTest {
     private val getLanguageUseCase: GetLanguageUseCase = mockk()
     private val setLanguageUseCase: SetLanguageUseCase = mockk()
     private val logoutUseCase: LogoutUseCase = mockk()
+    private val userRepository: IUserRepository = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
@@ -46,12 +49,14 @@ class AppSettingsViewModelTest {
         coEvery { setThemeModeUseCase(any()) } returns Unit
         coEvery { setLanguageUseCase(any()) } returns Unit
         coEvery { logoutUseCase() } returns Result.success(Unit)
+        coEvery { userRepository.getUserData() } returns flowOf(null)
         viewModel = AppSettingsViewModel(
             getThemeModeUseCase,
             setThemeModeUseCase,
             getLanguageUseCase,
             setLanguageUseCase,
             logoutUseCase,
+            userRepository,
         )
     }
 
@@ -82,6 +87,7 @@ class AppSettingsViewModelTest {
                 getLanguageUseCase,
                 setLanguageUseCase,
                 logoutUseCase,
+                userRepository,
             )
             testScheduler.advanceUntilIdle()
 

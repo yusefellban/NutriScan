@@ -1,12 +1,29 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit
 
+import android.content.Context
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import iti.grad.nutriscan.domain.allergy.model.Allergy
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import iti.grad.nutriscan.domain.disease.model.Disease
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.user.model.User
+import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,105 +37,246 @@ import org.junit.jupiter.api.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditProfileViewModelTest {
 
+    private val testScheduler = TestCoroutineScheduler()
+    private val testDispatcher = StandardTestDispatcher(testScheduler)
+
     private lateinit var viewModel: EditProfileViewModel
-    private val testDispatcher = StandardTestDispatcher()
+
+    private val userData = MutableStateFlow<User?>(null)
+    private val getUserProfileUseCase: GetUserProfileUseCase = mockk {
+        every { this@mockk() } returns userData
+    }
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase = mockk()
+    private val getDiseasesUseCase: GetDiseasesUseCase = mockk {
+        every { this@mockk() } returns flowOf(emptyList())
+    }
+    private val getAllergiesUseCase: GetAllergiesUseCase = mockk {
+        every { this@mockk() } returns flowOf(emptyList())
+    }
+    private val syncDiseasesUseCase: SyncDiseasesUseCase = mockk()
+    private val syncAllergiesUseCase: SyncAllergiesUseCase = mockk()
+    private val context: Context = mockk(relaxed = true)
 
     @BeforeEach
-    fun setup() {
+    fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = EditProfileViewModel()
+        coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
+        coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
+        viewModel = EditProfileViewModel(
+            getUserProfileUseCase,
+            updateUserProfileUseCase,
+            getDiseasesUseCase,
+            getAllergiesUseCase,
+            syncDiseasesUseCase,
+            syncAllergiesUseCase,
+            context,
+        )
     }
 
     @AfterEach
-    fun teardown() {
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `initial state pre-fills correct profile information`() {
+    fun `initial state is empty and not in edit mode`() = runTest(testDispatcher) {
         val state = viewModel.state.value
-        assertEquals("", state.name)
-        assertEquals("", state.username)
+        assertEquals("", state.firstName)
+        assertEquals("", state.lastName)
         assertEquals("", state.email)
-        assertEquals("", state.password)
-        assertTrue(state.selectedChronicConditions.contains("Celiac Disease"))
-        assertTrue(state.selectedAllergies.isEmpty())
+        assertFalse(state.isEditMode)
         assertFalse(state.showSaveConfirmation)
-        assertFalse(state.isLoading)
+        assertFalse(state.isSaving)
     }
 
     @Test
-    fun `UpdateName updates state correctly`() {
-        viewModel.onEvent(EditProfileEvent.UpdateName("Ahmed Ali"))
-        assertEquals("Ahmed Ali", viewModel.state.value.name)
+    fun `when repository emits a user, profile fields are pre-filled`() = runTest(testDispatcher) {
+        userData.value = User(
+            id = "1",
+            firstName = "Ahmed",
+            lastName = "Ali",
+            email = "ahmed@example.com",
+            gender = null,
+            dateOfBirth = "2000-01-01",
+            heightCm = 180.0,
+            weightKg = 75.0,
+            diseaseIds = listOf(1),
+            allergyIds = listOf(2),
+        )
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals("Ahmed", state.firstName)
+        assertEquals("Ali", state.lastName)
+        assertEquals("ahmed@example.com", state.email)
+        assertEquals("2000-01-01", state.dateOfBirth)
+        assertEquals(180.0, state.heightCm)
+        assertEquals(75.0, state.weightKg)
+        assertTrue(state.selectedDiseaseIds.contains(1))
+        assertTrue(state.selectedAllergyIds.contains(2))
     }
 
     @Test
-    fun `UpdateUsername updates state correctly`() {
-        viewModel.onEvent(EditProfileEvent.UpdateUsername("ahmed_ali"))
-        assertEquals("ahmed_ali", viewModel.state.value.username)
+    fun `diseases and allergies load from the offline use cases on init`() = runTest(testDispatcher) {
+        val diseases = MutableStateFlow(listOf(Disease(id = 1, name = "Diabetes")))
+        val allergies = MutableStateFlow(listOf(Allergy(id = 2, name = "Peanuts")))
+        every { getDiseasesUseCase() } returns diseases
+        every { getAllergiesUseCase() } returns allergies
+
+        viewModel = EditProfileViewModel(
+            getUserProfileUseCase,
+            updateUserProfileUseCase,
+            getDiseasesUseCase,
+            getAllergiesUseCase,
+            syncDiseasesUseCase,
+            syncAllergiesUseCase,
+            context,
+        )
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(listOf(Disease(id = 1, name = "Diabetes")), viewModel.state.value.diseases)
+        assertEquals(listOf(Allergy(id = 2, name = "Peanuts")), viewModel.state.value.allergies)
+        assertFalse(viewModel.state.value.isDiseasesLoading)
+        assertFalse(viewModel.state.value.isAllergiesLoading)
     }
 
     @Test
-    fun `UpdateEmail updates state correctly`() {
-        viewModel.onEvent(EditProfileEvent.UpdateEmail("ahmed@gmail.com"))
-        assertEquals("ahmed@gmail.com", viewModel.state.value.email)
+    fun `UpdateFirstName updates state correctly`() {
+        viewModel.onEvent(EditProfileEvent.UpdateFirstName("Ahmed"))
+        assertEquals("Ahmed", viewModel.state.value.firstName)
     }
 
     @Test
-    fun `UpdatePassword updates state correctly`() {
-        viewModel.onEvent(EditProfileEvent.UpdatePassword("newpass"))
-        assertEquals("newpass", viewModel.state.value.password)
+    fun `UpdateLastName updates state correctly`() {
+        viewModel.onEvent(EditProfileEvent.UpdateLastName("Ali"))
+        assertEquals("Ali", viewModel.state.value.lastName)
     }
 
     @Test
-    fun `ToggleCondition adds and removes conditions`() {
-        // Toggle Celiac Disease (which is initially selected) -> should be removed
-        viewModel.onEvent(EditProfileEvent.ToggleCondition("Celiac Disease"))
-        assertFalse(viewModel.state.value.selectedChronicConditions.contains("Celiac Disease"))
-
-        // Toggle Diabetes (initially unselected) -> should be added
-        viewModel.onEvent(EditProfileEvent.ToggleCondition("Diabetes"))
-        assertTrue(viewModel.state.value.selectedChronicConditions.contains("Diabetes"))
+    fun `UpdateDateOfBirth updates state correctly`() {
+        viewModel.onEvent(EditProfileEvent.UpdateDateOfBirth("1999-05-05"))
+        assertEquals("1999-05-05", viewModel.state.value.dateOfBirth)
     }
 
     @Test
-    fun `ToggleAllergy adds and removes allergies`() {
-        // Toggle Peanuts (initially unselected) -> should be added
-        viewModel.onEvent(EditProfileEvent.ToggleAllergy("Peanuts"))
-        assertTrue(viewModel.state.value.selectedAllergies.contains("Peanuts"))
-
-        // Toggle Peanuts again -> should be removed
-        viewModel.onEvent(EditProfileEvent.ToggleAllergy("Peanuts"))
-        assertFalse(viewModel.state.value.selectedAllergies.contains("Peanuts"))
+    fun `UpdateHeight updates state correctly`() {
+        viewModel.onEvent(EditProfileEvent.UpdateHeight(175.0))
+        assertEquals(175.0, viewModel.state.value.heightCm)
     }
 
     @Test
-    fun `Add custom condition works correctly`() {
-        viewModel.onEvent(EditProfileEvent.StartAddCustomCondition)
-        assertTrue(viewModel.state.value.isAddingCustomCondition)
-
-        viewModel.onEvent(EditProfileEvent.UpdateCustomConditionInput("Lactose Intolerance"))
-        assertEquals("Lactose Intolerance", viewModel.state.value.customConditionInput)
-
-        viewModel.onEvent(EditProfileEvent.SubmitCustomCondition)
-        assertFalse(viewModel.state.value.isAddingCustomCondition)
-        assertTrue(viewModel.state.value.chronicConditions.contains("Lactose Intolerance"))
-        assertTrue(viewModel.state.value.selectedChronicConditions.contains("Lactose Intolerance"))
+    fun `UpdateWeight updates state correctly`() {
+        viewModel.onEvent(EditProfileEvent.UpdateWeight(70.0))
+        assertEquals(70.0, viewModel.state.value.weightKg)
     }
 
     @Test
-    fun `Add custom allergy works correctly`() {
-        viewModel.onEvent(EditProfileEvent.StartAddCustomAllergy)
-        assertTrue(viewModel.state.value.isAddingCustomAllergy)
+    fun `SelectAvatar updates avatarUrl for a non-content URI`() {
+        viewModel.onEvent(EditProfileEvent.SelectAvatar("file:///tmp/avatar.jpg"))
+        assertEquals("file:///tmp/avatar.jpg", viewModel.state.value.avatarUrl)
+    }
 
-        viewModel.onEvent(EditProfileEvent.UpdateCustomAllergyInput("Soy"))
-        assertEquals("Soy", viewModel.state.value.customAllergyInput)
+    @Test
+    fun `ToggleDisease adds then removes disease ID`() {
+        viewModel.onEvent(EditProfileEvent.ToggleDisease(1))
+        assertTrue(viewModel.state.value.selectedDiseaseIds.contains(1))
 
-        viewModel.onEvent(EditProfileEvent.SubmitCustomAllergy)
-        assertFalse(viewModel.state.value.isAddingCustomAllergy)
-        assertTrue(viewModel.state.value.allergies.contains("Soy"))
-        assertTrue(viewModel.state.value.selectedAllergies.contains("Soy"))
+        viewModel.onEvent(EditProfileEvent.ToggleDisease(1))
+        assertFalse(viewModel.state.value.selectedDiseaseIds.contains(1))
+    }
+
+    @Test
+    fun `ToggleAllergy adds then removes allergy ID`() {
+        viewModel.onEvent(EditProfileEvent.ToggleAllergy(2))
+        assertTrue(viewModel.state.value.selectedAllergyIds.contains(2))
+
+        viewModel.onEvent(EditProfileEvent.ToggleAllergy(2))
+        assertFalse(viewModel.state.value.selectedAllergyIds.contains(2))
+    }
+
+    @Test
+    fun `EditClicked enters edit mode and re-syncs diseases and allergies`() = runTest(testDispatcher) {
+        viewModel.onEvent(EditProfileEvent.EditClicked)
+        testScheduler.advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isEditMode)
+        coVerify(exactly = 1) { syncDiseasesUseCase() }
+        coVerify(exactly = 1) { syncAllergiesUseCase() }
+    }
+
+    @Test
+    fun `RetryLoadDiseases re-syncs diseases and allergies`() = runTest(testDispatcher) {
+        viewModel.onEvent(EditProfileEvent.RetryLoadDiseases)
+        testScheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) { syncDiseasesUseCase() }
+        coVerify(exactly = 1) { syncAllergiesUseCase() }
+    }
+
+    @Test
+    fun `SaveClicked shows the save confirmation dialog`() {
+        viewModel.onEvent(EditProfileEvent.SaveClicked)
+        assertTrue(viewModel.state.value.showSaveConfirmation)
+    }
+
+    @Test
+    fun `DismissSaveConfirmation clears the dialog`() {
+        viewModel.onEvent(EditProfileEvent.SaveClicked)
+        viewModel.onEvent(EditProfileEvent.DismissSaveConfirmation)
+        assertFalse(viewModel.state.value.showSaveConfirmation)
+    }
+
+    @Test
+    fun `ConfirmSave success clears the dialog, exits edit mode and stops saving`() = runTest(testDispatcher) {
+        coEvery {
+            updateUserProfileUseCase(
+                firstName = any(),
+                lastName = any(),
+                gender = any(),
+                dateOfBirth = any(),
+                heightCm = any(),
+                weightKg = any(),
+                diseaseIds = any(),
+                allergyIds = any(),
+                avatarUrl = any(),
+            )
+        } returns Result.success(Unit)
+
+        viewModel.onEvent(EditProfileEvent.SaveClicked)
+        viewModel.onEvent(EditProfileEvent.ConfirmSave)
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showSaveConfirmation)
+        assertFalse(state.isSaving)
+        assertFalse(state.isEditMode)
+        coVerify(exactly = 1) { updateUserProfileUseCase(any(), any(), any(), any(), any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `ConfirmSave failure stops saving without exiting edit mode`() = runTest(testDispatcher) {
+        coEvery {
+            updateUserProfileUseCase(
+                firstName = any(),
+                lastName = any(),
+                gender = any(),
+                dateOfBirth = any(),
+                heightCm = any(),
+                weightKg = any(),
+                diseaseIds = any(),
+                allergyIds = any(),
+                avatarUrl = any(),
+            )
+        } returns Result.failure(Exception("Network error"))
+
+        viewModel.onEvent(EditProfileEvent.EditClicked)
+        viewModel.onEvent(EditProfileEvent.SaveClicked)
+        viewModel.onEvent(EditProfileEvent.ConfirmSave)
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.isSaving)
+        assertTrue(state.isEditMode)
     }
 
     @Test
@@ -127,27 +285,5 @@ class EditProfileViewModelTest {
             viewModel.onEvent(EditProfileEvent.BackClicked)
             assertEquals(EditProfileEffect.NavigateBack, awaitItem())
         }
-    }
-
-    @Test
-    fun `SaveClicked triggers confirmation dialog and confirming emits NavigateBack`() = runTest(testDispatcher) {
-        viewModel.onEvent(EditProfileEvent.SaveClicked)
-        assertTrue(viewModel.state.value.showSaveConfirmation)
-
-        viewModel.effect.test {
-            viewModel.onEvent(EditProfileEvent.ConfirmSave)
-            // Confirms save -> sets isLoading and then emits NavigateBack
-            assertEquals(EditProfileEffect.NavigateBack, awaitItem())
-            assertFalse(viewModel.state.value.showSaveConfirmation)
-        }
-    }
-
-    @Test
-    fun `Dismissing save confirmation dialog clears flag`() {
-        viewModel.onEvent(EditProfileEvent.SaveClicked)
-        assertTrue(viewModel.state.value.showSaveConfirmation)
-
-        viewModel.onEvent(EditProfileEvent.DismissSaveConfirmation)
-        assertFalse(viewModel.state.value.showSaveConfirmation)
     }
 }
