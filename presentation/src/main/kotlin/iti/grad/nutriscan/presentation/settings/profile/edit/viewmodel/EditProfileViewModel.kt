@@ -16,138 +16,192 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
+import kotlinx.coroutines.flow.collectLatest
+
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.collections.immutable.toImmutableList
+
 /**
  * ViewModel for the Edit Profile screen.
  *
  * Implements MVI patterns and stores editable profile states in-memory with safety confirmation flows.
  */
 @HiltViewModel
-class EditProfileViewModel @Inject constructor() : ViewModel() {
+class EditProfileViewModel @Inject constructor(
+    private val userRepository: IUserRepository, // Keep for getUserData()
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private val getDiseasesUseCase: GetDiseasesUseCase,
+    private val getAllergiesUseCase: GetAllergiesUseCase,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(createInitialState())
+    private val _state = MutableStateFlow(EditProfileState())
     val state: StateFlow<EditProfileState> = _state.asStateFlow()
 
     private val _effect = Channel<EditProfileEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    init {
+        loadDiseases()
+        loadAllergies()
+        viewModelScope.launch {
+            userRepository.getUserData().collectLatest { user ->
+                if (user != null) {
+                    _state.update {
+                        it.copy(
+                            firstName = user.firstName,
+                            lastName = user.lastName ?: "",
+                            dateOfBirth = user.dateOfBirth ?: "",
+                            email = user.email ?: "",
+                            heightCm = user.heightCm,
+                            weightKg = user.weightKg,
+                            avatarUrl = user.avatarUrl,
+                            selectedDiseaseIds = user.diseaseIds.toPersistentList(),
+                            selectedAllergyIds = user.allergyIds.toPersistentList()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun onEvent(event: EditProfileEvent) {
         when (event) {
-            is EditProfileEvent.UpdateName -> _state.update { it.copy(name = event.name) }
-            is EditProfileEvent.UpdateUsername -> _state.update { it.copy(username = event.username) }
-            is EditProfileEvent.UpdateEmail -> _state.update { it.copy(email = event.email) }
-            is EditProfileEvent.UpdatePassword -> _state.update { it.copy(password = event.password) }
-            is EditProfileEvent.ToggleCondition -> toggleCondition(event.condition)
-            is EditProfileEvent.ToggleAllergy -> toggleAllergy(event.allergy)
-            EditProfileEvent.StartAddCustomCondition -> _state.update {
-                it.copy(isAddingCustomCondition = true, customConditionInput = "")
-            }
-            is EditProfileEvent.UpdateCustomConditionInput -> _state.update {
-                it.copy(customConditionInput = event.value)
-            }
-            EditProfileEvent.SubmitCustomCondition -> submitCustomCondition()
-            EditProfileEvent.CancelAddCustomCondition -> _state.update {
-                it.copy(isAddingCustomCondition = false, customConditionInput = "")
-            }
-            EditProfileEvent.StartAddCustomAllergy -> _state.update {
-                it.copy(isAddingCustomAllergy = true, customAllergyInput = "")
-            }
-            is EditProfileEvent.UpdateCustomAllergyInput -> _state.update {
-                it.copy(customAllergyInput = event.value)
-            }
-            EditProfileEvent.SubmitCustomAllergy -> submitCustomAllergy()
-            EditProfileEvent.CancelAddCustomAllergy -> _state.update {
-                it.copy(isAddingCustomAllergy = false, customAllergyInput = "")
-            }
+            EditProfileEvent.EditClicked -> _state.update { it.copy(isEditMode = true) }
+            is EditProfileEvent.UpdateFirstName -> _state.update { it.copy(firstName = event.firstName) }
+            is EditProfileEvent.UpdateLastName -> _state.update { it.copy(lastName = event.lastName) }
+            is EditProfileEvent.UpdateDateOfBirth -> _state.update { it.copy(dateOfBirth = event.dateOfBirth) }
+            is EditProfileEvent.ToggleDisease -> toggleDisease(event.diseaseId)
+            is EditProfileEvent.ToggleAllergy -> toggleAllergy(event.allergyId)
+            EditProfileEvent.RetryLoadDiseases -> loadDiseases()
+            EditProfileEvent.RetryLoadAllergies -> loadAllergies()
             EditProfileEvent.SaveClicked -> _state.update { it.copy(showSaveConfirmation = true) }
             EditProfileEvent.ConfirmSave -> saveProfileData()
             EditProfileEvent.DismissSaveConfirmation -> _state.update { it.copy(showSaveConfirmation = false) }
             EditProfileEvent.BackClicked -> emitEffect(EditProfileEffect.NavigateBack)
             is EditProfileEvent.SelectAvatar -> _state.update { it.copy(avatarUrl = event.avatarUrl) }
+            is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
+            is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
         }
     }
 
-    private fun toggleCondition(condition: String) {
-        _state.update {
-            val list = it.selectedChronicConditions
-            val newList = if (list.contains(condition)) {
-                list - condition
+    private fun loadDiseases() {
+        viewModelScope.launch {
+            _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
+            getDiseasesUseCase()
+                .onSuccess { diseases ->
+                    _state.update {
+                        it.copy(
+                            diseases = diseases.toImmutableList(),
+                            isDiseasesLoading = false
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _state.update {
+                        it.copy(
+                            isDiseasesLoading = false,
+                            diseasesErrorMessage = throwable.message ?: "Failed to load diseases"
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun loadAllergies() {
+        viewModelScope.launch {
+            _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
+            getAllergiesUseCase()
+                .onSuccess { allergies ->
+                    _state.update {
+                        it.copy(
+                            allergies = allergies.toImmutableList(),
+                            isAllergiesLoading = false
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _state.update {
+                        it.copy(
+                            isAllergiesLoading = false,
+                            allergiesErrorMessage = throwable.message ?: "Failed to load allergies"
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun toggleDisease(diseaseId: Int) {
+        _state.update { state ->
+            val updatedSelected = if (state.selectedDiseaseIds.contains(diseaseId)) {
+                state.selectedDiseaseIds.filter { it != diseaseId }
             } else {
-                list + condition
+                state.selectedDiseaseIds + diseaseId
             }
-            it.copy(selectedChronicConditions = newList.toPersistentList())
+            state.copy(selectedDiseaseIds = updatedSelected.toImmutableList())
         }
     }
 
-    private fun toggleAllergy(allergy: String) {
-        _state.update {
-            val list = it.selectedAllergies
-            val newList = if (list.contains(allergy)) {
-                list - allergy
+    private fun toggleAllergy(allergyId: Int) {
+        _state.update { state ->
+            val updatedSelected = if (state.selectedAllergyIds.contains(allergyId)) {
+                state.selectedAllergyIds.filter { it != allergyId }
             } else {
-                list + allergy
+                state.selectedAllergyIds + allergyId
             }
-            it.copy(selectedAllergies = newList.toPersistentList())
-        }
-    }
-
-    private fun submitCustomCondition() {
-        val input = _state.value.customConditionInput.trim()
-        if (input.isNotEmpty()) {
-            _state.update {
-                val conditions = if (it.chronicConditions.contains(input)) {
-                    it.chronicConditions
-                } else {
-                    it.chronicConditions + input
-                }
-                val selected = if (it.selectedChronicConditions.contains(input)) {
-                    it.selectedChronicConditions
-                } else {
-                    it.selectedChronicConditions + input
-                }
-                it.copy(
-                    chronicConditions = conditions.toPersistentList(),
-                    selectedChronicConditions = selected.toPersistentList(),
-                    isAddingCustomCondition = false,
-                    customConditionInput = ""
-                )
-            }
-        } else {
-            _state.update { it.copy(isAddingCustomCondition = false) }
-        }
-    }
-
-    private fun submitCustomAllergy() {
-        val input = _state.value.customAllergyInput.trim()
-        if (input.isNotEmpty()) {
-            _state.update {
-                val allergiesList = if (it.allergies.contains(input)) {
-                    it.allergies
-                } else {
-                    it.allergies + input
-                }
-                val selected = if (it.selectedAllergies.contains(input)) {
-                    it.selectedAllergies
-                } else {
-                    it.selectedAllergies + input
-                }
-                it.copy(
-                    allergies = allergiesList.toPersistentList(),
-                    selectedAllergies = selected.toPersistentList(),
-                    isAddingCustomAllergy = false,
-                    customAllergyInput = ""
-                )
-            }
-        } else {
-            _state.update { it.copy(isAddingCustomAllergy = false) }
+            state.copy(selectedAllergyIds = updatedSelected.toImmutableList())
         }
     }
 
     private fun saveProfileData() {
-        _state.update { it.copy(isLoading = true, showSaveConfirmation = false) }
-        // Simulate save API success
+        _state.update { it.copy(isSaving = true, showSaveConfirmation = false) }
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = false) }
-            _effect.send(EditProfileEffect.NavigateBack)
+            val currentState = _state.value
+            var finalAvatarUrl = currentState.avatarUrl
+            
+            // If the user selected a new image from the PhotoPicker, it will be a content:// URI.
+            // These URIs lose permission after app restart, so we must copy the file to internal storage.
+            if (finalAvatarUrl != null && finalAvatarUrl.startsWith("content://")) {
+                try {
+                    val uri = android.net.Uri.parse(finalAvatarUrl)
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    // Save to a static filename so we don't leak space with multiple edits
+                    val file = File(context.filesDir, "profile_avatar.jpg")
+                    inputStream?.use { input ->
+                        file.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    // Coil and standard URI parsers handle file:// schemes perfectly
+                    finalAvatarUrl = "file://" + file.absolutePath
+                } catch (e: Exception) {
+                    // If copy fails, fallback to what we had (or ignore)
+                }
+            }
+            
+            updateUserProfileUseCase(
+                firstName = currentState.firstName,
+                lastName = currentState.lastName.takeIf { it.isNotBlank() },
+                gender = null, // Or handle if gender exists
+                dateOfBirth = currentState.dateOfBirth.takeIf { it.isNotBlank() },
+                heightCm = currentState.heightCm,
+                weightKg = currentState.weightKg,
+                diseaseIds = currentState.selectedDiseaseIds,
+                allergyIds = currentState.selectedAllergyIds,
+                avatarUrl = finalAvatarUrl
+            ).onSuccess {
+                _state.update { it.copy(isSaving = false, isEditMode = false) }
+            }.onFailure {
+                _state.update { it.copy(isSaving = false) }
+                // Handle error effect if needed
+            }
         }
     }
 
@@ -155,13 +209,5 @@ class EditProfileViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private fun createInitialState(): EditProfileState = EditProfileState(
-        name = "",
-        username = "",
-        email = "",
-        password = "",
-        avatarUrl = "https://i.pravatar.cc/200?u=yousef-elban",
-        selectedChronicConditions = kotlinx.collections.immutable.persistentListOf("Celiac Disease"),
-        selectedAllergies = kotlinx.collections.immutable.persistentListOf()
-    )
+
 }

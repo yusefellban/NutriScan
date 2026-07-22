@@ -114,6 +114,7 @@ private fun HomeFeedContent(
             item {
                 HomeGreetingHeader(
                     userName = state.userName,
+                    avatarUrl = state.avatarUrl,
                     onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
                 )
                 Spacer(modifier = Modifier.height(6.dp))

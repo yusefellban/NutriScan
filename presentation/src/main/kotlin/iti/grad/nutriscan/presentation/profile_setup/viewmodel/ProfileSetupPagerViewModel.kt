@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
-import iti.grad.nutriscan.domain.user.usecase.UpdateHealthProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerState
@@ -28,7 +28,7 @@ class ProfileSetupPagerViewModel @Inject constructor(
     private val completeOnboardingUseCase: CompleteOnboardingUseCase,
     private val getDiseasesUseCase: GetDiseasesUseCase,
     private val getAllergiesUseCase: GetAllergiesUseCase,
-    private val updateHealthProfileUseCase: UpdateHealthProfileUseCase
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileSetupPagerState())
@@ -183,7 +183,7 @@ class ProfileSetupPagerViewModel @Inject constructor(
                     .format(DateTimeFormatter.ISO_LOCAL_DATE)
             }
 
-            updateHealthProfileUseCase(
+            updateUserProfileUseCase(
                 diseaseIds = currentState.selectedDiseaseIds,
                 allergyIds = currentState.selectedAllergyIds,
                 gender = currentState.selectedGender?.name,

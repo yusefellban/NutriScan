@@ -22,13 +22,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.flow.collectLatest
+
 @HiltViewModel
 class AppSettingsViewModel @Inject constructor(
     private val getThemeModeUseCase: GetThemeModeUseCase,
     private val setThemeModeUseCase: SetThemeModeUseCase,
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val userRepository: IUserRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppSettingsState())
@@ -39,6 +43,18 @@ class AppSettingsViewModel @Inject constructor(
 
     init {
         loadSettings()
+        viewModelScope.launch {
+            userRepository.getUserData().collectLatest { user ->
+                if (user != null) {
+                    _state.update {
+                        it.copy(
+                            fullName = "${user.firstName} ${user.lastName ?: ""}".trim(),
+                            email = user.email ?: ""
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun onEvent(event: AppSettingsEvent) {
