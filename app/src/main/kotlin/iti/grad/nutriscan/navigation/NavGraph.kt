@@ -225,8 +225,8 @@ fun AppNavGraph(
                     navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
                 },
                 onNavigateToHome = { navController.navigate(HomeRoute) },
-                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
                 onNavigateToProfile = { navController.navigate(UserProfileRoute) }
             )
         }
@@ -336,10 +336,10 @@ fun AppNavGraph(
         // 18. Saved Screen
         composable<SavedRoute> {
             SavedScreen(
-                onNavigateToHome = { navController.navigate(HomeRoute) { popUpTo(HomeRoute) { inclusive = true } } },
-                onNavigateToScan = { navController.navigate(CameraScanRoute) },
-                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToHome = { navController.navigateToTab(HomeRoute) },
+                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
+                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
+                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
                 onNavigateToProductDetail = { /* No-op for now */ }
             )
         }

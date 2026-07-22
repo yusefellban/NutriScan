@@ -61,7 +61,7 @@ class SavedViewModel @Inject constructor() : ViewModel() {
             is SavedEvent.BottomNavTabClicked -> {
                 when (event.tab) {
                     BottomNavTab.HOME -> emitEffect(SavedEffect.NavigateToHome)
-                    BottomNavTab.HISTORY -> emitEffect(SavedEffect.NavigateToHistory)
+                    BottomNavTab.CALORIES -> emitEffect(SavedEffect.NavigateToCalories)
                     BottomNavTab.SCAN -> emitEffect(SavedEffect.NavigateToScan)
                     BottomNavTab.SAVED -> Unit // Already here
                     BottomNavTab.PROFILE -> emitEffect(SavedEffect.NavigateToProfile)

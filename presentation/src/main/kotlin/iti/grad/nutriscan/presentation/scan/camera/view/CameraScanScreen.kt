@@ -48,7 +48,7 @@ fun CameraScanScreen(
     onNavigateToProcessing: (String) -> Unit = {},
     onNavigateToProductDetailsPlaceholder: (String) -> Unit = {},
     onNavigateToHome: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
+    onNavigateToCalories: () -> Unit = {},
     onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
 ) {
@@ -68,7 +68,7 @@ fun CameraScanScreen(
                 is CameraScanEffect.NavigateToProcessing ->
                     onNavigateToProcessing(effect.barcode)
                 is CameraScanEffect.NavigateToHome -> onNavigateToHome()
-                is CameraScanEffect.NavigateToHistory -> onNavigateToHistory()
+                is CameraScanEffect.NavigateToCalories -> onNavigateToCalories()
                 is CameraScanEffect.NavigateToSaved -> onNavigateToSaved()
                 is CameraScanEffect.NavigateToProfile -> onNavigateToProfile()
                 is CameraScanEffect.ShowSnackBarRes ->

@@ -36,7 +36,7 @@ fun SavedScreen(
     viewModel: SavedViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
+    onNavigateToCalories: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToProductDetail: (String) -> Unit = {}
 ) {
@@ -48,7 +48,7 @@ fun SavedScreen(
             when (effect) {
                 is SavedEffect.NavigateToHome -> onNavigateToHome()
                 is SavedEffect.NavigateToScan -> onNavigateToScan()
-                is SavedEffect.NavigateToHistory -> onNavigateToHistory()
+                is SavedEffect.NavigateToCalories -> onNavigateToCalories()
                 is SavedEffect.NavigateToProfile -> onNavigateToProfile()
                 is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.productId)
                 is SavedEffect.ShowAddedToListSnackbar -> {
