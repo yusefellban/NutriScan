@@ -6,5 +6,6 @@ sealed interface SavedEffect {
     data object NavigateToScan : SavedEffect
     data object NavigateToProfile : SavedEffect
     data class NavigateToProductDetail(val productId: String) : SavedEffect
-    data class ShowAddedToListSnackbar(val productName: String) : SavedEffect
+    data class ShowAddedToFoodLogSnackbar(val productName: String) : SavedEffect
+    data object ShowAddErrorSnackbar : SavedEffect
 }

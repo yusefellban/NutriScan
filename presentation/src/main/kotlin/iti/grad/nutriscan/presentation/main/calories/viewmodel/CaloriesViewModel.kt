@@ -3,15 +3,18 @@ package iti.grad.nutriscan.presentation.main.calories.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
+import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
+import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
-import iti.grad.nutriscan.presentation.main.calories.model.FoodEntry
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,13 +23,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class CaloriesViewModel @Inject constructor(
     private val checkStepsPermission: CheckStepsPermissionUseCase,
     private val observeTodaySteps: ObserveTodayStepsUseCase,
+    private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
+    private val removeFoodEntry: RemoveFoodEntryUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CaloriesState())
@@ -37,9 +41,13 @@ class CaloriesViewModel @Inject constructor(
 
     private var stepsObservationJob: Job? = null
 
+    init {
+        observeFoodLog()
+    }
+
     fun onEvent(event: CaloriesEvent) {
         when (event) {
-            CaloriesEvent.AddFoodClicked -> addFoodClicked()
+            CaloriesEvent.AddFoodClicked -> navigate(CaloriesEffect.NavigateToSavedProducts)
             CaloriesEvent.AddExerciseClicked -> navigate(CaloriesEffect.NavigateToExercises)
             CaloriesEvent.AddWaterClicked -> addWaterCup()
             is CaloriesEvent.WaterCupClicked -> toggleWaterCup(event.index)
@@ -47,6 +55,37 @@ class CaloriesViewModel @Inject constructor(
             is CaloriesEvent.BottomNavTabClicked -> handleTabClick(event.tab)
             CaloriesEvent.StepsCardClicked -> checkStepsAccess()
             is CaloriesEvent.StepsPermissionResult -> handleStepsPermissionResult(event.granted)
+            is CaloriesEvent.FoodItemSwipedToRemove -> {
+                _state.update { it.copy(pendingRemoveFoodId = event.entryId) }
+            }
+            CaloriesEvent.RemoveFoodConfirmed -> confirmRemoveFood()
+            CaloriesEvent.RemoveFoodDismissed -> {
+                _state.update { it.copy(pendingRemoveFoodId = null) }
+            }
+        }
+    }
+
+    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in sync. */
+    private fun observeFoodLog() {
+        viewModelScope.launch {
+            observeTodayFoodLog().collect { entries ->
+                val products = entries.map { it.toProductUiModel() }.toImmutableList()
+                _state.update {
+                    it.copy(
+                        addedFoods = products,
+                        caloriesGained = entries.sumOf { entry -> entry.calories },
+                    )
+                }
+            }
+        }
+    }
+
+    private fun confirmRemoveFood() {
+        val entryId = _state.value.pendingRemoveFoodId ?: return
+        viewModelScope.launch {
+            removeFoodEntry(entryId)
+                .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.food_log_remove_error)) }
+            _state.update { it.copy(pendingRemoveFoodId = null) }
         }
     }
 
@@ -72,17 +111,6 @@ class CaloriesViewModel @Inject constructor(
         stepsObservationJob = viewModelScope.launch {
             observeTodaySteps().collect { steps -> _state.update { it.copy(steps = steps) } }
         }
-    }
-
-    /**
-     * Navigates to Saved Products (no real food-picking flow exists yet) and, so the carousel
-     * has something to show/scroll through in the meantime, appends a mock food entry.
-     */
-    private fun addFoodClicked() {
-        navigate(CaloriesEffect.NavigateToSavedProducts)
-        val (name, kcal) = MOCK_FOODS[_state.value.addedFoods.size % MOCK_FOODS.size]
-        val entry = FoodEntry(id = UUID.randomUUID().toString(), name = name, kcal = kcal)
-        _state.update { it.copy(addedFoods = (it.addedFoods + entry).toPersistentList()) }
     }
 
     private fun addWaterCup() {
@@ -132,13 +160,11 @@ class CaloriesViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private companion object {
-        val MOCK_FOODS = listOf(
-            "Apple" to 95,
-            "Bread" to 120,
-            "Banana" to 105,
-            "Yogurt" to 150,
-            "Eggs" to 78,
-        )
-    }
+    private fun FoodLogEntry.toProductUiModel() = ProductUiModel(
+        id = id,
+        productName = name,
+        imageUrl = imageUrl,
+        verdict = verdict,
+        calories = calories.toString(),
+    )
 }

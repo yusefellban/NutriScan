@@ -5,6 +5,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
+import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
+import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
@@ -25,21 +29,39 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.Instant
+import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CaloriesViewModelTest {
 
     private lateinit var checkStepsPermission: CheckStepsPermissionUseCase
     private lateinit var observeTodaySteps: ObserveTodayStepsUseCase
+    private lateinit var observeTodayFoodLog: ObserveTodayFoodLogUseCase
+    private lateinit var removeFoodEntry: RemoveFoodEntryUseCase
     private lateinit var viewModel: CaloriesViewModel
     private val testDispatcher = StandardTestDispatcher()
+
+    private fun foodEntry(id: String = "entry-1", calories: Int = 95) = FoodLogEntry(
+        id = id,
+        productId = "product-1",
+        name = "Apple",
+        calories = calories,
+        imageUrl = null,
+        verdict = ProductVerdict.SAFE,
+        loggedDate = LocalDate.now(),
+        addedAt = Instant.now(),
+    )
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         checkStepsPermission = mockk()
         observeTodaySteps = mockk()
-        viewModel = CaloriesViewModel(checkStepsPermission, observeTodaySteps)
+        observeTodayFoodLog = mockk()
+        removeFoodEntry = mockk()
+        every { observeTodayFoodLog() } returns flowOf(emptyList())
+        viewModel = CaloriesViewModel(checkStepsPermission, observeTodaySteps, observeTodayFoodLog, removeFoodEntry)
     }
 
     @AfterEach
@@ -56,7 +78,7 @@ class CaloriesViewModelTest {
             val state = viewModel.state.value
 
             Assertions.assertEquals(2350, state.tdee)
-            Assertions.assertEquals(2100, state.caloriesGained)
+            Assertions.assertEquals(0, state.caloriesGained)
             Assertions.assertTrue(state.addedFoods.isEmpty())
             Assertions.assertEquals(0, state.steps)
             Assertions.assertEquals(10000, state.stepsGoal)
@@ -66,6 +88,7 @@ class CaloriesViewModelTest {
             Assertions.assertEquals(4, state.waterConsumed)
             Assertions.assertEquals(8, state.waterGoal)
             Assertions.assertFalse(state.isLoading)
+            Assertions.assertNull(state.pendingRemoveFoodId)
         }
     }
 
@@ -74,22 +97,14 @@ class CaloriesViewModelTest {
     inner class Navigation {
 
         @Test
-        fun `AddFoodClicked emits NavigateToSavedProducts`() = runTest {
+        fun `AddFoodClicked emits NavigateToSavedProducts and does not mutate state`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(CaloriesEvent.AddFoodClicked)
                 testScheduler.runCurrent()
 
                 Assertions.assertTrue(awaitItem() is CaloriesEffect.NavigateToSavedProducts)
             }
-        }
-
-        @Test
-        fun `AddFoodClicked also appends a mock food entry for the carousel`() = runTest {
-            viewModel.onEvent(CaloriesEvent.AddFoodClicked)
-            viewModel.onEvent(CaloriesEvent.AddFoodClicked)
-            testScheduler.runCurrent()
-
-            Assertions.assertEquals(2, viewModel.state.value.addedFoods.size)
+            Assertions.assertTrue(viewModel.state.value.addedFoods.isEmpty())
         }
 
         @Test
@@ -119,6 +134,80 @@ class CaloriesViewModelTest {
                 testScheduler.runCurrent()
 
                 expectNoEvents()
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Food Log")
+    inner class FoodLog {
+
+        private fun createViewModel(entries: Flow<List<FoodLogEntry>>): CaloriesViewModel {
+            val foodLogUseCase = mockk<ObserveTodayFoodLogUseCase>()
+            every { foodLogUseCase() } returns entries
+            return CaloriesViewModel(checkStepsPermission, observeTodaySteps, foodLogUseCase, removeFoodEntry)
+        }
+
+        @Test
+        fun `observed food log populates addedFoods and caloriesGained`() = runTest {
+            val vm = createViewModel(flowOf(listOf(foodEntry(calories = 95), foodEntry(id = "entry-2", calories = 105))))
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(2, vm.state.value.addedFoods.size)
+            Assertions.assertEquals(200, vm.state.value.caloriesGained)
+        }
+
+        @Test
+        fun `FoodItemSwipedToRemove sets pendingRemoveFoodId without removing`() = runTest {
+            val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
+            testScheduler.runCurrent()
+
+            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals("entry-1", vm.state.value.pendingRemoveFoodId)
+            Assertions.assertEquals(1, vm.state.value.addedFoods.size)
+        }
+
+        @Test
+        fun `RemoveFoodConfirmed calls RemoveFoodEntryUseCase and clears pending id`() = runTest {
+            val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
+            coEvery { removeFoodEntry("entry-1") } returns Result.success(Unit)
+            testScheduler.runCurrent()
+
+            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
+            testScheduler.runCurrent()
+
+            coVerify(exactly = 1) { removeFoodEntry("entry-1") }
+            Assertions.assertNull(vm.state.value.pendingRemoveFoodId)
+        }
+
+        @Test
+        fun `RemoveFoodDismissed clears pending id without calling the use case`() = runTest {
+            val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
+            testScheduler.runCurrent()
+
+            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.RemoveFoodDismissed)
+            testScheduler.runCurrent()
+
+            coVerify(exactly = 0) { removeFoodEntry(any()) }
+            Assertions.assertNull(vm.state.value.pendingRemoveFoodId)
+        }
+
+        @Test
+        fun `RemoveFoodConfirmed failure shows an error snackbar`() = runTest {
+            val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
+            coEvery { removeFoodEntry("entry-1") } returns Result.failure(IllegalStateException("Not authenticated"))
+            testScheduler.runCurrent()
+
+            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.effect.test {
+                vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
+                testScheduler.runCurrent()
+
+                Assertions.assertTrue(awaitItem() is CaloriesEffect.ShowSnackbar)
             }
         }
     }
@@ -246,7 +335,7 @@ class CaloriesViewModelTest {
             val stepsUseCase = mockk<ObserveTodayStepsUseCase>()
             coEvery { permissionUseCase() } returns permissionGranted
             every { stepsUseCase() } returns steps
-            val vm = CaloriesViewModel(permissionUseCase, stepsUseCase)
+            val vm = CaloriesViewModel(permissionUseCase, stepsUseCase, observeTodayFoodLog, removeFoodEntry)
             return Triple(vm, permissionUseCase, stepsUseCase)
         }
 

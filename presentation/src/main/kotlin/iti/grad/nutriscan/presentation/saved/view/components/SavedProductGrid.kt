@@ -11,14 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.ProductCard
-import iti.grad.nutriscan.presentation.saved.state.SavedProductUiModel
+import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import kotlinx.collections.immutable.ImmutableList
 
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 
 @Composable
 fun SavedProductGrid(
-    products: ImmutableList<SavedProductUiModel>,
+    products: ImmutableList<ProductUiModel>,
     onProductClick: (String) -> Unit,
     onSwipeToAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -46,9 +47,11 @@ fun SavedProductGrid(
                 productName = product.productName,
                 verdict = product.verdict,
                 calories = product.calories,
-                swipeHintResId = R.string.product_card_swipe_hint,
                 onClick = { onProductClick(product.id) },
-                onSwipeToAdd = { onSwipeToAdd(product.id) }
+                swipeAction = ProductCardSwipeAction.Add(
+                    hintResId = R.string.product_card_swipe_hint,
+                    onTriggered = { onSwipeToAdd(product.id) },
+                ),
             )
         }
     }

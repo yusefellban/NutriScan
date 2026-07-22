@@ -35,9 +35,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
+import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
-import iti.grad.nutriscan.presentation.common.components.FoodEntryCard
+import iti.grad.nutriscan.presentation.common.components.ProductCard
+import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
 import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -163,12 +165,17 @@ private fun CaloriesContent(
                             )
                         }
                         items(state.addedFoods, key = { it.id }) { food ->
-                            FoodEntryCard(
-                                name = food.name,
-                                kcal = food.kcal,
-                                modifier = Modifier
-                                    .width(140.dp)
-                                    .height(130.dp),
+                            ProductCard(
+                                imageUrl = food.imageUrl,
+                                productName = food.productName,
+                                verdict = food.verdict,
+                                calories = food.calories,
+                                onClick = {},
+                                swipeAction = ProductCardSwipeAction.Remove(
+                                    hintResId = R.string.food_log_swipe_remove_hint,
+                                    onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
+                                ),
+                                modifier = Modifier.width(140.dp),
                             )
                         }
                     }
@@ -217,6 +224,17 @@ private fun CaloriesContent(
                     onCupLongPressed = { index -> onEvent(CaloriesEvent.WaterCupLongPressed(index)) },
                 )
             }
+        }
+
+        if (state.pendingRemoveFoodId != null) {
+            ConfirmationDialog(
+                title = stringResource(R.string.food_log_remove_confirm_title),
+                message = stringResource(R.string.food_log_remove_confirm_message),
+                confirmLabel = stringResource(R.string.action_remove),
+                cancelLabel = stringResource(R.string.action_cancel),
+                onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
+                onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) },
+            )
         }
     }
 }

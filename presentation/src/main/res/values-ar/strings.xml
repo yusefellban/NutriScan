@@ -170,7 +170,6 @@
     <string name="kcal_exercise">سعرة حرارية</string>
     <string name="min_today">دقيقة اليوم</string>
     <string name="water">الماء</string>
-    <string name="saved_products_title">المنتجات المحفوظة</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">المحفوظات</string>
@@ -178,6 +177,14 @@
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
+
+    <!-- Food Log -->
+    <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>
+    <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
+    <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
+    <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
+    <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
+    <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
 
     <!-- Verdicts -->
     <string name="verdict_safe">آمن</string>

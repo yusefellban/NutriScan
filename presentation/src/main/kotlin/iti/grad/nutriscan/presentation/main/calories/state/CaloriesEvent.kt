@@ -21,4 +21,9 @@ sealed interface CaloriesEvent {
 
     /** Reported back by the screen after the user responds to the Health Connect permission dialog. */
     data class StepsPermissionResult(val granted: Boolean) : CaloriesEvent
+
+    /** Swiped a food-log entry — shows the removal confirmation dialog, does not remove yet. */
+    data class FoodItemSwipedToRemove(val entryId: String) : CaloriesEvent
+    data object RemoveFoodConfirmed : CaloriesEvent
+    data object RemoveFoodDismissed : CaloriesEvent
 }

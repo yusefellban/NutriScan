@@ -1553,6 +1553,15 @@ abstract class NutriScanDatabase : RoomDatabase() {
 
 All DAOs expose **either `suspend fun` or `Flow<>`** — never blocking calls.
 
+> **First real worked example**: the entity list above is the long-term target
+> shape; `FoodLogEntity`/`FoodLogDao` (`data/db/entity/FoodLogEntity.kt`,
+> `data/db/dao/FoodLogDao.kt`) is the first entity actually implemented in the
+> codebase — use it as the concrete reference for a new entity/DAO pair
+> (scoped by `userId` + a `loggedDate` string column for "today" queries,
+> `@Insert(onConflict = REPLACE)`, a `Flow`-returning `observe*` query).
+> `NutriScanDatabase` currently only declares `FoodLogEntity`; add the others
+> to the `entities` list as they're implemented, not upfront.
+
 ### 8.2 DataStore Preferences
 
 > ✅ Use for: selected language, notification toggle preferences.
@@ -2039,6 +2048,18 @@ Checklist of what must be true before this plan is considered complete:
   - Token + profile exists → `HomeRoute`
 - On login success: navigate to Home, pop entire auth graph from back stack
 
+> **Reality check**: the actual implementation is Keycloak/OIDC (email+password
+> and Google, via AppAuth), and tokens are stored in `TokenManager`
+> (`EncryptedSharedPreferences`, not Proto DataStore) — reconcile this section
+> when Proto DataStore is actually adopted, don't assume it's there yet.
+>
+> `IAuthRepository.getCurrentUserId(): String?` decodes the `sub` claim out of
+> the stored OIDC ID token (`TokenManager.getIdToken()` → `JwtDecoder`,
+> `data/local/util/JwtDecoder.kt`) — this is how any locally-persisted,
+> per-user data (e.g. `FoodLogEntity.userId`) should be scoped. Returns `null`
+> if logged out or the token is undecodable; callers must handle that, not
+> assume a user id always exists.
+
 ### 13.2 Health Profile Setup — Safety-Critical Rules
 
 - The onboarding health profile form is the **most safety-critical screen** in the app.
@@ -2112,29 +2133,50 @@ Checklist of what must be true before this plan is considered complete:
 
 ### 13.9 Destructive Action Contract — HARD REQUIREMENT
 
-Every destructive action **must** emit a `ShowConfirmDialog` effect first.
+Every destructive action **must** show a confirmation dialog first.
 Execution happens only after the user explicitly confirms.
 
 Destructive actions list:
 - Delete a shopping list item
 - Clear the entire shopping list
 - Delete a family member profile
+- Remove a food-log entry (Calories dashboard, swipe-to-remove)
 - Edit health conditions / allergies (safety-critical — see §13.2)
 - Log out
 - Delete account
 
+> **Established real-code convention** (not the Effect-based sketch this
+> section used to show): a nullable/boolean field on `State` gates the
+> shared `ConfirmationDialog` composable (`presentation/common/components/ConfirmationDialog.kt`)
+> directly in the screen — no dedicated `ShowConfirmDialog` effect class.
+> See `AppSettingsScreen`/`AppSettingsState.showLogoutConfirmDialog` (logout),
+> `UserProfileScreen` (remove family member), and
+> `CaloriesState.pendingRemoveFoodId` (remove food-log entry) for three real
+> examples of the same shape. Use this pattern for new destructive actions.
+
 ```kotlin
-// ✅ CORRECT — ViewModel emits dialog effect; execution is a separate event
-private fun requestDeleteFamilyMember(memberId: String) {
-    viewModelScope.launch {
-        _effect.send(
-            ManageFamilyEffect.ShowConfirmDialog(
-                titleResId   = R.string.dialog_delete_member_title,
-                messageResId = R.string.dialog_delete_member_message,
-                onConfirm    = ManageFamilyEvent.ConfirmDeleteMember(memberId),
-            )
-        )
-    }
+// ✅ CORRECT — swipe/tap sets a pending-id field; a separate Confirmed event executes
+data class CaloriesState(
+    // ...
+    val pendingRemoveFoodId: String? = null,
+)
+
+is CaloriesEvent.FoodItemSwipedToRemove -> _state.update { it.copy(pendingRemoveFoodId = event.entryId) }
+CaloriesEvent.RemoveFoodConfirmed -> confirmRemoveFood() // calls the use case, then clears pendingRemoveFoodId
+CaloriesEvent.RemoveFoodDismissed -> _state.update { it.copy(pendingRemoveFoodId = null) }
+```
+
+```kotlin
+// Screen: gate ConfirmationDialog on the pending field, same as AppSettingsScreen's logout dialog
+if (state.pendingRemoveFoodId != null) {
+    ConfirmationDialog(
+        title = stringResource(R.string.food_log_remove_confirm_title),
+        message = stringResource(R.string.food_log_remove_confirm_message),
+        confirmLabel = stringResource(R.string.action_remove),
+        cancelLabel = stringResource(R.string.action_cancel),
+        onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
+        onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) },
+    )
 }
 ```
 

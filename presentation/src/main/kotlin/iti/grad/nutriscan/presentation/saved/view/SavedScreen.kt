@@ -42,6 +42,8 @@ fun SavedScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val addedTemplate = stringResource(id = R.string.food_log_added_snackbar)
+    val addErrorMessage = stringResource(id = R.string.food_log_add_error)
 
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collect { effect ->
@@ -51,9 +53,15 @@ fun SavedScreen(
                 is SavedEffect.NavigateToCalories -> onNavigateToCalories()
                 is SavedEffect.NavigateToProfile -> onNavigateToProfile()
                 is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.productId)
-                is SavedEffect.ShowAddedToListSnackbar -> {
+                is SavedEffect.ShowAddedToFoodLogSnackbar -> {
                     snackbarHostState.showSnackbar(
-                        message = "Added ${effect.productName} to shopping list",
+                        message = String.format(addedTemplate, effect.productName),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                is SavedEffect.ShowAddErrorSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = addErrorMessage,
                         duration = SnackbarDuration.Short
                     )
                 }

@@ -441,7 +441,7 @@ fun AppNavGraph(
         // 27. Calories Dashboard
         composable<CaloriesRoute> {
             CaloriesScreen(
-                onNavigateToSavedProducts = { navController.navigate(SavedProductsRoute) },
+                onNavigateToSavedProducts = { navController.navigateToTab(SavedRoute) },
                 onNavigateToHome = {
                     navController.navigateToTab(HomeRoute)
                 },
@@ -452,17 +452,7 @@ fun AppNavGraph(
             )
         }
 
-        // 28. Saved Products (Placeholder)
-        composable<SavedProductsRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.saved_products_title),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
-        }
-
-        // 29. Exercises (Placeholder)
+        // 28. Exercises (Placeholder)
         composable<ExercisesRoute> {
             PlaceholderScreen(
                 title = stringResource(R.string.exercises_title),
@@ -472,7 +462,7 @@ fun AppNavGraph(
             }
         }
 
-        // 30. Product Details Placeholder
+        // 29. Product Details Placeholder
         composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
             PlaceholderScreen(

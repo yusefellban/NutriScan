@@ -98,7 +98,4 @@ data class EmailVerificationRoute(val email: String)
 object CaloriesRoute
 
 @Serializable
-object SavedProductsRoute
-
-@Serializable
 object ExercisesRoute

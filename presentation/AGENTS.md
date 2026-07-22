@@ -327,7 +327,7 @@ ProfileVerdictCard(profileVerdict: ProfileVerdictUiModel)
 LoadingShimmer(modifier, shape)
 ScanHistoryCard(entry, onEvent)
 DashedActionCard(label, onClick, modifier, contentPadding)
-FoodEntryCard(name, kcal, modifier)
+ProductCard(imageUrl, productName, verdict, calories, onClick, modifier, swipeAction: ProductCardSwipeAction?)
 CalorieGoalsCard(tdee, caloriesGained, modifier)
 StepsGaugeCard(steps, stepsGoal, onClick, modifier)
 ExerciseCard(exerciseKcal, exerciseMinutes, onAddClick, modifier)
@@ -340,6 +340,16 @@ WaterTrackerCard(waterConsumed, waterGoal, onAddWater, onCupClicked, onCupLongPr
   the same PR, so the catalogue stays authoritative.
 - Never reach for raw `Button`, `TextField`, `Text` with inline styling when an
   `App*`-prefixed equivalent exists.
+- **`ProductCard`'s swipe gesture is a mode, not a fork.** It takes an optional
+  `swipeAction: ProductCardSwipeAction?` (`presentation/common/components/ProductCardSwipeAction.kt`,
+  a sealed interface with `Add`/`Remove` variants — each carries its own hint
+  string resource and `onTriggered` callback; `Add` renders the arrow icon,
+  `Remove` renders a trash icon in `AppTheme.colors.Error`). `null` renders no
+  swipe row at all. Needing a third swipe behavior (e.g. "undo")? Add a case
+  to this sealed interface and branch on it in `ProductCard`'s private
+  `SwipeActionButton` — do **not** copy `ProductCard` into a new file. This is
+  how the Saved catalog (swipe-to-add) and the Calories food log
+  (swipe-to-remove) share one component today.
 
 ---
 

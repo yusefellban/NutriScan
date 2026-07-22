@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.common.components
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -47,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -58,10 +57,9 @@ fun ProductCard(
     productName: String,
     verdict: ProductVerdict,
     calories: String,
-    @StringRes swipeHintResId: Int,
     onClick: () -> Unit,
-    onSwipeToAdd: () -> Unit,
     modifier: Modifier = Modifier,
+    swipeAction: ProductCardSwipeAction? = null,
 ) {
     val density = LocalDensity.current
     val shadowBlurPx = with(density) { 30.dp.toPx() }
@@ -155,13 +153,12 @@ fun ProductCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (swipeAction != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                // Swipe slider row — inside the card
-                SwipeToAddButton(
-                    swipeHintResId = swipeHintResId,
-                    onSwipeToAdd = onSwipeToAdd
-                )
+                    // Swipe slider row — inside the card
+                    SwipeActionButton(swipeAction = swipeAction)
+                }
             }
         }
     }
@@ -169,13 +166,12 @@ fun ProductCard(
 }
 
 @Composable
-private fun SwipeToAddButton(
-    @StringRes swipeHintResId: Int,
-    onSwipeToAdd: () -> Unit,
-) {
+private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val isRemove = swipeAction is ProductCardSwipeAction.Remove
+    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.ProductCardSwipeIconBackground
 
     // Track the drag offset
     val offsetX = remember { Animatable(0f) }
@@ -204,7 +200,7 @@ private fun SwipeToAddButton(
     ) {
         // Hint text — fades as button slides over it
         Text(
-            text = stringResource(id = swipeHintResId),
+            text = stringResource(id = swipeAction.hintResId),
             style = AppTheme.typography.bodySmall.copy(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal
@@ -221,7 +217,7 @@ private fun SwipeToAddButton(
             modifier = Modifier
                 .offset { IntOffset(offsetX.value.roundToInt(), 0) }
                 .size(width = buttonWidthDp, height = 32.dp)
-                .background(AppTheme.colors.ProductCardSwipeIconBackground, RoundedCornerShape(50))
+                .background(buttonColor, RoundedCornerShape(50))
                 .draggable(
                     orientation = Orientation.Horizontal,
                     state = rememberDraggableState { delta ->
@@ -234,7 +230,7 @@ private fun SwipeToAddButton(
                     onDragStopped = {
                         // If dragged past 70% of the track → trigger action
                         if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
-                            onSwipeToAdd()
+                            swipeAction.onTriggered()
                         }
                         // Always spring back to start
                         scope.launch {
@@ -244,8 +240,13 @@ private fun SwipeToAddButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
+            val icon = when {
+                isRemove -> R.drawable.ic_trash
+                isRtl -> R.drawable.ic_arrow_left
+                else -> R.drawable.ic_arrow_right
+            }
             Icon(
-                painter = painterResource(id = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right),
+                painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(16.dp)

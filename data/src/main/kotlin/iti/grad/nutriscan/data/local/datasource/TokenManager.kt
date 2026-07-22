@@ -22,16 +22,19 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    fun saveTokens(accessToken: String, refreshToken: String) {
-        sharedPreferences.edit()
+    fun saveTokens(accessToken: String, refreshToken: String, idToken: String? = null) {
+        val editor = sharedPreferences.edit()
             .putString("ACCESS_TOKEN", accessToken)
             .putString("REFRESH_TOKEN", refreshToken)
-            .apply()
+        if (idToken != null) editor.putString("ID_TOKEN", idToken)
+        editor.apply()
     }
 
     fun getAccessToken(): String? = sharedPreferences.getString("ACCESS_TOKEN", null)
-    
+
     fun getRefreshToken(): String? = sharedPreferences.getString("REFRESH_TOKEN", null)
+
+    fun getIdToken(): String? = sharedPreferences.getString("ID_TOKEN", null)
 
     fun clearTokens() {
         sharedPreferences.edit().clear().apply()

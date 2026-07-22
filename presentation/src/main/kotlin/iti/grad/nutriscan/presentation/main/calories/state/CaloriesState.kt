@@ -2,15 +2,17 @@ package iti.grad.nutriscan.presentation.main.calories.state
 
 import androidx.compose.runtime.Immutable
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
-import iti.grad.nutriscan.presentation.main.calories.model.FoodEntry
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class CaloriesState(
     val tdee: Int = 2350,
-    val caloriesGained: Int = 2100,
-    val addedFoods: ImmutableList<FoodEntry> = persistentListOf(),
+    val caloriesGained: Int = 0,
+    val addedFoods: ImmutableList<ProductUiModel> = persistentListOf(),
+    /** Food-log entry pending user confirmation before removal — gates the ConfirmationDialog. */
+    val pendingRemoveFoodId: String? = null,
     val steps: Int = 0,
     val stepsGoal: Int = 10000,
     val stepsPermissionGranted: Boolean = false,

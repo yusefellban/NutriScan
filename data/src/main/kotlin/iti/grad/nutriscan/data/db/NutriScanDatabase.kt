@@ -2,13 +2,14 @@ package iti.grad.nutriscan.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import iti.grad.nutriscan.data.db.entity.DummyEntity
+import iti.grad.nutriscan.data.db.dao.FoodLogDao
+import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 
 @Database(
-    entities = [DummyEntity::class],
+    entities = [FoodLogEntity::class],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class NutriScanDatabase : RoomDatabase() {
-    // abstract fun scanHistoryDao(): ScanHistoryDao
+    abstract fun foodLogDao(): FoodLogDao
 }
