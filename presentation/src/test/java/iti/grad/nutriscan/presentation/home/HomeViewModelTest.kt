@@ -88,10 +88,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to CALORIES, effect is NavigateToCalories and selectedTab stays HOME`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            expectNoEvents()
+            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
+            assertEquals(HomeEffect.NavigateToCalories, awaitItem())
         }
         // Home is the only tab rendered inline; the retained ViewModel must keep
         // highlighting HOME so returning here doesn't show a stale tab.

@@ -169,10 +169,10 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to HISTORY, effect is NavigateToTab HISTORY`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to CALORIES, effect is NavigateToTab CALORIES`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.HISTORY))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.HISTORY), awaitItem())
+            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
+            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.CALORIES), awaitItem())
         }
     }
 

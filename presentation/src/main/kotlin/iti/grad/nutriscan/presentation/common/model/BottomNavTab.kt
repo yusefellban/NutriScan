@@ -5,7 +5,7 @@ package iti.grad.nutriscan.presentation.common.model
  */
 enum class BottomNavTab {
     HOME,
-    HISTORY,
+    CALORIES,
     SCAN,
     SHOPPING,
     PROFILE,

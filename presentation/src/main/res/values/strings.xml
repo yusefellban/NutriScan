@@ -155,4 +155,20 @@
     <string name="email_verification_resend_error">Failed to resend verification email. Please try again.</string>
     <string name="register_error_email_taken">This email is already registered. Please sign in or use a different email.</string>
     <string name="register_error_generic">Registration failed. Please try again.</string>
+
+    <!-- Calories Dashboard -->
+    <string name="nav_calories">Calories</string>
+    <string name="daily_products">Daily Products</string>
+    <string name="calorie_badge">Calorie</string>
+    <string name="add_food">Add Food</string>
+    <string name="calorie_goals">Calorie Goals</string>
+    <string name="your_tdee">Your TDEE</string>
+    <string name="calories_gained">Calories Gained</string>
+    <string name="kcal_suffix">Kcal</string>
+    <string name="steps">Steps</string>
+    <string name="your_exercise">Your Exercise</string>
+    <string name="kcal_exercise">kcal</string>
+    <string name="min_today">min today</string>
+    <string name="water">Water</string>
+    <string name="saved_products_title">Saved Products</string>
 </resources>

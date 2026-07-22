@@ -80,10 +80,10 @@ fun AppBottomNavBar(
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 NavBarItem(
-                    iconResId = R.drawable.ic_history,
-                    contentDescription = stringResource(R.string.nav_history),
-                    isSelected = selectedTab == BottomNavTab.HISTORY,
-                    onClick = { onTabClick(BottomNavTab.HISTORY) },
+                    iconResId = R.drawable.ic_fire,
+                    contentDescription = stringResource(R.string.nav_calories),
+                    isSelected = selectedTab == BottomNavTab.CALORIES,
+                    onClick = { onTabClick(BottomNavTab.CALORIES) },
                 )
             }
 

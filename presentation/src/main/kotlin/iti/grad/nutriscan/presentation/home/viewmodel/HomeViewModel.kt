@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 // navigates back.
                 when (event.tab) {
                     BottomNavTab.HOME -> Unit
-                    BottomNavTab.HISTORY -> emitEffect(HomeEffect.NavigateToHistory)
+                    BottomNavTab.CALORIES -> emitEffect(HomeEffect.NavigateToCalories)
                     BottomNavTab.SCAN -> emitEffect(HomeEffect.NavigateToScan)
                     BottomNavTab.SHOPPING -> emitEffect(HomeEffect.NavigateToShopping)
                     BottomNavTab.PROFILE -> emitEffect(HomeEffect.NavigateToProfile)

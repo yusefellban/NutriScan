@@ -326,6 +326,11 @@ SafeAlternativeCard(alternative: SafeAlternativeUiModel, onClick)
 ProfileVerdictCard(profileVerdict: ProfileVerdictUiModel)
 LoadingShimmer(modifier, shape)
 ScanHistoryCard(entry, onEvent)
+DashedActionCard(label, onClick, modifier)
+CalorieGoalsCard(tdee, caloriesGained, modifier)
+StepsGaugeCard(steps, stepsGoal, modifier)
+ExerciseCard(exerciseKcal, exerciseMinutes, onAddClick, modifier)
+WaterTrackerCard(waterConsumed, waterGoal, onAddWater, onCupClicked, onCupLongPressed, modifier)
 ```
 
 - **Before building a new component**, check this list. Duplicating an existing

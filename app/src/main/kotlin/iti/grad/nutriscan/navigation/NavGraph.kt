@@ -26,6 +26,7 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -177,6 +178,9 @@ fun AppNavGraph(
                 onNavigateToHistory = {
                     navController.navigate(ScanHistoryRoute)
                 },
+                onNavigateToCalories = {
+                    navController.navigate(CaloriesRoute)
+                },
                 onNavigateToShopping = {
                     navController.navigate(ShoppingListRoute)
                 },
@@ -324,6 +328,7 @@ fun AppNavGraph(
                 },
                 onNavigateToScan = { navController.navigate(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToCalories = { navController.navigate(CaloriesRoute) },
                 onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
@@ -403,6 +408,31 @@ fun AppNavGraph(
         composable<HelpRoute> {
             PlaceholderScreen(
                 title = stringResource(R.string.app_settings_help),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 27. Calories Dashboard
+        composable<CaloriesRoute> {
+            CaloriesScreen(
+                onNavigateToSavedProducts = { navController.navigate(SavedProductsRoute) },
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(HomeRoute) { inclusive = false }
+                    }
+                },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+            )
+        }
+
+        // 28. Saved Products (Placeholder)
+        composable<SavedProductsRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.saved_products_title),
                 buttonText = stringResource(R.string.action_go_back),
             ) {
                 navController.navigateUp()

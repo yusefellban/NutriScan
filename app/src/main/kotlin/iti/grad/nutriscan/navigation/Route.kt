@@ -88,3 +88,9 @@ object HelpRoute
 
 @Serializable
 data class EmailVerificationRoute(val email: String)
+
+@Serializable
+object CaloriesRoute
+
+@Serializable
+object SavedProductsRoute

@@ -114,3 +114,34 @@ val AppTypography = Typography(
         lineHeight = 16.sp
     )
 )
+
+/**
+ * One-off text styles that don't fit Material3's fixed 15-slot [Typography] scale
+ * (which can't gain new named roles) but are reused across 2+ Calories Dashboard
+ * composables, so they live here rather than being duplicated inline per call site.
+ */
+object CaloriesTypography {
+    /** "Daily Products" header title — Plus Jakarta Sans SemiBold 22sp/28sp. */
+    val headerTitle = TextStyle(
+        fontFamily = PlusJakartaSans,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp
+    )
+
+    /** "Calorie Goals" / "Water" section titles — Plus Jakarta Sans Medium 20sp/25sp. */
+    val sectionTitle = TextStyle(
+        fontFamily = PlusJakartaSans,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        lineHeight = 25.sp
+    )
+
+    /** Small badge/pill text and the gauge's "Steps" label — Lexend Deca Light 12sp/15sp. */
+    val badgeText = TextStyle(
+        fontFamily = LexendDeca,
+        fontWeight = FontWeight.Light,
+        fontSize = 12.sp,
+        lineHeight = 15.sp
+    )
+}

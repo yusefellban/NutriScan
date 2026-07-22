@@ -155,4 +155,20 @@
     <string name="email_verification_resend_error">فشل إعادة إرسال بريد التحقق. يرجى المحاولة مرة أخرى.</string>
     <string name="register_error_email_taken">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.</string>
     <string name="register_error_generic">فشل التسجيل. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Calories Dashboard -->
+    <string name="nav_calories">السعرات</string>
+    <string name="daily_products">المنتجات اليومية</string>
+    <string name="calorie_badge">سعر حراري</string>
+    <string name="add_food">إضافة طعام</string>
+    <string name="calorie_goals">أهداف السعرات</string>
+    <string name="your_tdee">إجمالي الحرق</string>
+    <string name="calories_gained">السعرات المكتسبة</string>
+    <string name="kcal_suffix">سعرة حرارية</string>
+    <string name="steps">خطوات</string>
+    <string name="your_exercise">تمارينك</string>
+    <string name="kcal_exercise">سعرة حرارية</string>
+    <string name="min_today">دقيقة اليوم</string>
+    <string name="water">الماء</string>
+    <string name="saved_products_title">المنتجات المحفوظة</string>
 </resources>
