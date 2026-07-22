@@ -57,7 +57,9 @@ class SavedViewModel @Inject constructor(
                 }
             }
             is SavedEvent.ProductClicked -> {
-                emitEffect(SavedEffect.NavigateToProductDetail(event.productId))
+                viewModelScope.launch {
+                    _effect.send(SavedEffect.NavigateToProductDetail(event.product))
+                }
             }
             is SavedEvent.SwipeToAddTriggered -> {
                 val product = _state.value.products.find { it.id == event.productId }

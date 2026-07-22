@@ -210,4 +210,19 @@
     <string name="verdict_safe">Safe</string>
     <string name="verdict_caution">Caution</string>
     <string name="verdict_unsafe">Unsafe</string>
+
+    <!-- Product Details -->
+    <string name="product_details_title">Product Details</string>
+    <string name="product_details_scanned_at">Scanned at</string>
+    <string name="product_details_for_you">For you</string>
+    <string name="product_details_why_unsafe">Why It\'s Unsafe?</string>
+    <string name="product_details_why_caution">Why Caution?</string>
+    <string name="product_details_why_safe">Why It\'s Safe?</string>
+    <string name="product_details_calories">Calories</string>
+    <string name="product_details_serving">Serving</string>
+    <string name="product_details_sugar">Sugar</string>
+    <string name="product_details_fat">Fat</string>
+    <string name="product_details_sat_fat">Sat. Fat</string>
+    <string name="product_details_bookmark_add">Save product</string>
+    <string name="product_details_bookmark_remove">Remove from saved</string>
 </resources>

@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.main.calories.view
 
 import android.Manifest
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ import iti.grad.nutriscan.presentation.common.components.ProductCard
 import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
 import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
@@ -54,6 +56,7 @@ import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 /**
  * Calories Dashboard ("Daily Products") — second bottom-nav tab.
@@ -61,6 +64,7 @@ import java.util.Locale
  * Follows MVI: collects [CaloriesState] from [CaloriesViewModel], dispatches
  * [CaloriesEvent], and handles [CaloriesEffect] for one-shot navigation.
  */
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun CaloriesScreen(
     viewModel: CaloriesViewModel = hiltViewModel(),
@@ -70,6 +74,7 @@ fun CaloriesScreen(
     onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToExercises: () -> Unit = {},
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -95,6 +100,7 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToSaved -> onNavigateToSaved()
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
                 is CaloriesEffect.NavigateToExercises -> onNavigateToExercises()
+                is CaloriesEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarScope.launch {
                         snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
@@ -179,7 +185,7 @@ private fun CaloriesContent(
                                     productName = food.productName,
                                     verdict = null,
                                     calories = food.calories,
-                                    onClick = {},
+                                    onClick = { onEvent(CaloriesEvent.FoodItemClicked(food)) },
                                     swipeAction = ProductCardSwipeAction.Remove(
                                         hintResId = R.string.food_log_swipe_remove_hint,
                                         onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
@@ -252,6 +258,7 @@ private fun CaloriesContent(
     }
 }
 
+@SuppressLint("NonObservableLocale")
 @Composable
 private fun CaloriesHeader(caloriesGained: Int) {
     Row(
@@ -269,7 +276,7 @@ private fun CaloriesHeader(caloriesGained: Int) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = String.format(Locale.getDefault(), "%,d", caloriesGained),
+                text = String.format(LocalLocale.current.platformLocale, "%,d", caloriesGained),
                 style = CaloriesTypography.badgeText,
                 color = AppTheme.colors.Teal300,
                 modifier = Modifier

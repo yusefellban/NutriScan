@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
 import androidx.annotation.StringRes
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 
 /**
  * One-shot side effects emitted by the Calories Dashboard ViewModel.
@@ -19,4 +20,5 @@ sealed interface CaloriesEffect {
 
     /** Ask the screen to request the ACTIVITY_RECOGNITION runtime permission (needed to read the step counter). */
     data object RequestStepsPermission : CaloriesEffect
+    data class NavigateToProductDetail(val product: ProductUiModel) : CaloriesEffect
 }
