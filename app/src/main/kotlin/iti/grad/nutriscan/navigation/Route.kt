@@ -60,7 +60,7 @@ object ReportListRoute
 data class ReportDetailRoute(val reportId: String)
 
 @Serializable
-object ShoppingListRoute
+object SavedRoute
 
 @Serializable
 object UserProfileRoute

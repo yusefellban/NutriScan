@@ -93,9 +93,9 @@ fun AppBottomNavBar(
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 NavBarItem(
                     iconResId = R.drawable.ic_bookmark,
-                    contentDescription = stringResource(R.string.nav_shopping),
-                    isSelected = selectedTab == BottomNavTab.SHOPPING,
-                    onClick = { onTabClick(BottomNavTab.SHOPPING) },
+                    contentDescription = stringResource(R.string.nav_saved),
+                    isSelected = selectedTab == BottomNavTab.SAVED,
+                    onClick = { onTabClick(BottomNavTab.SAVED) },
                 )
             }
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {

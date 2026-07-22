@@ -34,7 +34,7 @@
     <string name="nav_home">الرئيسية</string>
     <string name="nav_history">السجل</string>
     <string name="nav_scan">مسح</string>
-    <string name="nav_shopping">التسوق</string>
+    <string name="nav_saved">المحفوظات</string>
     <string name="nav_profile">الملف الشخصي</string>
     <string name="forgot_password_title">نسيت كلمة المرور؟</string>
     <string name="forgot_password_subtitle">دعنا نقدم طلب إعادة تعيين كلمة المرور.</string>
@@ -155,4 +155,16 @@
     <string name="email_verification_resend_error">فشل إعادة إرسال بريد التحقق. يرجى المحاولة مرة أخرى.</string>
     <string name="register_error_email_taken">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.</string>
     <string name="register_error_generic">فشل التسجيل. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">المحفوظات</string>
+    <string name="saved_search_hint">ابحث هنا</string>
+    <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
+    <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
+    <string name="product_card_kcal_unit">سعرة</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">آمن</string>
+    <string name="verdict_caution">حذر</string>
+    <string name="verdict_unsafe">غير آمن</string>
 </resources>

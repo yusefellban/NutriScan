@@ -49,7 +49,7 @@ fun UserProfileScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
     onNavigateToScanHistory: () -> Unit = {},
-    onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
@@ -70,7 +70,7 @@ fun UserProfileScreen(
                     BottomNavTab.HOME -> onNavigateToHome()
                     BottomNavTab.HISTORY -> onNavigateToScanHistory()
                     BottomNavTab.SCAN -> onNavigateToScan()
-                    BottomNavTab.SHOPPING -> onNavigateToShopping()
+                    BottomNavTab.SAVED -> onNavigateToSaved()
                     BottomNavTab.PROFILE -> Unit
                 }
             }
