@@ -6,6 +6,8 @@ import iti.grad.nutriscan.domain.settings.model.ThemeMode
 
 @Immutable
 data class AppSettingsState(
+    val fullName: String = "",
+    val email: String = "",
     val selectedThemeMode: ThemeMode = ThemeMode.SYSTEM,
     val selectedLanguage: AppLanguage = AppLanguage.EN,
     val showLogoutConfirmDialog: Boolean = false,

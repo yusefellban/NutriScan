@@ -25,12 +25,16 @@ import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
+
 /**
  * Top greeting header showing the user avatar, name, subtitle, and notification bell.
  */
 @Composable
 fun HomeGreetingHeader(
     userName: String,
+    avatarUrl: String?,
     onNotificationClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -48,12 +52,21 @@ fun HomeGreetingHeader(
                 .background(AppTheme.colors.Primary),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_person_solid),
-                contentDescription = null,
-                tint = AppTheme.colors.OnPrimary,
-                modifier = Modifier.size(18.dp),
-            )
+            if (avatarUrl != null) {
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(52.dp).clip(CircleShape),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_person_solid),
+                    contentDescription = null,
+                    tint = AppTheme.colors.OnPrimary,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(12.dp))

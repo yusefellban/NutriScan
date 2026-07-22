@@ -20,11 +20,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginWithEmailUseCase: LoginWithEmailUseCase,
     private val getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase,
-    private val saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
+    private val saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase,
+    private val userRepository: IUserRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -83,6 +86,8 @@ class LoginViewModel @Inject constructor(
             _state.update { it.copy(isLoading = false) }
             
             result.onSuccess {
+                // Fetch profile immediately after login so we have it offline
+                userRepository.fetchAndSyncProfile()
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
                 _state.update { it.copy(genericErrorMessage = error.message) }
@@ -109,6 +114,7 @@ class LoginViewModel @Inject constructor(
             _state.update { it.copy(isLoading = false) }
             
             result.onSuccess {
+                userRepository.fetchAndSyncProfile()
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
                 _effect.send(LoginEffect.ShowErrorDialog(messageStr = "Failed to save Google login tokens: ${error.message}"))

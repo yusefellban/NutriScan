@@ -7,6 +7,7 @@ sealed interface CameraScanEffect {
     data object NavigateToHome : CameraScanEffect
     data object NavigateToHistory : CameraScanEffect
     data object NavigateToShopping : CameraScanEffect
+    data object NavigateToSaved : CameraScanEffect
     data object NavigateToProfile : CameraScanEffect
     data class ShowSnackBarRes(@StringRes val messageResId: Int) : CameraScanEffect
     data object RequestCameraPermission : CameraScanEffect

@@ -26,6 +26,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.TextButton
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.clickable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -48,13 +62,11 @@ import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.profile_setup.view.components.OtherInputChip
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileMeasurementField
 import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
 import iti.grad.presentation.R
 
@@ -77,18 +89,38 @@ fun EditProfileScreen(
         }
     }
 
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                viewModel.onEvent(EditProfileEvent.SelectAvatar(uri.toString()))
+            }
+        }
+    )
+
     EditProfileContent(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onSelectAvatarClick = {
+            photoPickerLauncher.launch(
+                androidx.activity.result.PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        }
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun EditProfileContent(
     state: EditProfileState,
-    onEvent: (EditProfileEvent) -> Unit
+    onEvent: (EditProfileEvent) -> Unit,
+    onSelectAvatarClick: () -> Unit
 ) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
     Scaffold(
         containerColor = AppTheme.colors.Background,
         bottomBar = {
@@ -98,9 +130,12 @@ private fun EditProfileContent(
                     .padding(bottom = 36.dp)
             ) {
                 AppButton(
-                    textResId = R.string.action_save,
+                    textResId = if (state.isEditMode) R.string.action_save else R.string.action_edit,
                     isLoading = state.isLoading,
-                    onClick = { onEvent(EditProfileEvent.SaveClicked) }
+                    onClick = { 
+                        if (state.isEditMode) onEvent(EditProfileEvent.SaveClicked)
+                        else onEvent(EditProfileEvent.EditClicked)
+                    }
                 )
             }
         }
@@ -185,36 +220,40 @@ private fun EditProfileContent(
                         }
 
                         // Circular Pencil Button Overlay at Top-Right with White Border
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .border(width = 2.dp, color = Color.White, shape = CircleShape)
-                                .clip(CircleShape)
-                                .background(AppTheme.colors.Teal1000)
-                                .align(Alignment.TopEnd)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_pen),
-                                contentDescription = stringResource(R.string.user_profile_edit_description),
-                                tint = Color.White,
+                        if (state.isEditMode) {
+                            Box(
                                 modifier = Modifier
-                                    .size(12.dp)
-                                    .align(Alignment.Center)
-                            )
+                                    .size(28.dp)
+                                    .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                                    .clip(CircleShape)
+                                    .background(AppTheme.colors.Teal1000)
+                                    .align(Alignment.TopEnd)
+                                    .clickable { onSelectAvatarClick() }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_pen),
+                                    contentDescription = stringResource(R.string.user_profile_edit_description),
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(12.dp)
+                                        .align(Alignment.Center)
+                                )
+                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column {
+                        val displayName = "${state.firstName} ${state.lastName}".trim()
                         Text(
-                            text = if (state.name.isNotEmpty()) state.name else "Yousef Elban",
+                            text = if (displayName.isNotEmpty()) displayName else stringResource(R.string.edit_profile_first_name_hint),
                             style = AppTheme.typography.headlineLarge,
                             color = AppTheme.colors.Teal1000
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (state.email.isNotEmpty()) state.email else "yousefelaban@gmail.com",
+                            text = state.email,
                             style = AppTheme.typography.bodyMedium,
                             color = AppTheme.colors.ProfileSetupSubtitle
                         )
@@ -225,39 +264,68 @@ private fun EditProfileContent(
 
                 // Input fields
                 EditProfileInputField(
-                    value = state.name,
-                    onValueChange = { onEvent(EditProfileEvent.UpdateName(it)) },
-                    hint = stringResource(R.string.edit_profile_name_hint),
-                    trailingIconRes = R.drawable.ic_edit
+                    value = state.firstName,
+                    onValueChange = { onEvent(EditProfileEvent.UpdateFirstName(it)) },
+                    hint = stringResource(R.string.edit_profile_first_name_hint),
+                    trailingIconRes = R.drawable.ic_edit,
+                    isReadOnly = !state.isEditMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 EditProfileInputField(
-                    value = state.username,
-                    onValueChange = { onEvent(EditProfileEvent.UpdateUsername(it)) },
-                    hint = stringResource(R.string.edit_profile_username_hint),
-                    trailingIconRes = R.drawable.ic_edit
+                    value = state.lastName,
+                    onValueChange = { onEvent(EditProfileEvent.UpdateLastName(it)) },
+                    hint = stringResource(R.string.edit_profile_last_name_hint),
+                    trailingIconRes = R.drawable.ic_edit,
+                    isReadOnly = !state.isEditMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 EditProfileInputField(
-                    value = state.email,
-                    onValueChange = { onEvent(EditProfileEvent.UpdateEmail(it)) },
-                    hint = stringResource(R.string.edit_profile_email_hint),
-                    trailingIconRes = R.drawable.ic_email
+                    value = state.dateOfBirth,
+                    onValueChange = { onEvent(EditProfileEvent.UpdateDateOfBirth(it)) },
+                    hint = stringResource(R.string.edit_profile_dob_hint),
+                    trailingIconRes = if (state.isEditMode) R.drawable.ic_date else R.drawable.ic_lock,
+                    isReadOnly = !state.isEditMode,
+                    onClick = { if (state.isEditMode) showDatePicker = true }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                EditProfileInputField(
-                    value = state.password,
-                    onValueChange = { onEvent(EditProfileEvent.UpdatePassword(it)) },
-                    hint = stringResource(R.string.edit_profile_password_hint),
-                    trailingIconRes = R.drawable.ic_lock,
-                    isPassword = true
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    EditProfileMeasurementField(
+                        label = stringResource(R.string.edit_profile_height_label),
+                        value = state.heightCm?.toString()?.removeSuffix(".0") ?: "",
+                        onValueChange = {
+                            val doubleValue = it.toDoubleOrNull()
+                            if (it.isEmpty() || doubleValue != null) {
+                                onEvent(EditProfileEvent.UpdateHeight(doubleValue))
+                            }
+                        },
+                        unit = "cm",
+                        isReadOnly = !state.isEditMode,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    EditProfileMeasurementField(
+                        label = stringResource(R.string.edit_profile_weight_label),
+                        value = state.weightKg?.toString()?.removeSuffix(".0") ?: "",
+                        onValueChange = {
+                            val doubleValue = it.toDoubleOrNull()
+                            if (it.isEmpty() || doubleValue != null) {
+                                onEvent(EditProfileEvent.UpdateWeight(doubleValue))
+                            }
+                        },
+                        unit = "kg",
+                        isReadOnly = !state.isEditMode,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -271,29 +339,49 @@ private fun EditProfileContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Chronic Conditions FlowRow
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    state.chronicConditions.forEach { condition ->
-                        val isSelected = state.selectedChronicConditions.contains(condition)
-                        SelectableChip(
-                            text = getConditionDisplayName(condition),
-                            isSelected = isSelected,
-                            onClick = { onEvent(EditProfileEvent.ToggleCondition(condition)) }
+                when {
+                    state.isDiseasesLoading -> {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = AppTheme.colors.Primary,
+                            strokeWidth = 2.dp
                         )
                     }
-
-                    OtherInputChip(
-                        isEditing = state.isAddingCustomCondition,
-                        inputValue = state.customConditionInput,
-                        onValueChange = { onEvent(EditProfileEvent.UpdateCustomConditionInput(it)) },
-                        onStartEditing = { onEvent(EditProfileEvent.StartAddCustomCondition) },
-                        onSubmit = { onEvent(EditProfileEvent.SubmitCustomCondition) },
-                        onCancel = { onEvent(EditProfileEvent.CancelAddCustomCondition) },
-                        placeholder = stringResource(R.string.profile_setup_other)
-                    )
+                    state.diseasesErrorMessage != null -> {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.profile_setup_load_error),
+                                style = AppTheme.typography.bodyMedium,
+                                color = AppTheme.colors.Error
+                            )
+                            TextButton(onClick = { onEvent(EditProfileEvent.RetryLoadDiseases) }) {
+                                Text(
+                                    text = stringResource(R.string.action_retry),
+                                    style = AppTheme.typography.labelLarge,
+                                    color = AppTheme.colors.Primary
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            state.diseases.forEach { disease ->
+                                val isSelected = state.selectedDiseaseIds.contains(disease.id)
+                                if (state.isEditMode || isSelected) {
+                                    iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip(
+                                        text = disease.name,
+                                        isSelected = isSelected,
+                                        enabled = state.isEditMode,
+                                        onClick = { onEvent(EditProfileEvent.ToggleDisease(disease.id)) }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -308,33 +396,80 @@ private fun EditProfileContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Allergies FlowRow
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    state.allergies.forEach { allergy ->
-                        val isSelected = state.selectedAllergies.contains(allergy)
-                        SelectableChip(
-                            text = getAllergyDisplayName(allergy),
-                            isSelected = isSelected,
-                            onClick = { onEvent(EditProfileEvent.ToggleAllergy(allergy)) }
+                when {
+                    state.isAllergiesLoading -> {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = AppTheme.colors.Primary,
+                            strokeWidth = 2.dp
                         )
                     }
-
-                    OtherInputChip(
-                        isEditing = state.isAddingCustomAllergy,
-                        inputValue = state.customAllergyInput,
-                        onValueChange = { onEvent(EditProfileEvent.UpdateCustomAllergyInput(it)) },
-                        onStartEditing = { onEvent(EditProfileEvent.StartAddCustomAllergy) },
-                        onSubmit = { onEvent(EditProfileEvent.SubmitCustomAllergy) },
-                        onCancel = { onEvent(EditProfileEvent.CancelAddCustomAllergy) },
-                        placeholder = stringResource(R.string.profile_setup_other)
-                    )
+                    state.allergiesErrorMessage != null -> {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.profile_setup_load_error),
+                                style = AppTheme.typography.bodyMedium,
+                                color = AppTheme.colors.Error
+                            )
+                            TextButton(onClick = { onEvent(EditProfileEvent.RetryLoadAllergies) }) {
+                                Text(
+                                    text = stringResource(R.string.action_retry),
+                                    style = AppTheme.typography.labelLarge,
+                                    color = AppTheme.colors.Primary
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            state.allergies.forEach { allergy ->
+                                val isSelected = state.selectedAllergyIds.contains(allergy.id)
+                                if (state.isEditMode || isSelected) {
+                                    iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip(
+                                        text = allergy.name,
+                                        isSelected = isSelected,
+                                        enabled = state.isEditMode,
+                                        onClick = { onEvent(EditProfileEvent.ToggleAllergy(allergy.id)) }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(120.dp))
             }
+        }
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE)
+                        onEvent(EditProfileEvent.UpdateDateOfBirth(date))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text(stringResource(R.string.action_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -351,22 +486,3 @@ private fun EditProfileContent(
     }
 }
 
-@Composable
-private fun getConditionDisplayName(condition: String): String {
-    return when (condition) {
-        "Diabetes" -> stringResource(R.string.profile_setup_diabetes)
-        "Hypertension" -> stringResource(R.string.profile_setup_hypertension)
-        "Celiac Disease" -> stringResource(R.string.profile_setup_celiac)
-        else -> condition
-    }
-}
-
-@Composable
-private fun getAllergyDisplayName(allergy: String): String {
-    return when (allergy) {
-        "Peanuts" -> stringResource(R.string.profile_setup_peanuts)
-        "Gluten" -> stringResource(R.string.profile_setup_gluten)
-        "Dairy" -> stringResource(R.string.profile_setup_dairy)
-        else -> allergy
-    }
-}

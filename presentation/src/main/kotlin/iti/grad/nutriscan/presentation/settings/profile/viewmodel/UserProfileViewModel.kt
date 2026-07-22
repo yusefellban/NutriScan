@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.flow.collectLatest
+
 /**
  * ViewModel for the User Profile screen.
  *
@@ -28,13 +31,33 @@ import javax.inject.Inject
  * family-member use cases backed by the API.
  */
 @HiltViewModel
-class UserProfileViewModel @Inject constructor() : ViewModel() {
+class UserProfileViewModel @Inject constructor(
+    private val userRepository: IUserRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
     val state: StateFlow<UserProfileState> = _state.asStateFlow()
 
     private val _effect = Channel<UserProfileEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            userRepository.fetchAndSyncProfile()
+        }
+        viewModelScope.launch {
+            userRepository.getUserData().collectLatest { user ->
+                if (user != null) {
+                    _state.update {
+                        it.copy(
+                            userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
+                            avatarUrl = user.avatarUrl
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     /** Deterministic id source for mock-added members (also used in unit tests). */
     private var nextMemberId = 1
@@ -95,8 +118,6 @@ class UserProfileViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun createInitialState(): UserProfileState = UserProfileState(
-        userName = "Osama Hosam",
-        avatarUrl = "https://i.pravatar.cc/200?u=osama-hosam",
         streakDays = 15,
         familyMembers = persistentListOf(),
         selectedTab = BottomNavTab.PROFILE,

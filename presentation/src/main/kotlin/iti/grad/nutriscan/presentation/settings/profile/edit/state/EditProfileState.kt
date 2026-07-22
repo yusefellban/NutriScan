@@ -6,27 +6,25 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class EditProfileState(
-    val name: String = "",
-    val username: String = "",
+    val isEditMode: Boolean = false,
+    val firstName: String = "",
+    val lastName: String = "",
+    val dateOfBirth: String = "",
     val email: String = "",
-    val password: String = "",
+    val heightCm: Double? = null,
+    val weightKg: Double? = null,
+    val isSaving: Boolean = false,
     val avatarUrl: String? = null,
-    val chronicConditions: ImmutableList<String> = persistentListOf(
-        "Diabetes",
-        "Hypertension",
-        "Celiac Disease"
-    ),
-    val selectedChronicConditions: ImmutableList<String> = persistentListOf(),
-    val allergies: ImmutableList<String> = persistentListOf(
-        "Peanuts",
-        "Gluten",
-        "Dairy"
-    ),
-    val selectedAllergies: ImmutableList<String> = persistentListOf(),
-    val isAddingCustomCondition: Boolean = false,
-    val isAddingCustomAllergy: Boolean = false,
-    val customConditionInput: String = "",
-    val customAllergyInput: String = "",
+    val diseases: ImmutableList<iti.grad.nutriscan.domain.disease.model.Disease> = persistentListOf(),
+    val selectedDiseaseIds: ImmutableList<Int> = persistentListOf(),
+    val isDiseasesLoading: Boolean = false,
+    val diseasesErrorMessage: String? = null,
+    
+    val allergies: ImmutableList<iti.grad.nutriscan.domain.allergy.model.Allergy> = persistentListOf(),
+    val selectedAllergyIds: ImmutableList<Int> = persistentListOf(),
+    val isAllergiesLoading: Boolean = false,
+    val allergiesErrorMessage: String? = null,
+
     val showSaveConfirmation: Boolean = false,
     val isLoading: Boolean = false
 )
