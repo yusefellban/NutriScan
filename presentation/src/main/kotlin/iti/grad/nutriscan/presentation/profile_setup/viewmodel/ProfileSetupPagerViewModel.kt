@@ -23,11 +23,17 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import kotlinx.coroutines.flow.collectLatest
+
 @HiltViewModel
 class ProfileSetupPagerViewModel @Inject constructor(
     private val completeOnboardingUseCase: CompleteOnboardingUseCase,
     private val getDiseasesUseCase: GetDiseasesUseCase,
     private val getAllergiesUseCase: GetAllergiesUseCase,
+    private val syncDiseasesUseCase: SyncDiseasesUseCase,
+    private val syncAllergiesUseCase: SyncAllergiesUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase
 ) : ViewModel() {
 
@@ -106,46 +112,56 @@ class ProfileSetupPagerViewModel @Inject constructor(
     private fun loadDiseases() {
         viewModelScope.launch {
             _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
-            getDiseasesUseCase()
-                .onSuccess { diseases ->
-                    _state.update {
-                        it.copy(
-                            diseases = diseases.toImmutableList(),
-                            isDiseasesLoading = false
-                        )
-                    }
+            
+            // First, trigger a network sync
+            val syncResult = syncDiseasesUseCase()
+            if (syncResult.isFailure) {
+                _state.update {
+                    it.copy(
+                        isDiseasesLoading = false,
+                        diseasesErrorMessage = syncResult.exceptionOrNull()?.message ?: "Failed to load diseases"
+                    )
                 }
-                .onFailure { throwable ->
-                    _state.update {
-                        it.copy(
-                            isDiseasesLoading = false,
-                            diseasesErrorMessage = throwable.message ?: "Failed to load diseases"
-                        )
-                    }
+            } else {
+                _state.update { it.copy(isDiseasesLoading = false) }
+            }
+            
+            // Collect the local cache Flow to update UI
+            getDiseasesUseCase().collectLatest { diseases ->
+                _state.update {
+                    it.copy(
+                        diseases = diseases.toImmutableList()
+                    )
                 }
+            }
         }
     }
 
     private fun loadAllergies() {
         viewModelScope.launch {
             _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
-            getAllergiesUseCase()
-                .onSuccess { allergies ->
-                    _state.update {
-                        it.copy(
-                            allergies = allergies.toImmutableList(),
-                            isAllergiesLoading = false
-                        )
-                    }
+            
+            // Trigger network sync
+            val syncResult = syncAllergiesUseCase()
+            if (syncResult.isFailure) {
+                _state.update {
+                    it.copy(
+                        isAllergiesLoading = false,
+                        allergiesErrorMessage = syncResult.exceptionOrNull()?.message ?: "Failed to load allergies"
+                    )
                 }
-                .onFailure { throwable ->
-                    _state.update {
-                        it.copy(
-                            isAllergiesLoading = false,
-                            allergiesErrorMessage = throwable.message ?: "Failed to load allergies"
-                        )
-                    }
+            } else {
+                _state.update { it.copy(isAllergiesLoading = false) }
+            }
+            
+            // Collect from flow
+            getAllergiesUseCase().collectLatest { allergies ->
+                _state.update {
+                    it.copy(
+                        allergies = allergies.toImmutableList()
+                    )
                 }
+            }
         }
     }
 

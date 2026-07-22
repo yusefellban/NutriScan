@@ -23,9 +23,11 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 
-import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
 import kotlinx.collections.immutable.toImmutableList
 
 /**
@@ -35,10 +37,12 @@ import kotlinx.collections.immutable.toImmutableList
  */
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val userRepository: IUserRepository, // Keep for getUserData()
+    private val getUserProfileUseCase: GetUserProfileUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase,
     private val getDiseasesUseCase: GetDiseasesUseCase,
     private val getAllergiesUseCase: GetAllergiesUseCase,
+    private val syncDiseasesUseCase: SyncDiseasesUseCase,
+    private val syncAllergiesUseCase: SyncAllergiesUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -49,10 +53,10 @@ class EditProfileViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadDiseases()
-        loadAllergies()
+        loadDiseasesOffline()
+        loadAllergiesOffline()
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            getUserProfileUseCase().collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(
@@ -74,14 +78,17 @@ class EditProfileViewModel @Inject constructor(
 
     fun onEvent(event: EditProfileEvent) {
         when (event) {
-            EditProfileEvent.EditClicked -> _state.update { it.copy(isEditMode = true) }
+            EditProfileEvent.EditClicked -> {
+                _state.update { it.copy(isEditMode = true) }
+                syncData()
+            }
             is EditProfileEvent.UpdateFirstName -> _state.update { it.copy(firstName = event.firstName) }
             is EditProfileEvent.UpdateLastName -> _state.update { it.copy(lastName = event.lastName) }
             is EditProfileEvent.UpdateDateOfBirth -> _state.update { it.copy(dateOfBirth = event.dateOfBirth) }
             is EditProfileEvent.ToggleDisease -> toggleDisease(event.diseaseId)
             is EditProfileEvent.ToggleAllergy -> toggleAllergy(event.allergyId)
-            EditProfileEvent.RetryLoadDiseases -> loadDiseases()
-            EditProfileEvent.RetryLoadAllergies -> loadAllergies()
+            EditProfileEvent.RetryLoadDiseases -> syncData() // now retry syncs data
+            EditProfileEvent.RetryLoadAllergies -> syncData()
             EditProfileEvent.SaveClicked -> _state.update { it.copy(showSaveConfirmation = true) }
             EditProfileEvent.ConfirmSave -> saveProfileData()
             EditProfileEvent.DismissSaveConfirmation -> _state.update { it.copy(showSaveConfirmation = false) }
@@ -92,49 +99,47 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    private fun loadDiseases() {
+    private fun loadDiseasesOffline() {
         viewModelScope.launch {
-            _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
-            getDiseasesUseCase()
-                .onSuccess { diseases ->
-                    _state.update {
-                        it.copy(
-                            diseases = diseases.toImmutableList(),
-                            isDiseasesLoading = false
-                        )
-                    }
+            getDiseasesUseCase().collectLatest { diseases ->
+                _state.update {
+                    it.copy(
+                        diseases = diseases.toImmutableList(),
+                        isDiseasesLoading = false
+                    )
                 }
-                .onFailure { throwable ->
-                    _state.update {
-                        it.copy(
-                            isDiseasesLoading = false,
-                            diseasesErrorMessage = throwable.message ?: "Failed to load diseases"
-                        )
-                    }
-                }
+            }
         }
     }
 
-    private fun loadAllergies() {
+    private fun loadAllergiesOffline() {
         viewModelScope.launch {
-            _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
-            getAllergiesUseCase()
-                .onSuccess { allergies ->
-                    _state.update {
-                        it.copy(
-                            allergies = allergies.toImmutableList(),
-                            isAllergiesLoading = false
-                        )
-                    }
+            getAllergiesUseCase().collectLatest { allergies ->
+                _state.update {
+                    it.copy(
+                        allergies = allergies.toImmutableList(),
+                        isAllergiesLoading = false
+                    )
                 }
-                .onFailure { throwable ->
-                    _state.update {
-                        it.copy(
-                            isAllergiesLoading = false,
-                            allergiesErrorMessage = throwable.message ?: "Failed to load allergies"
-                        )
-                    }
-                }
+            }
+        }
+    }
+
+    private fun syncData() {
+        viewModelScope.launch {
+            _state.update { it.copy(isDiseasesLoading = true, isAllergiesLoading = true, diseasesErrorMessage = null, allergiesErrorMessage = null) }
+            
+            val diseasesResult = syncDiseasesUseCase()
+            val allergiesResult = syncAllergiesUseCase()
+            
+            _state.update {
+                it.copy(
+                    isDiseasesLoading = false,
+                    isAllergiesLoading = false,
+                    diseasesErrorMessage = diseasesResult.exceptionOrNull()?.message,
+                    allergiesErrorMessage = allergiesResult.exceptionOrNull()?.message
+                )
+            }
         }
     }
 
