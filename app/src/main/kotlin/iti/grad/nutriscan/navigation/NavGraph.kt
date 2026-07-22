@@ -29,6 +29,7 @@ import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
+import iti.grad.nutriscan.presentation.news.view.NewsScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
 
@@ -210,6 +211,7 @@ fun AppNavGraph(
                 onNavigateToScanResult = { scanId ->
                     navController.navigate(ScanResultRoute(scanId))
                 },
+                onNavigateToNews = { navController.navigate(NewsRoute) },
             )
         }
 
@@ -460,6 +462,13 @@ fun AppNavGraph(
             ) {
                 navController.navigateUp()
             }
+        }
+
+        // 30. News
+        composable<NewsRoute> {
+            NewsScreen(
+                onNavigateBack = { navController.navigateUp() },
+            )
         }
 
         // 29. Product Details Placeholder

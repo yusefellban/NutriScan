@@ -166,4 +166,12 @@ class HomeViewModelTest {
         }
         assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }
+
+    @Test
+    fun `when NewsFabClicked, effect is NavigateToNews`() = runTest(testDispatcher) {
+        viewModel.effect.test {
+            viewModel.onEvent(HomeEvent.NewsFabClicked)
+            assertEquals(HomeEffect.NavigateToNews, awaitItem())
+        }
+    }
 }

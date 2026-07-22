@@ -1,9 +1,17 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) load(FileInputStream(file))
 }
 
 android {
@@ -25,6 +33,14 @@ android {
         
         buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://nutriscan.dev/api/\"")
         buildConfigField("String", "KEYCLOAK_BASE_URL", "\"https://auth.nutriscan.dev/\"")
+        buildConfigField(
+            "String", "NEWS_API_BASE_URL",
+            "\"${localProperties.getProperty("NEWS_API_BASE_URL", "https://newsapi.org/")}\""
+        )
+        buildConfigField(
+            "String", "NEWS_API_KEY",
+            "\"${localProperties.getProperty("NEWS_API_KEY", "")}\""
+        )
 
         manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"
     }

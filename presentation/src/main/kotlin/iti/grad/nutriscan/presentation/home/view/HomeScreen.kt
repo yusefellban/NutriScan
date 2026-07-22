@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +60,7 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToScanResult: (String) -> Unit = {},
+    onNavigateToNews: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -69,6 +74,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToProfile -> onNavigateToProfile()
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeEffect.NavigateToScanResult -> onNavigateToScanResult(effect.scanId)
+                is HomeEffect.NavigateToNews -> onNavigateToNews()
             }
         }
     }
@@ -91,6 +97,18 @@ private fun HomeScreenContent(
                 selectedTab = state.selectedTab,
                 onTabClick = { tab -> onEvent(HomeEvent.BottomNavTabClicked(tab)) },
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onEvent(HomeEvent.NewsFabClicked) },
+                containerColor = AppTheme.colors.ScanButtonBackground,
+                contentColor = AppTheme.colors.ScanButtonIconTint,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Article,
+                    contentDescription = stringResource(R.string.news_fab_content_description),
+                )
+            }
         },
     ) { innerPadding ->
         // Home is the only tab rendered inline — every other bottom-nav tab
