@@ -108,10 +108,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to SHOPPING, selectedTab is updated and no effect is emitted`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SAVED, selectedTab is updated and NavigateToSaved effect is emitted`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
-            expectNoEvents()
+            viewModel.onEvent(HomeEvent.BottomNavTabClicked(BottomNavTab.SAVED))
+            assertEquals(HomeEffect.NavigateToSaved, awaitItem())
         }
         assertEquals(BottomNavTab.HOME, viewModel.state.value.selectedTab)
     }

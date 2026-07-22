@@ -34,7 +34,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_history">History</string>
     <string name="nav_scan">Scan</string>
-    <string name="nav_shopping">Shopping</string>
+    <string name="nav_saved">Saved</string>
     <string name="nav_profile">Profile</string>
     <string name="forgot_password_title">Forgot Password?</string>
     <string name="forgot_password_subtitle">Then let\'s submit password reset.</string>
@@ -165,4 +165,16 @@
     <string name="email_verification_resend_error">Failed to resend verification email. Please try again.</string>
     <string name="register_error_email_taken">This email is already registered. Please sign in or use a different email.</string>
     <string name="register_error_generic">Registration failed. Please try again.</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">Saved</string>
+    <string name="saved_search_hint">Search here</string>
+    <string name="saved_empty_state">No saved products yet</string>
+    <string name="product_card_swipe_hint">Swipe right to add</string>
+    <string name="product_card_kcal_unit">Kcal</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">Safe</string>
+    <string name="verdict_caution">Caution</string>
+    <string name="verdict_unsafe">Unsafe</string>
 </resources>

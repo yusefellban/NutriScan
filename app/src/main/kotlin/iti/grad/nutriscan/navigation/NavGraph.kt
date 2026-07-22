@@ -18,6 +18,7 @@ import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerific
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
+import iti.grad.nutriscan.presentation.saved.view.SavedScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScreen
@@ -178,8 +179,8 @@ fun AppNavGraph(
                 onNavigateToHistory = {
                     navController.navigate(ScanHistoryRoute)
                 },
-                onNavigateToShopping = {
-                    navController.navigate(ShoppingListRoute)
+                onNavigateToSaved = {
+                    navController.navigate(SavedRoute)
                 },
                 onNavigateToProfile = {
                     navController.navigate(UserProfileRoute)
@@ -313,14 +314,15 @@ fun AppNavGraph(
             }
         }
 
-        // 18. Shopping List (Placeholder)
-        composable<ShoppingListRoute> {
-            PlaceholderScreen(
-                title = "Shopping List",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+        // 18. Saved Screen
+        composable<SavedRoute> {
+            SavedScreen(
+                onNavigateToHome = { navController.navigate(HomeRoute) { popUpTo(HomeRoute) { inclusive = true } } },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToProductDetail = { /* No-op for now */ }
+            )
         }
 
         // 19. User Profile
@@ -333,7 +335,7 @@ fun AppNavGraph(
                 },
                 onNavigateToScan = { navController.navigate(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToSaved = { navController.navigate(SavedRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
                     navController.navigate(EditConditionsRoute(memberId))
