@@ -23,6 +23,7 @@ import androidx.core.view.WindowCompat
 val LocalAppColors = staticCompositionLocalOf { lightColors() }
 val LocalAppTypography = staticCompositionLocalOf { AppTypography }
 val LocalAppShapes = staticCompositionLocalOf { AppShapes() }
+val LocalAppIsDark = staticCompositionLocalOf { false }
 
 private val Teal100 = Color(0xFFE8FAFA)
 private val Teal400 = Color(0xFFA3E9EC)
@@ -79,6 +80,16 @@ object AppTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalAppShapes.current
+
+    /**
+     * Resolved dark/light state from the user's in-app theme setting (System/Light/Dark) —
+     * use this instead of [isSystemInDarkTheme] so colors/assets follow the app's own setting
+     * rather than the phone's OS theme when the two disagree.
+     */
+    val isDark: Boolean
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppIsDark.current
 }
 
 @Composable
@@ -121,7 +132,8 @@ fun AppTheme(
     CompositionLocalProvider(
         LocalAppColors provides colors,
         LocalAppTypography provides typography,
-        LocalAppShapes provides shapes
+        LocalAppShapes provides shapes,
+        LocalAppIsDark provides darkTheme
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,7 +91,7 @@ fun DateOfBirthPage(
         }
 
         val shadowColor = AppTheme.colors.ShadowDobActive
-        val isDark = isSystemInDarkTheme()
+        val isDark = AppTheme.isDark
         val shadowBlur = if (isDark) 20f else 80f
 
         Box(

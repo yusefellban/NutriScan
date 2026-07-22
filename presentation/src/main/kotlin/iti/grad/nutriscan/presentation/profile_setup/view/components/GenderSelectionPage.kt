@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -99,7 +98,7 @@ fun GenderSelectionPage(
                 label = stringResource(R.string.profile_setup_gender_female),
                 cardColor = AppTheme.colors.GenderFemaleCardBackground,
                 labelColor = AppTheme.colors.GenderFemaleCardText,
-                svgAssetPath = if (isSystemInDarkTheme()) "ic_female_dark.svg" else "ic_female.svg",
+                svgAssetPath = if (AppTheme.isDark) "ic_female_dark.svg" else "ic_female.svg",
                 onClick = { onEvent(ProfileSetupPagerEvent.SelectGender(Gender.FEMALE)) },
                 modifier = Modifier.weight(femaleWeight)
             )
@@ -162,7 +161,7 @@ private fun GenderCard(
     } else {
         AppTheme.colors.ShadowUnselected
     }
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val shadowBlur = if (isDark) {
         if (isSelected) 20f else 8f
     } else {

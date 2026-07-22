@@ -1,7 +1,6 @@
 package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -71,7 +70,7 @@ fun Modifier.customShadow(
  */
 @Composable
 fun Modifier.calorieCardSurface(contentPadding: Dp = 16.dp): Modifier {
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val shadowColor = if (isDark) {
         AppTheme.colors.Teal700.copy(alpha = 0.35f)

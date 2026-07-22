@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.common.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,7 @@ fun ExerciseCard(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val addButtonBackground = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Gray200
     val addButtonIconTint = if (isDark) AppTheme.colors.Teal1000 else AppTheme.colors.Gray1000
     val bigNumberColor = if (isDark) AppTheme.colors.Teal400 else AppTheme.colors.Gray1600

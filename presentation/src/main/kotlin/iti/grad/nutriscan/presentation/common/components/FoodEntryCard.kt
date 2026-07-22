@@ -1,7 +1,6 @@
 package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,7 @@ fun FoodEntryCard(
     kcal: Int,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val iconBackgroundColor = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Teal100
     val iconTint = AppTheme.colors.Teal1000

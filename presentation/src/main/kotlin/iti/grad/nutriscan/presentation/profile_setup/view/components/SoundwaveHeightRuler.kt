@@ -2,7 +2,6 @@ package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun SoundwaveHeightRuler(
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
 
     val selectedTickColor = AppTheme.colors.Teal1000
     val unselectedTickColor = if (isDark) Color.White else AppTheme.colors.HeightRulerMinorTick

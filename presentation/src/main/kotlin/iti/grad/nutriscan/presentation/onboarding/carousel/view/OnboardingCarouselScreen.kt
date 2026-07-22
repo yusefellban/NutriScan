@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.onboarding.carousel.view
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -66,7 +65,7 @@ fun OnboardingCarouselScreen(
         }
     }
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val images = if (isDark) {
         listOf(
             R.drawable.onboarding_dark_1,

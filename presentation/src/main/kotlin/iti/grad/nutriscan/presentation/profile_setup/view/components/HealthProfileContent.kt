@@ -1,7 +1,6 @@
 package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +40,7 @@ fun HealthProfileContent(
     onEvent: (ProfileSetupPagerEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val edgeRes = if (isDark) R.drawable.edge_dark else R.drawable.edge_light
     val heartRes = if (isDark) R.drawable.heart_dark else R.drawable.hearts_light
 

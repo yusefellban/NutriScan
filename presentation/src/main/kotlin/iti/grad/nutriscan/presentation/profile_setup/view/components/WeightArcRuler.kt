@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.profile_setup.view.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +41,7 @@ fun WeightArcRuler(
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
 
     val selectedTickColor = AppTheme.colors.Teal1000
     val unselectedTickColor = if (isDark) {

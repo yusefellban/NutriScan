@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.common.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +34,7 @@ fun DashedActionCard(
     modifier: Modifier = Modifier,
     contentPadding: Dp = 32.dp,
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = AppTheme.isDark
     val borderColor = if (isDark) AppTheme.colors.CaloriesAccentTeal1200 else AppTheme.colors.Gray600
     val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val iconBackgroundColor = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Teal100
