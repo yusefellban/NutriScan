@@ -13,9 +13,23 @@ class UserRepositoryImpl @Inject constructor(
     private val json: Json
 ) : IUserRepository {
 
-    override suspend fun updateHealthProfile(diseaseIds: List<Int>, allergyIds: List<Int>): Result<Unit> {
+    override suspend fun updateHealthProfile(
+        diseaseIds: List<Int>?,
+        allergyIds: List<Int>?,
+        gender: String?,
+        dateOfBirth: String?,
+        heightCm: Double?,
+        weightKg: Double?
+    ): Result<Unit> {
         return try {
-            val request = UpdateUserProfileRequestDto(diseaseIds = diseaseIds, allergyIds = allergyIds)
+            val request = UpdateUserProfileRequestDto(
+                diseaseIds = diseaseIds,
+                allergyIds = allergyIds,
+                gender = gender,
+                dateOfBirth = dateOfBirth,
+                heightCm = heightCm,
+                weightKg = weightKg
+            )
             val response = remoteDataSource.updateProfile(request)
             if (response.isSuccessful) {
                 Result.success(Unit)
