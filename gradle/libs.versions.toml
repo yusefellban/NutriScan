@@ -30,6 +30,8 @@ kotlinxCollectionsImmutable = "0.3.8"
 coil3 = "3.0.4"
 datastore = "1.1.1"
 ui = "1.11.4"
+camerax = "1.4.2"
+mlkitBarcode = "17.3.0"
 timber = "5.0.1"
 
 [libraries]
@@ -76,6 +78,11 @@ coil3-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", vers
 coil3-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil3" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 [plugins]

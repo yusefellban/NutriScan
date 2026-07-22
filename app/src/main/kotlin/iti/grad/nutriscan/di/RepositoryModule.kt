@@ -19,6 +19,8 @@ import iti.grad.nutriscan.data.repository.UserRepositoryImpl
 import iti.grad.nutriscan.domain.allergy.repository.IAllergyRepository
 import iti.grad.nutriscan.data.repository.AllergyRepositoryImpl
 import javax.inject.Singleton
+import iti.grad.nutriscan.domain.scan.repository.IScanRepository
+import iti.grad.nutriscan.data.repository.ScanRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -43,6 +45,11 @@ abstract class RepositoryModule {
     ): ILanguageRepository
 
     @Binds
+    @Singleton
+    abstract fun bindScanRepository(
+        impl: ScanRepositoryImpl
+    ): IScanRepository
+     @Binds
     @Singleton
     abstract fun bindAuthRepository(
         impl: AuthRepositoryImpl
