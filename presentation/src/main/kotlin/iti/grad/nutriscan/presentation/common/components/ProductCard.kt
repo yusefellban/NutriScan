@@ -7,11 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import iti.grad.presentation.R
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
@@ -55,15 +55,15 @@ import kotlin.math.roundToInt
 fun ProductCard(
     imageUrl: String?,
     productName: String,
-    verdict: ProductVerdict,
+    verdict: ProductVerdict?,
     calories: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     swipeAction: ProductCardSwipeAction? = null,
 ) {
     val density = LocalDensity.current
-    val shadowBlurPx = with(density) { 30.dp.toPx() }
-    val shadowOffsetYPx = with(density) { 15.dp.toPx() }
+    val shadowBlurPx = with(density) { 12.dp.toPx() }
+    val shadowOffsetYPx = with(density) { 6.dp.toPx() }
 
     Box(
         modifier = modifier
@@ -84,73 +84,67 @@ fun ProductCard(
             color = AppTheme.colors.ProductCardBackground
         ) {
         Column {
-            // Product image — inside the card with padding
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = productName,
+            // Product image, with the kcal badge layered on top in its top-end corner
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                     .height(130.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.ic_scanner),
-                placeholder = painterResource(id = R.drawable.ic_scanner)
-            )
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = productName,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(id = R.drawable.ic_scanner),
+                    placeholder = painterResource(id = R.drawable.ic_scanner)
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .zIndex(1f)
+                        .padding(6.dp)
+                        .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = calories,
+                        style = AppTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        ),
+                        color = Color.White
+                    )
+                    Text(
+                        text = stringResource(id = R.string.product_card_kcal_unit),
+                        style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                        color = Color.White
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
             ) {
-                // Row containing Title+Verdict and Kcal Badge
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = productName,
-                            style = AppTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            ),
-                            color = AppTheme.colors.ProductCardNameText,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        
-                        Spacer(modifier = Modifier.height(4.dp))
-                        
-                        // Verdict badge
-                        VerdictBadge(verdict = verdict)
-                    }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    // Kcal stacked badge
-                    Box(
-                        modifier = Modifier
-                            .background(AppTheme.colors.ProductCardCaloriesBackground, RoundedCornerShape(4.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = calories,
-                                style = AppTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp
-                                ),
-                                color = AppTheme.colors.ProductCardCaloriesText
-                            )
-                            Text(
-                                text = stringResource(id = R.string.product_card_kcal_unit),
-                                style = AppTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                                color = AppTheme.colors.ProductCardCaloriesText
-                            )
-                        }
-                    }
+                Text(
+                    text = productName,
+                    style = AppTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    ),
+                    color = AppTheme.colors.ProductCardNameText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (verdict != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    VerdictBadge(verdict = verdict)
                 }
 
                 if (swipeAction != null) {

@@ -4,10 +4,9 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,10 +19,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,7 @@ import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
@@ -70,6 +73,7 @@ fun CaloriesScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val stepsPermissionLauncher = rememberLauncherForActivityResult(
@@ -92,7 +96,9 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
                 is CaloriesEffect.NavigateToExercises -> onNavigateToExercises()
                 is CaloriesEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                    snackbarScope.launch {
+                        snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                    }
                 }
 
                 is CaloriesEffect.RequestStepsPermission -> {
@@ -151,32 +157,38 @@ private fun CaloriesContent(
                 }
             } else {
                 item {
-                    LazyRow(
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min)
+                            .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        item {
-                            DashedActionCard(
-                                label = stringResource(R.string.add_food),
-                                onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
-                                contentPadding = 16.dp,
-                                modifier = Modifier
-                                    .width(140.dp)
-                                    .height(130.dp),
-                            )
-                        }
-                        items(state.addedFoods, key = { it.id }) { food ->
-                            ProductCard(
-                                imageUrl = food.imageUrl,
-                                productName = food.productName,
-                                verdict = food.verdict,
-                                calories = food.calories,
-                                onClick = {},
-                                swipeAction = ProductCardSwipeAction.Remove(
-                                    hintResId = R.string.food_log_swipe_remove_hint,
-                                    onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
-                                ),
-                                modifier = Modifier.width(140.dp),
-                            )
+                        DashedActionCard(
+                            label = stringResource(R.string.add_food),
+                            onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
+                            contentPadding = 16.dp,
+                            modifier = Modifier
+                                .width(140.dp)
+                                .fillMaxHeight(),
+                        )
+                        for (food in state.addedFoods) {
+                            key(food.id) {
+                                ProductCard(
+                                    imageUrl = food.imageUrl,
+                                    productName = food.productName,
+                                    verdict = null,
+                                    calories = food.calories,
+                                    onClick = {},
+                                    swipeAction = ProductCardSwipeAction.Remove(
+                                        hintResId = R.string.food_log_swipe_remove_hint,
+                                        onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
+                                    ),
+                                    modifier = Modifier
+                                        .width(140.dp)
+                                        .fillMaxHeight(),
+                                )
+                            }
                         }
                     }
                 }

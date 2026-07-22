@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,6 +31,7 @@ import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SavedScreen(
@@ -44,6 +46,7 @@ fun SavedScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val addedTemplate = stringResource(id = R.string.food_log_added_snackbar)
     val addErrorMessage = stringResource(id = R.string.food_log_add_error)
+    val snackbarScope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collect { effect ->
@@ -54,16 +57,23 @@ fun SavedScreen(
                 is SavedEffect.NavigateToProfile -> onNavigateToProfile()
                 is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.productId)
                 is SavedEffect.ShowAddedToFoodLogSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = String.format(addedTemplate, effect.productName),
-                        duration = SnackbarDuration.Short
-                    )
+                    // Launched on its own scope so showing the snackbar (which suspends until
+                    // dismissed) never stalls this loop from handling the next effect — e.g. a
+                    // bottom-nav tap right after a swipe must navigate immediately, not wait.
+                    snackbarScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = String.format(addedTemplate, effect.productName),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
                 is SavedEffect.ShowAddErrorSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = addErrorMessage,
-                        duration = SnackbarDuration.Short
-                    )
+                    snackbarScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = addErrorMessage,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
             }
         }
