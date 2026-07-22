@@ -437,6 +437,7 @@ fun AppNavGraph(
                 onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
                 onNavigateToShopping = { navController.navigateToTab(ShoppingListRoute) },
                 onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
+                onNavigateToExercises = { navController.navigate(ExercisesRoute) },
             )
         }
 
@@ -444,6 +445,16 @@ fun AppNavGraph(
         composable<SavedProductsRoute> {
             PlaceholderScreen(
                 title = stringResource(R.string.saved_products_title),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 29. Exercises (Placeholder)
+        composable<ExercisesRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.exercises_title),
                 buttonText = stringResource(R.string.action_go_back),
             ) {
                 navController.navigateUp()

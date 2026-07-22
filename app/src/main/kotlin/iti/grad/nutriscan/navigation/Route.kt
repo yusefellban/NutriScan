@@ -94,3 +94,6 @@ object CaloriesRoute
 
 @Serializable
 object SavedProductsRoute
+
+@Serializable
+object ExercisesRoute

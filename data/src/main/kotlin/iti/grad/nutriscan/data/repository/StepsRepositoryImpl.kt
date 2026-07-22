@@ -8,7 +8,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
-import android.os.HandlerThread
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import iti.grad.nutriscan.data.local.datasource.IStepsPreferencesDataSource
@@ -43,7 +43,7 @@ class StepsRepositoryImpl @Inject constructor(
 ) : IStepsRepository {
 
     private val sensorManager by lazy { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
-    private val sensorThread by lazy { HandlerThread("StepsSensorThread").apply { start() } }
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val isTracking = AtomicBoolean(false)
     private val dailySteps = MutableStateFlow<Int?>(null)
@@ -72,8 +72,8 @@ class StepsRepositoryImpl @Inject constructor(
                 return@launch
             }
 
-            // Loaded once, then only ever mutated from onSensorChanged (always the same
-            // sensorThread callback), so no synchronization is needed around these.
+            // Loaded once, then only ever mutated from onSensorChanged (always delivered on
+            // the main thread), so no synchronization is needed around these.
             var baselineDate = preferences.getBaselineDate()
             var baselineSteps = preferences.getBaselineSteps()
 
@@ -104,7 +104,7 @@ class StepsRepositoryImpl @Inject constructor(
                 listener,
                 sensor,
                 SensorManager.SENSOR_DELAY_NORMAL,
-                Handler(sensorThread.looper)
+                mainHandler
             )
         }
     }

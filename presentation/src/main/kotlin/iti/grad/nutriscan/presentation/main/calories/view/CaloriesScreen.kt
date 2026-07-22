@@ -6,12 +6,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,6 +37,7 @@ import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
+import iti.grad.nutriscan.presentation.common.components.FoodEntryCard
 import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -60,6 +64,7 @@ fun CaloriesScreen(
     onNavigateToScan: () -> Unit = {},
     onNavigateToShopping: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToExercises: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -83,6 +88,7 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToScan -> onNavigateToScan()
                 is CaloriesEffect.NavigateToShopping -> onNavigateToShopping()
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
+                is CaloriesEffect.NavigateToExercises -> onNavigateToExercises()
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
                 }
@@ -133,11 +139,40 @@ private fun CaloriesContent(
                 CaloriesHeader(caloriesGained = state.caloriesGained)
             }
 
-            item {
-                DashedActionCard(
-                    label = stringResource(R.string.add_food),
-                    onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
-                )
+            if (state.addedFoods.isEmpty()) {
+                item {
+                    DashedActionCard(
+                        label = stringResource(R.string.add_food),
+                        onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            } else {
+                item {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        item {
+                            DashedActionCard(
+                                label = stringResource(R.string.add_food),
+                                onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
+                                contentPadding = 16.dp,
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(130.dp),
+                            )
+                        }
+                        items(state.addedFoods, key = { it.id }) { food ->
+                            FoodEntryCard(
+                                name = food.name,
+                                kcal = food.kcal,
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(130.dp),
+                            )
+                        }
+                    }
+                }
             }
 
             item {

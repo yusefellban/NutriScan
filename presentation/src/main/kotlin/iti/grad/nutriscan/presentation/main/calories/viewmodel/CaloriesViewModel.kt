@@ -6,10 +6,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.main.calories.model.FoodEntry
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,8 +39,8 @@ class CaloriesViewModel @Inject constructor(
 
     fun onEvent(event: CaloriesEvent) {
         when (event) {
-            CaloriesEvent.AddFoodClicked -> navigate(CaloriesEffect.NavigateToSavedProducts)
-            CaloriesEvent.AddExerciseClicked -> Unit
+            CaloriesEvent.AddFoodClicked -> addFoodClicked()
+            CaloriesEvent.AddExerciseClicked -> navigate(CaloriesEffect.NavigateToExercises)
             CaloriesEvent.AddWaterClicked -> addWaterCup()
             is CaloriesEvent.WaterCupClicked -> toggleWaterCup(event.index)
             is CaloriesEvent.WaterCupLongPressed -> removeWaterCup(event.index)
@@ -69,6 +72,17 @@ class CaloriesViewModel @Inject constructor(
         stepsObservationJob = viewModelScope.launch {
             observeTodaySteps().collect { steps -> _state.update { it.copy(steps = steps) } }
         }
+    }
+
+    /**
+     * Navigates to Saved Products (no real food-picking flow exists yet) and, so the carousel
+     * has something to show/scroll through in the meantime, appends a mock food entry.
+     */
+    private fun addFoodClicked() {
+        navigate(CaloriesEffect.NavigateToSavedProducts)
+        val (name, kcal) = MOCK_FOODS[_state.value.addedFoods.size % MOCK_FOODS.size]
+        val entry = FoodEntry(id = UUID.randomUUID().toString(), name = name, kcal = kcal)
+        _state.update { it.copy(addedFoods = (it.addedFoods + entry).toPersistentList()) }
     }
 
     private fun addWaterCup() {
@@ -116,5 +130,15 @@ class CaloriesViewModel @Inject constructor(
 
     private fun navigate(effect: CaloriesEffect) {
         viewModelScope.launch { _effect.send(effect) }
+    }
+
+    private companion object {
+        val MOCK_FOODS = listOf(
+            "Apple" to 95,
+            "Bread" to 120,
+            "Banana" to 105,
+            "Yogurt" to 150,
+            "Eggs" to 78,
+        )
     }
 }

@@ -57,6 +57,7 @@ class CaloriesViewModelTest {
 
             Assertions.assertEquals(2350, state.tdee)
             Assertions.assertEquals(2100, state.caloriesGained)
+            Assertions.assertTrue(state.addedFoods.isEmpty())
             Assertions.assertEquals(0, state.steps)
             Assertions.assertEquals(10000, state.stepsGoal)
             Assertions.assertFalse(state.stepsPermissionGranted)
@@ -79,6 +80,25 @@ class CaloriesViewModelTest {
                 testScheduler.runCurrent()
 
                 Assertions.assertTrue(awaitItem() is CaloriesEffect.NavigateToSavedProducts)
+            }
+        }
+
+        @Test
+        fun `AddFoodClicked also appends a mock food entry for the carousel`() = runTest {
+            viewModel.onEvent(CaloriesEvent.AddFoodClicked)
+            viewModel.onEvent(CaloriesEvent.AddFoodClicked)
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(2, viewModel.state.value.addedFoods.size)
+        }
+
+        @Test
+        fun `AddExerciseClicked emits NavigateToExercises`() = runTest {
+            viewModel.effect.test {
+                viewModel.onEvent(CaloriesEvent.AddExerciseClicked)
+                testScheduler.runCurrent()
+
+                Assertions.assertTrue(awaitItem() is CaloriesEffect.NavigateToExercises)
             }
         }
 

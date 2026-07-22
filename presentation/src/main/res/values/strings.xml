@@ -172,4 +172,5 @@
     <string name="water">Water</string>
     <string name="cup_removed">Cup removed</string>
     <string name="saved_products_title">Saved Products</string>
+    <string name="exercises_title">Exercises</string>
 </resources>
