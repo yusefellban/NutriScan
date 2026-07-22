@@ -91,3 +91,6 @@ object TermsAndConditionsRoute
 
 @Serializable
 object HelpRoute
+
+@Serializable
+data class ProductDetailsPlaceholderRoute(val barcode: String)

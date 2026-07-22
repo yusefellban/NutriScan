@@ -173,6 +173,9 @@ fun AppNavGraph(
                         popUpTo<CameraScanRoute> { inclusive = true }
                     }
                 },
+                onNavigateToProductDetailsPlaceholder = { barcode ->
+                    navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
+                },
                 onNavigateToHome = { navController.navigate(HomeRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
@@ -380,6 +383,16 @@ fun AppNavGraph(
             PlaceholderScreen(
                 title = stringResource(R.string.app_settings_help),
                 buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+        // 27. Product Details Placeholder
+        composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
+            PlaceholderScreen(
+                title = "Product Details\nBarcode: ${route.barcode}",
+                buttonText = "Back to Scan"
             ) {
                 navController.navigateUp()
             }

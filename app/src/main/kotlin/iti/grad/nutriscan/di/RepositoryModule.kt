@@ -11,6 +11,8 @@ import iti.grad.nutriscan.data.repository.ThemeRepositoryImpl
 import iti.grad.nutriscan.domain.settings.repository.ILanguageRepository
 import iti.grad.nutriscan.data.repository.LanguageRepositoryImpl
 import javax.inject.Singleton
+import iti.grad.nutriscan.domain.scan.repository.IScanRepository
+import iti.grad.nutriscan.data.repository.ScanRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindLanguageRepository(
         impl: LanguageRepositoryImpl
     ): ILanguageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindScanRepository(
+        impl: ScanRepositoryImpl
+    ): IScanRepository
 }

@@ -36,7 +36,7 @@ import iti.grad.presentation.R
 @Composable
 fun ActiveScanCard(
     scan: ActiveScanUiModel,
-    onAddToListClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(22.dp)
@@ -53,6 +53,7 @@ fun ActiveScanCard(
             )
             .clip(cardShape)
             .background(AppTheme.colors.PrimaryVariant)
+            .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -75,7 +76,11 @@ fun ActiveScanCard(
                 color = AppTheme.colors.OnPrimary,
             )
             Spacer(modifier = Modifier.height(6.dp))
-            ProcessingBadge(statusResId = scan.statusResId)
+            if (scan.statusResId != null) {
+                ProcessingBadge(statusResId = scan.statusResId)
+            } else if (scan.healthTag != null) {
+                HealthBadge(text = scan.healthTag)
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -88,7 +93,7 @@ fun ActiveScanCard(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    onClick = onAddToListClick,
+                    onClick = onClick,
                 ),
             contentAlignment = Alignment.Center,
         ) {
@@ -153,6 +158,28 @@ private fun ProcessingBadge(
             style = AppTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = AppTheme.colors.TextPrimary,
+            fontSize = 11.sp,
+        )
+    }
+}
+
+@Composable
+private fun HealthBadge(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(AppTheme.colors.Teal800.copy(alpha = 0.2f))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = AppTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = AppTheme.colors.Teal800,
             fontSize = 11.sp,
         )
     }

@@ -7,5 +7,6 @@ data class ActiveScanUiModel(
     val brand: String?,
     val productName: String?,
     val thumbnailUrl: String?,
-    @StringRes val statusResId: Int,
+    @StringRes val statusResId: Int? = null,
+    val healthTag: String? = null,
 )

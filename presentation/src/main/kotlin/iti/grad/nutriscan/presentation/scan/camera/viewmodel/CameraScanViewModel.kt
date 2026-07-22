@@ -17,11 +17,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import iti.grad.nutriscan.domain.scan.usecase.GetProductByBarcodeUseCase
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
-class CameraScanViewModel @Inject constructor() : ViewModel() {
+class CameraScanViewModel @Inject constructor(
+    private val getProductByBarcodeUseCase: GetProductByBarcodeUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(CameraScanState())
     val state: StateFlow<CameraScanState> = _state.asStateFlow()
@@ -29,7 +38,8 @@ class CameraScanViewModel @Inject constructor() : ViewModel() {
     private val _effect = Channel<CameraScanEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    private var scanCooldownActive = false
+    private var currentScanJob: Job? = null
+    private var lastScannedBarcode: String? = null
 
     init {
         viewModelScope.launch {
@@ -63,12 +73,13 @@ class CameraScanViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun handleBarcodeDetected(barcode: String) {
-        if (scanCooldownActive || !_state.value.isScanning) return
+        if (!_state.value.isScanning || barcode == lastScannedBarcode) return
 
-        scanCooldownActive = true
+        lastScannedBarcode = barcode
+        currentScanJob?.cancel()
+
         _state.update {
             it.copy(
-                isScanning = false,
                 activeScan = ActiveScanUiModel(
                     barcode = barcode,
                     brand = null,
@@ -79,9 +90,38 @@ class CameraScanViewModel @Inject constructor() : ViewModel() {
             )
         }
 
-        viewModelScope.launch {
-            delay(NAVIGATION_DELAY_MS.milliseconds)
-            _effect.send(CameraScanEffect.NavigateToProcessing(barcode))
+        currentScanJob = viewModelScope.launch {
+            val result = getProductByBarcodeUseCase(barcode)
+            result.onSuccess { product ->
+                _state.update { state ->
+                    state.copy(
+                        activeScan = state.activeScan?.copy(
+                            brand = product.brand,
+                            productName = product.productName ?: "Unknown Product",
+                            thumbnailUrl = product.imageUrl,
+                            healthTag = product.healthTag,
+                            statusResId = null
+                        )
+                    )
+                }
+            }.onFailure { error ->
+                val errorMessage = when (error) {
+                    is UnknownHostException,
+                    is ConnectException,
+                    is SocketException,
+                    is SocketTimeoutException,
+                    is IOException -> "No Internet Connection"
+                    else -> "Product Not Found"
+                }
+                _state.update { state ->
+                    state.copy(
+                        activeScan = state.activeScan?.copy(
+                            productName = errorMessage,
+                            statusResId = null
+                        )
+                    )
+                }
+            }
         }
     }
 
