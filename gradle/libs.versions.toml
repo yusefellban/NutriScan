@@ -33,6 +33,7 @@ ui = "1.11.4"
 camerax = "1.4.2"
 mlkitBarcode = "17.3.0"
 timber = "5.0.1"
+androidxBrowser = "1.9.0"
 
 [libraries]
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
@@ -84,6 +85,7 @@ androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycl
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

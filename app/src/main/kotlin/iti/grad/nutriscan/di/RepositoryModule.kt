@@ -25,6 +25,8 @@ import iti.grad.nutriscan.domain.scan.repository.IScanRepository
 import iti.grad.nutriscan.data.repository.ScanRepositoryImpl
 import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
+import iti.grad.nutriscan.domain.news.repository.INewsRepository
+import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -88,4 +90,10 @@ abstract class RepositoryModule {
     abstract fun bindFoodLogRepository(
         impl: FoodLogRepositoryImpl
     ): IFoodLogRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNewsRepository(
+        impl: NewsRepositoryImpl
+    ): INewsRepository
 }
