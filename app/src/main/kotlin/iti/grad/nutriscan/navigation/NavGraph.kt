@@ -207,7 +207,7 @@ fun AppNavGraph(
                 },
                 onNavigateToHome = { navController.navigate(HomeRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToShopping = { navController.navigate(ShoppingListRoute) },
+                onNavigateToSaved = { navController.navigate(SavedRoute) },
                 onNavigateToProfile = { navController.navigate(UserProfileRoute) }
             )
         }

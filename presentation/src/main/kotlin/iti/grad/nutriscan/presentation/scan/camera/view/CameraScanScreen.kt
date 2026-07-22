@@ -50,6 +50,7 @@ fun CameraScanScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
@@ -70,6 +71,7 @@ fun CameraScanScreen(
                 is CameraScanEffect.NavigateToHome -> onNavigateToHome()
                 is CameraScanEffect.NavigateToHistory -> onNavigateToHistory()
                 is CameraScanEffect.NavigateToShopping -> onNavigateToShopping()
+                is CameraScanEffect.NavigateToSaved -> onNavigateToSaved()
                 is CameraScanEffect.NavigateToProfile -> onNavigateToProfile()
                 is CameraScanEffect.ShowSnackBarRes ->
                     snackbarHostState.showSnackbar(context.getString(effect.messageResId))
