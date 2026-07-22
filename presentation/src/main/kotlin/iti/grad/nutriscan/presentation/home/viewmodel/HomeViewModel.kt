@@ -53,7 +53,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                     BottomNavTab.HOME -> Unit
                     BottomNavTab.CALORIES -> emitEffect(HomeEffect.NavigateToCalories)
                     BottomNavTab.SCAN -> emitEffect(HomeEffect.NavigateToScan)
-                    BottomNavTab.SHOPPING -> emitEffect(HomeEffect.NavigateToShopping)
+                    BottomNavTab.SAVED -> emitEffect(HomeEffect.NavigateToSaved)
                     BottomNavTab.PROFILE -> emitEffect(HomeEffect.NavigateToProfile)
                 }
             }

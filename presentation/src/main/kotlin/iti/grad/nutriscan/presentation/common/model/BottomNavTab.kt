@@ -7,6 +7,6 @@ enum class BottomNavTab {
     HOME,
     CALORIES,
     SCAN,
-    SHOPPING,
+    SAVED,
     PROFILE,
 }

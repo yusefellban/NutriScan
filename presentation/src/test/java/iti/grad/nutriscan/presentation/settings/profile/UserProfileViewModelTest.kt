@@ -177,10 +177,10 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when BottomNavTabClicked to SHOPPING, effect is NavigateToTab SHOPPING`() = runTest(testDispatcher) {
+    fun `when BottomNavTabClicked to SAVED, effect is NavigateToTab SAVED`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.SHOPPING))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.SHOPPING), awaitItem())
+            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.SAVED))
+            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.SAVED), awaitItem())
         }
     }
 

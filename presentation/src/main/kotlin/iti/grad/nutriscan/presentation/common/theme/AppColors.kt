@@ -79,6 +79,23 @@ internal data class AppColorsExtension(
     val ShadowFemaleSelected: Color,
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
+    
+    // --- Product Card ---
+    val ProductCardBackground: Color,
+    val SavedSearchBarBorder: Color,
+    val SavedSearchIconBackground: Color,
+    val SavedSearchIconTint: Color,
+    val ProductCardNameText: Color,
+    val ProductCardVerdictBackground: Color,
+    val ProductCardVerdictText: Color,
+    val ProductCardCautionText: Color,
+    val ProductCardCaloriesBackground: Color,
+    val ProductCardCaloriesText: Color,
+    val ProductCardSwipeIconBackground: Color,
+    val ProductCardSwipeContainerBackground: Color,
+    val ProductCardSwipeText: Color,
+    val ProductCardShadow: Color,
+    
     // --- App Settings ---
     val AppSettingsCardBackground: Color,
     val AppSettingsIconContainerBackground: Color,
@@ -272,6 +289,21 @@ data class AppColors internal constructor(
     val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
     val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
     val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
+
+    val ProductCardBackground: Color get() = extension.ProductCardBackground
+    val SavedSearchBarBorder: Color get() = extension.SavedSearchBarBorder
+    val SavedSearchIconBackground: Color get() = extension.SavedSearchIconBackground
+    val SavedSearchIconTint: Color get() = extension.SavedSearchIconTint
+    val ProductCardNameText: Color get() = extension.ProductCardNameText
+    val ProductCardVerdictBackground: Color get() = extension.ProductCardVerdictBackground
+    val ProductCardVerdictText: Color get() = extension.ProductCardVerdictText
+    val ProductCardCautionText: Color get() = extension.ProductCardCautionText
+    val ProductCardCaloriesBackground: Color get() = extension.ProductCardCaloriesBackground
+    val ProductCardCaloriesText: Color get() = extension.ProductCardCaloriesText
+    val ProductCardSwipeIconBackground: Color get() = extension.ProductCardSwipeIconBackground
+    val ProductCardSwipeContainerBackground: Color get() = extension.ProductCardSwipeContainerBackground
+    val ProductCardSwipeText: Color get() = extension.ProductCardSwipeText
+    val ProductCardShadow: Color get() = extension.ProductCardShadow
 
     val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
     val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
@@ -490,6 +522,23 @@ fun lightColors() = AppColors(
         ShadowFemaleSelected = Color(0x6613A4AB),
         ShadowMaleSelected = Color(0x6613A4AB),
         ShadowDobActive = Color(0x6613A4AB),
+        
+        // Product Card
+        ProductCardBackground = Color(0xFFFFFFFF), // White
+        SavedSearchBarBorder = Color(0xFFC0C0C0), // Gray500
+        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
+        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
+        ProductCardNameText = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
+        ProductCardCautionText = Color(0xFF0B5F65), // Teal1400 (matches dark mode surface)
+        ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
+        ProductCardCaloriesText = Color(0xFF2FC5CC), // Teal700
+        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardSwipeContainerBackground = Color(0xFFF1F1F1), // Gray200
+        ProductCardSwipeText = Color(0xFFC0C0C0), // Gray500
+        ProductCardShadow = Color(0x3313A4AB), // Teal1000 20% alpha
+
         // App Settings
         AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
         AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
@@ -710,6 +759,23 @@ fun darkColors() = AppColors(
         ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
         ShadowMaleSelected = Color(0x9975DEE3),
         ShadowDobActive = Color(0x9975DEE3),
+        
+        // Product Card
+        ProductCardBackground = Color(0xFF0A545A), // Teal1500
+        SavedSearchBarBorder = Color(0xFF0F8389), // Teal1200
+        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
+        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
+        ProductCardNameText = Color(0xFF75DEE3), // Teal500
+        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
+        ProductCardCautionText = Color(0xFF0B5F65), // Teal1400
+        ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
+        ProductCardCaloriesText = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
+        ProductCardSwipeContainerBackground = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeText = Color(0xFF108188), // Teal1300
+        ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
+
         // App Settings
         AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
         // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this

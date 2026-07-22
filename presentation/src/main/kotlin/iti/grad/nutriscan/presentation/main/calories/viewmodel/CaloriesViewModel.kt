@@ -123,7 +123,7 @@ class CaloriesViewModel @Inject constructor(
             BottomNavTab.CALORIES -> Unit
             BottomNavTab.HOME -> navigate(CaloriesEffect.NavigateToHome)
             BottomNavTab.SCAN -> navigate(CaloriesEffect.NavigateToScan)
-            BottomNavTab.SHOPPING -> navigate(CaloriesEffect.NavigateToShopping)
+            BottomNavTab.SAVED -> navigate(CaloriesEffect.NavigateToSaved)
             BottomNavTab.PROFILE -> navigate(CaloriesEffect.NavigateToProfile)
         }
     }

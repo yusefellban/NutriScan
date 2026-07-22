@@ -34,7 +34,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_history">History</string>
     <string name="nav_scan">Scan</string>
-    <string name="nav_shopping">Shopping</string>
+    <string name="nav_saved">Saved</string>
     <string name="nav_profile">Profile</string>
     <string name="forgot_password_title">Forgot Password?</string>
     <string name="forgot_password_subtitle">Then let\'s submit password reset.</string>
@@ -143,6 +143,16 @@
     <string name="placeholder_edit_profile_title">Edit Profile</string>
     <string name="action_go_back">Go Back</string>
 
+    <!-- Camera Scan Screen -->
+    <string name="scan_status_processing">Processing</string>
+    <string name="scan_product_unknown">Scanned product</string>
+    <string name="scan_brand_unknown">Unknown brand</string>
+    <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
+    <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
+    <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
+    <string name="scan_add_to_list_content_description">Add product to list</string>
+    <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
     <!-- Email Verification -->
     <string name="email_verification_title">Verify Your Email</string>
     <string name="email_verification_subtitle">Confirm it\'s you to start scanning.</string>
@@ -173,4 +183,16 @@
     <string name="cup_removed">Cup removed</string>
     <string name="saved_products_title">Saved Products</string>
     <string name="exercises_title">Exercises</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">Saved</string>
+    <string name="saved_search_hint">Search here</string>
+    <string name="saved_empty_state">No saved products yet</string>
+    <string name="product_card_swipe_hint">Swipe right to add</string>
+    <string name="product_card_kcal_unit">Kcal</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">Safe</string>
+    <string name="verdict_caution">Caution</string>
+    <string name="verdict_unsafe">Unsafe</string>
 </resources>

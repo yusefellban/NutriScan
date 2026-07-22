@@ -50,7 +50,7 @@ fun UserProfileScreen(
     onNavigateToScan: () -> Unit = {},
     onNavigateToScanHistory: () -> Unit = {},
     onNavigateToCalories: () -> Unit = {},
-    onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
@@ -71,7 +71,7 @@ fun UserProfileScreen(
                     BottomNavTab.HOME -> onNavigateToHome()
                     BottomNavTab.CALORIES -> onNavigateToCalories()
                     BottomNavTab.SCAN -> onNavigateToScan()
-                    BottomNavTab.SHOPPING -> onNavigateToShopping()
+                    BottomNavTab.SAVED -> onNavigateToSaved()
                     BottomNavTab.PROFILE -> Unit
                 }
             }

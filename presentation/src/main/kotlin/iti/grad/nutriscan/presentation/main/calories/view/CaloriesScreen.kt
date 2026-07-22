@@ -62,7 +62,7 @@ fun CaloriesScreen(
     onNavigateToSavedProducts: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
-    onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToExercises: () -> Unit = {},
 ) {
@@ -86,7 +86,7 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToSavedProducts -> onNavigateToSavedProducts()
                 is CaloriesEffect.NavigateToHome -> onNavigateToHome()
                 is CaloriesEffect.NavigateToScan -> onNavigateToScan()
-                is CaloriesEffect.NavigateToShopping -> onNavigateToShopping()
+                is CaloriesEffect.NavigateToSaved -> onNavigateToSaved()
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
                 is CaloriesEffect.NavigateToExercises -> onNavigateToExercises()
                 is CaloriesEffect.ShowSnackbar -> {

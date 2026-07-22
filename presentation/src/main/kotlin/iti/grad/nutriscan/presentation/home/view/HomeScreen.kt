@@ -52,7 +52,7 @@ fun HomeScreen(
     onNavigateToScan: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToCalories: () -> Unit = {},
-    onNavigateToShopping: () -> Unit = {},
+    onNavigateToSaved: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToScanResult: (String) -> Unit = {},
@@ -65,7 +65,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
                 is HomeEffect.NavigateToCalories -> onNavigateToCalories()
-                is HomeEffect.NavigateToShopping -> onNavigateToShopping()
+                is HomeEffect.NavigateToSaved -> onNavigateToSaved()
                 is HomeEffect.NavigateToProfile -> onNavigateToProfile()
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeEffect.NavigateToScanResult -> onNavigateToScanResult(effect.scanId)

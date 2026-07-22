@@ -19,6 +19,7 @@ import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerific
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
+import iti.grad.nutriscan.presentation.saved.view.SavedScreen
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.ForgotPasswordScreen
 import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarouselScreen
 import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScreen
@@ -28,6 +29,7 @@ import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
+import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
 
 /**
@@ -196,8 +198,8 @@ fun AppNavGraph(
                 onNavigateToCalories = {
                     navController.navigateToTab(CaloriesRoute)
                 },
-                onNavigateToShopping = {
-                    navController.navigateToTab(ShoppingListRoute)
+                onNavigateToSaved = {
+                    navController.navigateToTab(SavedRoute)
                 },
                 onNavigateToProfile = {
                     navController.navigateToTab(UserProfileRoute)
@@ -211,25 +213,33 @@ fun AppNavGraph(
             )
         }
 
-        // 8. Camera Scan (Placeholder)
+        // 8. Camera Scan
         composable<CameraScanRoute> {
-            PlaceholderScreen(
-                title = "Camera Scan",
-                buttonText = "Capture & Process"
-            ) {
-                navController.navigate(ScanProcessingRoute("content://media/external/images/media/dummy"))
-            }
+            CameraScanScreen(
+                onNavigateToProcessing = { barcode ->
+                    navController.navigate(ScanProcessingRoute(barcode = barcode)) {
+                        popUpTo<CameraScanRoute> { inclusive = true }
+                    }
+                },
+                onNavigateToProductDetailsPlaceholder = { barcode ->
+                    navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
+                },
+                onNavigateToHome = { navController.navigate(HomeRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToSaved = { navController.navigate(SavedRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) }
+            )
         }
 
         // 9. Scan Processing (Placeholder)
         composable<ScanProcessingRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ScanProcessingRoute>()
             PlaceholderScreen(
-                title = "Scan Processing\nImage URI: ${route.imageUri}",
+                title = "Scan Processing\nCode: ${route.barcode}",
                 buttonText = "View Results"
             ) {
-                navController.navigate(ScanResultRoute(route.imageUri)) {
-                    popUpTo(ScanProcessingRoute(route.imageUri)) { inclusive = true }
+                navController.navigate(ScanResultRoute(route.imageUri ?: "")) {
+                    popUpTo(ScanProcessingRoute(barcode = route.barcode, imageUri = route.imageUri)) { inclusive = true }
                 }
             }
         }
@@ -323,14 +333,15 @@ fun AppNavGraph(
             }
         }
 
-        // 18. Shopping List (Placeholder)
-        composable<ShoppingListRoute> {
-            PlaceholderScreen(
-                title = "Shopping List",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+        // 18. Saved Screen
+        composable<SavedRoute> {
+            SavedScreen(
+                onNavigateToHome = { navController.navigate(HomeRoute) { popUpTo(HomeRoute) { inclusive = true } } },
+                onNavigateToScan = { navController.navigate(CameraScanRoute) },
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToProfile = { navController.navigate(UserProfileRoute) },
+                onNavigateToProductDetail = { /* No-op for now */ }
+            )
         }
 
         // 19. User Profile
@@ -342,7 +353,7 @@ fun AppNavGraph(
                 onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
                 onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
-                onNavigateToShopping = { navController.navigateToTab(ShoppingListRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { memberId ->
                     navController.navigate(EditConditionsRoute(memberId))
@@ -435,7 +446,7 @@ fun AppNavGraph(
                     navController.navigateToTab(HomeRoute)
                 },
                 onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
-                onNavigateToShopping = { navController.navigateToTab(ShoppingListRoute) },
+                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
                 onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
             )
@@ -456,6 +467,17 @@ fun AppNavGraph(
             PlaceholderScreen(
                 title = stringResource(R.string.exercises_title),
                 buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
+        }
+
+        // 30. Product Details Placeholder
+        composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
+            PlaceholderScreen(
+                title = "Product Details\nBarcode: ${route.barcode}",
+                buttonText = "Back to Scan"
             ) {
                 navController.navigateUp()
             }

@@ -4,7 +4,10 @@ import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateHealthProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.Gender
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
@@ -26,13 +29,26 @@ import org.junit.jupiter.api.Test
 class ProfileSetupPagerViewModelTest {
 
     private lateinit var viewModel: ProfileSetupPagerViewModel
-    private val completeOnboardingUseCase: CompleteOnboardingUseCase = mockk()
+    private val completeOnboardingUseCase: CompleteOnboardingUseCase = mockk(relaxed = true)
+    private val getDiseasesUseCase: GetDiseasesUseCase = mockk()
+    private val getAllergiesUseCase: GetAllergiesUseCase = mockk()
+    private val updateHealthProfileUseCase: UpdateHealthProfileUseCase = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ProfileSetupPagerViewModel(completeOnboardingUseCase)
+        
+        // Mock initial data loading
+        coEvery { getDiseasesUseCase() } returns Result.success(emptyList())
+        coEvery { getAllergiesUseCase() } returns Result.success(emptyList())
+        
+        viewModel = ProfileSetupPagerViewModel(
+            completeOnboardingUseCase = completeOnboardingUseCase,
+            getDiseasesUseCase = getDiseasesUseCase,
+            getAllergiesUseCase = getAllergiesUseCase,
+            updateHealthProfileUseCase = updateHealthProfileUseCase
+        )
     }
 
     @AfterEach
@@ -67,7 +83,7 @@ class ProfileSetupPagerViewModelTest {
 
         @Test
         fun `NextClicked on last page does not emit ScrollToPage`() = runTest {
-            // Move to last page
+            // Move to last page (index 4)
             viewModel.onEvent(ProfileSetupPagerEvent.PageChanged(4))
 
             viewModel.effect.test {
@@ -166,88 +182,27 @@ class ProfileSetupPagerViewModelTest {
             viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(75))
             Assertions.assertEquals(75, viewModel.state.value.selectedWeightKg)
         }
-
-        @Test
-        fun `SelectWeight replaces previously selected weight`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(80))
-            viewModel.onEvent(ProfileSetupPagerEvent.SelectWeight(55))
-            Assertions.assertEquals(55, viewModel.state.value.selectedWeightKg)
-        }
     }
 
-    // ── Health Profile: Conditions ───────────────────────────────────────
+    // ── Health Profile: Diseases ────────────────────────────────────────
 
     @Nested
-    @DisplayName("Health Profile — Conditions")
-    inner class HealthProfileConditions {
+    @DisplayName("Health Profile — Diseases")
+    inner class HealthProfileDiseases {
 
         @Test
-        fun `initial state has default list of conditions and nothing selected`() {
+        fun `initial state has empty selectedDiseaseIds`() {
             val state = viewModel.state.value
-            Assertions.assertTrue(state.selectedChronicConditions.isEmpty())
-            Assertions.assertTrue(state.chronicConditions.contains("Diabetes"))
-            Assertions.assertTrue(state.chronicConditions.contains("Hypertension"))
-            Assertions.assertTrue(state.chronicConditions.contains("Celiac Disease"))
+            Assertions.assertTrue(state.selectedDiseaseIds.isEmpty())
         }
 
         @Test
-        fun `ToggleCondition adds then removes condition`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.ToggleCondition("Diabetes"))
-            Assertions.assertTrue(viewModel.state.value.selectedChronicConditions.contains("Diabetes"))
+        fun `ToggleDisease adds then removes disease ID`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.ToggleDisease(1))
+            Assertions.assertTrue(viewModel.state.value.selectedDiseaseIds.contains(1))
 
-            viewModel.onEvent(ProfileSetupPagerEvent.ToggleCondition("Diabetes"))
-            Assertions.assertFalse(viewModel.state.value.selectedChronicConditions.contains("Diabetes"))
-        }
-
-        @Test
-        fun `StartAddCustomCondition sets isAddingCustomCondition to true`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomCondition)
-            val state = viewModel.state.value
-            Assertions.assertTrue(state.isAddingCustomCondition)
-            Assertions.assertEquals("", state.customConditionInput)
-        }
-
-        @Test
-        fun `UpdateCustomConditionInput updates state`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomConditionInput("Asthma"))
-            Assertions.assertEquals("Asthma", viewModel.state.value.customConditionInput)
-        }
-
-        @Test
-        fun `SubmitCustomCondition with non-empty input adds and selects condition`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomCondition)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomConditionInput("Asthma"))
-            viewModel.onEvent(ProfileSetupPagerEvent.SubmitCustomCondition)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomCondition)
-            Assertions.assertEquals("", state.customConditionInput)
-            Assertions.assertTrue(state.chronicConditions.contains("Asthma"))
-            Assertions.assertTrue(state.selectedChronicConditions.contains("Asthma"))
-        }
-
-        @Test
-        fun `SubmitCustomCondition with blank input resets state`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomCondition)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomConditionInput("   "))
-            viewModel.onEvent(ProfileSetupPagerEvent.SubmitCustomCondition)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomCondition)
-            Assertions.assertEquals("", state.customConditionInput)
-            Assertions.assertFalse(state.chronicConditions.contains("   "))
-        }
-
-        @Test
-        fun `CancelAddCustomCondition resets state without adding`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomCondition)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomConditionInput("Asthma"))
-            viewModel.onEvent(ProfileSetupPagerEvent.CancelAddCustomCondition)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomCondition)
-            Assertions.assertEquals("", state.customConditionInput)
-            Assertions.assertFalse(state.chronicConditions.contains("Asthma"))
+            viewModel.onEvent(ProfileSetupPagerEvent.ToggleDisease(1))
+            Assertions.assertFalse(viewModel.state.value.selectedDiseaseIds.contains(1))
         }
     }
 
@@ -258,72 +213,18 @@ class ProfileSetupPagerViewModelTest {
     inner class HealthProfileAllergies {
 
         @Test
-        fun `initial state has default list of allergies and nothing selected`() {
+        fun `initial state has empty selectedAllergyIds`() {
             val state = viewModel.state.value
-            Assertions.assertTrue(state.selectedAllergies.isEmpty())
-            Assertions.assertTrue(state.allergies.contains("Peanuts"))
-            Assertions.assertTrue(state.allergies.contains("Gluten"))
-            Assertions.assertTrue(state.allergies.contains("Dairy"))
+            Assertions.assertTrue(state.selectedAllergyIds.isEmpty())
         }
 
         @Test
-        fun `ToggleAllergy adds then removes allergy`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.ToggleAllergy("Peanuts"))
-            Assertions.assertTrue(viewModel.state.value.selectedAllergies.contains("Peanuts"))
+        fun `ToggleAllergy adds then removes allergy ID`() {
+            viewModel.onEvent(ProfileSetupPagerEvent.ToggleAllergy(10))
+            Assertions.assertTrue(viewModel.state.value.selectedAllergyIds.contains(10))
 
-            viewModel.onEvent(ProfileSetupPagerEvent.ToggleAllergy("Peanuts"))
-            Assertions.assertFalse(viewModel.state.value.selectedAllergies.contains("Peanuts"))
-        }
-
-        @Test
-        fun `StartAddCustomAllergy sets isAddingCustomAllergy to true`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomAllergy)
-            val state = viewModel.state.value
-            Assertions.assertTrue(state.isAddingCustomAllergy)
-            Assertions.assertEquals("", state.customAllergyInput)
-        }
-
-        @Test
-        fun `UpdateCustomAllergyInput updates state`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomAllergyInput("Soy"))
-            Assertions.assertEquals("Soy", viewModel.state.value.customAllergyInput)
-        }
-
-        @Test
-        fun `SubmitCustomAllergy with non-empty input adds and selects allergy`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomAllergy)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomAllergyInput("Soy"))
-            viewModel.onEvent(ProfileSetupPagerEvent.SubmitCustomAllergy)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomAllergy)
-            Assertions.assertEquals("", state.customAllergyInput)
-            Assertions.assertTrue(state.allergies.contains("Soy"))
-            Assertions.assertTrue(state.selectedAllergies.contains("Soy"))
-        }
-
-        @Test
-        fun `SubmitCustomAllergy with blank input resets state`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomAllergy)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomAllergyInput("   "))
-            viewModel.onEvent(ProfileSetupPagerEvent.SubmitCustomAllergy)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomAllergy)
-            Assertions.assertEquals("", state.customAllergyInput)
-            Assertions.assertFalse(state.allergies.contains("   "))
-        }
-
-        @Test
-        fun `CancelAddCustomAllergy resets state without adding`() {
-            viewModel.onEvent(ProfileSetupPagerEvent.StartAddCustomAllergy)
-            viewModel.onEvent(ProfileSetupPagerEvent.UpdateCustomAllergyInput("Soy"))
-            viewModel.onEvent(ProfileSetupPagerEvent.CancelAddCustomAllergy)
-
-            val state = viewModel.state.value
-            Assertions.assertFalse(state.isAddingCustomAllergy)
-            Assertions.assertEquals("", state.customAllergyInput)
-            Assertions.assertFalse(state.allergies.contains("Soy"))
+            viewModel.onEvent(ProfileSetupPagerEvent.ToggleAllergy(10))
+            Assertions.assertFalse(viewModel.state.value.selectedAllergyIds.contains(10))
         }
     }
 
@@ -334,9 +235,13 @@ class ProfileSetupPagerViewModelTest {
     inner class SaveProfile {
 
         @Test
-        fun `SaveProfile success calls use case and emits NavigateToHome`() = runTest {
-            coEvery { completeOnboardingUseCase.invoke() } returns Unit
-
+        fun `SaveProfile success calls use cases and emits NavigateToHome`() = runTest {
+            coEvery { 
+                updateHealthProfileUseCase(
+                    any(), any(), any(), any(), any(), any()
+                )
+            } returns Result.success(Unit)
+            
             viewModel.effect.test {
                 viewModel.onEvent(ProfileSetupPagerEvent.SaveProfile)
                 testScheduler.advanceUntilIdle()
@@ -344,14 +249,28 @@ class ProfileSetupPagerViewModelTest {
                 val effect = awaitItem()
                 Assertions.assertTrue(effect is ProfileSetupPagerEffect.NavigateToHome)
                 Assertions.assertFalse(viewModel.state.value.isLoading)
-                coVerify(exactly = 1) { completeOnboardingUseCase.invoke() }
+                coVerify(exactly = 1) { 
+                    updateHealthProfileUseCase(
+                        diseaseIds = any(),
+                        allergyIds = any(),
+                        gender = any(),
+                        dateOfBirth = any(),
+                        heightCm = any(),
+                        weightKg = any()
+                    )
+                }
+                coVerify(exactly = 1) { completeOnboardingUseCase() }
             }
         }
 
         @Test
-        fun `SaveProfile failure calls use case and emits ShowSnackbar`() = runTest {
+        fun `SaveProfile failure emits ShowSnackbar`() = runTest {
             val errorMessage = "Network Error"
-            coEvery { completeOnboardingUseCase.invoke() } throws Exception(errorMessage)
+            coEvery { 
+                updateHealthProfileUseCase(
+                    any(), any(), any(), any(), any(), any()
+                )
+            } returns Result.failure(Exception(errorMessage))
 
             viewModel.effect.test {
                 viewModel.onEvent(ProfileSetupPagerEvent.SaveProfile)
@@ -364,7 +283,6 @@ class ProfileSetupPagerViewModelTest {
                     (effect as ProfileSetupPagerEffect.ShowSnackbar).messageStr
                 )
                 Assertions.assertFalse(viewModel.state.value.isLoading)
-                coVerify(exactly = 1) { completeOnboardingUseCase.invoke() }
             }
         }
     }

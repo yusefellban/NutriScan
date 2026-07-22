@@ -12,7 +12,7 @@ sealed interface CaloriesEffect {
     data object NavigateToSavedProducts : CaloriesEffect
     data object NavigateToHome : CaloriesEffect
     data object NavigateToScan : CaloriesEffect
-    data object NavigateToShopping : CaloriesEffect
+    data object NavigateToSaved : CaloriesEffect
     data object NavigateToProfile : CaloriesEffect
     data object NavigateToExercises : CaloriesEffect
     data class ShowSnackbar(@StringRes val messageResId: Int) : CaloriesEffect

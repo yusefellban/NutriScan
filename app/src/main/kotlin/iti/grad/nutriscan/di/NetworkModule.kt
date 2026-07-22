@@ -19,6 +19,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -26,7 +27,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
     fun provideJson(): Json {
@@ -75,9 +75,12 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }
-
+      @Provides
+    @Singleton 
+   fun provideOpenFoodFactsApiService(retrofit: Retrofit): OpenFoodFactsApiService {
+        return retrofit.create(OpenFoodFactsApiService::class.java) }
     @Provides
-    @Singleton
+    @Singleton 
     @javax.inject.Named("KeycloakRetrofit")
     fun provideKeycloakRetrofit(
         okHttpClient: OkHttpClient,
