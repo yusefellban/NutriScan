@@ -21,7 +21,7 @@ import iti.grad.nutriscan.data.db.entity.AllergyEntity
         DiseaseEntity::class,
         AllergyEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class)
