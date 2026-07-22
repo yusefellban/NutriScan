@@ -1,5 +1,7 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
+import androidx.annotation.StringRes
+
 /**
  * One-shot side effects emitted by the Calories Dashboard ViewModel.
  *
@@ -12,4 +14,5 @@ sealed interface CaloriesEffect {
     data object NavigateToScan : CaloriesEffect
     data object NavigateToShopping : CaloriesEffect
     data object NavigateToProfile : CaloriesEffect
+    data class ShowSnackbar(@StringRes val messageResId: Int) : CaloriesEffect
 }

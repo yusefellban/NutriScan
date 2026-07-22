@@ -174,5 +174,25 @@ class CaloriesViewModelTest {
             Assertions.assertEquals(8, viewModel.state.value.waterGoal)
             Assertions.assertEquals(4, viewModel.state.value.waterConsumed)
         }
+
+        @Test
+        fun `WaterCupLongPressed on the last cup shows a snackbar`() = runTest {
+            viewModel.effect.test {
+                viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(7))
+                testScheduler.advanceUntilIdle()
+
+                Assertions.assertTrue(awaitItem() is CaloriesEffect.ShowSnackbar)
+            }
+        }
+
+        @Test
+        fun `WaterCupLongPressed on a non-last cup emits no snackbar`() = runTest {
+            viewModel.effect.test {
+                viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(3))
+                testScheduler.advanceUntilIdle()
+
+                expectNoEvents()
+            }
+        }
     }
 }

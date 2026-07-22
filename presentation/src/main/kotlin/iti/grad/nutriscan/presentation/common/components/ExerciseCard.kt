@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,25 +37,12 @@ fun ExerciseCard(
     modifier: Modifier = Modifier,
 ) {
     val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val addButtonBackground = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Gray200
     val addButtonIconTint = if (isDark) AppTheme.colors.Teal1000 else AppTheme.colors.Gray1000
     val bigNumberColor = if (isDark) AppTheme.colors.Teal400 else AppTheme.colors.Gray1600
-    val shadowColor = if (isDark) AppTheme.colors.Teal700.copy(alpha = 0.35f) else AppTheme.colors.Teal1000.copy(alpha = 0.2f)
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .customShadow(
-                shape = RoundedCornerShape(24.dp),
-                color = shadowColor,
-                blurRadius = 45f,
-                offsetY = 15f,
-                spread = 5.dp,
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(backgroundColor)
-            .padding(16.dp),
+        modifier = modifier.calorieCardSurface(),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(

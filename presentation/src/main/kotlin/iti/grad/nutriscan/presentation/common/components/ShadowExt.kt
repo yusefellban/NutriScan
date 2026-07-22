@@ -1,6 +1,12 @@
 package iti.grad.nutriscan.presentation.common.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
@@ -10,6 +16,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 /**
  * Custom shadow modifier to provide a uniform glowing shadow or directionally offset shadow.
@@ -55,4 +62,27 @@ fun Modifier.customShadow(
             )
         }
     }
+}
+
+/**
+ * Shared surface for the Calories dashboard's Steps/Exercise/Water cards:
+ * [AppTheme.shapes] rounded corners, theme-aware background, and a soft
+ * shadow that glows teal in dark mode instead of the usual flat black.
+ */
+@Composable
+fun Modifier.calorieCardSurface(contentPadding: Dp = 16.dp): Modifier {
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
+    val shadowColor = if (isDark) {
+        AppTheme.colors.Teal700.copy(alpha = 0.35f)
+    } else {
+        AppTheme.colors.Teal1000.copy(alpha = 0.2f)
+    }
+    val shape = AppTheme.shapes.Large
+    return this
+        .fillMaxWidth()
+        .customShadow(shape = shape, color = shadowColor, blurRadius = 45f, offsetY = 15f, spread = 5.dp)
+        .clip(shape)
+        .background(backgroundColor)
+        .padding(contentPadding)
 }

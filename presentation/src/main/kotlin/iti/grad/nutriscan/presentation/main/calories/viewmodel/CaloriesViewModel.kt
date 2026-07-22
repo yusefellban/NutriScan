@@ -7,6 +7,7 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
+import iti.grad.presentation.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,14 +60,12 @@ class CaloriesViewModel @Inject constructor() : ViewModel() {
 
     /** Only the last cup can be deleted, same ordering rule as [toggleWaterCup]. */
     private fun removeWaterCup(index: Int) {
+        if (index != _state.value.waterGoal - 1) return
         _state.update { state ->
-            if (index == state.waterGoal - 1) {
-                val newGoal = state.waterGoal - 1
-                state.copy(waterGoal = newGoal, waterConsumed = state.waterConsumed.coerceAtMost(newGoal))
-            } else {
-                state
-            }
+            val newGoal = state.waterGoal - 1
+            state.copy(waterGoal = newGoal, waterConsumed = state.waterConsumed.coerceAtMost(newGoal))
         }
+        navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
     }
 
     private fun handleTabClick(tab: BottomNavTab) {

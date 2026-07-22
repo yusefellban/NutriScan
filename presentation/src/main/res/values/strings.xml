@@ -170,5 +170,6 @@
     <string name="kcal_exercise">kcal</string>
     <string name="min_today">min today</string>
     <string name="water">Water</string>
+    <string name="cup_removed">Cup removed</string>
     <string name="saved_products_title">Saved Products</string>
 </resources>

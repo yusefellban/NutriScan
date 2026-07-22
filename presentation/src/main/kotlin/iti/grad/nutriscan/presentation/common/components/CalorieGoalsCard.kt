@@ -54,7 +54,7 @@ fun CalorieGoalsCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
+            .clip(AppTheme.shapes.Large)
             .background(AppTheme.colors.Teal500)
             .padding(16.dp),
     ) {

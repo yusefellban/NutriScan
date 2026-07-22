@@ -3,22 +3,17 @@ package iti.grad.nutriscan.presentation.common.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -42,7 +37,6 @@ fun StepsGaugeCard(
     modifier: Modifier = Modifier,
 ) {
     val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val trackColor = AppTheme.colors.CaloriesMutedTeal
     val fillColor = AppTheme.colors.Teal700
     val goalReached = stepsGoal > 0 && steps >= stepsGoal
@@ -56,7 +50,6 @@ fun StepsGaugeCard(
         isDark -> AppTheme.colors.CaloriesMutedTeal
         else -> AppTheme.colors.Gray1600
     }
-    val shadowColor = if (isDark) AppTheme.colors.Teal700.copy(alpha = 0.35f) else AppTheme.colors.Teal1000.copy(alpha = 0.2f)
 
     val targetProgress = if (stepsGoal > 0) (steps.toFloat() / stepsGoal).coerceIn(0f, 1f) else 0f
     val animatedProgress by animateFloatAsState(
@@ -66,18 +59,7 @@ fun StepsGaugeCard(
     )
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .customShadow(
-                shape = RoundedCornerShape(24.dp),
-                color = shadowColor,
-                blurRadius = 45f,
-                offsetY = 15f,
-                spread = 5.dp,
-            )
-            .clip(RoundedCornerShape(24.dp))
-            .background(backgroundColor)
-            .padding(16.dp),
+        modifier = modifier.calorieCardSurface(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

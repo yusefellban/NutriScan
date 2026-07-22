@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,13 +46,11 @@ fun WaterTrackerCard(
     modifier: Modifier = Modifier,
 ) {
     val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Surface
     val headerColor = if (isDark) AppTheme.colors.Teal300 else AppTheme.colors.Gray1600
     val filledGlassTint = AppTheme.colors.Teal700
     val emptyGlassTint = if (isDark) AppTheme.colors.Teal1300 else AppTheme.colors.Gray400
     val addButtonBackground = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Gray200
     val addButtonIconTint = if (isDark) AppTheme.colors.Teal1000 else AppTheme.colors.Gray1000
-    val shadowColor = if (isDark) AppTheme.colors.Teal700.copy(alpha = 0.35f) else AppTheme.colors.Teal1000.copy(alpha = 0.2f)
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -77,18 +74,7 @@ fun WaterTrackerCard(
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .customShadow(
-                    shape = RoundedCornerShape(24.dp),
-                    color = shadowColor,
-                    blurRadius = 45f,
-                    offsetY = 15f,
-                    spread = 5.dp,
-                )
-                .clip(RoundedCornerShape(24.dp))
-                .background(backgroundColor)
-                .padding(16.dp),
+            modifier = Modifier.calorieCardSurface(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

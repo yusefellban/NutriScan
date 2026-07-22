@@ -11,18 +11,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
@@ -54,6 +59,8 @@ fun CaloriesScreen(
     onNavigateToProfile: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -63,6 +70,9 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToScan -> onNavigateToScan()
                 is CaloriesEffect.NavigateToShopping -> onNavigateToShopping()
                 is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
+                is CaloriesEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                }
             }
         }
     }
@@ -70,6 +80,7 @@ fun CaloriesScreen(
     CaloriesContent(
         state = state,
         onEvent = viewModel::onEvent,
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -77,9 +88,15 @@ fun CaloriesScreen(
 private fun CaloriesContent(
     state: CaloriesState,
     onEvent: (CaloriesEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
         containerColor = AppTheme.colors.Background,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                AppSnackbar(message = data.visuals.message)
+            }
+        },
         bottomBar = {
             AppBottomNavBar(
                 selectedTab = state.selectedTab,
