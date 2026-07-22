@@ -22,9 +22,22 @@ object DatabaseModule {
             context,
             NutriScanDatabase::class.java,
             "nutriscan_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
+    @Singleton
     fun provideFoodLogDao(db: NutriScanDatabase): FoodLogDao = db.foodLogDao()
+
+    @Provides
+    @Singleton
+    fun provideUserDao(db: NutriScanDatabase) = db.userDao()
+
+    @Provides
+    @Singleton
+    fun provideDiseaseDao(db: NutriScanDatabase) = db.diseaseDao()
+
+    @Provides
+    @Singleton
+    fun provideAllergyDao(db: NutriScanDatabase) = db.allergyDao()
 }

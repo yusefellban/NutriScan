@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit.view.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,13 +40,16 @@ fun EditProfileInputField(
     hint: String,
     trailingIconRes: Int,
     modifier: Modifier = Modifier,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isReadOnly: Boolean = false,
+    onClick: (() -> Unit)? = null
 ) {
     val containerBg = AppTheme.colors.EditProfileInputBackground
     val borderColor = AppTheme.colors.EditProfileInputBorder
-    val textColor = AppTheme.colors.TextPrimary
+    val baseTextColor = AppTheme.colors.TextPrimary
     val iconTint = AppTheme.colors.ProfileSetupSubtitle
     val hintColor = AppTheme.colors.ProfileSetupSubtitle
+    val textColor = if (isReadOnly) hintColor else baseTextColor
 
     Row(
         modifier = modifier
@@ -58,6 +62,10 @@ fun EditProfileInputField(
                 color = borderColor,
                 shape = RoundedCornerShape(12.dp)
             )
+            .then(
+                if (onClick != null && !isReadOnly) Modifier.clickable { onClick() }
+                else Modifier
+            )
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -66,6 +74,7 @@ fun EditProfileInputField(
             onValueChange = onValueChange,
             modifier = Modifier.weight(1f),
             singleLine = true,
+            enabled = !isReadOnly && onClick == null,
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(
                 keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text

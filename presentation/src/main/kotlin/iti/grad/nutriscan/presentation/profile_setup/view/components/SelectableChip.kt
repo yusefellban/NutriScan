@@ -21,7 +21,8 @@ fun SelectableChip(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val backgroundColor = if (isSelected) {
         AppTheme.colors.ChipBackgroundSelected
@@ -50,7 +51,7 @@ fun SelectableChip(
                 color = borderColor,
                 shape = CircleShape
             )
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

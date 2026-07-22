@@ -103,8 +103,16 @@
     <string name="edit_profile_username_hint">Username</string>
     <string name="edit_profile_email_hint">Email</string>
     <string name="edit_profile_password_hint">Password</string>
-    <string name="edit_profile_confirm_title">Save Profile Changes?</string>
-    <string name="edit_profile_confirm_message">Are you sure you want to modify your health profile? This will update future food safety scan verdicts.</string>
+    <string name="edit_profile_confirm_title">Save Changes?</string>
+    <string name="edit_profile_confirm_message">Your health profile changes will affect how products are evaluated for you. Continue?</string>
+    <string name="action_edit">Edit</string>
+    <string name="edit_profile_first_name_hint">First name</string>
+    <string name="edit_profile_last_name_hint">Last name</string>
+    <string name="edit_profile_dob_hint">Date of birth</string>
+    <string name="edit_profile_height_label">Hight</string> <!-- Intentional typo to match image -->
+    <string name="edit_profile_weight_label">Weight</string>
+
+    <!-- Permissions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_remove">Remove</string>
 

@@ -189,6 +189,10 @@ data class AppColors internal constructor(
 
     // --- Specific Overrides ---
     val BottomNavBarBackground: Color,
+    /** Floating Scan-button background. Matches the iOS `FloatingTabButton` fill exactly. */
+    val ScanButtonBackground: Color,
+    /** Floating Scan-button icon tint. Matches the iOS `FloatingTabButton` icon color exactly. */
+    val ScanButtonIconTint: Color,
     val VerdictRedBackground: Color,
     val VerdictRedText: Color,
     val HealthSubtitleColor: Color,
@@ -382,6 +386,8 @@ fun lightColors() = AppColors(
     SplashBackground = Color(0xFF13A4AB),     // Teal1000 — must match windowSplashScreenBackground
     SplashBackgroundEnd = Color(0xFFFFFFFF),  // White — final background after animation
     BottomNavBarBackground = Color(0xFF17B8BE), // Teal800
+    ScanButtonBackground = Color(0xFF0B5F65), // Teal1400
+    ScanButtonIconTint = Color(0xFFE8FAFA), // Teal100
     VerdictRedBackground = Color(0xFFD32F2F).copy(alpha = 0.12f),
     VerdictRedText = Color(0xFFD32F2F),
     HealthSubtitleColor = Color(0xFF0B5F65), // PrimaryVariant
@@ -618,7 +624,9 @@ fun darkColors() = AppColors(
     // Splash — starts on the dark teal starting window color
     SplashBackground = Color(0xFF108188),    // Teal1300 — matches values-night/colors.xml
     SplashBackgroundEnd = Color(0xFF0F1A1A), // Dark background — final state in dark mode
-    BottomNavBarBackground = Color(0xFF0B5F65), // Surface in dark mode
+    BottomNavBarBackground = Color(0xFF108188), // Teal1300 — matches iOS dark-mode bar fill
+    ScanButtonBackground = Color(0xFFE8FAFA), // Teal100
+    ScanButtonIconTint = Color(0xFF13A4AB), // Teal1000
     VerdictRedBackground = Color(0xFFFF80AB), // Solid pink in dark mode
     VerdictRedText = Color(0xFFFFFFFF), // White for contrast
     HealthSubtitleColor = Color(0xFFA3E9EC), // OnPrimary in dark mode

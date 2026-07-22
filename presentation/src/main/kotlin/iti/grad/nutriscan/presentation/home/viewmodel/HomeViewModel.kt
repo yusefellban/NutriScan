@@ -26,14 +26,40 @@ import javax.inject.Inject
  * Currently uses dummy data matching the Figma screenshots.
  * In a future sprint this will inject use cases to load real data from the API.
  */
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.flow.collectLatest
+
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val userRepository: IUserRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
     private val _effect = Channel<HomeEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            // Trigger fetch from remote on load
+            userRepository.fetchAndSyncProfile()
+        }
+
+        viewModelScope.launch {
+            userRepository.getUserData().collectLatest { user ->
+                if (user != null) {
+                    _state.update {
+                        it.copy(
+                            firstName = user.firstName,
+                            userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
+                            avatarUrl = user.avatarUrl
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -65,7 +91,6 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun createInitialState(): HomeState = HomeState(
-        userName = "Noureldeen",
         recentHistory = persistentListOf(
             HomeHistoryItem(
                 id = "scan_001",

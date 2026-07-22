@@ -7,7 +7,7 @@ import io.mockk.mockk
 import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
-import iti.grad.nutriscan.domain.user.usecase.UpdateHealthProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.Gender
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
@@ -32,7 +32,7 @@ class ProfileSetupPagerViewModelTest {
     private val completeOnboardingUseCase: CompleteOnboardingUseCase = mockk(relaxed = true)
     private val getDiseasesUseCase: GetDiseasesUseCase = mockk()
     private val getAllergiesUseCase: GetAllergiesUseCase = mockk()
-    private val updateHealthProfileUseCase: UpdateHealthProfileUseCase = mockk()
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
@@ -47,7 +47,7 @@ class ProfileSetupPagerViewModelTest {
             completeOnboardingUseCase = completeOnboardingUseCase,
             getDiseasesUseCase = getDiseasesUseCase,
             getAllergiesUseCase = getAllergiesUseCase,
-            updateHealthProfileUseCase = updateHealthProfileUseCase
+            updateUserProfileUseCase = updateUserProfileUseCase
         )
     }
 
@@ -237,7 +237,7 @@ class ProfileSetupPagerViewModelTest {
         @Test
         fun `SaveProfile success calls use cases and emits NavigateToHome`() = runTest {
             coEvery { 
-                updateHealthProfileUseCase(
+                updateUserProfileUseCase(
                     any(), any(), any(), any(), any(), any()
                 )
             } returns Result.success(Unit)
@@ -250,7 +250,7 @@ class ProfileSetupPagerViewModelTest {
                 Assertions.assertTrue(effect is ProfileSetupPagerEffect.NavigateToHome)
                 Assertions.assertFalse(viewModel.state.value.isLoading)
                 coVerify(exactly = 1) { 
-                    updateHealthProfileUseCase(
+                    updateUserProfileUseCase(
                         diseaseIds = any(),
                         allergyIds = any(),
                         gender = any(),
@@ -267,7 +267,7 @@ class ProfileSetupPagerViewModelTest {
         fun `SaveProfile failure emits ShowSnackbar`() = runTest {
             val errorMessage = "Network Error"
             coEvery { 
-                updateHealthProfileUseCase(
+                updateUserProfileUseCase(
                     any(), any(), any(), any(), any(), any()
                 )
             } returns Result.failure(Exception(errorMessage))
