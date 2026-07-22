@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.home.view.components.FloatingScanButton
 import iti.grad.presentation.R
 import kotlin.math.abs
 
