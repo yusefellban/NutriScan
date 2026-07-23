@@ -97,6 +97,7 @@ internal data class AppColorsExtension(
     val ProductCardShadow: Color,
     
     // --- App Settings ---
+    val SaveAlertButtonBackground: Color,
     val AppSettingsCardBackground: Color,
     val AppSettingsIconContainerBackground: Color,
     val AppSettingsRowLabel: Color,
@@ -332,6 +333,7 @@ data class AppColors internal constructor(
     val ProductCardShadow: Color get() = extension.ProductCardShadow
 
     val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
+    val SaveAlertButtonBackground: Color get() = extension.SaveAlertButtonBackground
     val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
     val AppSettingsRowLabel: Color get() = extension.AppSettingsRowLabel
     val AppSettingsToggleContainerBackground: Color get() = extension.AppSettingsToggleContainerBackground
@@ -589,6 +591,7 @@ fun lightColors() = AppColors(
         ProductCardShadow = Color(0x3313A4AB), // Teal1000 20% alpha
 
         // App Settings
+        SaveAlertButtonBackground = Color(0xFF13A4AB), // Teal1000
         AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
         AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
         AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
@@ -711,7 +714,7 @@ fun darkColors() = AppColors(
     MethodCardBackground = Color(0xFF0B5F65), // Teal1400
     MethodCardIconBgUnselected = Color(0xFF108188), // Teal1300
     MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
-    AuthDialogBackground = Color(0xFF0A545A), // Teal1500
+    AuthDialogBackground = Color(0xFF0F474A), // Teal1600
     AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
 
     // Profile Setup
@@ -855,6 +858,7 @@ fun darkColors() = AppColors(
         ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
 
         // App Settings
+        SaveAlertButtonBackground = Color(0xFF13A4AB), // Teal1000
         AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
         // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
         AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600

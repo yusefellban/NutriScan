@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.common.components
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.Warning
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -27,9 +29,8 @@ fun ActionConfirmAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Warning,
-        iconBackgroundColor = AppTheme.colors.Primary,
-        iconContentColor = AppTheme.colors.OnPrimary,
+        icon = painterResource(id = R.drawable.warning_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -38,10 +39,9 @@ fun ActionConfirmAlert(
             textColor = AppTheme.colors.TextPrimary,
             onClick = onDismiss
         )
-        Spacer(modifier = Modifier.width(12.dp))
         AlertButton(
             text = confirmText,
-            backgroundColor = AppTheme.colors.Primary,
+            backgroundColor = AppTheme.colors.SaveAlertButtonBackground,
             textColor = AppTheme.colors.OnPrimary,
             onClick = onConfirm
         )
@@ -60,8 +60,39 @@ fun DeleteWarningAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Warning,
-        iconBackgroundColor = AppTheme.colors.VerdictYellow,
+        icon = painterResource(id = R.drawable.warning_ic),
+
+        onDismiss = onDismiss
+    ) {
+        AlertButton(
+            text = cancelText,
+            backgroundColor = AppTheme.colors.HeightUnselectedCardBackground,
+            textColor = AppTheme.colors.TextPrimary,
+            onClick = onDismiss
+        )
+        AlertButton(
+            text = confirmText,
+            backgroundColor = AppTheme.colors.VerdictRed,
+            textColor = AppTheme.colors.OnPrimary,
+            onClick = onConfirm
+        )
+    }
+}
+
+@Composable
+fun LogoutAlert(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    title: String,
+    message: String,
+    confirmText: String,
+    cancelText: String = stringResource(id = R.string.alert_button_cancel)
+) {
+    CustomAlertDialog(
+        title = title,
+        message = message,
+        icon = androidx.compose.ui.graphics.vector.rememberVectorPainter(Icons.AutoMirrored.Filled.Logout),
+        iconBackgroundColor = AppTheme.colors.AppSettingsLogoutAccent,
         iconContentColor = AppTheme.colors.Background,
         onDismiss = onDismiss
     ) {
@@ -71,11 +102,10 @@ fun DeleteWarningAlert(
             textColor = AppTheme.colors.TextPrimary,
             onClick = onDismiss
         )
-        Spacer(modifier = Modifier.width(12.dp))
         AlertButton(
             text = confirmText,
-            backgroundColor = AppTheme.colors.VerdictRed,
-            textColor = AppTheme.colors.OnPrimary,
+            backgroundColor = AppTheme.colors.AppSettingsLogoutAccent,
+            textColor = AppTheme.colors.Background,
             onClick = onConfirm
         )
     }
@@ -93,9 +123,8 @@ fun SuccessAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Check,
-        iconBackgroundColor = AppTheme.colors.Accent,
-        iconContentColor = AppTheme.colors.Background,
+        icon = painterResource(id = R.drawable.success_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -104,7 +133,6 @@ fun SuccessAlert(
             textColor = AppTheme.colors.TextPrimary,
             onClick = onDismiss
         )
-        Spacer(modifier = Modifier.width(12.dp))
         AlertButton(
             text = confirmText,
             backgroundColor = AppTheme.colors.Primary,
@@ -124,9 +152,8 @@ fun SuccessAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Check,
-        iconBackgroundColor = AppTheme.colors.Accent,
-        iconContentColor = AppTheme.colors.Background,
+        icon = painterResource(id = R.drawable.success_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -148,9 +175,8 @@ fun ErrorAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Error,
-        iconBackgroundColor = AppTheme.colors.Error,
-        iconContentColor = AppTheme.colors.Background,
+        icon = painterResource(id = R.drawable.error_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -172,9 +198,8 @@ fun WarningAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.Warning,
-        iconBackgroundColor = AppTheme.colors.VerdictYellow,
-        iconContentColor = AppTheme.colors.Background,
+        icon = painterResource(id = R.drawable.warning_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -197,9 +222,8 @@ fun InternetAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = Icons.Rounded.WifiOff,
-        iconBackgroundColor = AppTheme.colors.Error,
-        iconContentColor = AppTheme.colors.Background,
+        icon = painterResource(id = R.drawable.internet_error_ic),
+
         onDismiss = onDismiss
     ) {
         AlertButton(

@@ -147,11 +147,11 @@ private fun AppSettingsContent(
     }
 
     if (state.showLogoutConfirmDialog) {
-        ConfirmationDialog(
+        iti.grad.nutriscan.presentation.common.components.LogoutAlert(
             title = stringResource(R.string.app_settings_logout_confirm_title),
             message = stringResource(R.string.app_settings_logout_confirm_message),
-            confirmLabel = stringResource(R.string.app_settings_logout),
-            cancelLabel = stringResource(R.string.action_cancel),
+            confirmText = stringResource(R.string.app_settings_logout),
+            cancelText = stringResource(R.string.action_cancel),
             onConfirm = { onEvent(AppSettingsEvent.LogoutConfirmed) },
             onDismiss = { onEvent(AppSettingsEvent.LogoutDismissed) },
         )

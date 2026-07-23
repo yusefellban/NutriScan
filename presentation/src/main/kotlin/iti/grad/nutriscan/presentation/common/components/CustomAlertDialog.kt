@@ -38,9 +38,9 @@ import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 fun CustomAlertDialog(
     title: String,
     message: String,
-    icon: ImageVector,
-    iconBackgroundColor: Color,
-    iconContentColor: Color,
+    icon: androidx.compose.ui.graphics.painter.Painter,
+    iconBackgroundColor: Color = Color.Unspecified,
+    iconContentColor: Color = Color.Unspecified,
     onDismiss: () -> Unit,
     buttons: @Composable RowScope.() -> Unit
 ) {
@@ -92,7 +92,7 @@ fun CustomAlertDialog(
                         modifier = Modifier
                             .matchParentSize()
                             .blur(radius = 48.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                            .background(Color(0xFF13A4AB).copy(alpha = 0.8f), RoundedCornerShape(24.dp))
+                            .background(AppTheme.colors.Accent.copy(alpha = 0.8f), RoundedCornerShape(24.dp))
                     )
 
                     // Main Card
@@ -101,10 +101,10 @@ fun CustomAlertDialog(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(24.dp))
                             .background(AppTheme.colors.AuthDialogBackground)
-                            .padding(horizontal = 24.dp, vertical = 24.dp),
+                            .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(16.dp)) // space for the icon overlap
+                        Spacer(modifier = Modifier.height(12.dp)) // space for the icon overlap
                         
                         Text(
                             text = title,
@@ -128,7 +128,7 @@ fun CustomAlertDialog(
                             textAlign = TextAlign.Center
                         )
                         
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -140,18 +140,26 @@ fun CustomAlertDialog(
                 }
                 
                 // Overlapping Icon
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(iconBackgroundColor),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
+                if (iconBackgroundColor != Color.Unspecified && iconContentColor != Color.Unspecified) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(iconBackgroundColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.foundation.Image(
+                            painter = icon,
+                            contentDescription = title,
+                            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(iconContentColor),
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                } else {
+                    androidx.compose.foundation.Image(
+                        painter = icon,
                         contentDescription = title,
-                        tint = iconContentColor,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(56.dp)
                     )
                 }
             }
