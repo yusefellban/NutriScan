@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -54,36 +57,32 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToScan: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToCalories: () -> Unit = {},
-    onNavigateToSaved: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
-    onNavigateToNotifications: () -> Unit = {},
+    bottomPadding: Dp = 0.dp,
     onNavigateToScanResult: (String) -> Unit = {},
+    onNavigateToHistory: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
     onNavigateToNews: () -> Unit = {},
     onNavigateToChatWithAi: () -> Unit = {},
+    onNavigateToScan: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is HomeEffect.NavigateToScan -> onNavigateToScan()
-                is HomeEffect.NavigateToHistory -> onNavigateToHistory()
-                is HomeEffect.NavigateToCalories -> onNavigateToCalories()
-                is HomeEffect.NavigateToSaved -> onNavigateToSaved()
-                is HomeEffect.NavigateToProfile -> onNavigateToProfile()
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeEffect.NavigateToScanResult -> onNavigateToScanResult(effect.scanId)
                 is HomeEffect.NavigateToNews -> onNavigateToNews()
                 is HomeEffect.NavigateToChatWithAi -> onNavigateToChatWithAi()
+                is HomeEffect.NavigateToScan -> onNavigateToScan()
+                is HomeEffect.NavigateToHistory -> onNavigateToHistory()
             }
         }
     }
 
     HomeScreenContent(
         state = state,
+        bottomPadding = bottomPadding,
         onEvent = viewModel::onEvent,
     )
 }
@@ -91,37 +90,25 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     state: HomeState,
+    bottomPadding: Dp,
     onEvent: (HomeEvent) -> Unit,
 ) {
-    Scaffold(
-        containerColor = AppTheme.colors.Background,
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top),
-        bottomBar = {
-            AppBottomNavBar(
-                selectedTab = state.selectedTab,
-                onTabClick = { tab -> onEvent(HomeEvent.BottomNavTabClicked(tab)) },
-            )
-        },
-    ) { innerPadding ->
-        // Home is the only tab rendered inline — every other bottom-nav tab
-        // navigates to its own destination (see HomeViewModel.onEvent).
-        HomeFeedContent(state, onEvent, innerPadding)
-    }
+    HomeFeedContent(state, onEvent, bottomPadding)
 }
 
 @Composable
 private fun HomeFeedContent(
     state: HomeState,
     onEvent: (HomeEvent) -> Unit,
-    innerPadding: androidx.compose.foundation.layout.PaddingValues
+    bottomPadding: Dp
 ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppTheme.colors.Background)
-                .padding(top = innerPadding.calculateTopPadding() - 8.dp),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                bottom = innerPadding.calculateBottomPadding(),
+                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding()),
+            contentPadding = PaddingValues(
+                bottom = bottomPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {

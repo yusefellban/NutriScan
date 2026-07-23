@@ -9,9 +9,6 @@ package iti.grad.nutriscan.presentation.home.state
 sealed interface HomeEffect {
     data object NavigateToScan : HomeEffect
     data object NavigateToHistory : HomeEffect
-    data object NavigateToCalories : HomeEffect
-    data object NavigateToSaved : HomeEffect
-    data object NavigateToProfile : HomeEffect
     data object NavigateToNotifications : HomeEffect
     data class NavigateToScanResult(val scanId: String) : HomeEffect
     data object NavigateToNews : HomeEffect

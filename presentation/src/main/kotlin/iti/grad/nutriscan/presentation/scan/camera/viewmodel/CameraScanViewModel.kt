@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.scan.camera.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
@@ -52,7 +51,6 @@ class CameraScanViewModel @Inject constructor(
             is CameraScanEvent.PermissionResult -> handlePermissionResult(event.granted)
             is CameraScanEvent.RequestPermissionClicked -> requestPermission()
             is CameraScanEvent.BarcodeDetected -> handleBarcodeDetected(event.value)
-            is CameraScanEvent.BottomNavTabClicked -> handleBottomNavTab(event.tab)
             is CameraScanEvent.AddToListClicked -> handleAddToList()
         }
     }
@@ -125,17 +123,6 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
-    private fun handleBottomNavTab(tab: BottomNavTab) {
-        viewModelScope.launch {
-            when (tab) {
-                BottomNavTab.HOME -> _effect.send(CameraScanEffect.NavigateToHome)
-                BottomNavTab.CALORIES -> _effect.send(CameraScanEffect.NavigateToCalories)
-                BottomNavTab.SAVED -> _effect.send(CameraScanEffect.NavigateToSaved)
-                BottomNavTab.PROFILE -> _effect.send(CameraScanEffect.NavigateToProfile)
-                BottomNavTab.SCAN -> Unit
-            }
-        }
-    }
 
     private fun handleAddToList() {
         viewModelScope.launch {

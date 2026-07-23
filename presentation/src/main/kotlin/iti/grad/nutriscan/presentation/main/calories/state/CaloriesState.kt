@@ -1,7 +1,6 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
 import androidx.compose.runtime.Immutable
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -21,5 +20,4 @@ data class CaloriesState(
     val waterConsumed: Int = 4,
     val waterGoal: Int = 8,
     val isLoading: Boolean = false,
-    val selectedTab: BottomNavTab = BottomNavTab.CALORIES,
 )
