@@ -24,6 +24,9 @@
     <string name="home_daily_tip_body">Stay hydrated! Drink at least\n8 glasses of water today.</string>
     <string name="home_ready_to_scan">Ready to scan?</string>
     <string name="home_scan_subtitle">Check nutritional facts instantly</string>
+    <string name="home_explore">Explore</string>
+    <string name="home_health_news">Health News</string>
+    <string name="home_chat_with_ai">Chat with AI</string>
     <string name="home_recent_history">Recent History</string>
     <string name="home_view_all">View All</string>
     <string name="verdict_healthy">HEALTHY</string>
@@ -230,7 +233,6 @@
     <string name="news_chip_all">All</string>
     <string name="news_load_error">Couldn\'t load news. Please try again.</string>
     <string name="news_empty_state">No articles found for the selected topics.</string>
-    <string name="news_fab_content_description">Health News</string>
     <string name="news_card_byline">By %1$s</string>
     <string name="news_time_just_now">Just now</string>
     <string name="news_time_minutes_ago">%1$dm ago</string>

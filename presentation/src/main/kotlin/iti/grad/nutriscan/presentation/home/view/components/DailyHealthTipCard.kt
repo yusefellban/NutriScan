@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.HomeTypography
 import iti.grad.presentation.R
 
 /**
@@ -95,13 +96,13 @@ fun DailyHealthTipCard(
         Column {
             Text(
                 text = stringResource(R.string.home_daily_tip_title),
-                style = AppTheme.typography.titleSmall,
+                style = HomeTypography.dailyTipTitle,
                 color = AppTheme.colors.Teal800,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.home_daily_tip_body),
-                style = AppTheme.typography.titleSmall,
+                style = AppTheme.typography.bodyLarge,
                 color = AppTheme.colors.PrimaryVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

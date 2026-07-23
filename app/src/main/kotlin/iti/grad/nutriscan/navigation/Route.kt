@@ -123,3 +123,6 @@ object ExercisesRoute
 
 @Serializable
 object NewsRoute
+
+@Serializable
+object ChatWithAiRoute
