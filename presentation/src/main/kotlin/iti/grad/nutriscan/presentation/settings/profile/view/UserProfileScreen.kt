@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,11 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
@@ -46,11 +46,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun UserProfileScreen(
     viewModel: UserProfileViewModel = hiltViewModel(),
-    onNavigateToHome: () -> Unit = {},
-    onNavigateToScan: () -> Unit = {},
+    bottomPadding: Dp = 0.dp,
     onNavigateToScanHistory: () -> Unit = {},
-    onNavigateToCalories: () -> Unit = {},
-    onNavigateToSaved: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
@@ -67,38 +64,23 @@ fun UserProfileScreen(
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
-                is UserProfileEffect.NavigateToTab -> when (effect.tab) {
-                    BottomNavTab.HOME -> onNavigateToHome()
-                    BottomNavTab.CALORIES -> onNavigateToCalories()
-                    BottomNavTab.SCAN -> onNavigateToScan()
-                    BottomNavTab.SAVED -> onNavigateToSaved()
-                    BottomNavTab.PROFILE -> Unit
-                }
             }
         }
     }
 
-    UserProfileContent(state = state, onEvent = viewModel::onEvent)
+    UserProfileContent(state = state, onEvent = viewModel::onEvent, bottomPadding = bottomPadding)
 }
 
 @Composable
 private fun UserProfileContent(
     state: UserProfileState,
     onEvent: (UserProfileEvent) -> Unit,
+    bottomPadding: androidx.compose.ui.unit.Dp,
 ) {
-    Scaffold(
-        containerColor = AppTheme.colors.Background,
-        bottomBar = {
-            AppBottomNavBar(
-                selectedTab = state.selectedTab,
-                onTabClick = { tab -> onEvent(UserProfileEvent.BottomNavTabClicked(tab)) },
-            )
-        },
-    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(bottom = bottomPadding)
                 // Must contrast with ProfileSheetBackground, or the sheet's
                 // rounded top corners have nothing to show through and
                 // render as sharp.
@@ -160,7 +142,6 @@ private fun UserProfileContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-    }
 
     state.memberPendingDeletion?.let { member ->
         ConfirmationDialog(

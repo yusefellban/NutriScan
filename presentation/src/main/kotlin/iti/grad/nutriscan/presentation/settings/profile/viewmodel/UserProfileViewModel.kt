@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.settings.profile.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
@@ -75,16 +74,6 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileEvent.ScanHistoryClicked -> emitEffect(UserProfileEffect.NavigateToScanHistory)
             is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotifications)
             is UserProfileEvent.SettingsClicked -> emitEffect(UserProfileEffect.NavigateToSettings)
-            is UserProfileEvent.BottomNavTabClicked -> {
-                // Profile is the only tab rendered by this screen; every other
-                // tab is a separate destination pushed on top, so this retained
-                // ViewModel's `selectedTab` is intentionally left at PROFILE —
-                // mutating it here would leave the wrong tab highlighted when
-                // the user navigates back.
-                if (event.tab != BottomNavTab.PROFILE) {
-                    emitEffect(UserProfileEffect.NavigateToTab(event.tab))
-                }
-            }
         }
     }
 
@@ -120,6 +109,5 @@ class UserProfileViewModel @Inject constructor(
     private fun createInitialState(): UserProfileState = UserProfileState(
         streakDays = 15,
         familyMembers = persistentListOf(),
-        selectedTab = BottomNavTab.PROFILE,
     )
 }

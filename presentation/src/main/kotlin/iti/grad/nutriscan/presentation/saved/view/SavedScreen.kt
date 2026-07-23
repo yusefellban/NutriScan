@@ -2,12 +2,15 @@ package iti.grad.nutriscan.presentation.saved.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.Dp
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -37,10 +40,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SavedScreen(
     viewModel: SavedViewModel = hiltViewModel(),
-    onNavigateToHome: () -> Unit = {},
-    onNavigateToScan: () -> Unit = {},
-    onNavigateToCalories: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
+    bottomPadding: Dp = 0.dp,
+    snackbarHostState: SnackbarHostState,
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -52,10 +53,6 @@ fun SavedScreen(
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is SavedEffect.NavigateToHome -> onNavigateToHome()
-                is SavedEffect.NavigateToScan -> onNavigateToScan()
-                is SavedEffect.NavigateToCalories -> onNavigateToCalories()
-                is SavedEffect.NavigateToProfile -> onNavigateToProfile()
                 is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is SavedEffect.ShowAddedToFoodLogSnackbar -> {
                     // Launched on its own scope so showing the snackbar (which suspends until
@@ -80,34 +77,25 @@ fun SavedScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            AppBottomNavBar(
-                selectedTab = state.selectedTab,
-                onTabClick = { tab -> viewModel.onEvent(SavedEvent.BottomNavTabClicked(tab)) }
-            )
-        },
-        containerColor = AppTheme.colors.SurfaceVariant
-    ) { paddingValues ->
-        SavedScreenContent(
-            state = state,
-            onEvent = viewModel::onEvent,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        )
-    }
+    SavedScreenContent(
+        state = state,
+        onEvent = viewModel::onEvent,
+        bottomPadding = bottomPadding,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
+    )
 }
 
 @Composable
 private fun SavedScreenContent(
     state: SavedState,
     onEvent: (SavedEvent) -> Unit,
+    bottomPadding: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     if (state.filteredProducts.isEmpty()) {
-        Column(modifier = modifier) {
+        Column(modifier = modifier.padding(bottom = bottomPadding)) {
             SavedSearchBar(
                 query = state.searchQuery,
                 onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
@@ -130,7 +118,7 @@ private fun SavedScreenContent(
             products = state.filteredProducts,
             onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
             onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 4.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = bottomPadding + 4.dp),
             header = {
                 SavedSearchBar(
                     query = state.searchQuery,
