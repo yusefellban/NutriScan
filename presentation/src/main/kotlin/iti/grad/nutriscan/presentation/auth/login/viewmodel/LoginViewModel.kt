@@ -98,7 +98,7 @@ class LoginViewModel @Inject constructor(
                     error is java.io.IOException -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError
                     isUnauthorized -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = iti.grad.presentation.R.string.error_invalid_credentials)
                     msg.contains("500") || msg.contains("Server Error") -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = iti.grad.presentation.R.string.error_server_down)
-                    else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = error.message ?: "Login failed")
+                    else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = "Login failed. Please try again.")
                 }
                 _state.update { it.copy(alertState = newAlertState) }
             }
@@ -126,7 +126,7 @@ class LoginViewModel @Inject constructor(
                 userRepository.fetchAndSyncProfile()
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = "Failed to save Google login tokens: ${error.message}")) }
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = "Failed to complete Google login. Please try again.")) }
             }
         }
     }

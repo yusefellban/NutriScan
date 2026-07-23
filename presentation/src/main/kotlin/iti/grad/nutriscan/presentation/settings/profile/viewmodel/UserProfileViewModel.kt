@@ -42,9 +42,7 @@ class UserProfileViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        viewModelScope.launch {
-            userRepository.fetchAndSyncProfile()
-        }
+        loadProfileData()
         viewModelScope.launch {
             userRepository.getUserData().collectLatest { user ->
                 if (user != null) {
@@ -85,6 +83,26 @@ class UserProfileViewModel @Inject constructor(
                     emitEffect(UserProfileEffect.NavigateToTab(event.tab))
                 }
             }
+            UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None) }
+            UserProfileEvent.RetryAction -> loadProfileData(isUserInitiated = true)
+        }
+    }
+
+    private fun loadProfileData(isUserInitiated: Boolean = false) {
+        viewModelScope.launch {
+            if (isUserInitiated) {
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None) }
+            }
+            userRepository.fetchAndSyncProfile()
+                .onFailure { error ->
+                    if (isUserInitiated) {
+                        val newAlertState = when (error) {
+                            is java.io.IOException -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
+                            else -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error(messageResId = iti.grad.presentation.R.string.profile_setup_load_error)
+                        }
+                        _state.update { it.copy(alertState = newAlertState) }
+                    }
+                }
         }
     }
 

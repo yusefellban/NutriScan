@@ -96,6 +96,14 @@ class EditProfileViewModel @Inject constructor(
             is EditProfileEvent.SelectAvatar -> _state.update { it.copy(avatarUrl = event.avatarUrl) }
             is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
             is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
+            EditProfileEvent.DismissAlert -> {
+                val wasSuccess = _state.value.alertState is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None) }
+                if (wasSuccess) {
+                    emitEffect(EditProfileEffect.NavigateBack)
+                }
+            }
+            EditProfileEvent.RetryAction -> saveProfileData()
         }
     }
 
@@ -202,10 +210,21 @@ class EditProfileViewModel @Inject constructor(
                 allergyIds = currentState.selectedAllergyIds,
                 avatarUrl = finalAvatarUrl
             ).onSuccess {
-                _state.update { it.copy(isSaving = false, isEditMode = false) }
-            }.onFailure {
-                _state.update { it.copy(isSaving = false) }
-                // Handle error effect if needed
+                _state.update { 
+                    it.copy(
+                        isSaving = false, 
+                        isEditMode = false,
+                        alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success(
+                            messageResId = iti.grad.presentation.R.string.alert_success_title // You can provide a specific string for profile updated
+                        )
+                    ) 
+                }
+            }.onFailure { error ->
+                val newAlertState = when {
+                    error is java.io.IOException -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
+                    else -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error(messageStr = "Failed to update profile. Please try again.")
+                }
+                _state.update { it.copy(isSaving = false, alertState = newAlertState) }
             }
         }
     }

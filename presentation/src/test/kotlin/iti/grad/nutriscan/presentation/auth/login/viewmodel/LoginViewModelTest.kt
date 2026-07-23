@@ -72,7 +72,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `SignInClicked with valid credentials emits ShowErrorDialog on failure`() = runTest {
+    fun `SignInClicked with valid credentials emits Error alert on failure`() = runTest {
         val email = "test@example.com"
         val password = "Password123"
         val errorMessage = "Invalid credentials"
@@ -81,14 +81,11 @@ class LoginViewModelTest {
         viewModel.onEvent(LoginEvent.EmailChanged(email))
         viewModel.onEvent(LoginEvent.PasswordChanged(password))
         
-        viewModel.effect.test {
-            viewModel.onEvent(LoginEvent.SignInClicked)
-            testDispatcher.scheduler.advanceUntilIdle()
-            
-            val effect = awaitItem()
-            assertTrue(effect is LoginEffect.ShowErrorDialog)
-            assertEquals(errorMessage, (effect as LoginEffect.ShowErrorDialog).messageStr)
-            cancelAndIgnoreRemainingEvents()
-        }
+        viewModel.onEvent(LoginEvent.SignInClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+        
+        val alertState = viewModel.state.value.alertState
+        assertTrue(alertState is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error)
+        assertEquals(errorMessage, (alertState as iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error).messageStr)
     }
 }

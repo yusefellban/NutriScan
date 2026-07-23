@@ -16,4 +16,6 @@ sealed interface UserProfileEvent {
     data object NotificationsClicked : UserProfileEvent
     data object SettingsClicked : UserProfileEvent
     data class BottomNavTabClicked(val tab: BottomNavTab) : UserProfileEvent
+    object DismissAlert : UserProfileEvent
+    object RetryAction : UserProfileEvent
 }

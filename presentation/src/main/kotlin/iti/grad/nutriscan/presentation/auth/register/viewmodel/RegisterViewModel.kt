@@ -107,7 +107,7 @@ class RegisterViewModel @Inject constructor(
                         throwable is java.io.IOException -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError
                         isConflict -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning(messageResId = R.string.error_email_exists)
                         msg.contains("500") || msg.contains("Server Error") -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = R.string.error_server_down)
-                        else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = throwable.message ?: "Registration failed")
+                        else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = R.string.register_error_generic)
                     }
                     _state.update { it.copy(isLoading = false, alertState = newAlertState) }
                 }

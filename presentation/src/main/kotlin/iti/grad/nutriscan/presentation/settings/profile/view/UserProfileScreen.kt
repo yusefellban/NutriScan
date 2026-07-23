@@ -163,13 +163,44 @@ private fun UserProfileContent(
     }
 
     state.memberPendingDeletion?.let { member ->
-        ConfirmationDialog(
+        iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert(
             title = stringResource(R.string.user_profile_remove_member_title),
             message = stringResource(R.string.user_profile_remove_member_message, member.name),
-            confirmLabel = stringResource(R.string.action_remove),
-            cancelLabel = stringResource(R.string.action_cancel),
+            confirmText = stringResource(R.string.action_remove),
+            cancelText = stringResource(R.string.action_cancel),
             onConfirm = { onEvent(UserProfileEvent.ConfirmRemoveMemberClicked) },
             onDismiss = { onEvent(UserProfileEvent.CancelRemoveMemberClicked) },
         )
+    }
+
+    when (val alert = state.alertState) {
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError -> {
+            iti.grad.nutriscan.presentation.common.components.InternetAlert(
+                onRetry = { onEvent(UserProfileEvent.RetryAction) },
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error -> {
+            iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+                title = stringResource(id = R.string.alert_error_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning -> {
+            iti.grad.nutriscan.presentation.common.components.WarningAlert(
+                title = stringResource(id = R.string.alert_warning_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success -> {
+            iti.grad.nutriscan.presentation.common.components.SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None -> Unit
     }
 }

@@ -54,7 +54,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `SignUpClicked emits NavigateToEmailVerification on success and calls resendVerificationEmail`() = runTest {
+    fun `SignUpClicked emits Success alert and calls resendVerificationEmail`() = runTest {
         val email = "test@example.com"
         val password = "Password123"
         coEvery { registerUseCase(email, password) } returns Result.success(Unit)
@@ -64,14 +64,10 @@ class RegisterViewModelTest {
         viewModel.onEvent(RegisterEvent.PasswordChanged(password))
         viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(password))
 
-        viewModel.effect.test {
-            viewModel.onEvent(RegisterEvent.SignUpClicked)
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            val effect = awaitItem()
-            assertTrue(effect is RegisterEffect.NavigateToEmailVerification)
-            assertEquals(email, (effect as RegisterEffect.NavigateToEmailVerification).email)
-            cancelAndIgnoreRemainingEvents()
-        }
+        val alertState = viewModel.state.value.alertState
+        assertTrue(alertState is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success)
     }
 }

@@ -231,6 +231,7 @@
     <string name="alert_button_ok">موافق</string>
     <string name="alert_button_retry">إعادة المحاولة</string>
     <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">فشل تسجيل الدخول</string>

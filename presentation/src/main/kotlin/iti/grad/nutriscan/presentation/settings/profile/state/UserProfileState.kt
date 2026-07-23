@@ -18,4 +18,5 @@ data class UserProfileState(
     val selectedTab: BottomNavTab = BottomNavTab.PROFILE,
     /** Non-null while the remove-family-member confirmation dialog is showing. */
     val memberPendingDeletion: FamilyMemberUiModel? = null,
+    val alertState: ProfileAlertState = ProfileAlertState.None
 )

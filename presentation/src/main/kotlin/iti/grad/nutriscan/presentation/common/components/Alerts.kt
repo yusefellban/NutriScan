@@ -16,6 +16,39 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
 @Composable
+fun ActionConfirmAlert(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    title: String,
+    message: String,
+    confirmText: String,
+    cancelText: String = stringResource(id = R.string.alert_button_cancel)
+) {
+    CustomAlertDialog(
+        title = title,
+        message = message,
+        icon = Icons.Rounded.Warning,
+        iconBackgroundColor = AppTheme.colors.Primary,
+        iconContentColor = AppTheme.colors.OnPrimary,
+        onDismiss = onDismiss
+    ) {
+        AlertButton(
+            text = cancelText,
+            backgroundColor = AppTheme.colors.HeightUnselectedCardBackground,
+            textColor = AppTheme.colors.TextPrimary,
+            onClick = onDismiss
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        AlertButton(
+            text = confirmText,
+            backgroundColor = AppTheme.colors.Primary,
+            textColor = AppTheme.colors.OnPrimary,
+            onClick = onConfirm
+        )
+    }
+}
+
+@Composable
 fun DeleteWarningAlert(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
@@ -158,7 +191,7 @@ fun InternetAlert(
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
     title: String = stringResource(id = R.string.alert_internet_title),
-    message: String = stringResource(id = R.string.alert_test_message),
+    message: String = stringResource(id = R.string.alert_internet_message),
     retryText: String = stringResource(id = R.string.alert_button_retry)
 ) {
     CustomAlertDialog(

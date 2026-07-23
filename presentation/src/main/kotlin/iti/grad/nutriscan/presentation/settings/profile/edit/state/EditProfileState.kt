@@ -26,5 +26,6 @@ data class EditProfileState(
     val allergiesErrorMessage: String? = null,
 
     val showSaveConfirmation: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val alertState: iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
 )
