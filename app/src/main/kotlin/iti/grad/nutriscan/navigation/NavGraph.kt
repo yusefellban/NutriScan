@@ -513,15 +513,7 @@ fun AppNavGraph(
         }
 
         // 29. Product Details Placeholder
-        composable<ProductDetailsPlaceholderRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ProductDetailsPlaceholderRoute>()
-            PlaceholderScreen(
-                title = "Product Details\nBarcode: ${route.barcode}",
-                buttonText = "Back to Scan"
-            ) {
-                navController.navigateUp()
-            }
-        }
+
     }
 }
 
