@@ -194,6 +194,20 @@
     <string name="verdict_caution">حذر</string>
     <string name="verdict_unsafe">غير آمن</string>
 
+    <!-- Product Details -->
+    <string name="product_details_title">تفاصيل المنتج</string>
+    <string name="product_details_scanned_at">تم المسح في</string>
+    <string name="product_details_for_you">لك</string>
+    <string name="product_details_why_unsafe">لماذا هو غير آمن؟</string>
+    <string name="product_details_why_caution">لماذا الحذر؟</string>
+    <string name="product_details_why_safe">لماذا هو آمن؟</string>
+    <string name="product_details_calories">السعرات الحرارية</string>
+    <string name="product_details_serving">الحصة</string>
+    <string name="product_details_sugar">السكر</string>
+    <string name="product_details_fat">الدهون</string>
+    <string name="product_details_sat_fat">دهون مشبعة</string>
+    <string name="product_details_bookmark_add">حفظ المنتج</string>
+    <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
     <!-- News -->
     <string name="news_screen_title">أخبار صحية</string>
     <string name="news_chip_all">الكل</string>

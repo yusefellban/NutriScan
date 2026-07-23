@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -57,6 +58,7 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.coil3.svg)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

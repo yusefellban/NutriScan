@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
@@ -40,7 +41,7 @@ fun SavedScreen(
     onNavigateToScan: () -> Unit = {},
     onNavigateToCalories: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToProductDetail: (String) -> Unit = {}
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -55,7 +56,7 @@ fun SavedScreen(
                 is SavedEffect.NavigateToScan -> onNavigateToScan()
                 is SavedEffect.NavigateToCalories -> onNavigateToCalories()
                 is SavedEffect.NavigateToProfile -> onNavigateToProfile()
-                is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.productId)
+                is SavedEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is SavedEffect.ShowAddedToFoodLogSnackbar -> {
                     // Launched on its own scope so showing the snackbar (which suspends until
                     // dismissed) never stalls this loop from handling the next effect — e.g. a
@@ -127,7 +128,7 @@ private fun SavedScreenContent(
     } else {
         SavedProductGrid(
             products = state.filteredProducts,
-            onProductClick = { productId -> onEvent(SavedEvent.ProductClicked(productId)) },
+            onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
             onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 4.dp),
             header = {

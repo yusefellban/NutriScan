@@ -307,26 +307,4 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     }
 }
 
-@Composable
-private fun VerdictBadge(verdict: ProductVerdict) {
-    val (backgroundColor, textColor, textResId) = when (verdict) {
-        ProductVerdict.SAFE -> Triple(AppTheme.colors.ProductCardVerdictBackground, AppTheme.colors.ProductCardVerdictText, R.string.verdict_safe)
-        ProductVerdict.CAUTION -> Triple(AppTheme.colors.VerdictYellow, AppTheme.colors.ProductCardCautionText, R.string.verdict_caution)
-        ProductVerdict.UNSAFE -> Triple(AppTheme.colors.Error, AppTheme.colors.ProductCardVerdictText, R.string.verdict_unsafe)
-    }
-
-    Box(
-        modifier = Modifier
-            .background(backgroundColor, RoundedCornerShape(50))
-            .padding(horizontal = 10.dp, vertical = 3.dp)
-    ) {
-        Text(
-            text = stringResource(id = textResId),
-            style = AppTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 11.sp
-            ),
-            color = textColor
-        )
-    }
-}
+// VerdictBadge is now a shared component — see VerdictBadge.kt

@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 @Composable
 fun SavedProductGrid(
     products: ImmutableList<ProductUiModel>,
-    onProductClick: (String) -> Unit,
+    onProductClick: (ProductUiModel) -> Unit,
     onSwipeToAdd: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
@@ -47,7 +47,7 @@ fun SavedProductGrid(
                 productName = product.productName,
                 verdict = product.verdict,
                 calories = product.calories,
-                onClick = { onProductClick(product.id) },
+                onClick = { onProductClick(product) },
                 swipeAction = ProductCardSwipeAction.Add(
                     hintResId = R.string.product_card_swipe_hint,
                     onTriggered = { onSwipeToAdd(product.id) },
