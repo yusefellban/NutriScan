@@ -81,7 +81,7 @@ private fun NutritionPill(
                 .fillMaxWidth()
                 .background(
                     color = AppTheme.colors.ProductDetailNutritionCardBg,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(8.dp),
                 )
                 .padding(horizontal = 10.dp, vertical = 5.dp),
         )
@@ -96,7 +96,7 @@ private fun NutritionPill(
                 .padding(top = 4.dp)
                 .background(
                     color = AppTheme.colors.ProductDetailNutritionPill,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(8.dp),
                 )
                 .padding(horizontal = 10.dp, vertical = 5.dp),
         )
