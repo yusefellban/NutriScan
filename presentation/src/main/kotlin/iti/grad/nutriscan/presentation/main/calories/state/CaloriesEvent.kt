@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 
 sealed interface CaloriesEvent {
@@ -15,7 +14,6 @@ sealed interface CaloriesEvent {
 
     /** Long-presses the cup at [index] to delete it — only responds if it's the last cup. */
     data class WaterCupLongPressed(val index: Int) : CaloriesEvent
-    data class BottomNavTabClicked(val tab: BottomNavTab) : CaloriesEvent
 
     /** Checks Health Connect availability/permission — dispatched once on screen start, and again on every steps-gauge tap as a retry. */
     data object StepsCardClicked : CaloriesEvent

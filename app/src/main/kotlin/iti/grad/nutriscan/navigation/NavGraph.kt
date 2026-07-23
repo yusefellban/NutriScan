@@ -16,8 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlin.reflect.typeOf
-import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
+import iti.grad.nutriscan.presentation.main.container.view.MainScreen
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
+import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.saved.view.SavedScreen
@@ -27,35 +28,11 @@ import iti.grad.nutriscan.presentation.onboarding.carousel.view.OnboardingCarous
 import iti.grad.nutriscan.presentation.profile_setup.view.ProfileSetupPagerScreen
 import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
-import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
-import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
-
-/**
- * Navigates to a bottom-nav tab destination, popping back to [HomeRoute] (saving its state)
- * and restoring the target tab's own state if it's been visited before. Keeps exactly one
- * back-stack entry (and one ViewModel instance) per tab, regardless of how many times the
- * user bounces between tabs — the standard Compose-Navigation bottom-nav pattern.
- *
- * Targets [HomeRoute] explicitly rather than `graph.findStartDestination()`: the graph's
- * static start destination is [SplashRoute], which is removed from the back stack (via
- * `popUpTo(SplashRoute) { inclusive = true }`) as soon as the user reaches Home or Login.
- * Once that destination no longer exists anywhere in the back stack, `popUpTo` silently
- * pops nothing, so every tab click would just keep stacking on top instead of collapsing
- * back to Home.
- */
-private fun NavHostController.navigateToTab(route: Any) {
-    navigate(route) {
-        popUpTo<HomeRoute> { saveState = true }
-        launchSingleTop = true
-        restoreState = true
-    }
-}
 
 @Composable
 fun AppNavGraph(
@@ -83,7 +60,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
+                    navController.navigate(MainRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 }
@@ -121,7 +98,7 @@ fun AppNavGraph(
                             popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
                         }
                     } else {
-                        navController.navigate(HomeRoute) {
+                        navController.navigate(MainRoute) {
                             popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
                         }
                     }
@@ -178,7 +155,7 @@ fun AppNavGraph(
             ProfileSetupPagerScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToHome = {
-                    navController.navigate(HomeRoute) {
+                    navController.navigate(MainRoute) {
                         popUpTo(ProfileSetupPagerRoute) { inclusive = true }
                     }
                 }
@@ -191,63 +168,34 @@ fun AppNavGraph(
                 title = "Family Profile Setup",
                 buttonText = "Complete Setup"
             ) {
-                navController.navigate(HomeRoute) {
+                navController.navigate(MainRoute) {
                     popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
 
-        // 7. Home Screen
-        composable<HomeRoute> {
-            HomeScreen(
-                onNavigateToScan = {
-                    navController.navigateToTab(CameraScanRoute)
-                },
-                onNavigateToHistory = {
-                    navController.navigate(ScanHistoryRoute)
-                },
-                onNavigateToCalories = {
-                    navController.navigateToTab(CaloriesRoute)
-                },
-                onNavigateToSaved = {
-                    navController.navigateToTab(SavedRoute)
-                },
-                onNavigateToProfile = {
-                    navController.navigateToTab(UserProfileRoute)
-                },
-                onNavigateToNotifications = {
-                    navController.navigate(NotificationSettingsRoute)
-                },
+        // 7. Main Screen (Container for Home, Scan, Calories, Saved, Profile)
+        composable<MainRoute> {
+            MainScreen(
                 onNavigateToScanResult = { scanId ->
                     navController.navigate(ScanResultRoute(scanId))
                 },
+                onNavigateToScanProcessing = { barcode ->
+                    navController.navigate(ScanProcessingRoute(barcode = barcode))
+                },
+                onNavigateToProductDetail = { product ->
+                    navController.navigate(ProductDetailsRoute(product = product))
+                },
                 onNavigateToNews = { navController.navigate(NewsRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
-            )
-        }
-
-        // 8. Camera Scan
-        composable<CameraScanRoute> {
-            CameraScanScreen(
-                onNavigateToProcessing = { barcode ->
-                    navController.navigate(ScanProcessingRoute(barcode = barcode)) {
-                        popUpTo<CameraScanRoute> { inclusive = true }
-                    }
+                onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
+                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
+                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
+                onNavigateToFamilyMemberDetail = { memberId ->
+                    navController.navigate(EditConditionsRoute(memberId))
                 },
-                onNavigateToProductDetail = { barcode ->
-                    val dummyProduct = ProductUiModel(
-                        id = barcode,
-                        productName = "Scanned Product",
-                        imageUrl = null,
-                        verdict = ProductVerdict.SAFE,
-                        calories = "0 kcal"
-                    )
-                    navController.navigate(ProductDetailsRoute(product = dummyProduct))
-                },
-                onNavigateToHome = { navController.navigateToTab(HomeRoute) },
-                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
-                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
-                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) }
+                onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
+                onNavigateToExercises = { navController.navigate(ExercisesRoute) },
             )
         }
 
@@ -282,8 +230,8 @@ fun AppNavGraph(
                 title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(HomeRoute) {
-                    popUpTo(HomeRoute) { inclusive = false }
+                navController.navigate(MainRoute) {
+                    popUpTo(MainRoute) { inclusive = false }
                 }
             }
         }
@@ -316,8 +264,8 @@ fun AppNavGraph(
                 title = "Receipt Result\nURI: ${route.receiptImageUri}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(HomeRoute) {
-                    popUpTo(HomeRoute) { inclusive = false }
+                navController.navigate(MainRoute) {
+                    popUpTo(MainRoute) { inclusive = false }
                 }
             }
         }
@@ -353,39 +301,7 @@ fun AppNavGraph(
             }
         }
 
-        // 18. Saved Screen
-        composable<SavedRoute> {
-            SavedScreen(
-                onNavigateToHome = { navController.navigateToTab(HomeRoute) },
-                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
-                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
-                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
-                onNavigateToProductDetail = { productId ->
-                    navController.navigate(ProductDetailsRoute(productId))
-                }
-            )
-        }
 
-        // 19. User Profile
-        composable<UserProfileRoute> {
-            UserProfileScreen(
-                onNavigateToHome = {
-                    navController.navigateToTab(HomeRoute)
-                },
-                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
-                onNavigateToScanHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
-                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
-                onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
-                onNavigateToFamilyMemberDetail = { memberId ->
-                    navController.navigate(EditConditionsRoute(memberId))
-                },
-                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
-                onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
-            )
-        }
-
-        // 19b. Edit Profile
         composable<EditProfileRoute> {
             EditProfileScreen(
                 onNavigateBack = { navController.navigateUp() }
@@ -460,24 +376,7 @@ fun AppNavGraph(
             }
         }
 
-        // 27. Calories Dashboard
-        composable<CaloriesRoute> {
-            CaloriesScreen(
-                onNavigateToSavedProducts = { navController.navigateToTab(SavedRoute) },
-                onNavigateToHome = {
-                    navController.navigateToTab(HomeRoute)
-                },
-                onNavigateToScan = { navController.navigateToTab(CameraScanRoute) },
-                onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
-                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) },
-                onNavigateToProductDetail = { product ->
-                    navController.navigate(ProductDetailsRoute(product = product))
-                },
-                onNavigateToExercises = { navController.navigate(ExercisesRoute) },
-            )
-        }
 
-        // 28. Exercises (Placeholder)
         composable<ExercisesRoute> {
             PlaceholderScreen(
                 title = stringResource(R.string.exercises_title),

@@ -3,7 +3,6 @@ package iti.grad.nutriscan.presentation.settings.profile.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
@@ -138,6 +137,5 @@ class UserProfileViewModel @Inject constructor(
     private fun createInitialState(): UserProfileState = UserProfileState(
         streakDays = 15,
         familyMembers = persistentListOf(),
-        selectedTab = BottomNavTab.PROFILE,
     )
 }

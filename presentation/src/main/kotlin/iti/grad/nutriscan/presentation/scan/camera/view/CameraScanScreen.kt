@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.scan.camera.view
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,11 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
@@ -42,18 +42,16 @@ import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun CameraScanScreen(
     viewModel: CameraScanViewModel = hiltViewModel(),
+    bottomPadding: Dp = 0.dp,
+    snackbarHostState: SnackbarHostState,
     onNavigateToProcessing: (String) -> Unit = {},
-    onNavigateToProductDetail: (String) -> Unit = {},
-    onNavigateToHome: () -> Unit = {},
-    onNavigateToCalories: () -> Unit = {},
-    onNavigateToSaved: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -67,10 +65,6 @@ fun CameraScanScreen(
             when (effect) {
                 is CameraScanEffect.NavigateToProcessing ->
                     onNavigateToProcessing(effect.barcode)
-                is CameraScanEffect.NavigateToHome -> onNavigateToHome()
-                is CameraScanEffect.NavigateToCalories -> onNavigateToCalories()
-                is CameraScanEffect.NavigateToSaved -> onNavigateToSaved()
-                is CameraScanEffect.NavigateToProfile -> onNavigateToProfile()
                 is CameraScanEffect.ShowSnackBarRes ->
                     snackbarHostState.showSnackbar(context.getString(effect.messageResId))
                 is CameraScanEffect.RequestCameraPermission -> {
@@ -91,8 +85,11 @@ fun CameraScanScreen(
     CameraScanContent(
         state = state,
         onEvent = viewModel::onEvent,
-        onNavigateToProductDetail = onNavigateToProductDetail,
-        snackbarHostState = snackbarHostState,
+        onNavigateToProductDetail = { barcode ->
+            // Use dummy product until CameraScanScreen has access to full ProductUiModel
+            onNavigateToProductDetail(ProductUiModel(id = barcode, productName = "", imageUrl = null, verdict = iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE, calories = "0"))
+        },
+        bottomPadding = bottomPadding,
     )
 }
 
@@ -101,22 +98,11 @@ private fun CameraScanContent(
     state: CameraScanState,
     onEvent: (CameraScanEvent) -> Unit,
     onNavigateToProductDetail: (String) -> Unit,
-    snackbarHostState: SnackbarHostState,
+    bottomPadding: Dp,
 ) {
-    Scaffold(
-        containerColor = AppTheme.colors.Background,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            AppBottomNavBar(
-                selectedTab = state.selectedTab,
-                onTabClick = { tab -> onEvent(CameraScanEvent.BottomNavTabClicked(tab)) },
-            )
-        },
-    ) { innerPadding ->
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding()),
+                .fillMaxSize(),
         ) {
             when {
                 state.hasCameraPermission -> {
@@ -158,11 +144,10 @@ private fun CameraScanContent(
                     onClick = { onNavigateToProductDetail(scan.barcode) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = bottomPadding + 16.dp),
                 )
             }
         }
-    }
 }
 
 @Composable

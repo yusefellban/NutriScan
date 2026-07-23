@@ -6,18 +6,22 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.foundation.rememberScrollState
@@ -35,8 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog // Keeping if used elsewhere, but maybe unused now
 import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
@@ -59,6 +61,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.unit.Dp
 
 /**
  * Calories Dashboard ("Daily Products") — second bottom-nav tab.
@@ -70,16 +73,13 @@ import androidx.compose.ui.platform.LocalLocale
 @Composable
 fun CaloriesScreen(
     viewModel: CaloriesViewModel = hiltViewModel(),
-    onNavigateToSavedProducts: () -> Unit = {},
-    onNavigateToHome: () -> Unit = {},
-    onNavigateToScan: () -> Unit = {},
-    onNavigateToSaved: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
-    onNavigateToExercises: () -> Unit = {},
+    bottomPadding: androidx.compose.ui.unit.Dp = 0.dp,
+    snackbarHostState: SnackbarHostState,
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
+    onNavigateToSavedProducts: () -> Unit = {},
+    onNavigateToExercises: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val snackbarScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -96,12 +96,8 @@ fun CaloriesScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is CaloriesEffect.NavigateToSavedProducts -> onNavigateToSavedProducts()
-                is CaloriesEffect.NavigateToHome -> onNavigateToHome()
-                is CaloriesEffect.NavigateToScan -> onNavigateToScan()
-                is CaloriesEffect.NavigateToSaved -> onNavigateToSaved()
-                is CaloriesEffect.NavigateToProfile -> onNavigateToProfile()
                 is CaloriesEffect.NavigateToExercises -> onNavigateToExercises()
+                is CaloriesEffect.NavigateToSavedProducts -> onNavigateToSavedProducts()
                 is CaloriesEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarScope.launch {
@@ -119,7 +115,7 @@ fun CaloriesScreen(
     CaloriesContent(
         state = state,
         onEvent = viewModel::onEvent,
-        snackbarHostState = snackbarHostState,
+        bottomPadding = bottomPadding,
     )
 }
 
@@ -127,28 +123,15 @@ fun CaloriesScreen(
 private fun CaloriesContent(
     state: CaloriesState,
     onEvent: (CaloriesEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
+    bottomPadding: Dp,
 ) {
-    Scaffold(
-        containerColor = AppTheme.colors.Background,
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
-            }
-        },
-        bottomBar = {
-            AppBottomNavBar(
-                selectedTab = state.selectedTab,
-                onTabClick = { tab -> onEvent(CaloriesEvent.BottomNavTabClicked(tab)) },
-            )
-        },
-    ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(AppTheme.colors.Background)
-                .padding(innerPadding)
+                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
                 .padding(horizontal = 22.dp),
+            contentPadding = PaddingValues(bottom = bottomPadding),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {
@@ -270,7 +253,6 @@ private fun CaloriesContent(
                 )
             }
         }
-    }
 }
 
 @SuppressLint("NonObservableLocale")
