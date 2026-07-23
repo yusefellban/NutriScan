@@ -38,7 +38,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
+import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog // Keeping if used elsewhere, but maybe unused now
+import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
+import iti.grad.nutriscan.presentation.common.components.AlertButton
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
 import iti.grad.nutriscan.presentation.common.components.ProductCard
@@ -246,14 +248,27 @@ private fun CaloriesContent(
         }
 
         if (state.pendingRemoveFoodId != null) {
-            ConfirmationDialog(
+            CustomAlertDialog(
                 title = stringResource(R.string.food_log_remove_confirm_title),
                 message = stringResource(R.string.food_log_remove_confirm_message),
-                confirmLabel = stringResource(R.string.action_remove),
-                cancelLabel = stringResource(R.string.action_cancel),
-                onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
-                onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) },
-            )
+                icon = androidx.compose.ui.res.painterResource(id = R.drawable.ic_trash),
+                iconBackgroundColor = AppTheme.colors.ErrorBackground,
+                iconContentColor = AppTheme.colors.Error,
+                onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
+            ) {
+                AlertButton(
+                    text = stringResource(R.string.action_cancel),
+                    backgroundColor = AppTheme.colors.SurfaceVariant,
+                    textColor = AppTheme.colors.TextPrimary,
+                    onClick = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
+                )
+                AlertButton(
+                    text = stringResource(R.string.action_remove),
+                    backgroundColor = AppTheme.colors.Error,
+                    textColor = androidx.compose.ui.graphics.Color.White,
+                    onClick = { onEvent(CaloriesEvent.RemoveFoodConfirmed) }
+                )
+            }
         }
     }
 }
