@@ -225,4 +225,16 @@
     <string name="product_details_sat_fat">Sat. Fat</string>
     <string name="product_details_bookmark_add">Save product</string>
     <string name="product_details_bookmark_remove">Remove from saved</string>
+    <!-- News -->
+    <string name="news_screen_title">Health News</string>
+    <string name="news_chip_all">All</string>
+    <string name="news_load_error">Couldn\'t load news. Please try again.</string>
+    <string name="news_empty_state">No articles found for the selected topics.</string>
+    <string name="news_fab_content_description">Health News</string>
+    <string name="news_card_byline">By %1$s</string>
+    <string name="news_time_just_now">Just now</string>
+    <string name="news_time_minutes_ago">%1$dm ago</string>
+    <string name="news_time_hours_ago">%1$dh ago</string>
+    <string name="news_time_days_ago">%1$dd ago</string>
+    <string name="news_card_menu_content_description">More options</string>
 </resources>

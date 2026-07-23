@@ -14,4 +14,5 @@ sealed interface HomeEffect {
     data object NavigateToProfile : HomeEffect
     data object NavigateToNotifications : HomeEffect
     data class NavigateToScanResult(val scanId: String) : HomeEffect
+    data object NavigateToNews : HomeEffect
 }

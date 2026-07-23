@@ -9,12 +9,14 @@ import iti.grad.nutriscan.data.remote.api.AllergyApiService
 import iti.grad.nutriscan.data.remote.api.AuthApiService
 import iti.grad.nutriscan.data.remote.api.DiseaseApiService
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.NewsApiService
 import iti.grad.nutriscan.data.remote.api.UserApiService
 import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.ErrorInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.NutriScanAuthenticator
 import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,6 +24,7 @@ import retrofit2.Retrofit
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -142,4 +145,46 @@ object NetworkModule {
     fun provideTokenRefreshApiService(@javax.inject.Named("TokenRefreshRetrofit") retrofit: Retrofit): TokenRefreshApiService {
         return retrofit.create(TokenRefreshApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    @Named("NewsOkHttpClient")
+    fun provideNewsOkHttpClient(): OkHttpClient {
+        // Deliberately its own client: the shared AuthInterceptor would attach our
+        // backend's Bearer token to a third-party public API, and ErrorInterceptor's
+        // 422 -> OcrLowConfidenceException mapping doesn't apply to newsapi.org.
+        val apiKeyInterceptor = Interceptor { chain ->
+            val original = chain.request()
+            val urlWithKey = original.url.newBuilder()
+                .addQueryParameter("apiKey", BuildConfig.NEWS_API_KEY)
+                .build()
+            chain.proceed(original.newBuilder().url(urlWithKey).build())
+        }
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("NewsRetrofit")
+    fun provideNewsRetrofit(
+        @Named("NewsOkHttpClient") client: OkHttpClient,
+        json: Json,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.NEWS_API_BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideNewsApiService(@Named("NewsRetrofit") retrofit: Retrofit): NewsApiService =
+        retrofit.create(NewsApiService::class.java)
 }

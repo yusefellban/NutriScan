@@ -205,4 +205,16 @@
     <string name="product_details_sat_fat">دهون مشبعة</string>
     <string name="product_details_bookmark_add">حفظ المنتج</string>
     <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
+    <!-- News -->
+    <string name="news_screen_title">أخبار صحية</string>
+    <string name="news_chip_all">الكل</string>
+    <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
+    <string name="news_empty_state">لا توجد مقالات للمواضيع المحددة.</string>
+    <string name="news_fab_content_description">أخبار صحية</string>
+    <string name="news_card_byline">بقلم %1$s</string>
+    <string name="news_time_just_now">الآن</string>
+    <string name="news_time_minutes_ago">منذ %1$d د</string>
+    <string name="news_time_hours_ago">منذ %1$d س</string>
+    <string name="news_time_days_ago">منذ %1$d ي</string>
+    <string name="news_card_menu_content_description">خيارات إضافية</string>
 </resources>

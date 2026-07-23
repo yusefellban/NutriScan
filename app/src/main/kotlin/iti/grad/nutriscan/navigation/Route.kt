@@ -120,3 +120,6 @@ object CaloriesRoute
 
 @Serializable
 object ExercisesRoute
+
+@Serializable
+object NewsRoute
