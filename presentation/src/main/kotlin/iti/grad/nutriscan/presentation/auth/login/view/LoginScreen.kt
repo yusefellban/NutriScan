@@ -32,9 +32,9 @@ import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
 import iti.grad.nutriscan.presentation.auth.login.view.components.LoginFormBody
 import iti.grad.nutriscan.presentation.auth.login.viewmodel.LoginViewModel
-import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.AuthHeader
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.res.stringResource
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -55,7 +55,6 @@ fun LoginScreen(
     onNavigateToForgotPassword: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val authService = remember { AuthorizationService(context) }
     
@@ -111,19 +110,39 @@ fun LoginScreen(
                     val intent = authService.getAuthorizationRequestIntent(authRequest)
                     authLauncher.launch(intent)
                 }
-                is LoginEffect.ShowErrorDialog -> {
-                    errorDialogMessage = effect.messageStr
-                }
             }
         }
     }
 
-    errorDialogMessage?.let { msg ->
-        AppErrorDialog(
-            title = "Login Failed",
-            message = msg,
-            onDismiss = { errorDialogMessage = null }
-        )
+    when (val alert = state.alertState) {
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError -> {
+            iti.grad.nutriscan.presentation.common.components.InternetAlert(
+                onRetry = { viewModel.onEvent(LoginEvent.RetryAction) },
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error -> {
+            iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+                title = stringResource(id = R.string.alert_login_failed_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning -> {
+            iti.grad.nutriscan.presentation.common.components.WarningAlert(
+                title = stringResource(id = R.string.alert_login_failed_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success -> {
+            iti.grad.nutriscan.presentation.common.components.SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.None -> Unit
     }
 
     LoginScreenContent(

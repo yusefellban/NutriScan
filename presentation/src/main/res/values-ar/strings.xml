@@ -222,13 +222,18 @@
 
     <!-- Custom Alerts -->
     <string name="alert_delete_warning_title">تحذير الحذف</string>
-    <string name="alert_success_title">تنبيه نجاح</string>
-    <string name="alert_error_title">تنبيه خطأ</string>
-    <string name="alert_warning_title">تنبيه تحذير</string>
-    <string name="alert_internet_title">تنبيه الإنترنت</string>
-    <string name="alert_test_message">هذا تنبيه اختباري للتحقق من عمل الإشعارات بشكل صحيح. لا يلزم اتخاذ أي إجراء.</string>
+    <string name="alert_success_title">نجاح</string>
+    <string name="alert_error_title">خطأ</string>
+    <string name="alert_warning_title">تحذير</string>
+    <string name="alert_internet_title">لا يوجد اتصال</string>
     <string name="alert_button_cancel">إلغاء</string>
     <string name="alert_button_delete">حذف</string>
-    <string name="alert_button_ok">حسناً</string>
+    <string name="alert_button_ok">موافق</string>
     <string name="alert_button_retry">إعادة المحاولة</string>
+    <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">فشل تسجيل الدخول</string>
+    <string name="alert_registration_failed_title">فشل التسجيل</string>
+    <string name="alert_reset_failed_title">فشل إعادة التعيين</string>
 </resources>

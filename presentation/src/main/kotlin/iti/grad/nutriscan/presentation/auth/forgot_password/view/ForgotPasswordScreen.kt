@@ -31,7 +31,6 @@ import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.Forg
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.PasswordSentDialog
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ResetMethodCard
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.EmailInputDialog
-import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
@@ -66,8 +65,8 @@ fun ForgotPasswordScreen(
     }
 
     if (errorDialogMessage != null) {
-        AppErrorDialog(
-            title = "Error",
+        iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+            title = androidx.compose.ui.res.stringResource(id = R.string.alert_reset_failed_title),
             message = errorDialogMessage!!,
             onDismiss = { errorDialogMessage = null }
         )

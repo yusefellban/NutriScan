@@ -10,6 +10,6 @@ data class LoginState(
     val isLoading: Boolean = false,
     @StringRes val emailErrorResId: Int? = null,
     @StringRes val passwordErrorResId: Int? = null,
-    val genericErrorMessage: String? = null,
-    val oidcAuthConfig: OidcAuthConfig? = null
+    val oidcAuthConfig: OidcAuthConfig? = null,
+    val alertState: iti.grad.nutriscan.presentation.common.state.AuthAlertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None
 )

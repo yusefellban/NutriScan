@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,7 +41,6 @@ fun CustomAlertDialog(
     icon: ImageVector,
     iconBackgroundColor: Color,
     iconContentColor: Color,
-    glowColor: Color,
     onDismiss: () -> Unit,
     buttons: @Composable RowScope.() -> Unit
 ) {
@@ -49,7 +49,8 @@ fun CustomAlertDialog(
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
         )
     ) {
         val view = androidx.compose.ui.platform.LocalView.current
@@ -59,8 +60,9 @@ fun CustomAlertDialog(
         }
 
         Box(
-            modifier = Modifier.fillMaxWidth()
-                .background(Color(0x800F474A))
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xB30F474A))
                 .clickable(
                     interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                     indication = null,
@@ -79,57 +81,61 @@ fun CustomAlertDialog(
                     ),
                 contentAlignment = Alignment.TopCenter
             ) {
-                // Glow effect behind the dialog
+                // We wrap the Main Card and its Glow in a Box
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 28.dp) // align with the main card
-                        .height(200.dp) // approximate height to create a halo
-                        .blur(radius = 48.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                        .background(glowColor.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
-                )
-
-                // Main Card
-                Column(
-                    modifier = Modifier
-                        .padding(top = 28.dp) // Leave space for half the icon
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(AppTheme.colors.AuthDialogBackground)
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(top = 28.dp) // Leave space for half the icon at the top
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp)) // space for the icon overlap
-                    
-                    Text(
-                        text = title,
-                        style = AppTheme.typography.titleLarge.copy(
-                            fontFamily = LexendDeca,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        ),
-                        color = AppTheme.colors.ProfileSetupTitle,
-                        textAlign = TextAlign.Center
+                    // Glow effect behind the dialog
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .blur(radius = 48.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                            .background(Color(0xFF13A4AB).copy(alpha = 0.8f), RoundedCornerShape(24.dp))
                     )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = message,
-                        style = AppTheme.typography.bodyMedium.copy(
-                            fontFamily = LexendDeca
-                        ),
-                        color = AppTheme.colors.AuthDialogSubtitle,
-                        textAlign = TextAlign.Center
-                    )
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+
+                    // Main Card
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(AppTheme.colors.AuthDialogBackground)
+                            .padding(horizontal = 24.dp, vertical = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        buttons()
+                        Spacer(modifier = Modifier.height(16.dp)) // space for the icon overlap
+                        
+                        Text(
+                            text = title,
+                            style = AppTheme.typography.titleLarge.copy(
+                                fontFamily = LexendDeca,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            ),
+                            color = AppTheme.colors.ProfileSetupTitle,
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = message,
+                            style = AppTheme.typography.bodyMedium.copy(
+                                fontFamily = LexendDeca
+                            ),
+                            color = AppTheme.colors.AuthDialogSubtitle,
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            buttons()
+                        }
                     }
                 }
                 

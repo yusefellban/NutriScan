@@ -36,13 +36,22 @@ class RegisterViewModel @Inject constructor(
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
-            is RegisterEvent.EmailChanged -> _state.update { it.copy(email = event.value, emailErrorResId = null) }
-            is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value, passwordErrorResId = null) }
-            is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null) }
+            is RegisterEvent.EmailChanged -> _state.update { it.copy(email = event.value, emailErrorResId = null, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
+            is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value, passwordErrorResId = null, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
+            is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
             is RegisterEvent.TogglePasswordVisibility -> _state.update { it.copy(passwordVisible = !it.passwordVisible) }
             is RegisterEvent.ToggleConfirmPasswordVisibility -> _state.update { it.copy(confirmPasswordVisible = !it.confirmPasswordVisible) }
             is RegisterEvent.SignUpClicked -> handleSignUp()
             is RegisterEvent.SignInClicked -> navigateToSignIn()
+            is RegisterEvent.DismissAlert -> {
+                val wasSuccess = _state.value.alertState is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
+                if (wasSuccess) {
+                    // When the user clicks OK on the success alert, navigate to Login
+                    navigateToSignIn()
+                }
+            }
+            is RegisterEvent.RetryAction -> handleSignUp()
         }
     }
 
@@ -73,24 +82,34 @@ class RegisterViewModel @Inject constructor(
             )
         }
         
-        if (emailError != null || passwordError != null || confirmPasswordError != null) return
+        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+            _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning(messageResId = R.string.error_validation_fields)) }
+            return
+        }
         
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
             registerUseCase(currentState.email, currentState.password)
                 .onSuccess {
-                    // Automatically trigger verification email after successful registration
                     resendVerificationEmailUseCase(currentState.email)
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(RegisterEffect.NavigateToEmailVerification(currentState.email))
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success(messageResId = R.string.success_account_created)
+                        ) 
+                    }
                 }
                 .onFailure { throwable ->
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(
-                        RegisterEffect.ShowErrorDialog(
-                            messageStr = throwable.message ?: "Registration failed. Please try again."
-                        )
-                    )
+                    val msg = throwable.message.orEmpty()
+                    val isConflict = msg.contains("409") || msg.contains("exists")
+                    
+                    val newAlertState = when {
+                        throwable is java.io.IOException -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError
+                        isConflict -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning(messageResId = R.string.error_email_exists)
+                        msg.contains("500") || msg.contains("Server Error") -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = R.string.error_server_down)
+                        else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = throwable.message ?: "Registration failed")
+                    }
+                    _state.update { it.copy(isLoading = false, alertState = newAlertState) }
                 }
         }
     }

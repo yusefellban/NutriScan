@@ -11,5 +11,6 @@ data class RegisterState(
     val confirmPasswordVisible: Boolean = false,
     @StringRes val emailErrorResId: Int? = null,
     @StringRes val passwordErrorResId: Int? = null,
-    @StringRes val confirmPasswordErrorResId: Int? = null
+    @StringRes val confirmPasswordErrorResId: Int? = null,
+    val alertState: iti.grad.nutriscan.presentation.common.state.AuthAlertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None
 )

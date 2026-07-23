@@ -39,10 +39,10 @@ class LoginViewModel @Inject constructor(
     fun onEvent(event: LoginEvent) {
         when (event) {
             is LoginEvent.EmailChanged -> _state.update { 
-                it.copy(email = event.value, emailErrorResId = null, genericErrorMessage = null) 
+                it.copy(email = event.value, emailErrorResId = null, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) 
             }
             is LoginEvent.PasswordChanged -> _state.update { 
-                it.copy(password = event.value, passwordErrorResId = null, genericErrorMessage = null) 
+                it.copy(password = event.value, passwordErrorResId = null, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) 
             }
             is LoginEvent.TogglePasswordVisibility -> _state.update { 
                 it.copy(passwordVisible = !it.passwordVisible) 
@@ -51,9 +51,7 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.SocialLoginClicked -> handleSocialLogin(event)
             is LoginEvent.GoogleLoginSuccess -> handleGoogleLoginSuccess(event)
             is LoginEvent.GoogleLoginFailure -> {
-                viewModelScope.launch {
-                    _effect.send(LoginEffect.ShowErrorDialog(messageStr = event.error))
-                }
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = event.error)) }
             }
             is LoginEvent.SignUpClicked -> {
                 viewModelScope.launch { _effect.send(LoginEffect.NavigateToRegister) }
@@ -61,6 +59,8 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.ForgotPasswordClicked -> {
                 viewModelScope.launch { _effect.send(LoginEffect.NavigateToForgotPassword) }
             }
+            is LoginEvent.DismissAlert -> _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
+            is LoginEvent.RetryAction -> handleSignIn()
         }
     }
 
@@ -72,14 +72,15 @@ class LoginViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     emailErrorResId = emailError,
-                    passwordErrorResId = passwordError
+                    passwordErrorResId = passwordError,
+                    alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning(messageResId = iti.grad.presentation.R.string.error_validation_fields)
                 )
             }
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, genericErrorMessage = null) }
+            _state.update { it.copy(isLoading = true, alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.None) }
             
             val result = loginWithEmailUseCase(_state.value.email, _state.value.password)
             
@@ -90,8 +91,16 @@ class LoginViewModel @Inject constructor(
                 userRepository.fetchAndSyncProfile()
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _state.update { it.copy(genericErrorMessage = error.message) }
-                _effect.send(LoginEffect.ShowErrorDialog(messageStr = error.message ?: "Login failed"))
+                val msg = error.message.orEmpty()
+                val isUnauthorized = error.javaClass.simpleName == "UnauthorizedException" || msg.contains("401") || msg.contains("invalid_grant")
+                
+                val newAlertState = when {
+                    error is java.io.IOException -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError
+                    isUnauthorized -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = iti.grad.presentation.R.string.error_invalid_credentials)
+                    msg.contains("500") || msg.contains("Server Error") -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageResId = iti.grad.presentation.R.string.error_server_down)
+                    else -> iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = error.message ?: "Login failed")
+                }
+                _state.update { it.copy(alertState = newAlertState) }
             }
         }
     }
@@ -102,7 +111,7 @@ class LoginViewModel @Inject constructor(
                 val config = getOidcAuthConfigUseCase()
                 _effect.send(LoginEffect.LaunchGoogleLogin(config))
             } else {
-                _effect.send(LoginEffect.ShowErrorDialog(messageStr = "${event.provider.name} login not implemented yet"))
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = "${event.provider.name} login not implemented yet")) }
             }
         }
     }
@@ -117,7 +126,7 @@ class LoginViewModel @Inject constructor(
                 userRepository.fetchAndSyncProfile()
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _effect.send(LoginEffect.ShowErrorDialog(messageStr = "Failed to save Google login tokens: ${error.message}"))
+                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error(messageStr = "Failed to save Google login tokens: ${error.message}")) }
             }
         }
     }

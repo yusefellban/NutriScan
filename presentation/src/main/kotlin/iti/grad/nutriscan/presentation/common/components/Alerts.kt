@@ -30,7 +30,6 @@ fun DeleteWarningAlert(
         icon = Icons.Rounded.Warning,
         iconBackgroundColor = AppTheme.colors.VerdictYellow,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.VerdictYellow,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -64,7 +63,6 @@ fun SuccessAlert(
         icon = Icons.Rounded.Check,
         iconBackgroundColor = AppTheme.colors.Accent,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.Accent,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -96,7 +94,6 @@ fun SuccessAlert(
         icon = Icons.Rounded.Check,
         iconBackgroundColor = AppTheme.colors.Accent,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.Accent,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -121,7 +118,6 @@ fun ErrorAlert(
         icon = Icons.Rounded.Error,
         iconBackgroundColor = AppTheme.colors.Error,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.Error,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -146,7 +142,6 @@ fun WarningAlert(
         icon = Icons.Rounded.Warning,
         iconBackgroundColor = AppTheme.colors.VerdictYellow,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.VerdictYellow,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -172,7 +167,6 @@ fun InternetAlert(
         icon = Icons.Rounded.WifiOff,
         iconBackgroundColor = AppTheme.colors.Error,
         iconContentColor = AppTheme.colors.Background,
-        glowColor = AppTheme.colors.Error,
         onDismiss = onDismiss
     ) {
         AlertButton(

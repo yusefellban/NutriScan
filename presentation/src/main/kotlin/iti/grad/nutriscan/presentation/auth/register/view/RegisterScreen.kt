@@ -66,7 +66,6 @@ import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.AuthHeader
 import iti.grad.nutriscan.presentation.auth.register.view.components.RegisterFormBody
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
@@ -81,26 +80,44 @@ fun RegisterScreen(
     onNavigateToSignIn: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
-
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is RegisterEffect.NavigateToEmailVerification -> onNavigateToEmailVerification(effect.email)
                 is RegisterEffect.NavigateToSignIn -> onNavigateToSignIn()
-                is RegisterEffect.ShowErrorDialog -> {
-                    errorDialogMessage = effect.messageStr
-                }
             }
         }
     }
 
-    errorDialogMessage?.let { msg ->
-        AppErrorDialog(
-            title = "Registration Failed",
-            message = msg,
-            onDismiss = { errorDialogMessage = null }
-        )
+    when (val alert = state.alertState) {
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError -> {
+            iti.grad.nutriscan.presentation.common.components.InternetAlert(
+                onRetry = { viewModel.onEvent(RegisterEvent.RetryAction) },
+                onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error -> {
+            iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+                title = stringResource(id = R.string.alert_registration_failed_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning -> {
+            iti.grad.nutriscan.presentation.common.components.WarningAlert(
+                title = stringResource(id = R.string.alert_registration_failed_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success -> {
+            iti.grad.nutriscan.presentation.common.components.SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.None -> Unit
     }
 
     Scaffold(
