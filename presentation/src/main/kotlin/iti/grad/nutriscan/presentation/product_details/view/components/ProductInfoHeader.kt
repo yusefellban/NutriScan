@@ -18,12 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.components.VerdictBadge
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
+import iti.grad.nutriscan.presentation.common.theme.ProductDetailsTypography
 import iti.grad.presentation.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -49,29 +49,23 @@ fun ProductInfoHeader(
         ) {
             Text(
                 text = productName,
-                style = AppTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                ),
+                style = ProductDetailsTypography.productTitle,
                 color = AppTheme.colors.ProductDetailTitleText,
                 modifier = Modifier.weight(1f),
             )
             if (scanDate != null) {
                 Column(
-                    horizontalAlignment = Alignment.End,
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
                         text = stringResource(R.string.product_details_scanned_at),
-                        style = AppTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                        style = AppTheme.typography.bodyMedium,
                         color = AppTheme.colors.ProductDetailScanDate,
                     )
                     Text(
                         text = scanDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                        style = AppTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                        ),
-                        color = AppTheme.colors.Primary,
+                        style = AppTheme.typography.bodyMedium,
+                        color = AppTheme.colors.ProductDetailScanDateBadgeText,
                         modifier = Modifier
                             .background(
                                 color = AppTheme.colors.ProductDetailScanDateBadgeBg,
@@ -93,8 +87,8 @@ fun ProductInfoHeader(
             VerdictBadge(verdict = verdict)
             Text(
                 text = stringResource(R.string.product_details_for_you),
-                style = AppTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = AppTheme.colors.TextSecondary,
+                style = AppTheme.typography.labelLarge,
+                color = AppTheme.colors.Teal1000,
             )
         }
 
@@ -106,12 +100,12 @@ fun ProductInfoHeader(
                     modifier = Modifier
                         .padding(top = 7.dp)
                         .size(5.dp)
-                        .background(AppTheme.colors.ProductDetailSafetyText, CircleShape),
+                        .background(AppTheme.colors.ProductDetailSafetyReasonText, CircleShape),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = safetyReasonText,
-                    style = AppTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                    style = CaloriesTypography.badgeText,
                     color = AppTheme.colors.ProductDetailSafetyReasonText,
                 )
             }

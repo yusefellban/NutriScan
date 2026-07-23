@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.domain.scan.model.FlaggedIngredient
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
 
 @Composable
 fun FlaggedIngredientCard(
@@ -40,10 +41,7 @@ fun FlaggedIngredientCard(
         // Ingredient name with "- " prefix (matches mockup)
         Text(
             text = "- ${ingredient.name}",
-            style = AppTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-            ),
+            style = AppTheme.typography.bodyMedium,
             color = AppTheme.colors.ProductDetailIngredientName,
             maxLines = 2,
         )
@@ -53,10 +51,7 @@ fun FlaggedIngredientCard(
         // Allergy / condition tag pill
         Text(
             text = ingredient.matchTag,
-            style = AppTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = 10.sp,
-            ),
+            style = CaloriesTypography.badgeText,
             color = AppTheme.colors.ProductDetailMatchTagText,
             modifier = Modifier
                 .background(
@@ -71,7 +66,7 @@ fun FlaggedIngredientCard(
         // Reason text
         Text(
             text = ingredient.reason,
-            style = AppTheme.typography.bodySmall.copy(fontSize = 11.sp),
+            style = CaloriesTypography.badgeText,
             color = AppTheme.colors.ProductDetailIngredientReasonText,
         )
     }

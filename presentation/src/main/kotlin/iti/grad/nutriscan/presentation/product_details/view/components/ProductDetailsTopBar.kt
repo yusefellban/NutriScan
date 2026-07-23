@@ -62,7 +62,7 @@ fun ProductDetailsTopBar(
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(AppTheme.colors.Accent) // A lighter teal for contrast
+                .background(AppTheme.colors.Teal700)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -79,7 +79,7 @@ fun ProductDetailsTopBar(
                     if (isBookmarked) R.string.product_details_bookmark_remove
                     else R.string.product_details_bookmark_add
                 ),
-                tint = AppTheme.colors.PrimaryVariant, // Darker teal tint for icon
+                tint = AppTheme.colors.Teal1600,
                 modifier = Modifier.size(24.dp)
             )
         }

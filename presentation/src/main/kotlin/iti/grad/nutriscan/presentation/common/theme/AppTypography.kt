@@ -145,3 +145,16 @@ object CaloriesTypography {
         lineHeight = 15.sp
     )
 }
+
+// --- Feature-Specific Typography Tokens ---
+
+/**
+ * Typography styles specific to the Product Details screen.
+ */
+object ProductDetailsTypography {
+    val productTitle = TextStyle(
+        fontFamily = PlusJakartaSans,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+    )
+}

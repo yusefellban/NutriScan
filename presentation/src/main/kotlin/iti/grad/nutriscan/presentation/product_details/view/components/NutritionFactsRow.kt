@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
 
 /**
  * Horizontal row of nutritional macro pills.
@@ -74,10 +75,7 @@ private fun NutritionPill(
         Text(
             text = label,
             textAlign = TextAlign.Center,
-            style = AppTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = 11.sp,
-            ),
+            style = CaloriesTypography.badgeText,
             color = AppTheme.colors.ProductDetailNutritionLabelText,
             modifier = Modifier
                 .fillMaxWidth()
@@ -91,10 +89,7 @@ private fun NutritionPill(
         Text(
             text = value,
             textAlign = TextAlign.Center,
-            style = AppTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-            ),
+            style = CaloriesTypography.badgeText,
             color = AppTheme.colors.ProductDetailNutritionText,
             modifier = Modifier
                 .fillMaxWidth()

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
@@ -37,10 +36,7 @@ fun VerdictBadge(
     ) {
         Text(
             text = stringResource(id = textResId),
-            style = AppTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 11.sp
-            ),
+            style = AppTheme.typography.labelLarge,
             color = textColor
         )
     }

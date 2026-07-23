@@ -121,6 +121,7 @@ internal data class AppColorsExtension(
     val ProductDetailImageCardBg: Color,
     val ProductDetailScanDate: Color,
     val ProductDetailScanDateBadgeBg: Color,
+    val ProductDetailScanDateBadgeText: Color,
     val ProductDetailSafetyText: Color,
     val ProductDetailTitleText: Color,
     val ProductDetailSafetyReasonText: Color,
@@ -348,6 +349,7 @@ data class AppColors internal constructor(
     val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
     val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
     val ProductDetailScanDateBadgeBg: Color get() = extension.ProductDetailScanDateBadgeBg
+    val ProductDetailScanDateBadgeText: Color get() = extension.ProductDetailScanDateBadgeText
     val ProductDetailSafetyText: Color get() = extension.ProductDetailSafetyText
     val ProductDetailTitleText: Color get() = extension.ProductDetailTitleText
     val ProductDetailSafetyReasonText: Color get() = extension.ProductDetailSafetyReasonText
@@ -607,6 +609,7 @@ fun lightColors() = AppColors(
         ProductDetailImageCardBg = Color(0xFFF8F8F9), // Gray100
         ProductDetailScanDate = Color(0xFF898989), // Gray700
         ProductDetailScanDateBadgeBg = Color(0xFFE8FAFA), // Teal100
+        ProductDetailScanDateBadgeText = Color(0xFF13A4AB), // Primary (Teal1000)
         ProductDetailSafetyText = Color(0xFF393C3C), // Gray1600
 
         ProductDetailTitleText = Color(0xFF13A4AB), // Teal1000
@@ -874,7 +877,8 @@ fun darkColors() = AppColors(
         // Product Details
         ProductDetailImageCardBg = Color(0xFF0F474A), // Teal1600
         ProductDetailScanDate = Color(0xFFA3E9EC), // Teal400
-        ProductDetailScanDateBadgeBg = Color(0xFF0B5F65), // Teal1400
+        ProductDetailScanDateBadgeBg = Color(0xFFD4F1F2), // Teal200
+        ProductDetailScanDateBadgeText = Color(0xFF17B8BE), // Teal800
         ProductDetailSafetyText = Color(0xFF13A4AB), // Teal1000
 
         ProductDetailTitleText = Color(0xFFA3E9EC), // Teal400
