@@ -239,4 +239,16 @@
     <string name="news_time_hours_ago">%1$dh ago</string>
     <string name="news_time_days_ago">%1$dd ago</string>
     <string name="news_card_menu_content_description">More options</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">Delete Warning</string>
+    <string name="alert_success_title">Success Alert</string>
+    <string name="alert_error_title">Error Alert</string>
+    <string name="alert_warning_title">Warning Alert</string>
+    <string name="alert_internet_title">Internet Alert</string>
+    <string name="alert_test_message">This is a test alert to verify that notifications are working correctly. No action is required.</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="alert_button_delete">Delete</string>
+    <string name="alert_button_ok">ok</string>
+    <string name="alert_button_retry">Retry</string>
 </resources>

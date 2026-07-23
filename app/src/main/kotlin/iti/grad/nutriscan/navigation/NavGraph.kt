@@ -512,7 +512,7 @@ fun AppNavGraph(
             }
         }
 
-        // 29. Product Details Placeholder
+
 
     }
 }
