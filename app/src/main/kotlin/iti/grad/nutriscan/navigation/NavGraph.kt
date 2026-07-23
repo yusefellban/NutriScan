@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,14 +33,21 @@ import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.presentation.R
 
 /**
- * Navigates to a bottom-nav tab destination, popping back to the graph's start destination
- * (saving its state) and restoring the target tab's own state if it's been visited before.
- * Keeps exactly one back-stack entry (and one ViewModel instance) per tab, regardless of how
- * many times the user bounces between tabs — the standard Compose-Navigation bottom-nav pattern.
+ * Navigates to a bottom-nav tab destination, popping back to [HomeRoute] (saving its state)
+ * and restoring the target tab's own state if it's been visited before. Keeps exactly one
+ * back-stack entry (and one ViewModel instance) per tab, regardless of how many times the
+ * user bounces between tabs — the standard Compose-Navigation bottom-nav pattern.
+ *
+ * Targets [HomeRoute] explicitly rather than `graph.findStartDestination()`: the graph's
+ * static start destination is [SplashRoute], which is removed from the back stack (via
+ * `popUpTo(SplashRoute) { inclusive = true }`) as soon as the user reaches Home or Login.
+ * Once that destination no longer exists anywhere in the back stack, `popUpTo` silently
+ * pops nothing, so every tab click would just keep stacking on top instead of collapsing
+ * back to Home.
  */
 private fun NavHostController.navigateToTab(route: Any) {
     navigate(route) {
-        popUpTo(graph.findStartDestination().id) { saveState = true }
+        popUpTo<HomeRoute> { saveState = true }
         launchSingleTop = true
         restoreState = true
     }
@@ -227,10 +233,10 @@ fun AppNavGraph(
                 onNavigateToProductDetailsPlaceholder = { barcode ->
                     navController.navigate(ProductDetailsPlaceholderRoute(barcode = barcode))
                 },
-                onNavigateToHome = { navController.navigate(HomeRoute) },
+                onNavigateToHome = { navController.navigateToTab(HomeRoute) },
                 onNavigateToCalories = { navController.navigateToTab(CaloriesRoute) },
                 onNavigateToSaved = { navController.navigateToTab(SavedRoute) },
-                onNavigateToProfile = { navController.navigate(UserProfileRoute) }
+                onNavigateToProfile = { navController.navigateToTab(UserProfileRoute) }
             )
         }
 
