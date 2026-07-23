@@ -4,18 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -35,6 +35,7 @@ import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
+import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
 import iti.grad.nutriscan.presentation.home.view.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
@@ -61,6 +62,7 @@ fun HomeScreen(
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToScanResult: (String) -> Unit = {},
     onNavigateToNews: () -> Unit = {},
+    onNavigateToChatWithAi: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -75,6 +77,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeEffect.NavigateToScanResult -> onNavigateToScanResult(effect.scanId)
                 is HomeEffect.NavigateToNews -> onNavigateToNews()
+                is HomeEffect.NavigateToChatWithAi -> onNavigateToChatWithAi()
             }
         }
     }
@@ -92,23 +95,12 @@ private fun HomeScreenContent(
 ) {
     Scaffold(
         containerColor = AppTheme.colors.Background,
+        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top),
         bottomBar = {
             AppBottomNavBar(
                 selectedTab = state.selectedTab,
                 onTabClick = { tab -> onEvent(HomeEvent.BottomNavTabClicked(tab)) },
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onEvent(HomeEvent.NewsFabClicked) },
-                containerColor = AppTheme.colors.ScanButtonBackground,
-                contentColor = AppTheme.colors.ScanButtonIconTint,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Article,
-                    contentDescription = stringResource(R.string.news_fab_content_description),
-                )
-            }
         },
     ) { innerPadding ->
         // Home is the only tab rendered inline — every other bottom-nav tab
@@ -127,7 +119,10 @@ private fun HomeFeedContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppTheme.colors.Background)
-                .padding(innerPadding),
+                .padding(top = innerPadding.calculateTopPadding() - 8.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                bottom = innerPadding.calculateBottomPadding(),
+            ),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             // ── Greeting Header ──
@@ -153,6 +148,33 @@ private fun HomeFeedContent(
                 )
             }
 
+            // ── Explore Section ──
+            item {
+                Spacer(modifier = Modifier.height(14.dp))
+                Text(
+                    text = stringResource(R.string.home_explore),
+                    style = AppTheme.typography.headlineMedium,
+                    color = AppTheme.colors.PrimaryVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    ExploreItemRow(
+                        iconResId = R.drawable.ic_health_news,
+                        label = stringResource(R.string.home_health_news),
+                        onClick = { onEvent(HomeEvent.HealthNewsClicked) },
+                    )
+                    ExploreItemRow(
+                        iconResId = R.drawable.ic_chat_ai,
+                        label = stringResource(R.string.home_chat_with_ai),
+                        onClick = { onEvent(HomeEvent.ChatWithAiClicked) },
+                    )
+                }
+            }
+
             // ── Recent History Header ──
             item {
                 Spacer(modifier = Modifier.height(14.dp))
@@ -165,13 +187,12 @@ private fun HomeFeedContent(
                 ) {
                     Text(
                         text = stringResource(R.string.home_recent_history),
-                        style = AppTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
+                        style = AppTheme.typography.headlineMedium,
                         color = AppTheme.colors.PrimaryVariant,
                     )
                     Text(
                         text = stringResource(R.string.home_view_all),
-                        style = AppTheme.typography.titleMedium,
+                        style = AppTheme.typography.bodyLarge,
                         color = AppTheme.colors.Teal800,
                         modifier = Modifier.clickable(
                             interactionSource = remember { MutableInteractionSource() },

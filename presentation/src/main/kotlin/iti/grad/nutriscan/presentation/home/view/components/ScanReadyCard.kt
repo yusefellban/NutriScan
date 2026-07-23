@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -86,13 +85,12 @@ fun ScanReadyCard(
         Text(
             text = stringResource(R.string.home_ready_to_scan),
             style = AppTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
             color = AppTheme.colors.HealthSubtitleColor,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.home_scan_subtitle),
-            style = AppTheme.typography.titleSmall,
+            style = AppTheme.typography.bodyMedium,
             color = AppTheme.colors.Teal800,
         )
     }

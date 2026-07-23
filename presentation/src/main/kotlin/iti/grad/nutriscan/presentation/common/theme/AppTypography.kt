@@ -116,6 +116,46 @@ val AppTypography = Typography(
 )
 
 /**
+ * One-off text styles for Home screen composables that don't fit Material3's fixed
+ * 15-slot [Typography] scale (which can't gain new named roles) but are reused across
+ * 2+ Home screen composables, so they live here rather than being duplicated inline
+ * per call site.
+ */
+object HomeTypography {
+    /** "Daily Health Tip" card title — Plus Jakarta Sans SemiBold 14sp/20sp. */
+    val dailyTipTitle = TextStyle(
+        fontFamily = PlusJakartaSans,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp
+    )
+
+    /** Recent History item product name — Lexend Deca Medium 18sp/22sp. */
+    val historyItemTitle = TextStyle(
+        fontFamily = LexendDeca,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        lineHeight = 22.sp
+    )
+
+    /** Recent History item scan date/time — Lexend Deca Light 12sp/15sp. */
+    val historyItemDate = TextStyle(
+        fontFamily = LexendDeca,
+        fontWeight = FontWeight.Light,
+        fontSize = 12.sp,
+        lineHeight = 15.sp
+    )
+
+    /** Verdict badge pill text ("HEALTHY", "PROBIOTIC"...) — Lexend Deca Light 10sp/13sp. */
+    val verdictBadge = TextStyle(
+        fontFamily = LexendDeca,
+        fontWeight = FontWeight.Light,
+        fontSize = 10.sp,
+        lineHeight = 13.sp
+    )
+}
+
+/**
  * One-off text styles that don't fit Material3's fixed 15-slot [Typography] scale
  * (which can't gain new named roles) but are reused across 2+ Calories Dashboard
  * composables, so they live here rather than being duplicated inline per call site.

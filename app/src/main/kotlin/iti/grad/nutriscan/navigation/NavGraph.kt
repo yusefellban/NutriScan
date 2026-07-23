@@ -212,6 +212,7 @@ fun AppNavGraph(
                     navController.navigate(ScanResultRoute(scanId))
                 },
                 onNavigateToNews = { navController.navigate(NewsRoute) },
+                onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
             )
         }
 
@@ -469,6 +470,16 @@ fun AppNavGraph(
             NewsScreen(
                 onNavigateBack = { navController.navigateUp() },
             )
+        }
+
+        // 31. Chat with AI (Placeholder)
+        composable<ChatWithAiRoute> {
+            PlaceholderScreen(
+                title = stringResource(R.string.home_chat_with_ai),
+                buttonText = stringResource(R.string.action_go_back),
+            ) {
+                navController.navigateUp()
+            }
         }
 
         // 29. Product Details Placeholder

@@ -168,10 +168,18 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `when NewsFabClicked, effect is NavigateToNews`() = runTest(testDispatcher) {
+    fun `when HealthNewsClicked, effect is NavigateToNews`() = runTest(testDispatcher) {
         viewModel.effect.test {
-            viewModel.onEvent(HomeEvent.NewsFabClicked)
+            viewModel.onEvent(HomeEvent.HealthNewsClicked)
             assertEquals(HomeEffect.NavigateToNews, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when ChatWithAiClicked, effect is NavigateToChatWithAi`() = runTest(testDispatcher) {
+        viewModel.effect.test {
+            viewModel.onEvent(HomeEvent.ChatWithAiClicked)
+            assertEquals(HomeEffect.NavigateToChatWithAi, awaitItem())
         }
     }
 }

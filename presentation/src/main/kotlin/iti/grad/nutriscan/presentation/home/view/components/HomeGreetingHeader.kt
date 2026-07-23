@@ -80,7 +80,7 @@ fun HomeGreetingHeader(
             )
             Text(
                 text = stringResource(R.string.home_subtitle),
-                style = AppTheme.typography.titleSmall,
+                style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.HealthSubtitleColor,
             )
         }

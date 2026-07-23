@@ -69,7 +69,8 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.HistoryItemClicked -> emitEffect(
                 HomeEffect.NavigateToScanResult(event.itemId)
             )
-            is HomeEvent.NewsFabClicked -> emitEffect(HomeEffect.NavigateToNews)
+            is HomeEvent.HealthNewsClicked -> emitEffect(HomeEffect.NavigateToNews)
+            is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
             is HomeEvent.BottomNavTabClicked -> {
                 // Home is the only tab rendered inline; every other tab is a
                 // separate destination, so `selectedTab` is intentionally left

@@ -11,5 +11,6 @@ sealed interface HomeEvent {
     data object NotificationClicked : HomeEvent
     data class BottomNavTabClicked(val tab: BottomNavTab) : HomeEvent
     data class HistoryItemClicked(val itemId: String) : HomeEvent
-    data object NewsFabClicked : HomeEvent
+    data object HealthNewsClicked : HomeEvent
+    data object ChatWithAiClicked : HomeEvent
 }

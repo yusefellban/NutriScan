@@ -24,11 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.HomeTypography
 import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
 import iti.grad.nutriscan.presentation.home.state.VerdictType
 import iti.grad.presentation.R
@@ -92,13 +91,13 @@ fun HistoryItemCard(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = item.productName,
-                style = AppTheme.typography.titleMedium,
+                style = HomeTypography.historyItemTitle,
                 color = AppTheme.colors.HistoryItemTitleColor,
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = item.scanDate,
-                style = AppTheme.typography.bodyMedium,
+                style = HomeTypography.historyItemDate,
                 color = AppTheme.colors.HistoryItemDateColor,
             )
         }
@@ -143,10 +142,8 @@ private fun VerdictBadge(
         ) {
             Text(
                 text = stringResource(item.verdictLabelResId),
-                style = AppTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
+                style = HomeTypography.verdictBadge,
                 color = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedText else badgeColor,
-                fontSize = 11.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }
