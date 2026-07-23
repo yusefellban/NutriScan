@@ -116,6 +116,28 @@ internal data class AppColorsExtension(
     val CaloriesMutedTeal: Color,
     val CaloriesIconOnAccent: Color,
     val ExerciseSecondaryText: Color,
+
+    // --- Product Details ---
+    val ProductDetailImageCardBg: Color,
+    val ProductDetailScanDate: Color,
+    val ProductDetailScanDateBadgeBg: Color,
+    val ProductDetailScanDateBadgeText: Color,
+    val ProductDetailSafetyText: Color,
+    val ProductDetailTitleText: Color,
+    val ProductDetailSafetyReasonText: Color,
+    val ProductDetailWhyNotSafeText: Color,
+    val ProductDetailIngredientCardBg: Color,
+    val ProductDetailIngredientCardBorder: Color,
+    val ProductDetailIngredientName: Color,
+    val ProductDetailIngredientReasonText: Color,
+    val ProductDetailFlaggedContainerBg: Color,
+    val ProductDetailMatchTag: Color,
+    val ProductDetailMatchTagText: Color,
+    val ProductDetailNutritionCardBg: Color,
+    val ProductDetailNutritionLabelText: Color,
+    val ProductDetailNutritionPill: Color,
+    val ProductDetailNutritionText: Color,
+    val ProductDetailBookmarkTint: Color,
 )
 
 @Immutable
@@ -323,6 +345,27 @@ data class AppColors internal constructor(
     val CaloriesMutedTeal: Color get() = extension.CaloriesMutedTeal
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
+
+    val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
+    val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
+    val ProductDetailScanDateBadgeBg: Color get() = extension.ProductDetailScanDateBadgeBg
+    val ProductDetailScanDateBadgeText: Color get() = extension.ProductDetailScanDateBadgeText
+    val ProductDetailSafetyText: Color get() = extension.ProductDetailSafetyText
+    val ProductDetailTitleText: Color get() = extension.ProductDetailTitleText
+    val ProductDetailSafetyReasonText: Color get() = extension.ProductDetailSafetyReasonText
+    val ProductDetailWhyNotSafeText: Color get() = extension.ProductDetailWhyNotSafeText
+    val ProductDetailIngredientCardBg: Color get() = extension.ProductDetailIngredientCardBg
+    val ProductDetailIngredientCardBorder: Color get() = extension.ProductDetailIngredientCardBorder
+    val ProductDetailIngredientName: Color get() = extension.ProductDetailIngredientName
+    val ProductDetailIngredientReasonText: Color get() = extension.ProductDetailIngredientReasonText
+    val ProductDetailFlaggedContainerBg: Color get() = extension.ProductDetailFlaggedContainerBg
+    val ProductDetailMatchTag: Color get() = extension.ProductDetailMatchTag
+    val ProductDetailMatchTagText: Color get() = extension.ProductDetailMatchTagText
+    val ProductDetailNutritionCardBg: Color get() = extension.ProductDetailNutritionCardBg
+    val ProductDetailNutritionLabelText: Color get() = extension.ProductDetailNutritionLabelText
+    val ProductDetailNutritionPill: Color get() = extension.ProductDetailNutritionPill
+    val ProductDetailNutritionText: Color get() = extension.ProductDetailNutritionText
+    val ProductDetailBookmarkTint: Color get() = extension.ProductDetailBookmarkTint
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -561,6 +604,33 @@ fun lightColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
+
+        // Product Details
+        ProductDetailImageCardBg = Color(0xFFF8F8F9), // Gray100
+        ProductDetailScanDate = Color(0xFF898989), // Gray700
+        ProductDetailScanDateBadgeBg = Color(0xFFE8FAFA), // Teal100
+        ProductDetailScanDateBadgeText = Color(0xFF13A4AB), // Primary (Teal1000)
+        ProductDetailSafetyText = Color(0xFF393C3C), // Gray1600
+
+        ProductDetailTitleText = Color(0xFF13A4AB), // Teal1000
+        ProductDetailSafetyReasonText = Color(0xFF777777), // Gray800
+        ProductDetailWhyNotSafeText = Color(0xFF393C3C), // Gray1600
+
+        ProductDetailIngredientCardBg = Color(0xFFF8F8F9), // Gray100
+        ProductDetailIngredientCardBorder = Color(0xFFE5E5E5), // Lighter border? or transparent
+        ProductDetailIngredientName = Color(0xFF13A4AB), // Teal1000
+        ProductDetailIngredientReasonText = Color(0xFF757575), // Gray600
+        ProductDetailFlaggedContainerBg = Color(0xFFF8F8F9), // Gray100
+
+        ProductDetailMatchTag = Color(0xFFC0C0C0), // Gray500
+        ProductDetailMatchTagText = Color(0xFFF8F8F9), // Gray100
+
+        ProductDetailNutritionCardBg = Color(0xFFF8F8F9), // Gray100
+        ProductDetailNutritionLabelText = Color(0xFF777777), // Gray800
+        ProductDetailNutritionPill = Color(0xFF13A4AB), // Teal1000
+        ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
+
+        ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
     ),
 )
 
@@ -803,5 +873,32 @@ fun darkColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value
+
+        // Product Details
+        ProductDetailImageCardBg = Color(0xFF0F474A), // Teal1600
+        ProductDetailScanDate = Color(0xFFA3E9EC), // Teal400
+        ProductDetailScanDateBadgeBg = Color(0xFFD4F1F2), // Teal200
+        ProductDetailScanDateBadgeText = Color(0xFF17B8BE), // Teal800
+        ProductDetailSafetyText = Color(0xFF13A4AB), // Teal1000
+
+        ProductDetailTitleText = Color(0xFFA3E9EC), // Teal400
+        ProductDetailSafetyReasonText = Color(0xFF11939A), // Teal1200
+        ProductDetailWhyNotSafeText = Color(0xFF13A4AB), // Teal1000
+
+        ProductDetailIngredientCardBg = Color(0xFF0A545A), // Teal1500
+        ProductDetailIngredientCardBorder = Color(0xFF11939A), // Teal1200
+        ProductDetailIngredientName = Color(0xFF13A4AB), // Teal1000
+        ProductDetailIngredientReasonText = Color(0xFF108188), // Teal1300
+        ProductDetailFlaggedContainerBg = Color(0xFF0A545A), // Teal1500
+
+        ProductDetailMatchTag = Color(0xFF0F474A), // Teal1600
+        ProductDetailMatchTagText = Color(0xFF11939A), // Teal1200
+
+        ProductDetailNutritionCardBg = Color(0xFF0B5F65), // Teal1400
+        ProductDetailNutritionLabelText = Color(0xFF11939A), // Teal1200
+        ProductDetailNutritionPill = Color(0xFF13A4AB), // Teal1000
+        ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
+
+        ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
     ),
 )

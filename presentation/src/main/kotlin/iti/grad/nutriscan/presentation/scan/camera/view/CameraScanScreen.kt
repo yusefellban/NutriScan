@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun CameraScanScreen(
     viewModel: CameraScanViewModel = hiltViewModel(),
     onNavigateToProcessing: (String) -> Unit = {},
-    onNavigateToProductDetailsPlaceholder: (String) -> Unit = {},
+    onNavigateToProductDetail: (String) -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToCalories: () -> Unit = {},
     onNavigateToSaved: () -> Unit = {},
@@ -91,7 +91,7 @@ fun CameraScanScreen(
     CameraScanContent(
         state = state,
         onEvent = viewModel::onEvent,
-        onNavigateToProductDetailsPlaceholder = onNavigateToProductDetailsPlaceholder,
+        onNavigateToProductDetail = onNavigateToProductDetail,
         snackbarHostState = snackbarHostState,
     )
 }
@@ -100,7 +100,7 @@ fun CameraScanScreen(
 private fun CameraScanContent(
     state: CameraScanState,
     onEvent: (CameraScanEvent) -> Unit,
-    onNavigateToProductDetailsPlaceholder: (String) -> Unit,
+    onNavigateToProductDetail: (String) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
@@ -155,7 +155,7 @@ private fun CameraScanContent(
             state.activeScan?.let { scan ->
                 ActiveScanCard(
                     scan = scan,
-                    onClick = { onNavigateToProductDetailsPlaceholder(scan.barcode) },
+                    onClick = { onNavigateToProductDetail(scan.barcode) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 16.dp),

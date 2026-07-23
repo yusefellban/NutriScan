@@ -1,7 +1,12 @@
 package iti.grad.nutriscan.navigation
 
 import kotlinx.serialization.Serializable
-
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import android.net.Uri
+import android.os.Bundle
+import androidx.navigation.NavType
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 @Serializable
 object SplashRoute
 
@@ -86,11 +91,27 @@ object EditProfileRoute
 @Serializable
 object TermsAndConditionsRoute
 
+
 @Serializable
 object HelpRoute
 
+val ProductUiModelNavType = object : NavType<ProductUiModel>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): ProductUiModel? {
+        return bundle.getString(key)?.let { Json.decodeFromString(it) }
+    }
+    override fun parseValue(value: String): ProductUiModel {
+        return Json.decodeFromString(Uri.decode(value))
+    }
+    override fun put(bundle: Bundle, key: String, value: ProductUiModel) {
+        bundle.putString(key, Json.encodeToString(value))
+    }
+    override fun serializeAsValue(value: ProductUiModel): String {
+        return Uri.encode(Json.encodeToString(value))
+    }
+}
+
 @Serializable
-data class ProductDetailsPlaceholderRoute(val barcode: String)
+data class ProductDetailsRoute(val product: ProductUiModel)
 @Serializable
 data class EmailVerificationRoute(val email: String)
 

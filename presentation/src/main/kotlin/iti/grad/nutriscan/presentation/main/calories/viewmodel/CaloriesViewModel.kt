@@ -62,6 +62,7 @@ class CaloriesViewModel @Inject constructor(
             CaloriesEvent.RemoveFoodDismissed -> {
                 _state.update { it.copy(pendingRemoveFoodId = null) }
             }
+            is CaloriesEvent.FoodItemClicked -> navigate(CaloriesEffect.NavigateToProductDetail(event.product))
         }
     }
 

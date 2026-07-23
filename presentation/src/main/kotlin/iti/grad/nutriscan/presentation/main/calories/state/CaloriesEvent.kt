@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 
 sealed interface CaloriesEvent {
     data object AddFoodClicked : CaloriesEvent
@@ -26,4 +27,5 @@ sealed interface CaloriesEvent {
     data class FoodItemSwipedToRemove(val entryId: String) : CaloriesEvent
     data object RemoveFoodConfirmed : CaloriesEvent
     data object RemoveFoodDismissed : CaloriesEvent
+    data class FoodItemClicked(val product: ProductUiModel) : CaloriesEvent
 }
