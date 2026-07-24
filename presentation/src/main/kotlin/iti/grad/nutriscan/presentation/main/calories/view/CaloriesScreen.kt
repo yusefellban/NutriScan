@@ -129,7 +129,7 @@ private fun CaloriesContent(
                 .background(AppTheme.colors.Background)
                 .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
                 .padding(horizontal = 22.dp),
-            contentPadding = PaddingValues(bottom = bottomPadding),
+            contentPadding = PaddingValues(bottom = bottomPadding + 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {

@@ -17,7 +17,7 @@ data class CaloriesState(
     val stepsPermissionGranted: Boolean = false,
     val exerciseKcal: Int = 250,
     val exerciseMinutes: Int = 45,
-    val waterConsumed: Int = 4,
+    val waterConsumed: Int = 0,
     val waterGoal: Int = 8,
     val isLoading: Boolean = false,
 )

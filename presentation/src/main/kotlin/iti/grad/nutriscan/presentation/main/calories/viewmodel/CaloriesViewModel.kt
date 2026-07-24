@@ -8,6 +8,10 @@ import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
+import iti.grad.nutriscan.domain.water.usecase.LogWaterGlassUseCase
+import iti.grad.nutriscan.domain.water.usecase.ObserveTodayWaterUseCase
+import iti.grad.nutriscan.domain.water.usecase.SetWaterGoalUseCase
+import iti.grad.nutriscan.domain.water.usecase.UnlogWaterGlassUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
@@ -30,6 +34,10 @@ class CaloriesViewModel @Inject constructor(
     private val observeTodaySteps: ObserveTodayStepsUseCase,
     private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
     private val removeFoodEntry: RemoveFoodEntryUseCase,
+    private val observeTodayWater: ObserveTodayWaterUseCase,
+    private val logWaterGlass: LogWaterGlassUseCase,
+    private val unlogWaterGlass: UnlogWaterGlassUseCase,
+    private val setWaterGoal: SetWaterGoalUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CaloriesState())
@@ -42,6 +50,7 @@ class CaloriesViewModel @Inject constructor(
 
     init {
         observeFoodLog()
+        observeWater()
     }
 
     fun onEvent(event: CaloriesEvent) {
@@ -112,8 +121,19 @@ class CaloriesViewModel @Inject constructor(
         }
     }
 
+    /** Collects today's water log (Room, offline-first) and keeps waterConsumed/waterGoal in sync. */
+    private fun observeWater() {
+        viewModelScope.launch {
+            observeTodayWater().collect { water ->
+                _state.update { it.copy(waterConsumed = water.glassCount, waterGoal = water.goalGlasses) }
+            }
+        }
+    }
+
     private fun addWaterCup() {
-        _state.update { it.copy(waterGoal = it.waterGoal + 1) }
+        val newGoal = _state.value.waterGoal + 1
+        _state.update { it.copy(waterGoal = newGoal) }
+        viewModelScope.launch { setWaterGoal(newGoal) }
     }
 
     /**
@@ -122,13 +142,15 @@ class CaloriesViewModel @Inject constructor(
      * so cups always fill/unfill strictly in order.
      */
     private fun toggleWaterCup(index: Int) {
-        _state.update { state ->
-            when {
-                index == state.waterConsumed && index < state.waterGoal ->
-                    state.copy(waterConsumed = state.waterConsumed + 1)
-                index == state.waterConsumed - 1 && state.waterConsumed > 0 ->
-                    state.copy(waterConsumed = state.waterConsumed - 1)
-                else -> state
+        val state = _state.value
+        when {
+            index == state.waterConsumed && index < state.waterGoal -> {
+                _state.update { it.copy(waterConsumed = it.waterConsumed + 1) }
+                viewModelScope.launch { logWaterGlass() }
+            }
+            index == state.waterConsumed - 1 && state.waterConsumed > 0 -> {
+                _state.update { it.copy(waterConsumed = it.waterConsumed - 1) }
+                viewModelScope.launch { unlogWaterGlass() }
             }
         }
     }
@@ -136,10 +158,11 @@ class CaloriesViewModel @Inject constructor(
     /** Only the last cup can be deleted, same ordering rule as [toggleWaterCup]. */
     private fun removeWaterCup(index: Int) {
         if (index != _state.value.waterGoal - 1) return
+        val newGoal = _state.value.waterGoal - 1
         _state.update { state ->
-            val newGoal = state.waterGoal - 1
             state.copy(waterGoal = newGoal, waterConsumed = state.waterConsumed.coerceAtMost(newGoal))
         }
+        viewModelScope.launch { setWaterGoal(newGoal) }
         navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
     }
 
