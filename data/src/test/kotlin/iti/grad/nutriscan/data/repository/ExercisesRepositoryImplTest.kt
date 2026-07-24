@@ -71,8 +71,8 @@ class ExercisesRepositoryImplTest {
         
         val exercise = page.exercises.first()
         Assertions.assertEquals("1", exercise.id)
-        Assertions.assertEquals("Instructions in English", exercise.instructions)
-        Assertions.assertEquals("Step 1", exercise.instructionSteps.first())
+        Assertions.assertEquals("Instructions in English", exercise.instructions["en"])
+        Assertions.assertEquals("Step 1", exercise.instructionSteps["en"]?.first())
         Assertions.assertEquals(0.20, exercise.repKcal) // DEFAULT_REP_KCAL fallback
         Assertions.assertEquals(0.15, exercise.minKcal) // DEFAULT_MIN_KCAL fallback
         Assertions.assertEquals("https://exercises-dataset-mu.vercel.app/image_url", exercise.imageUrl)
@@ -107,7 +107,7 @@ class ExercisesRepositoryImplTest {
         
         val exercise = result.getOrThrow()
         Assertions.assertEquals("1", exercise.id)
-        Assertions.assertEquals("Instructions in English", exercise.instructions)
+        Assertions.assertEquals("Instructions in English", exercise.instructions["en"])
         Assertions.assertEquals(0.5, exercise.repKcal)
         Assertions.assertEquals(0.4, exercise.minKcal)
     }
@@ -144,8 +144,8 @@ class ExercisesRepositoryImplTest {
             category = "strength",
             bodyPart = "chest",
             equipment = "body only",
-            instructions = "Instructions in English",
-            instructionSteps = listOf("Step 1"),
+            instructions = mapOf("en" to "Instructions in English"),
+            instructionSteps = mapOf("en" to listOf("Step 1")),
             secondaryMuscles = listOf("triceps"),
             target = "pectorals",
             repKcal = 0.20,
@@ -164,6 +164,6 @@ class ExercisesRepositoryImplTest {
         val exercise = page.exercises.first()
         Assertions.assertEquals("1", exercise.id)
         Assertions.assertEquals("Push Up", exercise.name)
-        Assertions.assertEquals("Instructions in English", exercise.instructions)
+        Assertions.assertEquals("Instructions in English", exercise.instructions["en"])
     }
 }

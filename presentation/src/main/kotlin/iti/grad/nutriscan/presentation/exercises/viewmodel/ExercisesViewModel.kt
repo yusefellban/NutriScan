@@ -187,7 +187,10 @@ class ExercisesViewModel @Inject constructor(
         name = name,
         equipment = equipment,
         target = target,
-        instructions = instructions,
+        instructions = run {
+            val lang = java.util.Locale.getDefault().language.lowercase()
+            instructions[lang] ?: instructions["en"].orEmpty()
+        },
         type = if (category == "cardio" || minKcal != null) ExerciseType.CARDIO else ExerciseType.NORMAL_WORKOUT,
         imageUrl = imageUrl,
         gifUrl = gifUrl,

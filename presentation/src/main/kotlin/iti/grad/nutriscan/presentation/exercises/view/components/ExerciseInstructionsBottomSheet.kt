@@ -16,6 +16,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -47,6 +49,7 @@ fun ExerciseInstructionsBottomSheet(
     onStartWorkoutClick: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val context = LocalContext.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -54,11 +57,12 @@ fun ExerciseInstructionsBottomSheet(
         containerColor = AppTheme.colors.Surface,
         scrimColor = Color(0x660F474A),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 20.dp), // Reduced top padding
-        ) {
+        CompositionLocalProvider(LocalContext provides context) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 20.dp), // Reduced top padding
+            ) {
             // Exercise header row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -155,6 +159,7 @@ fun ExerciseInstructionsBottomSheet(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
         }
     }
 }

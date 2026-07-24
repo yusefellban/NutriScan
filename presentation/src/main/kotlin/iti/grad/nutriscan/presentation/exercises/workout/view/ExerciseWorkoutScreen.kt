@@ -29,6 +29,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -516,6 +519,7 @@ fun CongratsDialog(
     caloriesBurned: Int,
     onConfirm: () -> Unit
 ) {
+    val context = LocalContext.current
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -524,52 +528,55 @@ fun CongratsDialog(
             usePlatformDefaultWidth = false
         )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
+        CompositionLocalProvider(LocalContext provides context) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(AppTheme.colors.AuthDialogBackground)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_fire_solid),
-                    contentDescription = null,
-                    tint = AppTheme.colors.Warning,
-                    modifier = Modifier.size(64.dp)
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(AppTheme.colors.AuthDialogBackground)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_fire_solid),
+                        contentDescription = null,
+                        tint = AppTheme.colors.Warning,
+                        modifier = Modifier.size(64.dp)
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = stringResource(id = R.string.exercise_result_title),
-                    style = AppTheme.typography.titleLarge,
-                    color = AppTheme.colors.TextPrimary,
-                    textAlign = TextAlign.Center
-                )
+                    Text(
+                        text = stringResource(id = R.string.exercise_result_title),
+                        style = AppTheme.typography.titleLarge,
+                        color = AppTheme.colors.TextPrimary,
+                        textAlign = TextAlign.Center
+                    )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = stringResource(id = R.string.exercise_result_message, caloriesBurned),
-                    style = AppTheme.typography.bodyLarge,
-                    color = AppTheme.colors.TextSecondary,
-                    textAlign = TextAlign.Center
-                )
+                    val formattedCalories = String.format(LocalLocale.current.platformLocale, "%d", caloriesBurned)
+                    Text(
+                        text = stringResource(id = R.string.exercise_result_message, formattedCalories),
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.TextSecondary,
+                        textAlign = TextAlign.Center
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                AppButton(
-                    textResId = R.string.exercise_result_confirm,
-                    isLoading = false,
-                    onClick = onConfirm
-                )
+                    AppButton(
+                        textResId = R.string.exercise_result_confirm,
+                        isLoading = false,
+                        onClick = onConfirm
+                    )
+                }
             }
         }
     }
