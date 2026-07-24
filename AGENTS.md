@@ -2394,6 +2394,7 @@ Box(modifier = Modifier.background(AppColors.VerdictRed))
 | Shared component catalogue              | §14.3                                               |
 | Localization rules                       | §14.4                                               |
 | Git commit conventions                   | §17.3                                               |
+| Notification system precedent pattern    | §17.4                                               |
 
 ### 17.3 Git Commit Conventions
 
@@ -2401,6 +2402,34 @@ Box(modifier = Modifier.background(AppColors.VerdictRed))
   **not** include a `Co-Authored-By:` trailer for the agent (e.g. no
   `Co-Authored-By: Claude <noreply@anthropic.com>`). Author the commit as
   the human developer only.
+
+### 17.4 Notification System — Precedent Pattern
+
+Full design + implementation plan:
+`docs/superpowers/specs/2026-07-24-notification-system-design.md` and
+`docs/plans/2026-07-24-notification-system.md`. Any new notification type or
+background-check feature should follow this shape instead of re-deriving it:
+
+- **Decision logic lives in pure domain use cases**, never in the
+  `CoroutineWorker` itself. Pattern: `ShouldNotifyXUseCase(prefs, ...state,
+  now: LocalTime): Boolean` — no Android imports, fully unit-testable.
+  Workers stay thin: fetch state, call the decision use case, post if true.
+- **One `CoroutineWorker` per notification type**, scheduled via
+  `NotificationScheduler` (`app/.../notification/NotificationScheduler.kt`)
+  using `WorkManager.enqueueUniquePeriodicWork`. Do not add exact-alarm
+  (`AlarmManager`) scheduling without a specific reason — periodic
+  WorkManager + a decision use case that no-ops when not due is the
+  established approach.
+- **One Android notification channel per type**
+  (`app/.../notification/NotificationChannels.kt`), so users get OS-level
+  per-channel muting in addition to the in-app toggle.
+- **Per-type enable/disable + quiet hours live in DataStore**, not Room —
+  mirrors `StepsPreferencesDataSourceImpl`. Only counters/logs tied to a
+  specific date belong in Room.
+- **New trackable habits** (the water/workout/streak precedent) get a
+  minimal domain repository + Room table + use cases — do not build a
+  dedicated logging screen unless the feature explicitly needs one; a
+  quick-action from the relevant settings/progress screen is enough.
 
 ---
 
