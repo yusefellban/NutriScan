@@ -23,10 +23,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
+import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -40,7 +49,8 @@ fun ChatInputBar(
     isListening: Boolean = false,
     onQueryChange: (String) -> Unit,
     onSend: () -> Unit,
-    onMicClick: () -> Unit,
+    onMicPress: () -> Unit,
+    onMicRelease: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -56,11 +66,11 @@ fun ChatInputBar(
                 .height(48.dp)
                 .border(
                     width = 1.dp,
-                    color = if (isListening) AppTheme.colors.Primary else AppTheme.colors.Accent,
+                    color = if (isListening) Color.Red else AppTheme.colors.Accent,
                     shape = RoundedCornerShape(24.dp)
                 )
                 .clip(RoundedCornerShape(24.dp))
-                .background(AppTheme.colors.ChatInputBackground),
+                .background(if (isListening) Color.Red.copy(alpha = 0.05f) else AppTheme.colors.ChatInputBackground),
             contentAlignment = Alignment.CenterStart
         ) {
             Row(
@@ -94,15 +104,28 @@ fun ChatInputBar(
                 
                 Spacer(modifier = Modifier.width(4.dp))
                 
-                IconButton(
-                    onClick = onMicClick,
-                    modifier = Modifier.size(32.dp),
-                    enabled = !isLoading
+                Box(
+                    modifier = Modifier
+                        .size(if (isListening) 40.dp else 32.dp)
+                        .clip(CircleShape)
+                        .background(if (isListening) Color.Red.copy(alpha = 0.2f) else Color.Transparent)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    if (!isLoading) {
+                                        onMicPress()
+                                        tryAwaitRelease()
+                                        onMicRelease()
+                                    }
+                                }
+                            )
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Mic,
                         contentDescription = stringResource(id = R.string.nutrigpt_mic_content_description),
-                        tint = if (isListening) AppTheme.colors.Primary else AppTheme.colors.Accent
+                        tint = if (isListening) Color.Red else AppTheme.colors.Accent
                     )
                 }
             }

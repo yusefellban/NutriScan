@@ -224,6 +224,9 @@
     <string name="nutrigpt_title">Nutrition AI</string>
     <string name="nutrigpt_input_hint">اسأل عن التغذية…</string>
     <string name="nutrigpt_listening_hint">جاري الاستماع…</string>
+    <string name="nutrigpt_voice_official_sources">مصادر من وثائق رسمية</string>
+    <string name="nutrigpt_voice_switch_text">التبديل إلى الدردشة النصية</string>
+    <string name="nutrigpt_voice_generating">جاري الرد...</string>
     <string name="nutrigpt_sources_header">المصادر</string>
     <string name="nutrigpt_disclaimer">الوثائق المقدمة لا تحتوي على معلومات كافية للإجابة على سؤالك. يرجى استشارة مصادر إضافية.</string>
     <string name="nutrigpt_send_content_description">إرسال</string>

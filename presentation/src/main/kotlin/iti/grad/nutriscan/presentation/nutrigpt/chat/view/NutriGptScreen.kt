@@ -51,6 +51,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.chat.viewmodel.NutriGptViewModel
 @Composable
 fun NutriGptScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToVoice: () -> Unit,
     viewModel: NutriGptViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -153,7 +154,8 @@ fun NutriGptScreen(
             ChatTopBar(
                 currentLanguage = state.chatLanguage,
                 onNavigateBack = viewModel::onNavigateBack,
-                onToggleLanguage = { viewModel.onEvent(NutriGptEvent.ToggleLanguage) }
+                onToggleLanguage = { viewModel.onEvent(NutriGptEvent.ToggleLanguage) },
+                onVoiceIconClick = onNavigateToVoice
             )
             
             LazyColumn(
@@ -187,29 +189,29 @@ fun NutriGptScreen(
                         viewModel.onEvent(NutriGptEvent.SendMessage(state.currentQuery))
                     }
                 },
-                onMicClick = {
-                    if (state.isListening) {
-                        speechRecognizer?.stopListening()
-                        viewModel.onEvent(NutriGptEvent.SetListeningState(false))
-                    } else {
-                        val hasPermission = ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.RECORD_AUDIO
-                        ) == PackageManager.PERMISSION_GRANTED
-                        
-                        if (hasPermission) {
-                            val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
-                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                                putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
-                            }
-                            speechRecognizer?.startListening(intent)
-                            viewModel.onEvent(NutriGptEvent.SetListeningState(true))
-                        } else {
-                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                onMicPress = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                    
+                    if (hasPermission) {
+                        val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
+                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
                         }
+                        speechRecognizer?.startListening(intent)
+                        viewModel.onEvent(NutriGptEvent.SetListeningState(true))
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
+                },
+                onMicRelease = {
+                    speechRecognizer?.stopListening()
+                    // The UI will return to normal immediately, but we let onResults send the message
+                    viewModel.onEvent(NutriGptEvent.SetListeningState(false))
                 }
             )
         }

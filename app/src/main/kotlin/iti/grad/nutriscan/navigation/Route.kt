@@ -129,3 +129,6 @@ object NewsRoute
 
 @Serializable
 object ChatWithAiRoute
+
+@Serializable
+object NutriGptVoiceRoute

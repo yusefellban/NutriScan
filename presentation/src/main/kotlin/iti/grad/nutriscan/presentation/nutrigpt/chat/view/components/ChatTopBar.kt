@@ -26,12 +26,14 @@ import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
+import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsSegmentedToggle
 
 @Composable
 fun ChatTopBar(
     currentLanguage: ChatLanguage,
     onNavigateBack: () -> Unit,
     onToggleLanguage: () -> Unit,
+    onVoiceIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -58,26 +60,16 @@ fun ChatTopBar(
         )
         
         // Language Toggle
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(AppTheme.colors.ChatBotBubble)
-                .clickable { onToggleLanguage() }
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (currentLanguage == ChatLanguage.EN) {
-                    stringResource(id = R.string.nutrigpt_lang_en)
-                } else {
-                    stringResource(id = R.string.nutrigpt_lang_ar)
-                },
-                style = AppTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.Primary
-                )
-            )
-        }
+        SettingsSegmentedToggle(
+            options = listOf("En", "Ar"),
+            selectedIndex = if (currentLanguage == ChatLanguage.EN) 0 else 1,
+            onOptionSelected = { index ->
+                val selected = if (index == 0) ChatLanguage.EN else ChatLanguage.AR
+                if (currentLanguage != selected) {
+                    onToggleLanguage()
+                }
+            }
+        )
         
         Spacer(modifier = Modifier.width(12.dp))
         
@@ -86,7 +78,8 @@ fun ChatTopBar(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.Primary),
+                .background(AppTheme.colors.Primary)
+                .clickable { onVoiceIconClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(

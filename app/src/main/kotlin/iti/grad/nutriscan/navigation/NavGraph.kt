@@ -33,6 +33,7 @@ import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
+import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -228,7 +229,8 @@ fun AppNavGraph(
         composable<NutriGptRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<NutriGptRoute>()
             NutriGptScreen(
-                onNavigateBack = { navController.navigateUp() }
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
             )
         }
 
@@ -400,6 +402,14 @@ fun AppNavGraph(
         // 31. Chat with AI
         composable<ChatWithAiRoute> {
             NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
+        }
+
+        // 32. Voice Chat with AI
+        composable<NutriGptVoiceRoute> {
+            NutriGptVoiceScreen(
                 onNavigateBack = { navController.navigateUp() }
             )
         }
