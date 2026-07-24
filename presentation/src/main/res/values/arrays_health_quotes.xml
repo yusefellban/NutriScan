@@ -1,0 +1,14 @@
+<resources>
+    <string-array name="health_quotes">
+        <item>Small daily choices add up to big health changes.</item>
+        <item>Drinking enough water is one of the simplest gifts you can give your body.</item>
+        <item>Reading a food label takes ten seconds and can save you a bad reaction.</item>
+        <item>Your streak isn\'t about perfection — it\'s about showing up.</item>
+        <item>A short walk today is better than a perfect workout you never start.</item>
+        <item>Every meal is a chance to take care of yourself.</item>
+        <item>Progress, not perfection, is what keeps healthy habits alive.</item>
+        <item>The best diet is the one you can actually stick to.</item>
+        <item>Checking a label before you eat is an act of self-respect.</item>
+        <item>Consistency beats intensity when it comes to health.</item>
+    </string-array>
+</resources>

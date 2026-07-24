@@ -3,6 +3,7 @@ package iti.grad.nutriscan.data.repository
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.domain.scan.model.ProductResult
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
+import java.time.LocalDate
 import javax.inject.Inject
 
 class ScanRepositoryImpl @Inject constructor(
@@ -39,4 +40,7 @@ class ScanRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    // ponytail: returns null until scan history is persisted (no scan-history storage exists yet)
+    override suspend fun getLastScanDate(): LocalDate? = null
 }
