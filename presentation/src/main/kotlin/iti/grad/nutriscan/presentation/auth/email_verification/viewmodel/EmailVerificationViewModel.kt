@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
 import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEffect
 import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEvent
 import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationState
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.presentation.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,9 @@ class EmailVerificationViewModel @Inject constructor(
         when (event) {
             is EmailVerificationEvent.GoToSignInClicked -> handleGoToSignIn()
             is EmailVerificationEvent.ResendEmailClicked -> handleResendEmail()
+            is EmailVerificationEvent.DismissAlert -> {
+                _state.update { it.copy(alertState = AuthAlertState.None) }
+            }
         }
     }
 
@@ -55,21 +59,20 @@ class EmailVerificationViewModel @Inject constructor(
             _state.update { it.copy(isResending = true) }
             resendVerificationEmailUseCase(email)
                 .onSuccess {
-                    _state.update { it.copy(isResending = false) }
-                    _effect.send(
-                        EmailVerificationEffect.ShowSnackbar(
-                            messageResId = R.string.email_verification_resend_success
-                        )
-                    )
+                    _state.update { 
+                        it.copy(
+                            isResending = false,
+                            alertState = AuthAlertState.Success(messageResId = R.string.email_verification_resend_success)
+                        ) 
+                    }
                 }
                 .onFailure { throwable ->
-                    _state.update { it.copy(isResending = false) }
-                    _effect.send(
-                        EmailVerificationEffect.ShowSnackbar(
-                            messageStr = throwable.message
-                                ?: "Failed to resend verification email."
-                        )
-                    )
+                    _state.update { 
+                        it.copy(
+                            isResending = false,
+                            alertState = AuthAlertState.Error(messageStr = throwable.message ?: "Failed to resend verification email.")
+                        ) 
+                    }
                 }
         }
     }

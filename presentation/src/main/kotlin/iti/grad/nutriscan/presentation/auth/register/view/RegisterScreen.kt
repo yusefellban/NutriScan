@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -61,17 +62,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.presentation.R
-import androidx.compose.material3.MaterialTheme
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
+import iti.grad.nutriscan.presentation.auth.register.view.components.RegisterFormBody
+import iti.grad.nutriscan.presentation.auth.register.viewmodel.RegisterViewModel
+import iti.grad.nutriscan.presentation.common.components.AuthHeader
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import iti.grad.nutriscan.presentation.common.components.InternetAlert
+import iti.grad.nutriscan.presentation.common.components.SuccessAlert
+import iti.grad.nutriscan.presentation.common.components.WarningAlert
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.nutriscan.presentation.common.components.AuthHeader
-import iti.grad.nutriscan.presentation.auth.register.view.components.RegisterFormBody
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
-import iti.grad.nutriscan.presentation.auth.register.viewmodel.RegisterViewModel
+import iti.grad.presentation.R
 
 @Composable
 fun RegisterScreen(
@@ -90,34 +95,34 @@ fun RegisterScreen(
     }
 
     when (val alert = state.alertState) {
-        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError -> {
-            iti.grad.nutriscan.presentation.common.components.InternetAlert(
+        is AuthAlertState.InternetError -> {
+            InternetAlert(
                 onRetry = { viewModel.onEvent(RegisterEvent.RetryAction) },
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
-        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error -> {
-            iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+        is AuthAlertState.Error -> {
+            ErrorAlert(
                 title = stringResource(id = R.string.alert_registration_failed_title),
                 message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
-        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning -> {
-            iti.grad.nutriscan.presentation.common.components.WarningAlert(
+        is AuthAlertState.Warning -> {
+            WarningAlert(
                 title = stringResource(id = R.string.alert_registration_failed_title),
                 message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
-        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success -> {
-            iti.grad.nutriscan.presentation.common.components.SuccessAlert(
+        is AuthAlertState.Success -> {
+            SuccessAlert(
                 title = stringResource(id = R.string.alert_success_title),
                 message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
-        is iti.grad.nutriscan.presentation.common.state.AuthAlertState.None -> Unit
+        is AuthAlertState.None -> Unit
     }
 
     Scaffold(
