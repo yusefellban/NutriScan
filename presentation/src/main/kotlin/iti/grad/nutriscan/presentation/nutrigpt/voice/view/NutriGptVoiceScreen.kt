@@ -33,6 +33,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.voice.state.NutriGptVoiceEffect
 import iti.grad.nutriscan.presentation.nutrigpt.voice.state.NutriGptVoiceEvent
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.components.VoiceWaveform
 import iti.grad.nutriscan.presentation.nutrigpt.voice.viewmodel.NutriGptVoiceViewModel
+import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsSegmentedToggle
 import iti.grad.presentation.R
 
@@ -84,7 +85,7 @@ fun NutriGptVoiceScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppTheme.colors.Background)
             .padding(
                 top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding(),
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -203,19 +204,11 @@ fun NutriGptVoiceScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             // Bottom Button
-            Button(
-                onClick = { viewModel.onNavigateBack() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.nutrigpt_voice_switch_text),
-                    style = AppTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                    color = Color.White
+            Box(modifier = Modifier.padding(vertical = 16.dp)) {
+                AppButton(
+                    textResId = R.string.nutrigpt_voice_switch_text,
+                    isLoading = false,
+                    onClick = { viewModel.onNavigateBack() }
                 )
             }
         }

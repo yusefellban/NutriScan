@@ -50,7 +50,7 @@ fun ChatSourcesSection(
                 text = stringResource(id = R.string.nutrigpt_sources_header),
                 style = AppTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.SemiBold,
-                    color = AppTheme.colors.Primary
+                    color = AppTheme.colors.ChatDisclaimerIcon
                 )
             )
             
@@ -59,7 +59,7 @@ fun ChatSourcesSection(
             Icon(
                 imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = null,
-                tint = AppTheme.colors.Primary,
+                tint = AppTheme.colors.ChatDisclaimerIcon,
                 modifier = Modifier.size(16.dp)
             )
         }

@@ -111,17 +111,17 @@ fun ChatTypingBubble(
                 Box(
                     modifier = Modifier
                         .size(6.dp)
-                        .background(AppTheme.colors.Primary.copy(alpha = dot1Alpha), CircleShape)
+                        .background(AppTheme.colors.ChatDisclaimerIcon.copy(alpha = dot1Alpha), CircleShape)
                 )
                 Box(
                     modifier = Modifier
                         .size(6.dp)
-                        .background(AppTheme.colors.Primary.copy(alpha = dot2Alpha), CircleShape)
+                        .background(AppTheme.colors.ChatDisclaimerIcon.copy(alpha = dot2Alpha), CircleShape)
                 )
                 Box(
                     modifier = Modifier
                         .size(6.dp)
-                        .background(AppTheme.colors.Primary.copy(alpha = dot3Alpha), CircleShape)
+                        .background(AppTheme.colors.ChatDisclaimerIcon.copy(alpha = dot3Alpha), CircleShape)
                 )
             }
             
@@ -130,7 +130,7 @@ fun ChatTypingBubble(
             Icon(
                 imageVector = Icons.Rounded.AutoAwesome,
                 contentDescription = null,
-                tint = AppTheme.colors.Primary,
+                tint = AppTheme.colors.ChatDisclaimerIcon,
                 modifier = Modifier.size(16.dp)
             )
         }
