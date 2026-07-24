@@ -8,7 +8,6 @@ import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
@@ -67,7 +66,6 @@ class CaloriesViewModel @Inject constructor(
             CaloriesEvent.AddWaterClicked -> addWaterCup()
             is CaloriesEvent.WaterCupClicked -> toggleWaterCup(event.index)
             is CaloriesEvent.WaterCupLongPressed -> removeWaterCup(event.index)
-            is CaloriesEvent.BottomNavTabClicked -> handleTabClick(event.tab)
             CaloriesEvent.StepsCardClicked -> checkStepsAccess()
             is CaloriesEvent.StepsPermissionResult -> handleStepsPermissionResult(event.granted)
             is CaloriesEvent.FoodItemSwipedToRemove -> {
@@ -160,17 +158,6 @@ class CaloriesViewModel @Inject constructor(
         navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
     }
 
-    private fun handleTabClick(tab: BottomNavTab) {
-        // Calories is the only tab rendered inline here — every other tab is
-        // a separate destination reached via effect, mirroring HomeViewModel.
-        when (tab) {
-            BottomNavTab.CALORIES -> Unit
-            BottomNavTab.HOME -> navigate(CaloriesEffect.NavigateToHome)
-            BottomNavTab.SCAN -> navigate(CaloriesEffect.NavigateToScan)
-            BottomNavTab.SAVED -> navigate(CaloriesEffect.NavigateToSaved)
-            BottomNavTab.PROFILE -> navigate(CaloriesEffect.NavigateToProfile)
-        }
-    }
 
     private fun navigate(effect: CaloriesEffect) {
         viewModelScope.launch { _effect.send(effect) }

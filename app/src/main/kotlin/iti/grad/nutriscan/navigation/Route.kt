@@ -32,6 +32,9 @@ object FamilyProfileSetupRoute
 object HomeRoute
 
 @Serializable
+object MainRoute
+
+@Serializable
 object CameraScanRoute
 
 @Serializable
