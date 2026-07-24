@@ -75,7 +75,7 @@ fun VoiceWaveform(
                 val progress = x / width
                 val dampening = sin(progress * Math.PI).toFloat()
                 
-                val currentPhase = if (isRtl) -phase else phase
+                val currentPhase = if (isRtl) phase else -phase
                 val y = centerY + sin(x * 0.02f * freqMultiplier + currentPhase) * amplitude * dampening
                 path.lineTo(x, y)
             }

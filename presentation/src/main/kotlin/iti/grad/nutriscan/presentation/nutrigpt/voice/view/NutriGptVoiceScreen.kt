@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -169,11 +170,22 @@ fun NutriGptVoiceScreen(
                 else -> ""
             }
             
+            val isHintText = state.isGenerating || (state.isListening && state.currentQuery.isBlank())
+            val textAlign = if (isHintText) {
+                TextAlign.Center
+            } else {
+                if (state.chatLanguage == ChatLanguage.AR) TextAlign.Right else TextAlign.Left
+            }
+
             Text(
                 text = statusText,
                 color = AppTheme.colors.PrimaryVariant,
                 style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.padding(bottom = 48.dp)
+                textAlign = textAlign,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 48.dp)
             )
 
             // Main Action Button (Mic / Fast Forward)
