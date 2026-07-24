@@ -40,4 +40,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideAllergyDao(db: NutriScanDatabase) = db.allergyDao()
+
+    @Provides
+    @Singleton
+    fun provideExercisesDao(db: NutriScanDatabase): iti.grad.nutriscan.data.db.dao.ExercisesDao = db.exercisesDao()
 }

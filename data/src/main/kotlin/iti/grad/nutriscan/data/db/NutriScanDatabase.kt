@@ -7,27 +7,34 @@ import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 
 import androidx.room.TypeConverters
 import iti.grad.nutriscan.data.db.converter.IntListConverter
+import iti.grad.nutriscan.data.db.converter.StringListConverter
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.dao.DiseaseDao
 import iti.grad.nutriscan.data.db.dao.AllergyDao
+import iti.grad.nutriscan.data.db.dao.ExercisesDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.db.entity.DiseaseEntity
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
+import iti.grad.nutriscan.data.db.entity.ExerciseEntity
+import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
 
 @Database(
     entities = [
         FoodLogEntity::class,
         UserEntity::class,
         DiseaseEntity::class,
-        AllergyEntity::class
+        AllergyEntity::class,
+        ExerciseEntity::class,
+        ExerciseCategoryEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
-@TypeConverters(IntListConverter::class)
+@TypeConverters(IntListConverter::class, StringListConverter::class)
 abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun foodLogDao(): FoodLogDao
     abstract fun userDao(): UserDao
     abstract fun diseaseDao(): DiseaseDao
     abstract fun allergyDao(): AllergyDao
+    abstract fun exercisesDao(): ExercisesDao
 }
