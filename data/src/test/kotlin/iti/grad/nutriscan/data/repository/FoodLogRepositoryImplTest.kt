@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -38,6 +39,7 @@ class FoodLogRepositoryImplTest {
 
     private lateinit var dao: FakeFoodLogDao
     private lateinit var authRepository: IAuthRepository
+    private lateinit var streakRepository: IStreakRepository
     private lateinit var repository: FoodLogRepositoryImpl
 
     private fun entry(id: String = "entry-1") = FoodLogEntry(
@@ -55,7 +57,8 @@ class FoodLogRepositoryImplTest {
     fun setup() {
         dao = FakeFoodLogDao()
         authRepository = mockk()
-        repository = FoodLogRepositoryImpl(dao, authRepository, UnconfinedTestDispatcher())
+        streakRepository = mockk(relaxed = true)
+        repository = FoodLogRepositoryImpl(dao, authRepository, streakRepository, UnconfinedTestDispatcher())
     }
 
     @Test
