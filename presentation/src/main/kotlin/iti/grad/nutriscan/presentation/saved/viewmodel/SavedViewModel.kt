@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
@@ -65,15 +64,6 @@ class SavedViewModel @Inject constructor(
                 val product = _state.value.products.find { it.id == event.productId }
                 if (product != null) {
                     addToFoodLog(product)
-                }
-            }
-            is SavedEvent.BottomNavTabClicked -> {
-                when (event.tab) {
-                    BottomNavTab.HOME -> emitEffect(SavedEffect.NavigateToHome)
-                    BottomNavTab.CALORIES -> emitEffect(SavedEffect.NavigateToCalories)
-                    BottomNavTab.SCAN -> emitEffect(SavedEffect.NavigateToScan)
-                    BottomNavTab.SAVED -> Unit // Already here
-                    BottomNavTab.PROFILE -> emitEffect(SavedEffect.NavigateToProfile)
                 }
             }
         }

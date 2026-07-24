@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.settings.profile.state
 
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -15,7 +14,6 @@ data class UserProfileState(
     val avatarUrl: String? = null,
     val streakDays: Int = 0,
     val familyMembers: ImmutableList<FamilyMemberUiModel> = persistentListOf(),
-    val selectedTab: BottomNavTab = BottomNavTab.PROFILE,
     /** Non-null while the remove-family-member confirmation dialog is showing. */
     val memberPendingDeletion: FamilyMemberUiModel? = null,
     val alertState: ProfileAlertState = ProfileAlertState.None

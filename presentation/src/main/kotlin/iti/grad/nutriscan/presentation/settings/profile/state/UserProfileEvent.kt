@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.presentation.settings.profile.state
 
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 
 /**
  * Events that the User Profile screen UI can emit to the ViewModel.
