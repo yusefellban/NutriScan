@@ -41,6 +41,10 @@ android {
             "String", "NEWS_API_KEY",
             "\"${localProperties.getProperty("NEWS_API_KEY", "")}\""
         )
+        buildConfigField(
+            "String", "EXERCISES_API_BASE_URL",
+            "\"${localProperties.getProperty("EXERCISES_API_BASE_URL", "https://exercises-dataset-mu.vercel.app/")}\""
+        )
 
         manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"
     }
@@ -104,6 +108,7 @@ dependencies {
 
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.coil3.gif)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
