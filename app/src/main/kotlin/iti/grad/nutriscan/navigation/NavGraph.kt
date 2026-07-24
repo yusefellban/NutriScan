@@ -32,6 +32,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScr
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -223,17 +224,12 @@ fun AppNavGraph(
             }
         }
 
-        // 11. NutriGPT Chat (Placeholder)
+        // 11. NutriGPT Chat
         composable<NutriGptRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<NutriGptRoute>()
-            PlaceholderScreen(
-                title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
-                buttonText = "Back to Home"
-            ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
-                }
-            }
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
 
         // 12. Ingredient Detail (Placeholder)
@@ -401,14 +397,11 @@ fun AppNavGraph(
             )
         }
 
-        // 31. Chat with AI (Placeholder)
+        // 31. Chat with AI
         composable<ChatWithAiRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.home_chat_with_ai),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
 
         // 29. Product Details Placeholder

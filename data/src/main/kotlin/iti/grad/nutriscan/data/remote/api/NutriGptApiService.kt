@@ -10,5 +10,5 @@ interface NutriGptApiService {
     @POST("api/query")
     suspend fun sendQuery(
         @Body request: NutriGptRequestDto
-    ): NutriGptResponseDto
+    ): Response<NutriGptResponseDto>
 }

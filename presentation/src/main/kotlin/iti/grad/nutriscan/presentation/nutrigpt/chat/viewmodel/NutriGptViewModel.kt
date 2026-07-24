@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.nutrigpt.usecase.SendNutriGptMessageUseCase
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptState
+import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,24 @@ class NutriGptViewModel @Inject constructor(
             is NutriGptEvent.UpdateQuery -> {
                 _state.update { it.copy(currentQuery = event.text) }
             }
+            is NutriGptEvent.SetListeningState -> {
+                _state.update { it.copy(isListening = event.isListening) }
+            }
+            NutriGptEvent.ToggleSources -> {
+                _state.update { it.copy(areSourcesExpanded = !it.areSourcesExpanded) }
+            }
+            NutriGptEvent.ToggleLanguage -> {
+                _state.update {
+                    val newLang = if (it.chatLanguage == ChatLanguage.EN) ChatLanguage.AR else ChatLanguage.EN
+                    it.copy(chatLanguage = newLang)
+                }
+            }
+        }
+    }
+
+    fun onNavigateBack() {
+        viewModelScope.launch {
+            _effect.send(NutriGptEffect.NavigateBack)
         }
     }
 
