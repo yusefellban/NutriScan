@@ -63,7 +63,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 }
@@ -101,7 +101,7 @@ fun AppNavGraph(
                             popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
                         }
                     } else {
-                        navController.navigate(MainRoute) {
+                        navController.navigate(MainRoute()) {
                             popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
                         }
                     }
@@ -158,7 +158,7 @@ fun AppNavGraph(
             ProfileSetupPagerScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(ProfileSetupPagerRoute) { inclusive = true }
                     }
                 }
@@ -171,15 +171,17 @@ fun AppNavGraph(
                 title = "Family Profile Setup",
                 buttonText = "Complete Setup"
             ) {
-                navController.navigate(MainRoute) {
+                navController.navigate(MainRoute()) {
                     popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
 
         // 7. Main Screen (Container for Home, Scan, Calories, Saved, Profile)
-        composable<MainRoute> {
+        composable<MainRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<MainRoute>()
             MainScreen(
+                initialTab = route.initialTab,
                 onNavigateToScanResult = { scanId ->
                     navController.navigate(ScanResultRoute(scanId))
                 },
@@ -233,8 +235,8 @@ fun AppNavGraph(
                 title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
+                navController.navigate(MainRoute()) {
+                    popUpTo<MainRoute> { inclusive = false }
                 }
             }
         }
@@ -267,8 +269,8 @@ fun AppNavGraph(
                 title = "Receipt Result\nURI: ${route.receiptImageUri}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
+                navController.navigate(MainRoute()) {
+                    popUpTo<MainRoute> { inclusive = false }
                 }
             }
         }
@@ -397,8 +399,8 @@ fun AppNavGraph(
                 exerciseId = route.exerciseId,
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToCalories = {
-                    navController.navigate(CaloriesRoute) {
-                        popUpTo<ExercisesRoute> { inclusive = true }
+                    navController.navigate(MainRoute(initialTab = "CALORIES")) {
+                        popUpTo<MainRoute> { inclusive = true }
                     }
                 }
             )

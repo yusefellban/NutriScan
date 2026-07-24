@@ -32,7 +32,7 @@ object FamilyProfileSetupRoute
 object HomeRoute
 
 @Serializable
-object MainRoute
+data class MainRoute(val initialTab: String = "HOME")
 
 @Serializable
 object CameraScanRoute
