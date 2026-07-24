@@ -19,6 +19,8 @@ import iti.grad.nutriscan.data.local.datasource.ILanguagePreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.LanguagePreferencesDataSourceImpl
 import iti.grad.nutriscan.data.local.datasource.IStepsPreferencesDataSource
 import iti.grad.nutriscan.data.local.datasource.StepsPreferencesDataSourceImpl
+import iti.grad.nutriscan.data.local.datasource.INotificationPreferencesDataSource
+import iti.grad.nutriscan.data.local.datasource.NotificationPreferencesDataSourceImpl
 import iti.grad.nutriscan.data.remote.datasource.AuthRemoteDataSourceImpl
 import iti.grad.nutriscan.data.remote.datasource.IAuthRemoteDataSource
 import iti.grad.nutriscan.data.remote.datasource.DiseaseRemoteDataSourceImpl
@@ -56,6 +58,12 @@ abstract class DataSourceModule {
     abstract fun bindStepsPreferencesDataSource(
         impl: StepsPreferencesDataSourceImpl
     ): IStepsPreferencesDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationPreferencesDataSource(
+        impl: NotificationPreferencesDataSourceImpl
+    ): INotificationPreferencesDataSource
 
     @Binds
     @Singleton
