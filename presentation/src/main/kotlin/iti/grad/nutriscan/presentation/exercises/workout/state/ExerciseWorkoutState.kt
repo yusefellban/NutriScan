@@ -13,5 +13,6 @@ data class ExerciseWorkoutState(
     val sets: Int = 1,
     val reps: Int = 1,
     val showCongratsDialog: Boolean = false,
-    val caloriesBurned: Int = 0
+    val caloriesBurned: Int = 0,
+    val errorMessageRes: Int? = null
 )

@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.exercises.workout.view
 
 import androidx.compose.foundation.Image
+import coil3.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -59,6 +60,7 @@ import iti.grad.nutriscan.presentation.exercises.workout.viewmodel.ExerciseWorko
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -104,11 +106,37 @@ fun ExerciseWorkoutScreen(
                 .background(AppTheme.colors.Background),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Loading exercise...",
-                style = AppTheme.typography.bodyLarge,
-                color = AppTheme.colors.TextPrimary
-            )
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(
+                        color = AppTheme.colors.Teal1000
+                    )
+                }
+                state.errorMessageRes != null -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(state.errorMessageRes!!),
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.TextSecondary,
+                            textAlign = TextAlign.Center
+                        )
+                        Button(
+                            onClick = { viewModel.onEvent(ExerciseWorkoutEvent.OnRetryInitClick) },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
+                        ) {
+                            Text(text = stringResource(id = R.string.action_retry))
+                        }
+                    }
+                }
+                else -> {
+                    CircularProgressIndicator(
+                        color = AppTheme.colors.Teal1000
+                    )
+                }
+            }
         }
         return
     }
@@ -148,7 +176,7 @@ fun ExerciseWorkoutScreen(
 
         // Exercise Name
         Text(
-            text = stringResource(id = exercise.nameRes),
+            text = exercise.name,
             style = ExerciseWorkoutTypography.exerciseName,
             color = AppTheme.colors.ExerciseWorkoutHeaderTitle,
             textAlign = TextAlign.Center
@@ -173,13 +201,16 @@ fun ExerciseWorkoutScreen(
             )
 
             // Exercise pose image inside the circle with spacious internal padding to prevent clipping and look premium
-            Image(
-                painter = painterResource(id = R.drawable.img_exercise_person),
+            AsyncImage(
+                model = exercise.gifUrl ?: exercise.imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
+                placeholder = painterResource(id = R.drawable.dumbell),
+                error = painterResource(id = R.drawable.dumbell),
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(320.dp)
                     .padding(28.dp)
+                    .clip(CircleShape)
             )
         }
 

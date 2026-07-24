@@ -26,6 +26,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -61,16 +64,20 @@ fun ExerciseInstructionsBottomSheet(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.img_exercise_person),
+                AsyncImage(
+                    model = exercise.imageUrl,
                     contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(56.dp)
+                    placeholder = painterResource(id = R.drawable.dumbell),
+                    error = painterResource(id = R.drawable.dumbell),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = stringResource(id = exercise.nameRes),
+                        text = exercise.name,
                         style = AppTheme.typography.titleSmall,
                         color = AppTheme.colors.ExerciseCardTitle
                     )
@@ -78,8 +85,8 @@ fun ExerciseInstructionsBottomSheet(
                     Text(
                         text = stringResource(
                             id = R.string.exercise_equipment_target,
-                            stringResource(id = exercise.equipmentRes),
-                            stringResource(id = exercise.targetRes)
+                            exercise.equipment,
+                            exercise.target
                         ),
                         style = AppTheme.typography.bodyMedium,
                         color = AppTheme.colors.ExerciseCardSubtitle
@@ -99,7 +106,7 @@ fun ExerciseInstructionsBottomSheet(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Instructions body with bullet dot in a Row so text doesn't wrap under the dot
-            val instructionsText = stringResource(id = exercise.instructionsRes)
+            val instructionsText = exercise.instructions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

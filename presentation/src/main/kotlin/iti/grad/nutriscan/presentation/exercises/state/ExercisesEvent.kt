@@ -8,4 +8,6 @@ sealed interface ExercisesEvent {
     data object OnReadMoreClick : ExercisesEvent
     data object OnStartWorkoutClick : ExercisesEvent
     data object OnBackClick : ExercisesEvent
+    data object OnRetryClick : ExercisesEvent
+    data object OnLoadMore : ExercisesEvent
 }

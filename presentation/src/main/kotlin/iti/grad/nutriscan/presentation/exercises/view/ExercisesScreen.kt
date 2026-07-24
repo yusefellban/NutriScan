@@ -13,6 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +48,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun ExercisesScreen(
@@ -109,7 +115,7 @@ fun ExercisesScreen(
         ) {
             items(state.categories, key = { it.id }) { category ->
                 SelectableChip(
-                    text = stringResource(id = category.labelRes),
+                    text = category.label,
                     isSelected = state.selectedCategoryId == category.id,
                     onClick = { viewModel.onEvent(ExercisesEvent.OnCategorySelected(category.id)) },
                     selectedBgColor = AppTheme.colors.ExerciseChipSelectedBg,
@@ -126,27 +132,81 @@ fun ExercisesScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ── Exercise list ──
-        if (state.visibleExercises.isEmpty()) {
-            EmptyStateWidget(
-                message = stringResource(id = R.string.saved_empty_state),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 32.dp)
-            )
-        } else {
-            LazyColumn(
-                // 5- increase slightly the vertical space beween the exercises items itself
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                items(state.visibleExercises, key = { it.id }) { exercise ->
-                    ExerciseListItemCard(
-                        exercise = exercise,
-                        onClick = { viewModel.onEvent(ExercisesEvent.OnExerciseClick(exercise.id)) }
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = AppTheme.colors.Teal1000
                     )
                 }
+                state.errorMessageRes != null -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(state.errorMessageRes!!),
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.TextSecondary,
+                            textAlign = TextAlign.Center
+                        )
+                        Button(
+                            onClick = { viewModel.onEvent(ExercisesEvent.OnRetryClick) },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
+                        ) {
+                            Text(text = stringResource(id = R.string.action_retry))
+                        }
+                    }
+                }
+                state.visibleExercises.isEmpty() -> {
+                    EmptyStateWidget(
+                        message = stringResource(id = R.string.saved_empty_state),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp)
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        // 5- increase slightly the vertical space beween the exercises items itself
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(state.visibleExercises, key = { it.id }) { exercise ->
+                            ExerciseListItemCard(
+                                exercise = exercise,
+                                onClick = { viewModel.onEvent(ExercisesEvent.OnExerciseClick(exercise.id)) }
+                            )
+                        }
 
-                // Bottom spacing so content isn't hidden under bottom sheet
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+                        // Pagination loading indicator or retry
+                        if (state.hasNextPage) {
+                            item {
+                                LaunchedEffect(Unit) {
+                                    viewModel.onEvent(ExercisesEvent.OnLoadMore)
+                                }
+                                if (state.isLoadingMore) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = AppTheme.colors.Teal1000,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Bottom spacing so content isn't hidden under bottom sheet
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                    }
+                }
             }
         }
     }
