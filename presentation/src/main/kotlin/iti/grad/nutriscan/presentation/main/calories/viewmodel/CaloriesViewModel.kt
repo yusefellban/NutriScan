@@ -14,6 +14,7 @@ import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -43,6 +44,20 @@ class CaloriesViewModel @Inject constructor(
 
     init {
         observeFoodLog()
+        observeWorkoutStats()
+    }
+
+    private fun observeWorkoutStats() {
+        viewModelScope.launch {
+            ExercisesSharedTracker.exerciseKcal.collect { kcal ->
+                _state.update { it.copy(exerciseKcal = kcal) }
+            }
+        }
+        viewModelScope.launch {
+            ExercisesSharedTracker.exerciseMinutes.collect { mins ->
+                _state.update { it.copy(exerciseMinutes = mins) }
+            }
+        }
     }
 
     fun onEvent(event: CaloriesEvent) {

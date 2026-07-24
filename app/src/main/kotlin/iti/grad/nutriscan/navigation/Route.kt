@@ -122,6 +122,9 @@ object CaloriesRoute
 object ExercisesRoute
 
 @Serializable
+data class ExerciseWorkoutRoute(val exerciseId: String)
+
+@Serializable
 object NewsRoute
 
 @Serializable
