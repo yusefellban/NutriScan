@@ -125,6 +125,46 @@
     <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
     <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
 
+    <!-- Notification Settings -->
+    <string name="notification_settings_title">إعدادات الإشعارات</string>
+    <string name="notification_settings_toggles_header">أنواع الإشعارات</string>
+    <string name="notification_type_steps">الخطوات</string>
+    <string name="notification_type_water">الماء</string>
+    <string name="notification_type_workout">التمرين</string>
+    <string name="notification_type_food">سجل الطعام</string>
+    <string name="notification_type_news">الأخبار الصحية</string>
+    <string name="notification_type_quote">اقتباسات صحية</string>
+    <string name="notification_type_scan">تذكير المسح</string>
+    <string name="notification_type_streak">التتابع اليومي</string>
+    <string name="notification_settings_quiet_hours_header">ساعات الهدوء</string>
+    <string name="notification_settings_quiet_hours_label">عدم الإزعاج</string>
+    <string name="notification_settings_progress_header">تقدم اليوم</string>
+    <string name="notification_settings_water_progress">%1$d / %2$d أكواب</string>
+    <string name="notification_settings_log_water_glass">+١ كوب</string>
+    <string name="notification_settings_workout_done">تم التمرين</string>
+    <string name="notification_settings_mark_workout_done">تحديد كمنجز</string>
+    <string name="notification_settings_streak_days">%1$d يوم متتابع</string>
+    <string name="notification_settings_steps_progress">%1$d / %2$d خطوة</string>
+    <string name="notification_push_water_title">حافظ على ترطيب جسمك</string>
+    <string name="notification_push_water_body">أنت عند %1$d/%2$d أكواب اليوم.</string>
+    <string name="notification_push_workout_title">حان وقت الحركة</string>
+    <string name="notification_push_workout_body">لم تسجل تمرينًا اليوم — حتى نزهة قصيرة تحتسب.</string>
+    <string name="notification_push_steps_title">واصل التقدم</string>
+    <string name="notification_push_steps_body">أنت عند %1$d/%2$d خطوة اليوم.</string>
+    <string name="notification_push_streak_title">لا تفقد تتابعك</string>
+    <string name="notification_push_streak_body">أنت في تتابع %1$d يوم — سجّل وجبة قبل منتصف الليل للحفاظ عليه.</string>
+    <string name="notification_push_food_title">سجّل وجبات اليوم</string>
+    <string name="notification_push_food_body">لم تسجل أي طعام اليوم — مسح سريع أو إدخال يدوي يحافظ على دقة سجلك.</string>
+    <string name="notification_push_news_title">أخبار صحية اليوم</string>
+    <string name="notification_push_news_body">مقالات جديدة عن التغذية والسلامة بانتظارك.</string>
+    <string name="notification_push_quote_title">نصيحة صحية</string>
+    <string name="notification_push_scan_title">امسح قبل الشراء</string>
+    <string name="notification_push_scan_body">مرت أيام منذ آخر مسح لك — تحقق من سلامة مشترياتك القادمة.</string>
+    <string name="notification_push_test_title">إشعار تجريبي</string>
+    <string name="notification_push_test_body">إذا كنت ترى هذا، فالإشعارات تعمل بشكل صحيح.</string>
+    <string name="notification_settings_send_test">إرسال إشعار تجريبي</string>
+    <string name="notification_settings_test_sent">تم إرسال الإشعار التجريبي</string>
+
     <!-- App Settings -->
     <string name="app_settings_title">إعدادات التطبيق</string>
     <string name="app_settings_subtitle">غيّر إعدادات التطبيق هنا</string>
