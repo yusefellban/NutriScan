@@ -15,12 +15,15 @@ import androidx.compose.ui.unit.dp
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
+import androidx.compose.ui.unit.Dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavedSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    height: Dp = 48.dp
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -31,12 +34,12 @@ fun SavedSearchBar(
             onValueChange = onQueryChange,
             modifier = Modifier
                 .weight(1f)
-                .height(56.dp),
+                .height(height),
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.saved_search_hint),
                     style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.TextPrimary.copy(alpha = 0.5f)
+                    color = AppTheme.colors.ExerciseSearchPlaceholder
                 )
             },
             shape = RoundedCornerShape(28.dp),
@@ -57,13 +60,13 @@ fun SavedSearchBar(
             onClick = { /* Search action usually handled by onQueryChange */ },
             modifier = Modifier
                 .background(AppTheme.colors.SavedSearchIconBackground, CircleShape)
-                .size(56.dp)
+                .size(height)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = stringResource(id = R.string.saved_search_hint),
                 tint = AppTheme.colors.SavedSearchIconTint,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
     }

@@ -117,6 +117,40 @@ internal data class AppColorsExtension(
     val CaloriesIconOnAccent: Color,
     val ExerciseSecondaryText: Color,
 
+    // --- Exercise Screens (dark mode support) ---
+    val ExerciseCardBackground: Color,
+    val ExerciseCardTitle: Color,
+    val ExerciseCardSubtitle: Color,
+    val ExerciseCardChevron: Color,
+    val ExerciseChipSelectedBg: Color,
+    val ExerciseChipSelectedBorder: Color,
+    val ExerciseChipSelectedText: Color,
+    val ExerciseChipUnselectedBg: Color,
+    val ExerciseChipUnselectedBorder: Color,
+    val ExerciseChipUnselectedText: Color,
+    val ExerciseInstructionsTitle: Color,
+    val ExerciseInstructionsBody: Color,
+    val ExerciseInstructionsBullet: Color,
+    val ExerciseCancelWorkoutText: Color,
+
+    val ExerciseScreenTitle: Color,
+    val ExerciseBackButtonTint: Color,
+    val ExerciseSearchPlaceholder: Color,
+    val ExerciseWorkoutHeaderTitle: Color,
+    val ExerciseWorkoutImageBackground: Color,
+    val ExerciseWorkoutTimerText: Color,
+    val ExerciseWorkoutSecondaryButton: Color,
+    val ExerciseWorkoutPrimaryButtonBg: Color,
+    val ExerciseWorkoutPrimaryButtonText: Color,
+    val ExerciseWorkoutTotalTimeLabel: Color,
+    val ExerciseSetsRepsCardBg: Color,
+    val ExerciseSetsRepsCardBorder: Color,
+    val ExerciseSetsRepsBtnBg: Color,
+    val ExerciseSetsRepsLabelColor: Color,
+    val ExerciseSetsRepsValueColor: Color,
+    val ExerciseSetsRepsIconTint: Color,
+    val ExerciseReadMoreColor: Color,
+
     // --- Product Details ---
     val ProductDetailImageCardBg: Color,
     val ProductDetailScanDate: Color,
@@ -363,6 +397,41 @@ data class AppColors internal constructor(
     val CaloriesMutedTeal: Color get() = extension.CaloriesMutedTeal
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
+
+    val ExerciseCardBackground: Color get() = extension.ExerciseCardBackground
+    val ExerciseCardTitle: Color get() = extension.ExerciseCardTitle
+    val ExerciseCardSubtitle: Color get() = extension.ExerciseCardSubtitle
+    val ExerciseCardChevron: Color get() = extension.ExerciseCardChevron
+    val ExerciseChipSelectedBg: Color get() = extension.ExerciseChipSelectedBg
+    val ExerciseChipSelectedBorder: Color get() = extension.ExerciseChipSelectedBorder
+    val ExerciseChipSelectedText: Color get() = extension.ExerciseChipSelectedText
+    val ExerciseChipUnselectedBg: Color get() = extension.ExerciseChipUnselectedBg
+    val ExerciseChipUnselectedBorder: Color get() = extension.ExerciseChipUnselectedBorder
+    val ExerciseChipUnselectedText: Color get() = extension.ExerciseChipUnselectedText
+    val ExerciseInstructionsTitle: Color get() = extension.ExerciseInstructionsTitle
+    val ExerciseInstructionsBody: Color get() = extension.ExerciseInstructionsBody
+    val ExerciseInstructionsBullet: Color get() = extension.ExerciseInstructionsBullet
+    val ExerciseCancelWorkoutText: Color get() = extension.ExerciseCancelWorkoutText
+
+    val ExerciseScreenTitle: Color get() = extension.ExerciseScreenTitle
+    val ExerciseBackButtonTint: Color get() = extension.ExerciseBackButtonTint
+    val ExerciseSearchPlaceholder: Color get() = extension.ExerciseSearchPlaceholder
+    val ExerciseWorkoutHeaderTitle: Color get() = extension.ExerciseWorkoutHeaderTitle
+    val ExerciseWorkoutImageBackground: Color get() = extension.ExerciseWorkoutImageBackground
+    val ExerciseWorkoutTimerText: Color get() = extension.ExerciseWorkoutTimerText
+    val ExerciseWorkoutSecondaryButton: Color get() = extension.ExerciseWorkoutSecondaryButton
+    val ExerciseWorkoutPrimaryButtonBg: Color get() = extension.ExerciseWorkoutPrimaryButtonBg
+    val ExerciseWorkoutPrimaryButtonText: Color get() = extension.ExerciseWorkoutPrimaryButtonText
+    val ExerciseWorkoutTotalTimeLabel: Color get() = extension.ExerciseWorkoutTotalTimeLabel
+    val ExerciseSetsRepsCardBg: Color get() = extension.ExerciseSetsRepsCardBg
+    val ExerciseSetsRepsCardBorder: Color get() = extension.ExerciseSetsRepsCardBorder
+    val ExerciseSetsRepsBtnBg: Color get() = extension.ExerciseSetsRepsBtnBg
+    val ExerciseSetsRepsLabelColor: Color get() = extension.ExerciseSetsRepsLabelColor
+    val ExerciseSetsRepsValueColor: Color get() = extension.ExerciseSetsRepsValueColor
+    val ExerciseSetsRepsIconTint: Color get() = extension.ExerciseSetsRepsIconTint
+    val ExerciseReadMoreColor: Color get() = extension.ExerciseReadMoreColor
+
+
 
     val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
     val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
@@ -639,6 +708,42 @@ fun lightColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
+
+        // Exercise Screens — light values match current hardcoded colors exactly
+        ExerciseCardBackground = Color(0xFFE8FAFA), // Teal100 — exercise list card bg
+        ExerciseCardTitle = Color(0xFF0F474A), // Teal1600 — card/bottom sheet exercise name
+        ExerciseCardSubtitle = Color(0xFF898989), // Gray700 — card/bottom sheet subtitle
+        ExerciseCardChevron = Color(0xFF13A4AB), // Primary — card arrow icon
+        ExerciseChipSelectedBg = Color(0xFFFFFFFF), // White
+        ExerciseChipSelectedBorder = Color(0xFF13A4AB), // Primary
+        ExerciseChipSelectedText = Color(0xFF13A4AB), // Primary
+        ExerciseChipUnselectedBg = Color(0xFFFFFFFF), // White
+        ExerciseChipUnselectedBorder = Color(0xFFE5E5E4), // Gray300
+        ExerciseChipUnselectedText = Color(0xFF898989), // Gray700
+        ExerciseInstructionsTitle = Color(0xFF0F474A), // Teal1600
+        ExerciseInstructionsBody = Color(0xFF9E9E9E), // Lighter grey
+        ExerciseInstructionsBullet = Color(0xFF0F474A), // Teal1600
+        ExerciseCancelWorkoutText = Color(0xFF9E9E9E), // Lighter grey
+
+        ExerciseScreenTitle = Color(0xFF393C3C), // TextPrimary in light mode
+        ExerciseBackButtonTint = Color(0xFF13A4AB), // Teal1000 in light mode
+        ExerciseSearchPlaceholder = Color(0x80393C3C), // TextPrimary with 0.5 alpha
+        ExerciseWorkoutHeaderTitle = Color(0xFF393C3C), // TextPrimary in light mode
+        ExerciseWorkoutImageBackground = Color(0x66D4F1F2), // Teal200 with 0.4 alpha
+        ExerciseWorkoutTimerText = Color(0xFF393C3C), // TextPrimary
+        ExerciseWorkoutSecondaryButton = Color(0xFF13A4AB), // Primary
+        ExerciseWorkoutPrimaryButtonBg = Color(0xFF13A4AB), // Primary
+        ExerciseWorkoutPrimaryButtonText = Color(0xFFFFFFFF), // OnPrimary
+        ExerciseWorkoutTotalTimeLabel = Color(0xFF777777), // TextSecondary
+        ExerciseSetsRepsCardBg = Color(0x99D4F1F2), // Teal200 with 0.6 alpha
+        ExerciseSetsRepsCardBorder = Color(0xFFD4F1F2), // Teal200
+        ExerciseSetsRepsBtnBg = Color(0xFFD4F1F2), // Teal200
+        ExerciseSetsRepsLabelColor = Color(0xFF393C3C), // TextPrimary
+        ExerciseSetsRepsValueColor = Color(0xFF393C3C), // TextPrimary
+        ExerciseSetsRepsIconTint = Color(0xFF13A4AB), // Primary
+        ExerciseReadMoreColor = Color(0xFF13A4AB), // Primary
+
+
 
         // Product Details
         ProductDetailImageCardBg = Color(0xFFF8F8F9), // Gray100
@@ -926,6 +1031,42 @@ fun darkColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value
+
+        // Exercise Screens — dark values from Figma dark mode screenshots
+        ExerciseCardBackground = Color(0xFF0B5F65), // Medium-dark teal card bg (#0B5F65)
+        ExerciseCardTitle = Color(0xFFA3E9EC), // Light text on dark (#A3E9EC)
+        ExerciseCardSubtitle = Color(0xFF11939A), // Muted teal subtitle (#11939A)
+        ExerciseCardChevron = Color(0xFF47D3D9), // Teal600 — bright teal arrow
+        ExerciseChipSelectedBg = Color.Transparent, // Transparent background in dark
+        ExerciseChipSelectedBorder = Color(0xFF11939A), // Teal active border (#11939A)
+        ExerciseChipSelectedText = Color(0xFF11939A), // Teal active text (#11939A)
+        ExerciseChipUnselectedBg = Color.Transparent, // Transparent unselected background
+        ExerciseChipUnselectedBorder = Color(0xFF0B5F65), // Unselected border (#0B5F65)
+        ExerciseChipUnselectedText = Color(0xFF0B5F65), // Unselected text (#0B5F65)
+        ExerciseInstructionsTitle = Color(0xFF11939A), // Instructions title (#11939A)
+        ExerciseInstructionsBody = Color(0xFF11939A), // Instructions body text (#11939A)
+        ExerciseInstructionsBullet = Color(0xFF11939A), // Bullet dot color (#11939A)
+        ExerciseCancelWorkoutText = Color(0xFF108188), // Cancel workout text (#108188)
+
+        ExerciseScreenTitle = Color(0xFF11939A), // Exercises title (#11939A)
+        ExerciseBackButtonTint = Color(0xFF11939A), // Back button tint (#11939A)
+        ExerciseSearchPlaceholder = Color(0xFF11939A), // Search here text (#11939A)
+        ExerciseWorkoutHeaderTitle = Color(0xFF11939A), // Workout header & name above image (#11939A)
+        ExerciseWorkoutImageBackground = Color(0xFF0B5F65), // Image circular bg (#0B5F65)
+        ExerciseWorkoutTimerText = Color(0xFFA3E9EC), // Timer text (#A3E9EC)
+        ExerciseWorkoutSecondaryButton = Color(0xFF13A4AB), // Start/Restart outlined button (#13A4AB)
+        ExerciseWorkoutPrimaryButtonBg = Color(0xFF13A4AB), // Pause filled button bg (#13A4AB)
+        ExerciseWorkoutPrimaryButtonText = Color(0xFFFFFFFF), // Pause text color (White)
+        ExerciseWorkoutTotalTimeLabel = Color(0xFF108188), // Total Time label (#108188)
+        ExerciseSetsRepsCardBg = Color(0xFF0B5F65), // Card bg (#0B5F65)
+        ExerciseSetsRepsCardBorder = Color(0xFF0B5F65), // Card border (#0B5F65)
+        ExerciseSetsRepsBtnBg = Color(0xFF0F474A), // Plus/Minus button bg (#0F474A)
+        ExerciseSetsRepsLabelColor = Color(0xFF13A4AB), // Label text (#13A4AB)
+        ExerciseSetsRepsValueColor = Color(0xFF13A4AB), // Value text (#13A4AB)
+        ExerciseSetsRepsIconTint = Color(0xFF13A4AB), // Icon tint (#13A4AB)
+        ExerciseReadMoreColor = Color(0xFF11939A), // Read more text color (#11939A)
+
+
 
         // Product Details
         ProductDetailImageCardBg = Color(0xFF0F474A), // Teal1600

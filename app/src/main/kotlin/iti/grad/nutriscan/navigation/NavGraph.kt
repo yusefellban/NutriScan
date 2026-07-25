@@ -34,6 +34,9 @@ import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
+import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
+import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
+import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -375,13 +378,28 @@ fun AppNavGraph(
         }
 
 
+        // 28. Exercises
         composable<ExercisesRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.exercises_title),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            ExercisesScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToWorkout = { exerciseId ->
+                    navController.navigate(ExerciseWorkoutRoute(exerciseId))
+                }
+            )
+        }
+
+        // 28b. Exercise Workout Screen
+        composable<ExerciseWorkoutRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ExerciseWorkoutRoute>()
+            ExerciseWorkoutScreen(
+                exerciseId = route.exerciseId,
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToCalories = {
+                    navController.navigate(CaloriesRoute) {
+                        popUpTo<ExercisesRoute> { inclusive = true }
+                    }
+                }
+            )
         }
         // 29. Product Details
         composable<ProductDetailsRoute>(

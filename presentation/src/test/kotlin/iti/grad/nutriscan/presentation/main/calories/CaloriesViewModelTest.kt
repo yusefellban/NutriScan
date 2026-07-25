@@ -15,6 +15,7 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
+import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -56,6 +57,7 @@ class CaloriesViewModelTest {
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        ExercisesSharedTracker.reset()
         checkStepsPermission = mockk()
         observeTodaySteps = mockk()
         observeTodayFoodLog = mockk()
@@ -407,6 +409,23 @@ class CaloriesViewModelTest {
             testScheduler.runCurrent()
 
             coVerify(exactly = 2) { permissionUseCase() }
+        }
+    }
+
+    @Nested
+    @DisplayName("Exercise Stats Observation")
+    inner class ExerciseStatsObservation {
+
+        @Test
+        fun `CaloriesViewModel state updates when ExercisesSharedTracker updates`() = runTest {
+            // Act
+            ExercisesSharedTracker.addWorkout(120, 15)
+            testScheduler.runCurrent()
+
+            // Assert
+            val state = viewModel.state.value
+            Assertions.assertEquals(250 + 120, state.exerciseKcal)
+            Assertions.assertEquals(45 + 15, state.exerciseMinutes)
         }
     }
 }
