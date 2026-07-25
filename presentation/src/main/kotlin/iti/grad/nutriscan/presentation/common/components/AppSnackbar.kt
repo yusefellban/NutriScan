@@ -14,8 +14,8 @@ fun AppSnackbar(
 ) {
     Snackbar(
         modifier = modifier,
-        containerColor = AppTheme.colors.ErrorBackground,
-        contentColor = MaterialTheme.colorScheme.error
+        containerColor = AppTheme.colors.Background,
+        contentColor = androidx.compose.ui.graphics.Color.Black
     ) {
         Text(
             text = message,

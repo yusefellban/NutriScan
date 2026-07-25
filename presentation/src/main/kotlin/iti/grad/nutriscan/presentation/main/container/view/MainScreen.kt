@@ -79,6 +79,7 @@ fun MainScreen(
                         snackbarHostState = snackbarHostState,
                         onNavigateToProductDetail = onNavigateToProductDetail,
                         onNavigateToExercises = onNavigateToExercises,
+                        onNavigateToSavedProducts = { selectedTab = BottomNavTab.SAVED }
                     )
                 }
                 BottomNavTab.SCAN -> {

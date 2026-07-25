@@ -45,7 +45,6 @@ fun SavedScreen(
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val addedTemplate = stringResource(id = R.string.food_log_added_snackbar)
     val addErrorMessage = stringResource(id = R.string.food_log_add_error)
     val snackbarScope = rememberCoroutineScope()
