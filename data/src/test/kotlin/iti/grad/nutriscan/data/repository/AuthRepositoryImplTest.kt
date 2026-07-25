@@ -24,6 +24,7 @@ class AuthRepositoryImplTest {
     private lateinit var keycloakApiService: KeycloakApiService
     private lateinit var tokenRefreshApiService: TokenRefreshApiService
     private lateinit var tokenManager: TokenManager
+    private lateinit var mockDatabase: iti.grad.nutriscan.data.db.NutriScanDatabase
     private lateinit var json: Json
     private lateinit var repository: AuthRepositoryImpl
 
@@ -33,13 +34,15 @@ class AuthRepositoryImplTest {
         keycloakApiService = mockk()
         tokenRefreshApiService = mockk(relaxed = true)
         tokenManager = mockk(relaxed = true)
+        mockDatabase = mockk(relaxed = true)
         json = Json { ignoreUnknownKeys = true }
         repository = AuthRepositoryImpl(
             remoteDataSource,
             keycloakApiService,
             tokenRefreshApiService,
             tokenManager,
-            json
+            json,
+            mockDatabase
         )
     }
 
@@ -62,8 +65,8 @@ class AuthRepositoryImplTest {
         val email = "test@example.com"
         val password = "pwd"
         val request = RegisterRequestDto(
-            firstName = "string",
-            lastName = "string",
+            firstName = "test",
+            lastName = "",
             email = email,
             username = email,
             password = password,

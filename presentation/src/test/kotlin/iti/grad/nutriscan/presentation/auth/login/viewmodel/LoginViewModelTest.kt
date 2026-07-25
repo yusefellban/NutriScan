@@ -30,6 +30,8 @@ class LoginViewModelTest {
     private lateinit var getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase
     private lateinit var saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
     private lateinit var userRepository: IUserRepository
+    private lateinit var syncDiseasesUseCase: iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+    private lateinit var syncAllergiesUseCase: iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -40,12 +42,18 @@ class LoginViewModelTest {
         getOidcAuthConfigUseCase = mockk()
         saveGoogleLoginTokensUseCase = mockk()
         userRepository = mockk()
+        syncDiseasesUseCase = mockk()
+        syncAllergiesUseCase = mockk()
         coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
+        coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
+        coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
         viewModel = LoginViewModel(
             loginWithEmailUseCase,
             getOidcAuthConfigUseCase,
             saveGoogleLoginTokensUseCase,
             userRepository,
+            syncDiseasesUseCase,
+            syncAllergiesUseCase
         )
     }
 
