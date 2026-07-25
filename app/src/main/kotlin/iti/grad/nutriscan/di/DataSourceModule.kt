@@ -82,6 +82,7 @@ abstract class DataSourceModule {
     ): IAllergyRemoteDataSource
 
 
+
     companion object {
         @Provides
         @Singleton

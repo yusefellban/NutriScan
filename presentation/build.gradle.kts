@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.coil3.svg)
+    implementation(libs.coil3.gif)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.camera.core)
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.androidx.browser)
+    implementation(libs.compose.markdown)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

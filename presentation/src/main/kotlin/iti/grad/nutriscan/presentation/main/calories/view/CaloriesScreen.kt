@@ -191,7 +191,7 @@ private fun CaloriesContent(
             item {
                 CalorieGoalsCard(
                     tdee = state.tdee,
-                    caloriesGained = state.caloriesGained,
+                    caloriesGained = (state.caloriesGained - state.exerciseKcal).coerceAtLeast(0),
                 )
             }
 

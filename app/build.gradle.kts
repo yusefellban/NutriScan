@@ -31,15 +31,29 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "NUTRISCAN_BASE_URL", "\"https://nutriscan.dev/api/\"")
-        buildConfigField("String", "KEYCLOAK_BASE_URL", "\"https://auth.nutriscan.dev/\"")
+        buildConfigField(
+            "String", "NUTRISCAN_BASE_URL",
+            "\"${localProperties.getProperty("NUTRISCAN_BASE_URL", "")}\""
+        )
+        buildConfigField(
+            "String", "KEYCLOAK_BASE_URL",
+            "\"${localProperties.getProperty("KEYCLOAK_BASE_URL", "")}\""
+        )
         buildConfigField(
             "String", "NEWS_API_BASE_URL",
-            "\"${localProperties.getProperty("NEWS_API_BASE_URL", "https://newsapi.org/")}\""
+            "\"${localProperties.getProperty("NEWS_API_BASE_URL", "")}\""
         )
         buildConfigField(
             "String", "NEWS_API_KEY",
             "\"${localProperties.getProperty("NEWS_API_KEY", "")}\""
+        )
+        buildConfigField(
+            "String", "EXERCISES_API_BASE_URL",
+            "\"${localProperties.getProperty("EXERCISES_API_BASE_URL", "")}\""
+        )
+        buildConfigField(
+          "String", "NUTRI_GPT_BASE_URL",
+           "\"${localProperties.getProperty("NUTRI_GPT_BASE_URL", "")}\""
         )
 
         manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"
@@ -104,6 +118,7 @@ dependencies {
 
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.coil3.gif)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

@@ -2,6 +2,7 @@ package iti.grad.nutriscan.navigation
 
 import kotlinx.serialization.Serializable
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
@@ -32,7 +33,7 @@ object FamilyProfileSetupRoute
 object HomeRoute
 
 @Serializable
-object MainRoute
+data class MainRoute(val initialTab: BottomNavTab = BottomNavTab.HOME)
 
 @Serializable
 object CameraScanRoute
@@ -50,7 +51,7 @@ data class ScanProcessingRoute(
 data class ScanResultRoute(val imageUri: String)
 
 @Serializable
-data class NutriGptRoute(val scanResultId: String)
+object NutriGptRoute
 
 @Serializable
 data class IngredientDetailRoute(val ingredientName: String)
@@ -129,3 +130,6 @@ object NewsRoute
 
 @Serializable
 object ChatWithAiRoute
+
+@Serializable
+object NutriGptVoiceRoute

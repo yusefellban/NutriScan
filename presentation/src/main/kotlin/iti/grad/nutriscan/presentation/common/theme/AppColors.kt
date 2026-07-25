@@ -183,6 +183,24 @@ internal data class AppColorsExtension2(
     // --- Overlays ---
     /** Modal bottom sheet / dialog scrim. Replaces ad-hoc `Color(0x66...)` literals. */
     val ScrimOverlay: Color,
+    
+    // --- NutriGPT Chat ---
+    val ChatScreenBackground: Color,
+    val ChatScreenBackgroundEnd: Color,
+    val ChatUserBubble: Color,
+    val ChatUserBubbleText: Color,
+    val ChatBotBubble: Color,
+    val ChatBotBubbleText: Color,
+    val ChatSourceCardBackground: Color,
+    val ChatSourceScoreBadge: Color,
+    val ChatInputBackground: Color,
+    val ChatInputText: Color,
+    val ChatInputPlaceholder: Color,
+    val ChatSendButtonBackground: Color,
+    val ChatSendButtonIcon: Color,
+    val ChatDisclaimerBackground: Color,
+    val ChatDisclaimerText: Color,
+    val ChatDisclaimerIcon: Color,
 )
 
 @Immutable
@@ -450,6 +468,23 @@ data class AppColors internal constructor(
     val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
     val ProductDetailBookmarkTint: Color get() = extension2.ProductDetailBookmarkTint
     val ScrimOverlay: Color get() = extension2.ScrimOverlay
+
+    val ChatScreenBackground: Color get() = extension2.ChatScreenBackground
+    val ChatScreenBackgroundEnd: Color get() = extension2.ChatScreenBackgroundEnd
+    val ChatUserBubble: Color get() = extension2.ChatUserBubble
+    val ChatUserBubbleText: Color get() = extension2.ChatUserBubbleText
+    val ChatBotBubble: Color get() = extension2.ChatBotBubble
+    val ChatBotBubbleText: Color get() = extension2.ChatBotBubbleText
+    val ChatSourceCardBackground: Color get() = extension2.ChatSourceCardBackground
+    val ChatSourceScoreBadge: Color get() = extension2.ChatSourceScoreBadge
+    val ChatInputBackground: Color get() = extension2.ChatInputBackground
+    val ChatInputText: Color get() = extension2.ChatInputText
+    val ChatInputPlaceholder: Color get() = extension2.ChatInputPlaceholder
+    val ChatSendButtonBackground: Color get() = extension2.ChatSendButtonBackground
+    val ChatSendButtonIcon: Color get() = extension2.ChatSendButtonIcon
+    val ChatDisclaimerBackground: Color get() = extension2.ChatDisclaimerBackground
+    val ChatDisclaimerText: Color get() = extension2.ChatDisclaimerText
+    val ChatDisclaimerIcon: Color get() = extension2.ChatDisclaimerIcon
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -757,6 +792,24 @@ fun lightColors() = AppColors(
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
 
         ScrimOverlay = Color(0x660F474A), // Teal1600 40% alpha — light mode scrim
+        
+        // NutriGPT Chat (Light Mode)
+        ChatScreenBackground = Color(0xFFFFFFFF), // White
+        ChatScreenBackgroundEnd = Color(0xFFFFFFFF), // White
+        ChatUserBubble = Color(0xFF2FC5CC), // Teal700
+        ChatUserBubbleText = Color(0xFFFFFFFF), // White
+        ChatBotBubble = Color(0xFFE8FAFA), // Teal100
+        ChatBotBubbleText = Color(0xFF0F474A), // Teal1600
+        ChatSourceCardBackground = Color(0xFFE8FAFA), // Teal100
+        ChatSourceScoreBadge = Color.Transparent, // No background in light mode
+        ChatInputBackground = Color(0xFFFFFFFF), // White
+        ChatInputText = Color(0xFF393C3C), // Gray1600
+        ChatInputPlaceholder = Color(0xFFA6A5A5), // Gray600
+        ChatSendButtonBackground = Color(0xFFD6D6D5), // Gray400
+        ChatSendButtonIcon = Color(0xFFFFFFFF), // White
+        ChatDisclaimerBackground = Color(0xFFF8F8F9), // Gray100
+        ChatDisclaimerText = Color(0xFF777777), // Gray800
+        ChatDisclaimerIcon = Color(0xFF13A4AB), // Teal1000
     ),
 )
 
@@ -1068,5 +1121,23 @@ fun darkColors() = AppColors(
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
 
         ScrimOverlay = Color(0x99000000), // Black 60% alpha — dark mode scrim
+        
+        // NutriGPT Chat (Dark Mode)
+        ChatScreenBackground = Color(0xFF0A545A), // Teal1500
+        ChatScreenBackgroundEnd = Color(0xFF0F474A), // Teal1600
+        ChatUserBubble = Color(0xFF0B5F65), // Teal1400
+        ChatUserBubbleText = Color(0xFFE8FAFA), // Teal100
+        ChatBotBubble = Color(0x33108188), // Teal1300 at 20%
+        ChatBotBubbleText = Color(0xFFE8FAFA), // Teal100
+        ChatSourceCardBackground = Color(0x4D0F474A), // Teal1600 at 30%
+        ChatSourceScoreBadge = Color(0xFF75DEE3), // Teal500
+        ChatInputBackground = Color(0x330F474A), // Teal1600 at 20%
+        ChatInputText = Color(0xFFE8FAFA), // Teal100
+        ChatInputPlaceholder = Color(0xFF108188), // Teal1300
+        ChatSendButtonBackground = Color(0xFF11939A), // Teal1200
+        ChatSendButtonIcon = Color(0xFFE8FAFA), // Teal100
+        ChatDisclaimerBackground = Color(0x4D0F474A), // Teal1600 at 30%
+        ChatDisclaimerText = Color(0xFFE8FAFA), // Teal100
+        ChatDisclaimerIcon = Color(0xFF75DEE3), // Teal500
     ),
 )

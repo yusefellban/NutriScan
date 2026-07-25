@@ -7,6 +7,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.gif.GifDecoder
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -22,6 +23,7 @@ class NutriScanApplication : Application(), SingletonImageLoader.Factory {
         return ImageLoader.Builder(context)
             .components {
                 add(OkHttpNetworkFetcherFactory())
+                add(GifDecoder.Factory())
             }
             .build()
     }

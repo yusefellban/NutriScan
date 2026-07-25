@@ -3,12 +3,16 @@ package iti.grad.nutriscan.presentation.exercises.workout.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.exercises.model.Exercise
+import iti.grad.nutriscan.domain.exercises.usecase.GetExerciseByIdUseCase
 import iti.grad.nutriscan.presentation.common.model.ExerciseType
+import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
 import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutState
+import iti.grad.presentation.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -21,7 +25,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExerciseWorkoutViewModel @Inject constructor() : ViewModel() {
+class ExerciseWorkoutViewModel @Inject constructor(
+    private val getExerciseByIdUseCase: GetExerciseByIdUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ExerciseWorkoutState())
     val state: StateFlow<ExerciseWorkoutState> = _state.asStateFlow()
@@ -30,22 +36,26 @@ class ExerciseWorkoutViewModel @Inject constructor() : ViewModel() {
     val effect = _effect.receiveAsFlow()
 
     private var timerJob: Job? = null
+    private var exerciseId: String? = null
 
     fun onEvent(event: ExerciseWorkoutEvent) {
         when (event) {
             is ExerciseWorkoutEvent.InitExercise -> {
-                val exercise = ExercisesMockData.exercises.firstOrNull { it.id == event.id }
                 _state.update {
                     it.copy(
-                        exercise = exercise,
+                        isLoading = true,
+                        exercise = null,
                         secondsElapsed = 0,
                         isTimerRunning = false,
                         hasStarted = false,
                         sets = 1,
                         reps = 1,
-                        showCongratsDialog = false
+                        showCongratsDialog = false,
+                        errorMessageRes = null
                     )
                 }
+                exerciseId = event.id
+                loadExercise(event.id)
             }
             ExerciseWorkoutEvent.OnStartResumeClick -> {
                 _state.update {
@@ -112,6 +122,36 @@ class ExerciseWorkoutViewModel @Inject constructor() : ViewModel() {
                     _effect.send(ExerciseWorkoutEffect.NavigateBack)
                 }
             }
+            ExerciseWorkoutEvent.OnRetryInitClick -> {
+                exerciseId?.let { id ->
+                    _state.update { it.copy(isLoading = true, errorMessageRes = null) }
+                    loadExercise(id)
+                }
+            }
+        }
+    }
+
+    private fun loadExercise(id: String) {
+        viewModelScope.launch {
+            getExerciseByIdUseCase(id).fold(
+                onSuccess = { exercise ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            exercise = exercise.toUiModel(),
+                            errorMessageRes = null
+                        )
+                    }
+                },
+                onFailure = {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessageRes = R.string.exercises_load_error
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -154,6 +194,22 @@ class ExerciseWorkoutViewModel @Inject constructor() : ViewModel() {
             )
         }
     }
+
+    private fun Exercise.toUiModel(): ExerciseUiModel = ExerciseUiModel(
+        id = id,
+        name = name,
+        equipment = equipment,
+        target = target,
+        instructions = run {
+            val lang = java.util.Locale.getDefault().language.lowercase()
+            instructions[lang] ?: instructions["en"].orEmpty()
+        },
+        type = if (category == "cardio" || minKcal != null) ExerciseType.CARDIO else ExerciseType.NORMAL_WORKOUT,
+        imageUrl = imageUrl,
+        gifUrl = gifUrl,
+        kcalPerMin = minKcal,
+        kcalPerRep = repKcal
+    )
 
     override fun onCleared() {
         super.onCleared()

@@ -17,6 +17,7 @@ import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlin.reflect.typeOf
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
@@ -32,6 +33,8 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScr
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
+import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
@@ -63,7 +66,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 }
@@ -101,7 +104,7 @@ fun AppNavGraph(
                             popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
                         }
                     } else {
-                        navController.navigate(MainRoute) {
+                        navController.navigate(MainRoute()) {
                             popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
                         }
                     }
@@ -158,7 +161,7 @@ fun AppNavGraph(
             ProfileSetupPagerScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(ProfileSetupPagerRoute) { inclusive = true }
                     }
                 }
@@ -171,15 +174,17 @@ fun AppNavGraph(
                 title = "Family Profile Setup",
                 buttonText = "Complete Setup"
             ) {
-                navController.navigate(MainRoute) {
+                navController.navigate(MainRoute()) {
                     popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
 
         // 7. Main Screen (Container for Home, Scan, Calories, Saved, Profile)
-        composable<MainRoute> {
+        composable<MainRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<MainRoute>()
             MainScreen(
+                initialTab = route.initialTab,
                 onNavigateToScanResult = { scanId ->
                     navController.navigate(ScanResultRoute(scanId))
                 },
@@ -220,21 +225,16 @@ fun AppNavGraph(
                 title = "Scan Result\nImage URI: ${route.imageUri}",
                 buttonText = "Chat with NutriGPT"
             ) {
-                navController.navigate(NutriGptRoute("dummy_scan_id"))
+                navController.navigate(NutriGptRoute)
             }
         }
 
-        // 11. NutriGPT Chat (Placeholder)
-        composable<NutriGptRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<NutriGptRoute>()
-            PlaceholderScreen(
-                title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
-                buttonText = "Back to Home"
-            ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
-                }
-            }
+        // 11. NutriGPT Chat
+        composable<NutriGptRoute> {
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
         }
 
         // 12. Ingredient Detail (Placeholder)
@@ -265,8 +265,8 @@ fun AppNavGraph(
                 title = "Receipt Result\nURI: ${route.receiptImageUri}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
+                navController.navigate(MainRoute()) {
+                    popUpTo<MainRoute> { inclusive = false }
                 }
             }
         }
@@ -384,8 +384,8 @@ fun AppNavGraph(
                 exerciseId = route.exerciseId,
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToCalories = {
-                    navController.navigate(CaloriesRoute) {
-                        popUpTo<ExercisesRoute> { inclusive = true }
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.CALORIES)) {
+                        popUpTo<MainRoute> { inclusive = true }
                     }
                 }
             )
@@ -406,14 +406,19 @@ fun AppNavGraph(
             )
         }
 
-        // 31. Chat with AI (Placeholder)
+        // 31. Chat with AI
         composable<ChatWithAiRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.home_chat_with_ai),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
+        }
+
+        // 32. Voice Chat with AI
+        composable<NutriGptVoiceRoute> {
+            NutriGptVoiceScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
 
 
