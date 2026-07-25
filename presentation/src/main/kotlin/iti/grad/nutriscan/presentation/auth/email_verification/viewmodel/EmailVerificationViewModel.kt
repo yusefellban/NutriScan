@@ -1,15 +1,7 @@
 package iti.grad.nutriscan.presentation.auth.email_verification.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
-import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEffect
-import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEvent
-import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationState
-import iti.grad.nutriscan.presentation.common.state.AuthAlertState
-import iti.grad.presentation.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +10,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEvent
+import androidx.lifecycle.ViewModel
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationState
+import iti.grad.nutriscan.presentation.common.model.UiText.StringResource
+import iti.grad.presentation.R
+import androidx.lifecycle.SavedStateHandle
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEffect
+import iti.grad.nutriscan.presentation.common.model.UiText.DynamicString
+import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
@@ -62,7 +64,7 @@ class EmailVerificationViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isResending = false,
-                            alertState = AuthAlertState.Success(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.email_verification_resend_success))
+                            alertState = AuthAlertState.Success(message = StringResource(R.string.email_verification_resend_success))
                         ) 
                     }
                 }
@@ -70,7 +72,7 @@ class EmailVerificationViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isResending = false,
-                            alertState = AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.DynamicString(throwable.message ?: "Failed to resend verification email."))
+                            alertState = AuthAlertState.Error(message = DynamicString(throwable.message ?: "Failed to resend verification email."))
                         ) 
                     }
                 }

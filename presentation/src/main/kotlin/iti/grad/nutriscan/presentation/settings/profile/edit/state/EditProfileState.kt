@@ -1,8 +1,12 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit.state
 
-import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import iti.grad.nutriscan.domain.allergy.model.Allergy
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState
+import iti.grad.nutriscan.domain.disease.model.Disease
+import androidx.compose.runtime.Immutable
 
 @Immutable
 data class EditProfileState(
@@ -15,17 +19,17 @@ data class EditProfileState(
     val weightKg: Double? = null,
     val isSaving: Boolean = false,
     val avatarUrl: String? = null,
-    val diseases: ImmutableList<iti.grad.nutriscan.domain.disease.model.Disease> = persistentListOf(),
+    val diseases: ImmutableList<Disease> = persistentListOf(),
     val selectedDiseaseIds: ImmutableList<Int> = persistentListOf(),
     val isDiseasesLoading: Boolean = false,
     val diseasesErrorMessage: String? = null,
     
-    val allergies: ImmutableList<iti.grad.nutriscan.domain.allergy.model.Allergy> = persistentListOf(),
+    val allergies: ImmutableList<Allergy> = persistentListOf(),
     val selectedAllergyIds: ImmutableList<Int> = persistentListOf(),
     val isAllergiesLoading: Boolean = false,
     val allergiesErrorMessage: String? = null,
 
     val showSaveConfirmation: Boolean = false,
     val isLoading: Boolean = false,
-    val alertState: iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
+    val alertState: ProfileAlertState = None
 )

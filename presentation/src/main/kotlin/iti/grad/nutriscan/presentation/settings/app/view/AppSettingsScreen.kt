@@ -1,42 +1,43 @@
 package iti.grad.nutriscan.presentation.settings.app.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.domain.settings.model.AppLanguage
-import iti.grad.nutriscan.domain.settings.model.ThemeMode
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
-import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
-import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
-import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
-import iti.grad.nutriscan.presentation.settings.app.view.components.LogoutButton
-import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsActionRow
-import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsToggleRow
-import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
-import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.domain.settings.model.ThemeMode
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
+import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsToggleRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.WindowInsets
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
+import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
+import androidx.compose.material.icons.filled.Language
+import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
+import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsActionRow
+import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
+import androidx.compose.foundation.layout.Arrangement
+import iti.grad.nutriscan.domain.settings.model.AppLanguage
+import iti.grad.nutriscan.presentation.settings.app.view.components.LogoutButton
+import androidx.compose.runtime.Composable
+import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
+import iti.grad.nutriscan.presentation.common.components.LogoutAlert
+import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 
 @Composable
 fun AppSettingsScreen(
@@ -147,7 +148,7 @@ private fun AppSettingsContent(
     }
 
     if (state.showLogoutConfirmDialog) {
-        iti.grad.nutriscan.presentation.common.components.LogoutAlert(
+        LogoutAlert(
             title = stringResource(R.string.app_settings_logout_confirm_title),
             message = stringResource(R.string.app_settings_logout_confirm_message),
             confirmText = stringResource(R.string.app_settings_logout),

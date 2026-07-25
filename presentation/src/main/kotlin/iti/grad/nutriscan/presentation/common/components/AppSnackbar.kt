@@ -1,11 +1,13 @@
 package iti.grad.nutriscan.presentation.common.components
+import androidx.compose.ui.graphics.Color
 
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import androidx.compose.material3.MaterialTheme
+
+import androidx.compose.ui.Modifier
+import androidx.compose.material3.Snackbar
+import androidx.compose.runtime.Composable
+import androidx.compose.material3.Text
 
 @Composable
 fun AppSnackbar(
@@ -15,7 +17,7 @@ fun AppSnackbar(
     Snackbar(
         modifier = modifier,
         containerColor = AppTheme.colors.Background,
-        contentColor = androidx.compose.ui.graphics.Color.Black
+        contentColor = Color.Black
     ) {
         Text(
             text = message,

@@ -1,41 +1,43 @@
 package iti.grad.nutriscan.presentation.auth.forgot_password.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import iti.grad.nutriscan.presentation.auth.forgot_password.state.ForgotPasswordEffect
 import iti.grad.nutriscan.presentation.auth.forgot_password.state.ForgotPasswordEvent
-import iti.grad.nutriscan.presentation.auth.forgot_password.state.ForgotPasswordState
-import iti.grad.nutriscan.presentation.auth.forgot_password.state.ResetMethod
-import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ForgotPasswordHeader
-import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.PasswordSentDialog
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ResetMethodCard
-import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.EmailInputDialog
-import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
-import iti.grad.nutriscan.presentation.common.components.AppButton
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
+import iti.grad.nutriscan.presentation.auth.forgot_password.state.ResetMethod
+import androidx.compose.material3.SnackbarHost
 import iti.grad.presentation.R
-import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.PasswordSentDialog
+import androidx.compose.foundation.layout.Spacer
+import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ForgotPasswordHeader
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.MaterialTheme
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.AppButton
+import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.Column
+import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.EmailInputDialog
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
+import iti.grad.nutriscan.presentation.auth.forgot_password.state.ForgotPasswordState
 
 @Composable
 fun ForgotPasswordScreen(
@@ -65,8 +67,8 @@ fun ForgotPasswordScreen(
     }
 
     if (errorDialogMessage != null) {
-        iti.grad.nutriscan.presentation.common.components.ErrorAlert(
-            title = androidx.compose.ui.res.stringResource(id = R.string.alert_reset_failed_title),
+        ErrorAlert(
+            title = stringResource(id = R.string.alert_reset_failed_title),
             message = errorDialogMessage!!,
             onDismiss = { errorDialogMessage = null }
         )
