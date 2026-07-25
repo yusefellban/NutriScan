@@ -2,6 +2,8 @@ package iti.grad.nutriscan.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +17,21 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `family_members` (
+                    `id` TEXT NOT NULL, 
+                    `ownerUserId` TEXT NOT NULL, 
+                    `name` TEXT NOT NULL, 
+                    `allergyIds` TEXT NOT NULL, 
+                    `diseaseIds` TEXT NOT NULL, 
+                    PRIMARY KEY(`id`)
+                )
+            """)
+        }
+    }
+
     @Provides
     @Singleton
     fun provideNutriScanDatabase(@ApplicationContext context: Context): NutriScanDatabase {
@@ -22,7 +39,10 @@ object DatabaseModule {
             context,
             NutriScanDatabase::class.java,
             "nutriscan_db"
-        ).fallbackToDestructiveMigration().build()
+        )
+            .addMigrations(MIGRATION_3_4)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

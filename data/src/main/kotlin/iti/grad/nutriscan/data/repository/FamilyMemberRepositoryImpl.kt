@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.FamilyMemberDto
+import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.domain.family.model.FamilyMember
 import iti.grad.nutriscan.domain.family.model.FamilyMemberInput
@@ -39,15 +40,23 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         val dbUser = userDao.getUserFlow().firstOrNull()
         if (dbUser != null) return dbUser.id
 
-        val idToken = tokenManager.getIdToken()
-        val tokenUserId = JwtDecoder.extractSubjectClaim(idToken)
+        val token = tokenManager.getIdToken() ?: tokenManager.getAccessToken()
+        val tokenUserId = JwtDecoder.extractSubjectClaim(token)
         if (tokenUserId != null) {
+            val email = JwtDecoder.extractClaim(token, "email") ?: ""
+            val name = JwtDecoder.extractClaim(token, "name")
+            val givenName = JwtDecoder.extractClaim(token, "given_name")
+            val familyName = JwtDecoder.extractClaim(token, "family_name")
+
+            val finalFirstName = givenName ?: name ?: "User"
+            val finalLastName = familyName ?: ""
+
             // Seed a local placeholder user so database relational integrity is preserved offline.
             val placeholder = UserEntity(
                 id = tokenUserId,
-                firstName = "User",
-                lastName = "",
-                email = ""
+                firstName = finalFirstName,
+                lastName = finalLastName,
+                email = email
             )
             userDao.insertOrUpdateUser(placeholder)
             return tokenUserId
@@ -124,13 +133,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val refreshed = remoteDataSource.getProfile()
                 val entities = refreshed.familyMembers.orEmpty().map { dto ->
-                    FamilyMemberEntity(
-                        id = dto.id ?: dto.name,
-                        ownerUserId = userId,
-                        name = dto.name,
-                        allergyIds = dto.allergyIds,
-                        diseaseIds = dto.diseaseIds,
-                    )
+                    dto.toEntity(userId)
                 }
                 familyMemberDao.replaceAllForUser(userId, entities)
                 Result.success(Unit)

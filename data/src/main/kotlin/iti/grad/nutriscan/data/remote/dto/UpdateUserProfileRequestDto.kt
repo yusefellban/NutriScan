@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.data.remote.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,5 +20,5 @@ data class UpdateUserProfileRequestDto(
     val allergyIds: List<Int>? = null,
     val avatarUrl: String? = null,
     /** Full replace of the family members list — see family-members plan §2. */
-    val familyMembers: List<FamilyMemberDto>? = null
+    @SerialName("family_members") val familyMembers: List<FamilyMemberDto>? = null
 )

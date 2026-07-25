@@ -1,21 +1,24 @@
 package iti.grad.nutriscan.data.remote.dto
 
+import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
-/**
- * Wire shape for a family member inside [UserDto.familyMembers] /
- * [UpdateUserProfileRequestDto.familyMembers].
- *
- * NOTE: per the family-members implementation plan, the Postman collection's
- * `familyMembers` bodies use camelCase keys (`allergyIds`/`diseaseIds`)
- * while the rest of the user payload uses snake_case via `@SerialName` —
- * this is the backend's existing inconsistency, not a bug here. [id] is
- * null when sending a newly-created (not yet synced) member.
- */
 @Serializable
 data class FamilyMemberDto(
     val id: String? = null,
     val name: String,
-    val allergyIds: List<Int> = emptyList(),
-    val diseaseIds: List<Int> = emptyList(),
+    @SerialName("allergy_ids") val allergyIds: List<Int> = emptyList(),
+    @SerialName("disease_ids") val diseaseIds: List<Int> = emptyList(),
 )
+
+fun FamilyMemberDto.toEntity(ownerUserId: String): FamilyMemberEntity {
+    return FamilyMemberEntity(
+        id = id ?: UUID.randomUUID().toString(),
+        ownerUserId = ownerUserId,
+        name = name,
+        allergyIds = allergyIds,
+        diseaseIds = diseaseIds,
+    )
+}

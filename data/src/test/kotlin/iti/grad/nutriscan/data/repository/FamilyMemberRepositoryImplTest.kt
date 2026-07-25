@@ -213,8 +213,32 @@ class FamilyMemberRepositoryImplTest {
         )
 
         val members = repository.getFamilyMembers().first()
-
         assertEquals(1, members.size)
         assertEquals("Father", members.first().name)
+    }
+
+    @Test
+    fun `addFamilyMember when database has no user fallback retrieves from tokenManager and seeds placeholder user`() = runTest {
+        val userFlow = MutableStateFlow<UserEntity?>(null)
+        coEvery { userDao.getUserFlow() } returns userFlow
+
+        val fakeIdToken = "header.eyJzdWIiOiJzZWVkZWQtdXNlci0xMjMiLCJlbWFpbCI6InNlZWRlZEBleGFtcGxlLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiVGF5c2VlciJ9.sig"
+        coEvery { tokenManager.getIdToken() } returns fakeIdToken
+        coEvery { tokenManager.getAccessToken() } returns null
+
+        val insertedUser = io.mockk.slot<UserEntity>()
+        coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } returns Unit
+        coEvery { familyMemberDao.getFamilyMembersOnce("seeded-user-123") } returns emptyList()
+        coEvery { remoteDataSource.updateProfile(any()) } returns successResponse()
+        coEvery { remoteDataSource.getProfile() } returns userDto(emptyList())
+
+        val result = repository.addFamilyMember(FamilyMemberInput(name = "Mother"))
+
+        assertTrue(result.isSuccess)
+        coVerify { userDao.insertOrUpdateUser(any()) }
+        assertEquals("seeded-user-123", insertedUser.captured.id)
+        assertEquals("Ahmed", insertedUser.captured.firstName)
+        assertEquals("Tayseer", insertedUser.captured.lastName)
+        assertEquals("seeded@example.com", insertedUser.captured.email)
     }
 }

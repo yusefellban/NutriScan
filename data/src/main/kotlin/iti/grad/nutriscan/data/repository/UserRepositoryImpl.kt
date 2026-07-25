@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
+import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -68,13 +69,7 @@ class UserRepositoryImpl @Inject constructor(
             // Keep the family-member cache in sync with every profile refresh too,
             // not just the add/remove flows in FamilyMemberRepositoryImpl.
             val familyMemberEntities = dto.familyMembers.orEmpty().map { memberDto ->
-                FamilyMemberEntity(
-                    id = memberDto.id ?: memberDto.name,
-                    ownerUserId = dto.id,
-                    name = memberDto.name,
-                    allergyIds = memberDto.allergyIds,
-                    diseaseIds = memberDto.diseaseIds,
-                )
+                memberDto.toEntity(dto.id)
             }
             familyMemberDao.replaceAllForUser(dto.id, familyMemberEntities)
 
