@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.settings.profile.state
 
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 
 /**
  * One-shot side effects emitted by the User Profile ViewModel.
@@ -13,4 +14,5 @@ sealed interface UserProfileEffect {
     data object NavigateToScanHistory : UserProfileEffect
     data object NavigateToNotifications : UserProfileEffect
     data object NavigateToSettings : UserProfileEffect
+    data class NavigateToTab(val tab: BottomNavTab) : UserProfileEffect
 }

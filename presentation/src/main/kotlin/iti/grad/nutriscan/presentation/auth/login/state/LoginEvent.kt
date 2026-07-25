@@ -13,4 +13,6 @@ sealed interface LoginEvent {
     data class GoogleLoginFailure(val error: String) : LoginEvent
     data object SignUpClicked : LoginEvent
     data object ForgotPasswordClicked : LoginEvent
+    data object DismissAlert : LoginEvent
+    data object RetryAction : LoginEvent
 }

@@ -279,4 +279,22 @@
     <string name="news_time_hours_ago">منذ %1$d س</string>
     <string name="news_time_days_ago">منذ %1$d ي</string>
     <string name="news_card_menu_content_description">خيارات إضافية</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">تحذير الحذف</string>
+    <string name="alert_success_title">نجاح</string>
+    <string name="alert_error_title">خطأ</string>
+    <string name="alert_warning_title">تحذير</string>
+    <string name="alert_internet_title">لا يوجد اتصال</string>
+    <string name="alert_button_cancel">إلغاء</string>
+    <string name="alert_button_delete">حذف</string>
+    <string name="alert_button_ok">موافق</string>
+    <string name="alert_button_retry">إعادة المحاولة</string>
+    <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">فشل تسجيل الدخول</string>
+    <string name="alert_registration_failed_title">فشل التسجيل</string>
+    <string name="alert_reset_failed_title">فشل إعادة التعيين</string>
 </resources>

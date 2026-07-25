@@ -1,7 +1,9 @@
 package iti.grad.nutriscan.presentation.auth.login.state
 
-import androidx.annotation.StringRes
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState.None
 import iti.grad.nutriscan.domain.auth.model.OidcAuthConfig
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
+import androidx.annotation.StringRes
 
 data class LoginState(
     val email: String = "",
@@ -10,6 +12,6 @@ data class LoginState(
     val isLoading: Boolean = false,
     @StringRes val emailErrorResId: Int? = null,
     @StringRes val passwordErrorResId: Int? = null,
-    val genericErrorMessage: String? = null,
-    val oidcAuthConfig: OidcAuthConfig? = null
+    val oidcAuthConfig: OidcAuthConfig? = null,
+    val alertState: AuthAlertState = None
 )

@@ -1,15 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,58 +9,79 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.TextButton
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.clickable
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import iti.grad.nutriscan.presentation.common.components.AppBackButton
-import iti.grad.nutriscan.presentation.common.components.AppButton
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.components.customShadow
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.stringResource
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
-import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
-import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
-import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
-import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileMeasurementField
-import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning
+import androidx.compose.material3.DatePicker
+import androidx.compose.foundation.layout.FlowRow
+import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
 import iti.grad.presentation.R
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.foundation.layout.Spacer
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
+import androidx.compose.ui.Alignment
+import iti.grad.nutriscan.presentation.common.components.SuccessAlert
+import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import androidx.activity.result.contract.ActivityResultContracts
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error
+import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.MaterialTheme
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.compose.foundation.Image
+import iti.grad.nutriscan.presentation.common.components.InternetAlert
+import androidx.compose.foundation.layout.Arrangement
+import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
+import iti.grad.nutriscan.presentation.common.components.AppButton
+import androidx.compose.runtime.Composable
+import iti.grad.nutriscan.presentation.common.components.ActionConfirmAlert
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileMeasurementField
+import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
+import iti.grad.nutriscan.presentation.common.components.WarningAlert
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
 
 /**
  * Edit Profile Screen Composable.
@@ -103,7 +116,7 @@ fun EditProfileScreen(
         onEvent = viewModel::onEvent,
         onSelectAvatarClick = {
             photoPickerLauncher.launch(
-                androidx.activity.result.PickVisualMediaRequest(
+                PickVisualMediaRequest(
                     ActivityResultContracts.PickVisualMedia.ImageOnly
                 )
             )
@@ -341,7 +354,7 @@ private fun EditProfileContent(
                 // Chronic Conditions FlowRow
                 when {
                     state.isDiseasesLoading -> {
-                        androidx.compose.material3.CircularProgressIndicator(
+                        CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = AppTheme.colors.Primary,
                             strokeWidth = 2.dp
@@ -372,7 +385,7 @@ private fun EditProfileContent(
                             state.diseases.forEach { disease ->
                                 val isSelected = state.selectedDiseaseIds.contains(disease.id)
                                 if (state.isEditMode || isSelected) {
-                                    iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip(
+                                    SelectableChip(
                                         text = disease.name,
                                         isSelected = isSelected,
                                         enabled = state.isEditMode,
@@ -398,7 +411,7 @@ private fun EditProfileContent(
                 // Allergies FlowRow
                 when {
                     state.isAllergiesLoading -> {
-                        androidx.compose.material3.CircularProgressIndicator(
+                        CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = AppTheme.colors.Primary,
                             strokeWidth = 2.dp
@@ -429,7 +442,7 @@ private fun EditProfileContent(
                             state.allergies.forEach { allergy ->
                                 val isSelected = state.selectedAllergyIds.contains(allergy.id)
                                 if (state.isEditMode || isSelected) {
-                                    iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip(
+                                    SelectableChip(
                                         text = allergy.name,
                                         isSelected = isSelected,
                                         enabled = state.isEditMode,
@@ -475,14 +488,45 @@ private fun EditProfileContent(
 
     // Safety Confirmation Dialog on Save
     if (state.showSaveConfirmation) {
-        ConfirmationDialog(
+        ActionConfirmAlert(
             title = stringResource(R.string.edit_profile_confirm_title),
             message = stringResource(R.string.edit_profile_confirm_message),
-            confirmLabel = stringResource(R.string.action_save),
-            cancelLabel = stringResource(R.string.action_cancel),
+            confirmText = stringResource(R.string.action_save),
+            cancelText = stringResource(R.string.action_cancel),
             onConfirm = { onEvent(EditProfileEvent.ConfirmSave) },
             onDismiss = { onEvent(EditProfileEvent.DismissSaveConfirmation) }
         )
+    }
+
+    when (val alert = state.alertState) {
+        is InternetError -> {
+            InternetAlert(
+                onRetry = { onEvent(EditProfileEvent.RetryAction) },
+                onDismiss = { onEvent(EditProfileEvent.DismissAlert) }
+            )
+        }
+        is Error -> {
+            ErrorAlert(
+                title = stringResource(id = R.string.alert_error_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(EditProfileEvent.DismissAlert) }
+            )
+        }
+        is Warning -> {
+            WarningAlert(
+                title = stringResource(id = R.string.alert_warning_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(EditProfileEvent.DismissAlert) }
+            )
+        }
+        is Success -> {
+            SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(EditProfileEvent.DismissAlert) }
+            )
+        }
+        is None -> Unit
     }
 }
 
