@@ -25,8 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -53,7 +50,11 @@ import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerifi
 import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEvent
 import iti.grad.nutriscan.presentation.auth.email_verification.viewmodel.EmailVerificationViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import iti.grad.nutriscan.presentation.common.components.InternetAlert
+import iti.grad.nutriscan.presentation.common.components.SuccessAlert
+import iti.grad.nutriscan.presentation.common.components.WarningAlert
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
@@ -66,36 +67,24 @@ fun EmailVerificationScreen(
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is EmailVerificationEffect.NavigateToSignIn -> onNavigateToSignIn()
-                is EmailVerificationEffect.ShowSnackbar -> {
-                    val message = effect.messageStr
-                        ?: effect.messageResId?.let { context.getString(it) }
-                        ?: "An error occurred"
-                    snackbarHostState.showSnackbar(message)
-                }
             }
         }
     }
 
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
-            }
-        },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
             // ── Teal Header ──────────────────────────────────────────────────
             EmailVerificationHeader(onNavigateBack = onNavigateBack)
 
@@ -164,6 +153,38 @@ fun EmailVerificationScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        when (val alert = state.alertState) {
+            is AuthAlertState.InternetError -> {
+                InternetAlert(
+                    onRetry = { viewModel.onEvent(EmailVerificationEvent.ResendEmailClicked) },
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Error -> {
+                ErrorAlert(
+                    title = stringResource(id = R.string.alert_verification_failed_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Warning -> {
+                WarningAlert(
+                    title = stringResource(id = R.string.alert_verification_failed_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Success -> {
+                SuccessAlert(
+                    title = stringResource(id = R.string.alert_success_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.None -> Unit
+        }
         }
     }
 }

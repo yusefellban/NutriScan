@@ -86,12 +86,19 @@ class SavedViewModelTest {
         @Test
         fun `ProductClicked emits NavigateToProductDetail with the product id`() = runTest {
             viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.ProductClicked("3"))
+                val mockProduct = iti.grad.nutriscan.presentation.common.model.ProductUiModel(
+                    id = "3",
+                    productName = "Sample",
+                    imageUrl = null,
+                    verdict = iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE,
+                    calories = "100"
+                )
+                viewModel.onEvent(SavedEvent.ProductClicked(mockProduct))
                 testScheduler.runCurrent()
 
                 val effect = awaitItem()
                 Assertions.assertTrue(effect is SavedEffect.NavigateToProductDetail)
-                Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).productId)
+                Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).product.id)
             }
         }
 

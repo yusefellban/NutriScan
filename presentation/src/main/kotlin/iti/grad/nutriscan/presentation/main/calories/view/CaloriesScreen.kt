@@ -1,18 +1,11 @@
 package iti.grad.nutriscan.presentation.main.calories.view
+import androidx.compose.ui.graphics.Color
 
 import android.Manifest
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,45 +14,56 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
-import iti.grad.nutriscan.presentation.common.components.DashedActionCard
-import iti.grad.nutriscan.presentation.common.components.ExerciseCard
-import iti.grad.nutriscan.presentation.common.components.ProductCard
-import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
-import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
-import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
-import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
-import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
-import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
-import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
-import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.compose.foundation.layout.WindowInsetsSides
+import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
+import androidx.compose.runtime.LaunchedEffect
+import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
+import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.shape.RoundedCornerShape
+import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.WindowInsets
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.common.components.ProductCard
+import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
+import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
+import androidx.compose.ui.Alignment
+import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
+
+import androidx.activity.result.contract.ActivityResultContracts
+import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.platform.LocalContext
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import androidx.compose.foundation.lazy.LazyColumn
+import iti.grad.nutriscan.presentation.common.components.ExerciseCard
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.Composable
+import iti.grad.nutriscan.presentation.common.components.DashedActionCard
+import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
+import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
+import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
+import androidx.compose.ui.Modifier
+import iti.grad.nutriscan.presentation.common.components.AlertButton
 import androidx.compose.ui.unit.Dp
+import androidx.compose.material3.Text
 
 /**
  * Calories Dashboard ("Daily Products") — second bottom-nav tab.
@@ -71,7 +75,7 @@ import androidx.compose.ui.unit.Dp
 @Composable
 fun CaloriesScreen(
     viewModel: CaloriesViewModel = hiltViewModel(),
-    bottomPadding: androidx.compose.ui.unit.Dp = 0.dp,
+    bottomPadding: Dp = 0.dp,
     snackbarHostState: SnackbarHostState,
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
     onNavigateToSavedProducts: () -> Unit = {},
@@ -229,14 +233,27 @@ private fun CaloriesContent(
         }
 
         if (state.pendingRemoveFoodId != null) {
-            ConfirmationDialog(
+            CustomAlertDialog(
                 title = stringResource(R.string.food_log_remove_confirm_title),
                 message = stringResource(R.string.food_log_remove_confirm_message),
-                confirmLabel = stringResource(R.string.action_remove),
-                cancelLabel = stringResource(R.string.action_cancel),
-                onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
-                onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) },
-            )
+                icon = androidx.compose.ui.res.painterResource(id = R.drawable.ic_trash),
+                iconBackgroundColor = AppTheme.colors.ErrorBackground,
+                iconContentColor = AppTheme.colors.Error,
+                onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
+            ) {
+                AlertButton(
+                    text = stringResource(R.string.action_cancel),
+                    backgroundColor = AppTheme.colors.SurfaceVariant,
+                    textColor = AppTheme.colors.TextPrimary,
+                    onClick = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
+                )
+                AlertButton(
+                    text = stringResource(R.string.action_remove),
+                    backgroundColor = AppTheme.colors.Error,
+                    textColor = Color.White,
+                    onClick = { onEvent(CaloriesEvent.RemoveFoodConfirmed) }
+                )
+            }
         }
 }
 
