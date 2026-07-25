@@ -9,6 +9,8 @@ import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
+import iti.grad.nutriscan.presentation.common.model.UiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -85,7 +87,9 @@ class LoginViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
         
         val alertState = viewModel.state.value.alertState
-        assertTrue(alertState is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error)
-        assertEquals(errorMessage, (alertState as iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error).messageStr)
+        assertTrue(alertState is AuthAlertState.Error)
+        val errorMsg = (alertState as AuthAlertState.Error).message
+        assertTrue(errorMsg is UiText.DynamicString)
+        assertEquals(errorMessage, (errorMsg as UiText.DynamicString).value)
     }
 }

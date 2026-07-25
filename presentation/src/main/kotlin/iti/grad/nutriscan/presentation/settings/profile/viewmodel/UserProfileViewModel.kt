@@ -3,25 +3,25 @@ package iti.grad.nutriscan.presentation.settings.profile.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileState
+import iti.grad.presentation.R
+import javax.inject.Inject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
-import kotlinx.coroutines.flow.collectLatest
-
 /**
  * ViewModel for the User Profile screen.
  *
@@ -83,7 +83,7 @@ class UserProfileViewModel @Inject constructor(
                     emitEffect(UserProfileEffect.NavigateToTab(event.tab))
                 }
             }
-            UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None) }
+            UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = ProfileAlertState.None) }
             UserProfileEvent.RetryAction -> loadProfileData(isUserInitiated = true)
         }
     }
@@ -91,14 +91,14 @@ class UserProfileViewModel @Inject constructor(
     private fun loadProfileData(isUserInitiated: Boolean = false) {
         viewModelScope.launch {
             if (isUserInitiated) {
-                _state.update { it.copy(alertState = iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None) }
+                _state.update { it.copy(alertState = ProfileAlertState.None) }
             }
             userRepository.fetchAndSyncProfile()
                 .onFailure { error ->
                     if (isUserInitiated) {
                         val newAlertState = when (error) {
-                            is java.io.IOException -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
-                            else -> iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error(messageResId = iti.grad.presentation.R.string.profile_setup_load_error)
+                            is java.io.IOException -> ProfileAlertState.InternetError
+                            else -> ProfileAlertState.Error(messageResId = R.string.profile_setup_load_error)
                         }
                         _state.update { it.copy(alertState = newAlertState) }
                     }

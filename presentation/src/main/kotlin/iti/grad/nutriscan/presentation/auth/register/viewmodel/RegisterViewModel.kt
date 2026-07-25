@@ -4,7 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.auth.usecase.RegisterUseCase
+import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
+import iti.grad.nutriscan.presentation.common.model.UiText
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.presentation.R
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,12 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
-import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
@@ -85,7 +86,7 @@ class RegisterViewModel @Inject constructor(
         }
         
         if (emailError != null || passwordError != null || confirmPasswordError != null) {
-            _state.update { it.copy(alertState = AuthAlertState.Warning(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_validation_fields))) }
+            _state.update { it.copy(alertState = AuthAlertState.Warning(message = UiText.StringResource(R.string.error_validation_fields))) }
             return
         }
         
@@ -97,7 +98,7 @@ class RegisterViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isLoading = false,
-                            alertState = AuthAlertState.Success(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.success_account_created))
+                            alertState = AuthAlertState.Success(message = UiText.StringResource(R.string.success_account_created))
                         ) 
                     }
                 }
@@ -107,9 +108,9 @@ class RegisterViewModel @Inject constructor(
                     
                     val newAlertState = when {
                         throwable is java.io.IOException -> AuthAlertState.InternetError
-                        isConflict -> AuthAlertState.Warning(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_email_exists))
-                        msg.contains("500") || msg.contains("Server Error") -> AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_server_down))
-                        else -> AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.register_error_generic))
+                        isConflict -> AuthAlertState.Warning(message = UiText.StringResource(R.string.error_email_exists))
+                        msg.contains("500") || msg.contains("Server Error") -> AuthAlertState.Error(message = UiText.StringResource(R.string.error_server_down))
+                        else -> AuthAlertState.Error(message = UiText.StringResource(R.string.register_error_generic))
                     }
                     _state.update { it.copy(isLoading = false, alertState = newAlertState) }
                 }
