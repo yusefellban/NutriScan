@@ -12,4 +12,7 @@ sealed interface CameraScanEvent {
     data object BookmarkClicked : CameraScanEvent
     data object RetryClicked : CameraScanEvent
     data object DismissScanClicked : CameraScanEvent
+    data object CardClicked : CameraScanEvent
+    data object ConfirmDeleteBookmark : CameraScanEvent
+    data object DismissDeleteBookmark : CameraScanEvent
 }

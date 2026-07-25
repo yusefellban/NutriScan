@@ -8,4 +8,5 @@ data class ProductDetailsState(
     val isLoading: Boolean = true,
     val productDetail: ProductDetail? = null,
     val error: String? = null,
+    val showDeleteDialog: Boolean = false,
 )

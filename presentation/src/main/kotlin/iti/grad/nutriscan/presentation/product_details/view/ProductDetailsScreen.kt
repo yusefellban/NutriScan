@@ -21,9 +21,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
@@ -61,6 +64,17 @@ private fun ProductDetailsContent(
     state: ProductDetailsState,
     onEvent: (ProductDetailsEvent) -> Unit,
 ) {
+    if (state.showDeleteDialog) {
+        DeleteWarningAlert(
+            title = stringResource(id = R.string.alert_remove_saved_title),
+            message = stringResource(id = R.string.alert_remove_saved_message),
+            confirmText = stringResource(id = R.string.action_remove),
+            cancelText = stringResource(id = R.string.action_cancel),
+            onConfirm = { onEvent(ProductDetailsEvent.ConfirmDeleteBookmark) },
+            onDismiss = { onEvent(ProductDetailsEvent.DismissDeleteBookmark) },
+        )
+    }
+
     val scrollState = rememberScrollState()
 
     Column(

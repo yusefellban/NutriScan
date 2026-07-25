@@ -56,9 +56,9 @@ fun FlaggedIngredientCard(
             modifier = Modifier
                 .background(
                     color = AppTheme.colors.ProductDetailMatchTag,
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(percent = 50),
                 )
-                .padding(horizontal = 6.dp, vertical = 2.dp),
+                .padding(horizontal = 8.dp, vertical = 2.dp),
         )
 
         Spacer(modifier = Modifier.height(8.dp))

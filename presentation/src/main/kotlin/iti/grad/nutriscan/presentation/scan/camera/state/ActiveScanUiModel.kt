@@ -8,8 +8,9 @@ data class ActiveScanUiModel(
     val scanId: String,
     val thumbnailUrl: String?,
     @StringRes val statusResId: Int? = null,
-    val healthTag: String? = null,
+    @StringRes val healthTagResId: Int? = null,
     val isProcessing: Boolean = false,
     val isFailed: Boolean = false,
+    val isSaved: Boolean = false,
     val fullResult: ScanResult? = null
 )

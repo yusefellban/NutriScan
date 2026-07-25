@@ -17,4 +17,7 @@ interface SavedScanDao {
 
     @Query("SELECT * FROM saved_scans WHERE scanId = :scanId LIMIT 1")
     suspend fun getSavedScanById(scanId: String): SavedScanEntity?
+
+    @Query("DELETE FROM saved_scans WHERE scanId = :scanId")
+    suspend fun deleteScanById(scanId: String)
 }

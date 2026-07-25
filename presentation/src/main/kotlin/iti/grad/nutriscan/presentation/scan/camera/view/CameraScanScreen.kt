@@ -4,9 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
+import android.media.MediaActionSound
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +28,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,17 +42,19 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
 import iti.grad.nutriscan.presentation.scan.camera.view.components.CameraPreview
-import iti.grad.nutriscan.presentation.scan.camera.view.components.CaptureButton
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOverlay
 import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -55,16 +64,32 @@ fun CameraScanScreen(
     viewModel: CameraScanViewModel = hiltViewModel(),
     bottomPadding: Dp = 0.dp,
     snackbarHostState: SnackbarHostState,
+    captureTrigger: Int = 0,
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val imageCapture = remember { ImageCapture.Builder().build() }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+    val mediaActionSound = remember { MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) } }
+    val flashAlpha = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
+    }
+
+    var previousTrigger by remember { mutableIntStateOf(captureTrigger) }
+
+    LaunchedEffect(captureTrigger) {
+        if (captureTrigger > previousTrigger) {
+            previousTrigger = captureTrigger
+            if (state.isScanning) {
+                viewModel.onEvent(CameraScanEvent.CaptureClicked)
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -86,6 +111,11 @@ fun CameraScanScreen(
                     }
                 }
                 is CameraScanEffect.TakePicture -> {
+                    coroutineScope.launch {
+                        mediaActionSound.play(MediaActionSound.SHUTTER_CLICK)
+                        flashAlpha.animateTo(1f, animationSpec = tween(50))
+                        flashAlpha.animateTo(0f, animationSpec = tween(400))
+                    }
                     val photoFile = File(context.cacheDir, "scan_${System.currentTimeMillis()}.jpg")
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -103,6 +133,9 @@ fun CameraScanScreen(
                         }
                     )
                 }
+                is CameraScanEffect.NavigateToProductDetail -> {
+                    onNavigateToProductDetail(effect.product)
+                }
             }
         }
     }
@@ -112,6 +145,7 @@ fun CameraScanScreen(
         imageCapture = imageCapture,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
+        flashAlpha = flashAlpha.value,
     )
 }
 
@@ -122,6 +156,7 @@ private fun CameraScanContent(
     imageCapture: ImageCapture,
     onEvent: (CameraScanEvent) -> Unit,
     bottomPadding: Dp,
+    flashAlpha: Float,
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
@@ -134,6 +169,17 @@ private fun CameraScanContent(
         }
     )
 
+    if (state.showDeleteDialog) {
+        DeleteWarningAlert(
+            title = stringResource(id = R.string.alert_remove_saved_title),
+            message = stringResource(id = R.string.alert_remove_saved_message),
+            confirmText = stringResource(id = R.string.action_remove),
+            cancelText = stringResource(id = R.string.action_cancel),
+            onConfirm = { onEvent(CameraScanEvent.ConfirmDeleteBookmark) },
+            onDismiss = { onEvent(CameraScanEvent.DismissDeleteBookmark) },
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -145,18 +191,16 @@ private fun CameraScanContent(
                     imageCapture = imageCapture,
                     modifier = Modifier.fillMaxSize(),
                 )
+                if (flashAlpha > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White.copy(alpha = flashAlpha))
+                    )
+                }
                 ScanFrameOverlay(
                     modifier = Modifier.fillMaxSize(),
                 )
-                
-                if (state.isScanning) {
-                    CaptureButton(
-                        onClick = { onEvent(CameraScanEvent.CaptureClicked) },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = bottomPadding + 32.dp)
-                    )
-                }
             }
             state.permissionDenied -> {
                 Box(
@@ -185,11 +229,12 @@ private fun CameraScanContent(
                 backgroundContent = {},
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = bottomPadding + 16.dp),
+                    .padding(bottom = bottomPadding + 64.dp),
             ) {
                 ActiveScanCard(
                     scan = scan,
                     onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
+                    onCardClick = { onEvent(CameraScanEvent.CardClicked) },
                 )
             }
         }

@@ -3,7 +3,9 @@ package iti.grad.nutriscan.presentation.scan.camera.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
+import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
@@ -28,7 +30,8 @@ import javax.inject.Inject
 class CameraScanViewModel @Inject constructor(
     private val submitScanImageUseCase: SubmitScanImageUseCase,
     private val getScanResultUseCase: GetScanResultUseCase,
-    private val saveScanUseCase: SaveScanUseCase
+    private val saveScanUseCase: SaveScanUseCase,
+    private val deleteSavedScanUseCase: DeleteSavedScanUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CameraScanState())
@@ -55,6 +58,9 @@ class CameraScanViewModel @Inject constructor(
             is CameraScanEvent.BookmarkClicked -> handleBookmarkClicked()
             is CameraScanEvent.RetryClicked -> handleRetryClicked()
             is CameraScanEvent.DismissScanClicked -> handleDismissScanClicked()
+            is CameraScanEvent.CardClicked -> handleCardClicked()
+            is CameraScanEvent.ConfirmDeleteBookmark -> handleConfirmDeleteBookmark()
+            is CameraScanEvent.DismissDeleteBookmark -> handleDismissDeleteBookmark()
         }
     }
 
@@ -130,7 +136,13 @@ class CameraScanViewModel @Inject constructor(
                                 activeScan = state.activeScan?.copy(
                                     isProcessing = false,
                                     thumbnailUrl = scanResult.imageUrl,
-                                    healthTag = scanResult.foodSafetyResponse?.verdict?.name,
+                                    healthTagResId = scanResult.foodSafetyResponse?.verdict?.let {
+                                        when (it) {
+                                           ProductVerdict.SAFE -> R.string.verdict_safe
+                                            ProductVerdict.CAUTION -> R.string.verdict_caution
+                                            ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                                        }
+                                    },
                                     fullResult = scanResult
                                 )
                             )
@@ -158,14 +170,58 @@ class CameraScanViewModel @Inject constructor(
     }
 
     private fun handleBookmarkClicked() {
-        val currentScan = _state.value.activeScan?.fullResult ?: return
-        viewModelScope.launch {
-            val result = saveScanUseCase(currentScan)
-            if (result.isSuccess) {
-                _effect.send(CameraScanEffect.ShowSnackBar("Scan saved to Bookmarks"))
-            } else {
-                _effect.send(CameraScanEffect.ShowSnackBar("Failed to save scan"))
+        val currentScan = _state.value.activeScan ?: return
+        val fullResult = currentScan.fullResult ?: return
+
+        if (currentScan.isSaved) {
+            _state.update { it.copy(showDeleteDialog = true) }
+        } else {
+            viewModelScope.launch {
+                val result = saveScanUseCase(fullResult)
+                if (result.isSuccess) {
+                    _state.update { state ->
+                        state.copy(
+                            activeScan = state.activeScan?.copy(isSaved = true)
+                        )
+                    }
+                    _effect.send(CameraScanEffect.ShowSnackBar("Scan saved to Bookmarks"))
+                } else {
+                    _effect.send(CameraScanEffect.ShowSnackBar("Failed to save scan"))
+                }
             }
+        }
+    }
+
+    private fun handleConfirmDeleteBookmark() {
+        val currentScan = _state.value.activeScan ?: return
+        viewModelScope.launch {
+            deleteSavedScanUseCase(currentScan.scanId)
+            _state.update { state ->
+                state.copy(
+                    showDeleteDialog = false,
+                    activeScan = state.activeScan?.copy(isSaved = false)
+                )
+            }
+        }
+    }
+
+    private fun handleDismissDeleteBookmark() {
+        _state.update { it.copy(showDeleteDialog = false) }
+    }
+
+    private fun handleCardClicked() {
+        val currentScan = _state.value.activeScan ?: return
+        if (currentScan.isProcessing || currentScan.isFailed) return
+        
+        val uiModel = iti.grad.nutriscan.presentation.common.model.ProductUiModel(
+            id = currentScan.fullResult?.scanId ?: "",
+            productName = currentScan.fullResult?.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() } ?: "",
+            imageUrl = currentScan.fullResult?.imageUrl,
+            verdict = currentScan.fullResult?.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
+            calories = currentScan.fullResult?.nutritionFacts?.calories?.toString() ?: "0"
+        )
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.NavigateToProductDetail(uiModel))
         }
     }
 

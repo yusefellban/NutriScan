@@ -146,6 +146,19 @@
     <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
     <string name="action_go_back">رجوع</string>
 
+    <!-- Camera Scan Screen -->
+    <string name="scan_status_processing">جاري المعالجة</string>
+    <string name="scan_status_failed">فشل</string>
+    <string name="scan_status_completed">مكتمل</string>
+    <string name="scan_product_unknown">منتج تم مسحه</string>
+    <string name="scan_brand_unknown">علامة تجارية غير معروفة</string>
+    <string name="scan_camera_permission_denied">مطلوب الوصول إلى الكاميرا لمسح المنتجات</string>
+    <string name="scan_camera_permission_retry">منح الإذن</string>
+    <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
+    <string name="scan_frame_content_description">إطار ماسح الباركود</string>
+    <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>
+    <string name="scan_processing_placeholder_title">جاري المسح\nالباركود: %1$s</string>
+
     <!-- Email Verification -->
     <string name="email_verification_title">تحقق من بريدك الإلكتروني</string>
     <string name="email_verification_subtitle">تأكد من هويتك لبدء المسح.</string>
@@ -257,6 +270,15 @@
 
     <!-- Product Details -->
     <string name="product_details_title">تفاصيل المنتج</string>
+    <string name="nutrition_calories">سعرات</string>
+    <string name="nutrition_serving_size">حصة</string>
+    <string name="nutrition_sugar">سكر</string>
+    <string name="nutrition_fat">دهون</string>
+    <string name="nutrition_saturated_fat">دهون مشبعة</string>
+    <string name="unit_kcal">%s سعرة</string>
+    <string name="unit_serving">%s حصة</string>
+    <string name="unit_g">%s جم</string>
+    <string name="no_specific_match_found">لم يتم العثور على تطابق محدد.</string>
     <string name="product_details_scanned_at">تم المسح في</string>
     <string name="product_details_for_you">لك</string>
     <string name="product_details_why_unsafe">لماذا هو غير آمن؟</string>
@@ -301,6 +323,8 @@
 
     <!-- Custom Alerts -->
     <string name="alert_delete_warning_title">تحذير الحذف</string>
+    <string name="alert_remove_saved_title">إزالة من المحفوظات؟</string>
+    <string name="alert_remove_saved_message">هل أنت متأكد من رغبتك في إزالة هذا الفحص من قائمة المحفوظات الخاصة بك؟</string>
     <string name="alert_success_title">نجاح</string>
     <string name="alert_error_title">خطأ</string>
     <string name="alert_warning_title">تحذير</string>
