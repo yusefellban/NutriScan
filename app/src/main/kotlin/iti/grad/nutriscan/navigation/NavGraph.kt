@@ -33,6 +33,8 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScr
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
+import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
@@ -225,7 +227,7 @@ fun AppNavGraph(
                 title = "Scan Result\nImage URI: ${route.imageUri}",
                 buttonText = "Chat with NutriGPT"
             ) {
-                navController.navigate(NutriGptRoute("dummy_scan_id"))
+                navController.navigate(NutriGptRoute)
             }
         }
 
@@ -240,6 +242,12 @@ fun AppNavGraph(
                     popUpTo<MainRoute> { inclusive = false }
                 }
             }
+        // 11. NutriGPT Chat
+        composable<NutriGptRoute> {
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
         }
 
         // 12. Ingredient Detail (Placeholder)
@@ -422,14 +430,19 @@ fun AppNavGraph(
             )
         }
 
-        // 31. Chat with AI (Placeholder)
+        // 31. Chat with AI
         composable<ChatWithAiRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.home_chat_with_ai),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
+        }
+
+        // 32. Voice Chat with AI
+        composable<NutriGptVoiceRoute> {
+            NutriGptVoiceScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
 
 

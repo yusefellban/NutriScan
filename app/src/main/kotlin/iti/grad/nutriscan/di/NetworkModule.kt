@@ -16,6 +16,7 @@ import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.ErrorInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.NutriScanAuthenticator
 import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
+import iti.grad.nutriscan.data.remote.api.NutriGptApiService
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -221,4 +222,24 @@ object NetworkModule {
     @Singleton
     fun provideExercisesApiService(@Named("ExercisesRetrofit") retrofit: Retrofit): ExercisesApiService =
         retrofit.create(ExercisesApiService::class.java)
+    @Named("NutriGptRetrofit")
+    fun provideNutriGptRetrofit(
+        json: Json,
+    ): Retrofit {
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.NUTRI_GPT_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNutriGptApiService(@Named("NutriGptRetrofit") retrofit: Retrofit): NutriGptApiService =
+        retrofit.create(NutriGptApiService::class.java)
 }
