@@ -1,7 +1,9 @@
 package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.UserDao
+import iti.grad.nutriscan.data.db.dao.FamilyMemberDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
+import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
@@ -17,6 +19,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
+    private val familyMemberDao: FamilyMemberDao,
     private val remoteDataSource: IUserRemoteDataSource,
     private val json: Json
 ) : IUserRepository {
@@ -61,6 +64,20 @@ class UserRepositoryImpl @Inject constructor(
                 avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl
             )
             userDao.insertOrUpdateUser(entity)
+
+            // Keep the family-member cache in sync with every profile refresh too,
+            // not just the add/remove flows in FamilyMemberRepositoryImpl.
+            val familyMemberEntities = dto.familyMembers.orEmpty().map { memberDto ->
+                FamilyMemberEntity(
+                    id = memberDto.id ?: memberDto.name,
+                    ownerUserId = dto.id,
+                    name = memberDto.name,
+                    allergyIds = memberDto.allergyIds,
+                    diseaseIds = memberDto.diseaseIds,
+                )
+            }
+            familyMemberDao.replaceAllForUser(dto.id, familyMemberEntities)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

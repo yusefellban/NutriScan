@@ -15,5 +15,9 @@ data class UserDto(
     @SerialName("weight_kg") val weightKg: Double? = null,
     @SerialName("disease_ids") val diseaseIds: List<Int>? = null,
     @SerialName("allergy_ids") val allergyIds: List<Int>? = null,
-    @SerialName("avatar_url") val avatarUrl: String? = null
+    @SerialName("avatar_url") val avatarUrl: String? = null,
+    // ⚠️ Wire key/casing unconfirmed with backend — see family-members plan §2/§3.2.
+    // Postman request bodies show `familyMembers` (camelCase), unlike the rest of
+    // this DTO's snake_case fields, so no @SerialName override is applied here.
+    val familyMembers: List<FamilyMemberDto>? = null
 )
