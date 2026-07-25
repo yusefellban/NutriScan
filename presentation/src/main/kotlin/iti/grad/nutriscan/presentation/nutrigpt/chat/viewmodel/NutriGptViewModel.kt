@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptMessage
+import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
 import iti.grad.nutriscan.domain.nutrigpt.usecase.SendNutriGptMessageUseCase
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
@@ -14,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NutriGptViewModel @Inject constructor(
-    private val sendNutriGptMessageUseCase: SendNutriGptMessageUseCase
+    private val sendNutriGptMessageUseCase: SendNutriGptMessageUseCase,
+    private val nutriGptRepository: INutriGptRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NutriGptState())
@@ -30,6 +33,14 @@ class NutriGptViewModel @Inject constructor(
 
     private val _effect = Channel<NutriGptEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            nutriGptRepository.messages.collectLatest { repoMessages ->
+                _state.update { it.copy(messages = repoMessages.toImmutableList()) }
+            }
+        }
+    }
 
     fun onEvent(event: NutriGptEvent) {
         when (event) {
@@ -67,9 +78,11 @@ class NutriGptViewModel @Inject constructor(
             isFromUser = true
         )
 
+        // Store user message in repository
+        nutriGptRepository.addMessage(userMessage)
+
         _state.update {
             it.copy(
-                messages = (it.messages + userMessage).toImmutableList(),
                 currentQuery = "",
                 isLoading = true
             )
@@ -79,10 +92,8 @@ class NutriGptViewModel @Inject constructor(
             val result = sendNutriGptMessageUseCase(query)
             _state.update { it.copy(isLoading = false) }
 
-            result.onSuccess { data ->
-                _state.update {
-                    it.copy(messages = (it.messages + data).toImmutableList())
-                }
+            result.onSuccess { botMessage ->
+                nutriGptRepository.addMessage(botMessage)
             }.onFailure { error ->
                 _effect.send(NutriGptEffect.ShowError(error.message ?: "Unknown Error"))
             }

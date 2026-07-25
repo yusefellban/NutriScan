@@ -314,4 +314,6 @@
     <string name="nutrigpt_lang_ar">AR</string>
     <string name="nutrigpt_score_format">%1$d%%</string>
     <string name="nutrigpt_sparkle_content_description">AI Sparkle</string>
+    <string name="nutrigpt_empty_title">Ask anything about nutrition</string>
+    <string name="nutrigpt_empty_subtitle">Get answers backed by trusted health sources and research papers.</string>
 </resources>

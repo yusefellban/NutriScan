@@ -9,6 +9,10 @@ import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptMessage
 import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptSource
 import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
@@ -22,24 +26,30 @@ class NutriGptRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : INutriGptRepository {
 
+    private val _messages = MutableStateFlow<List<NutriGptMessage>>(emptyList())
+    override val messages: StateFlow<List<NutriGptMessage>> = _messages.asStateFlow()
+
+    override fun addMessage(message: NutriGptMessage) {
+        _messages.update { it + message }
+    }
+
+    override fun clearMessages() {
+        _messages.update { emptyList() }
+    }
+
     override suspend fun sendQuery(query: String): Result<NutriGptMessage> =
         withContext(ioDispatcher) {
             try {
-                Timber.d("Sending NutriGPT query")
                 val response = apiService.sendQuery(NutriGptRequestDto(query))
-                
                 if (response.isSuccessful) {
-                    Timber.d("NutriGPT query successful")
                     val message = response.body()?.toDomain() ?: throw Exception("Empty response body")
                     Result.success(message)
                 } else {
                     val rawError = response.errorBody()?.string()
-                    Timber.e("NutriGPT query failed with code: ${response.code()}, errorBody: $rawError")
                     val errorMessage = parseErrorMessage(rawError)
                     Result.failure(Exception(errorMessage))
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Exception during NutriGPT query")
                 Result.failure(e)
             }
         }

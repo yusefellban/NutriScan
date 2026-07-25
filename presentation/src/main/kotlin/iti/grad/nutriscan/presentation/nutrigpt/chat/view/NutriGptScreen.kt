@@ -46,6 +46,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.chat.view.components.ChatInputBa
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.components.ChatMessageBubble
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.components.ChatTopBar
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.components.ChatTypingBubble
+import iti.grad.nutriscan.presentation.nutrigpt.chat.view.components.NutriGptEmptyState
 import iti.grad.nutriscan.presentation.nutrigpt.chat.viewmodel.NutriGptViewModel
 
 @Composable
@@ -158,23 +159,29 @@ fun NutriGptScreen(
                 onVoiceIconClick = onNavigateToVoice
             )
             
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
-            ) {
-                items(
-                    items = state.messages,
-                    key = { it.id }
-                ) { message ->
-                    ChatMessageBubble(message = message)
-                }
-                
-                if (state.isLoading) {
-                    item(key = "loading_bubble") {
-                        ChatTypingBubble()
+            if (state.messages.isEmpty() && !state.isLoading) {
+                NutriGptEmptyState(
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
+                ) {
+                    items(
+                        items = state.messages,
+                        key = { it.id }
+                    ) { message ->
+                        ChatMessageBubble(message = message)
+                    }
+                    
+                    if (state.isLoading) {
+                        item(key = "loading_bubble") {
+                            ChatTypingBubble()
+                        }
                     }
                 }
             }

@@ -224,13 +224,12 @@ fun AppNavGraph(
                 title = "Scan Result\nImage URI: ${route.imageUri}",
                 buttonText = "Chat with NutriGPT"
             ) {
-                navController.navigate(NutriGptRoute("dummy_scan_id"))
+                navController.navigate(NutriGptRoute)
             }
         }
 
         // 11. NutriGPT Chat
-        composable<NutriGptRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<NutriGptRoute>()
+        composable<NutriGptRoute> {
             NutriGptScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }

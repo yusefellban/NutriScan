@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
 
 @HiltViewModel
@@ -129,12 +130,48 @@ class NutriGptVoiceViewModel @Inject constructor(
                 
             }.onFailure { error ->
                 _effect.send(NutriGptVoiceEffect.ShowError(error.message ?: "Unknown Error"))
+                
+                val fallbackReply = getRandomErrorReply(state.value.chatLanguage)
+                _state.update {
+                    it.copy(
+                        answer = fallbackReply,
+                        isPlaying = true,
+                        sources = persistentListOf()
+                    )
+                }
+                
+                val langCode = if (state.value.chatLanguage == ChatLanguage.AR) "ar" else "en"
+                voiceManager.speak(fallbackReply, langCode)
             }
+        }
+    }
+
+    private fun getRandomErrorReply(language: ChatLanguage): String {
+        return if (language == ChatLanguage.AR) {
+            fallbackErrorsAr.random()
+        } else {
+            fallbackErrorsEn.random()
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         voiceManager.release()
+    }
+
+    companion object {
+        private val fallbackErrorsAr = listOf(
+            "عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+            "لم أتمكن من معالجة طلبك، هل يمكنك إعادة المحاولة؟",
+            "للأسف واجهت مشكلة، حاول مرة أخرى.",
+            "عفواً، هناك خطأ في الشبكة، برجاء المحاولة لاحقاً."
+        )
+
+        private val fallbackErrorsEn = listOf(
+            "Sorry, an error occurred. Please try again.",
+            "I couldn't process your request, could you try again?",
+            "Unfortunately I encountered an issue, please try again.",
+            "Oops, there's a network error. Please try again later."
+        )
     }
 }

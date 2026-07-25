@@ -21,7 +21,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import dagger.hilt.android.qualifiers.ApplicationContext
 
-@Singleton
 class VoiceManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : IVoiceManager, RecognitionListener {
@@ -82,7 +81,6 @@ class VoiceManagerImpl @Inject constructor(
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             }
 
-            _state.update { VoiceState.Idle }
             _state.update { VoiceState.Listening }
             speechRecognizer?.startListening(intent)
         }
