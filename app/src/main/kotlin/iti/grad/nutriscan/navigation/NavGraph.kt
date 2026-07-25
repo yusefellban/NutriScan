@@ -231,17 +231,6 @@ fun AppNavGraph(
             }
         }
 
-        // 11. NutriGPT Chat (Placeholder)
-        composable<NutriGptRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<NutriGptRoute>()
-            PlaceholderScreen(
-                title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
-                buttonText = "Back to Home"
-            ) {
-                navController.navigate(MainRoute()) {
-                    popUpTo<MainRoute> { inclusive = false }
-                }
-            }
         // 11. NutriGPT Chat
         composable<NutriGptRoute> {
             NutriGptScreen(

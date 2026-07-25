@@ -7,7 +7,6 @@ import iti.grad.nutriscan.domain.exercises.model.Exercise
 import iti.grad.nutriscan.domain.exercises.usecase.GetExerciseByIdUseCase
 import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
-import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
 import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect

@@ -43,49 +43,33 @@ import kotlinx.coroutines.flow.collectLatest
 
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.material3.Icon
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.layout.WindowInsets
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.material3.AlertDialog
-import androidx.compose.foundation.Image
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.Button
 import iti.grad.nutriscan.presentation.exercises.workout.viewmodel.ExerciseWorkoutViewModel
 import androidx.compose.ui.text.input.KeyboardType
 import iti.grad.nutriscan.presentation.common.theme.ExerciseWorkoutTypography
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
 import iti.grad.nutriscan.presentation.common.components.AppButton
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Box
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.layout.ContentScale
-
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.ui.Modifier
 import androidx.compose.material3.Scaffold
 import iti.grad.nutriscan.presentation.common.model.ExerciseType
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.Text
 
 @Composable
 fun ExerciseWorkoutScreen(
