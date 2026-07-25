@@ -50,7 +50,7 @@ data class ScanProcessingRoute(
 data class ScanResultRoute(val imageUri: String)
 
 @Serializable
-data class NutriGptRoute(val scanResultId: String)
+object NutriGptRoute
 
 @Serializable
 data class IngredientDetailRoute(val ingredientName: String)
@@ -132,3 +132,6 @@ object NewsRoute
 
 @Serializable
 object ChatWithAiRoute
+
+@Serializable
+object NutriGptVoiceRoute

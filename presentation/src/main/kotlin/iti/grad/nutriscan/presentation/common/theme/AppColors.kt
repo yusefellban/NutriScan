@@ -178,6 +178,24 @@ internal data class AppColorsExtension2(
     val ProductDetailNutritionPill: Color,
     val ProductDetailNutritionText: Color,
     val ProductDetailBookmarkTint: Color,
+    
+    // --- NutriGPT Chat ---
+    val ChatScreenBackground: Color,
+    val ChatScreenBackgroundEnd: Color,
+    val ChatUserBubble: Color,
+    val ChatUserBubbleText: Color,
+    val ChatBotBubble: Color,
+    val ChatBotBubbleText: Color,
+    val ChatSourceCardBackground: Color,
+    val ChatSourceScoreBadge: Color,
+    val ChatInputBackground: Color,
+    val ChatInputText: Color,
+    val ChatInputPlaceholder: Color,
+    val ChatSendButtonBackground: Color,
+    val ChatSendButtonIcon: Color,
+    val ChatDisclaimerBackground: Color,
+    val ChatDisclaimerText: Color,
+    val ChatDisclaimerIcon: Color,
 )
 
 @Immutable
@@ -388,6 +406,78 @@ data class AppColors internal constructor(
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
 
+    val ExerciseCardBackground: Color get() = extension.ExerciseCardBackground
+    val ExerciseCardTitle: Color get() = extension.ExerciseCardTitle
+    val ExerciseCardSubtitle: Color get() = extension.ExerciseCardSubtitle
+    val ExerciseCardChevron: Color get() = extension.ExerciseCardChevron
+    val ExerciseChipSelectedBg: Color get() = extension.ExerciseChipSelectedBg
+    val ExerciseChipSelectedBorder: Color get() = extension.ExerciseChipSelectedBorder
+    val ExerciseChipSelectedText: Color get() = extension.ExerciseChipSelectedText
+    val ExerciseChipUnselectedBg: Color get() = extension.ExerciseChipUnselectedBg
+    val ExerciseChipUnselectedBorder: Color get() = extension.ExerciseChipUnselectedBorder
+    val ExerciseChipUnselectedText: Color get() = extension.ExerciseChipUnselectedText
+    val ExerciseInstructionsTitle: Color get() = extension.ExerciseInstructionsTitle
+    val ExerciseInstructionsBody: Color get() = extension.ExerciseInstructionsBody
+    val ExerciseInstructionsBullet: Color get() = extension.ExerciseInstructionsBullet
+    val ExerciseCancelWorkoutText: Color get() = extension.ExerciseCancelWorkoutText
+
+    val ExerciseScreenTitle: Color get() = extension.ExerciseScreenTitle
+    val ExerciseBackButtonTint: Color get() = extension.ExerciseBackButtonTint
+    val ExerciseSearchPlaceholder: Color get() = extension.ExerciseSearchPlaceholder
+    val ExerciseWorkoutHeaderTitle: Color get() = extension.ExerciseWorkoutHeaderTitle
+    val ExerciseWorkoutImageBackground: Color get() = extension.ExerciseWorkoutImageBackground
+    val ExerciseWorkoutTimerText: Color get() = extension.ExerciseWorkoutTimerText
+    val ExerciseWorkoutSecondaryButton: Color get() = extension.ExerciseWorkoutSecondaryButton
+    val ExerciseWorkoutPrimaryButtonBg: Color get() = extension.ExerciseWorkoutPrimaryButtonBg
+    val ExerciseWorkoutPrimaryButtonText: Color get() = extension.ExerciseWorkoutPrimaryButtonText
+    val ExerciseWorkoutTotalTimeLabel: Color get() = extension.ExerciseWorkoutTotalTimeLabel
+    val ExerciseSetsRepsCardBg: Color get() = extension.ExerciseSetsRepsCardBg
+    val ExerciseSetsRepsCardBorder: Color get() = extension.ExerciseSetsRepsCardBorder
+    val ExerciseSetsRepsBtnBg: Color get() = extension.ExerciseSetsRepsBtnBg
+    val ExerciseSetsRepsLabelColor: Color get() = extension.ExerciseSetsRepsLabelColor
+    val ExerciseSetsRepsValueColor: Color get() = extension.ExerciseSetsRepsValueColor
+    val ExerciseSetsRepsIconTint: Color get() = extension.ExerciseSetsRepsIconTint
+    val ExerciseReadMoreColor: Color get() = extension.ExerciseReadMoreColor
+
+
+
+    val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
+    val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
+    val ProductDetailScanDateBadgeBg: Color get() = extension.ProductDetailScanDateBadgeBg
+    val ProductDetailScanDateBadgeText: Color get() = extension.ProductDetailScanDateBadgeText
+    val ProductDetailSafetyText: Color get() = extension.ProductDetailSafetyText
+    val ProductDetailTitleText: Color get() = extension.ProductDetailTitleText
+    val ProductDetailSafetyReasonText: Color get() = extension.ProductDetailSafetyReasonText
+    val ProductDetailWhyNotSafeText: Color get() = extension.ProductDetailWhyNotSafeText
+    val ProductDetailIngredientCardBg: Color get() = extension.ProductDetailIngredientCardBg
+    val ProductDetailIngredientCardBorder: Color get() = extension.ProductDetailIngredientCardBorder
+    val ProductDetailIngredientName: Color get() = extension.ProductDetailIngredientName
+    val ProductDetailIngredientReasonText: Color get() = extension.ProductDetailIngredientReasonText
+    val ProductDetailFlaggedContainerBg: Color get() = extension.ProductDetailFlaggedContainerBg
+    val ProductDetailMatchTag: Color get() = extension.ProductDetailMatchTag
+    val ProductDetailMatchTagText: Color get() = extension.ProductDetailMatchTagText
+    val ProductDetailNutritionCardBg: Color get() = extension.ProductDetailNutritionCardBg
+    val ProductDetailNutritionLabelText: Color get() = extension.ProductDetailNutritionLabelText
+    val ProductDetailNutritionPill: Color get() = extension.ProductDetailNutritionPill
+    val ProductDetailNutritionText: Color get() = extension.ProductDetailNutritionText
+    val ProductDetailBookmarkTint: Color get() = extension.ProductDetailBookmarkTint
+
+    val ChatScreenBackground: Color get() = extension.ChatScreenBackground
+    val ChatScreenBackgroundEnd: Color get() = extension.ChatScreenBackgroundEnd
+    val ChatUserBubble: Color get() = extension.ChatUserBubble
+    val ChatUserBubbleText: Color get() = extension.ChatUserBubbleText
+    val ChatBotBubble: Color get() = extension.ChatBotBubble
+    val ChatBotBubbleText: Color get() = extension.ChatBotBubbleText
+    val ChatSourceCardBackground: Color get() = extension.ChatSourceCardBackground
+    val ChatSourceScoreBadge: Color get() = extension.ChatSourceScoreBadge
+    val ChatInputBackground: Color get() = extension.ChatInputBackground
+    val ChatInputText: Color get() = extension.ChatInputText
+    val ChatInputPlaceholder: Color get() = extension.ChatInputPlaceholder
+    val ChatSendButtonBackground: Color get() = extension.ChatSendButtonBackground
+    val ChatSendButtonIcon: Color get() = extension.ChatSendButtonIcon
+    val ChatDisclaimerBackground: Color get() = extension.ChatDisclaimerBackground
+    val ChatDisclaimerText: Color get() = extension.ChatDisclaimerText
+    val ChatDisclaimerIcon: Color get() = extension.ChatDisclaimerIcon
     val ExerciseCardBackground: Color get() = extension2.ExerciseCardBackground
     val ExerciseCardTitle: Color get() = extension2.ExerciseCardTitle
     val ExerciseCardSubtitle: Color get() = extension2.ExerciseCardSubtitle
@@ -747,6 +837,24 @@ fun lightColors() = AppColors(
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
+        
+        // NutriGPT Chat (Light Mode)
+        ChatScreenBackground = Color(0xFFFFFFFF), // White
+        ChatScreenBackgroundEnd = Color(0xFFFFFFFF), // White
+        ChatUserBubble = Color(0xFF2FC5CC), // Teal700
+        ChatUserBubbleText = Color(0xFFFFFFFF), // White
+        ChatBotBubble = Color(0xFFE8FAFA), // Teal100
+        ChatBotBubbleText = Color(0xFF0F474A), // Teal1600
+        ChatSourceCardBackground = Color(0xFFE8FAFA), // Teal100
+        ChatSourceScoreBadge = Color.Transparent, // No background in light mode
+        ChatInputBackground = Color(0xFFFFFFFF), // White
+        ChatInputText = Color(0xFF393C3C), // Gray1600
+        ChatInputPlaceholder = Color(0xFFA6A5A5), // Gray600
+        ChatSendButtonBackground = Color(0xFFD6D6D5), // Gray400
+        ChatSendButtonIcon = Color(0xFFFFFFFF), // White
+        ChatDisclaimerBackground = Color(0xFFF8F8F9), // Gray100
+        ChatDisclaimerText = Color(0xFF777777), // Gray800
+        ChatDisclaimerIcon = Color(0xFF13A4AB), // Teal1000
     ),
 )
 
@@ -1055,5 +1163,23 @@ fun darkColors() = AppColors(
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
+        
+        // NutriGPT Chat (Dark Mode)
+        ChatScreenBackground = Color(0xFF0A545A), // Teal1500
+        ChatScreenBackgroundEnd = Color(0xFF0F474A), // Teal1600
+        ChatUserBubble = Color(0xFF0B5F65), // Teal1400
+        ChatUserBubbleText = Color(0xFFE8FAFA), // Teal100
+        ChatBotBubble = Color(0x33108188), // Teal1300 at 20%
+        ChatBotBubbleText = Color(0xFFE8FAFA), // Teal100
+        ChatSourceCardBackground = Color(0x4D0F474A), // Teal1600 at 30%
+        ChatSourceScoreBadge = Color(0xFF75DEE3), // Teal500
+        ChatInputBackground = Color(0x330F474A), // Teal1600 at 20%
+        ChatInputText = Color(0xFFE8FAFA), // Teal100
+        ChatInputPlaceholder = Color(0xFF108188), // Teal1300
+        ChatSendButtonBackground = Color(0xFF11939A), // Teal1200
+        ChatSendButtonIcon = Color(0xFFE8FAFA), // Teal100
+        ChatDisclaimerBackground = Color(0x4D0F474A), // Teal1600 at 30%
+        ChatDisclaimerText = Color(0xFFE8FAFA), // Teal100
+        ChatDisclaimerIcon = Color(0xFF75DEE3), // Teal500
     ),
 )

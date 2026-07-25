@@ -279,6 +279,24 @@
     <string name="news_time_hours_ago">منذ %1$d س</string>
     <string name="news_time_days_ago">منذ %1$d ي</string>
     <string name="news_card_menu_content_description">خيارات إضافية</string>
+    
+    <!-- NutriGPT Chat -->
+    <string name="nutrigpt_title">المساعد الذكي</string>
+    <string name="nutrigpt_empty_title">اسأل أي شيء عن التغذية</string>
+    <string name="nutrigpt_empty_subtitle">احصل على إجابات مدعومة بمصادر صحية موثوقة وأبحاث علمية.</string>
+    <string name="nutrigpt_input_hint">اسأل عن التغذية…</string>
+    <string name="nutrigpt_listening_hint">جاري الاستماع…</string>
+    <string name="nutrigpt_voice_official_sources">مصادر من وثائق رسمية</string>
+    <string name="nutrigpt_voice_switch_text">التبديل إلى الدردشة النصية</string>
+    <string name="nutrigpt_voice_generating">جاري الرد...</string>
+    <string name="nutrigpt_sources_header">المصادر</string>
+    <string name="nutrigpt_disclaimer">الوثائق المقدمة لا تحتوي على معلومات كافية للإجابة على سؤالك. يرجى استشارة مصادر إضافية.</string>
+    <string name="nutrigpt_send_content_description">إرسال</string>
+    <string name="nutrigpt_mic_content_description">إدخال صوتي</string>
+    <string name="nutrigpt_lang_en">EN</string>
+    <string name="nutrigpt_lang_ar">AR</string>
+    <string name="nutrigpt_score_format">%% %1$d</string>
+    <string name="nutrigpt_sparkle_content_description">ذكاء اصطناعي</string>
 
     <!-- Custom Alerts -->
     <string name="alert_delete_warning_title">تحذير الحذف</string>
