@@ -13,4 +13,5 @@ sealed interface UserProfileEffect {
     data object NavigateToScanHistory : UserProfileEffect
     data object NavigateToNotifications : UserProfileEffect
     data object NavigateToSettings : UserProfileEffect
+    data class ShowError(val message: String) : UserProfileEffect
 }

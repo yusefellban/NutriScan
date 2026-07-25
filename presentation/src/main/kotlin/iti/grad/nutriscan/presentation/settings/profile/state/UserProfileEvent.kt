@@ -11,6 +11,7 @@ sealed interface UserProfileEvent {
     data class FamilyMemberLongPressed(val memberId: String) : UserProfileEvent
     data object ConfirmRemoveMemberClicked : UserProfileEvent
     data object CancelRemoveMemberClicked : UserProfileEvent
+    data object AddMemberSheetDismissed : UserProfileEvent
     data object ScanHistoryClicked : UserProfileEvent
     data object NotificationsClicked : UserProfileEvent
     data object SettingsClicked : UserProfileEvent

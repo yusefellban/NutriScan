@@ -3,6 +3,8 @@ package iti.grad.nutriscan.presentation.settings.profile.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
@@ -13,25 +15,24 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import kotlinx.coroutines.flow.collectLatest
-
 /**
  * ViewModel for the User Profile screen.
  *
- * Family members are mocked entirely in-memory here (add/remove) — there is
- * no domain use case yet, matching [iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel]'s
- * current no-usecase pattern. In a future sprint this will inject real
- * family-member use cases backed by the API.
+ * Family members are backed by Room via [IFamilyMemberRepository] (single
+ * source of truth) — see the family-members implementation plan. Injects the
+ * repository interface directly rather than a use case, matching this
+ * screen's existing local convention of injecting [IUserRepository] directly.
  */
 @HiltViewModel
 class UserProfileViewModel @Inject constructor(
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val familyMemberRepository: IFamilyMemberRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -56,15 +57,25 @@ class UserProfileViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            familyMemberRepository.getFamilyMembers().collectLatest { members ->
+                _state.update {
+                    it.copy(
+                        familyMembers = members.map { member ->
+                            FamilyMemberUiModel(id = member.id, name = member.name, avatarUrl = null)
+                        }.toPersistentList()
+                    )
+                }
+            }
+        }
     }
-
-    /** Deterministic id source for mock-added members (also used in unit tests). */
-    private var nextMemberId = 1
 
     fun onEvent(event: UserProfileEvent) {
         when (event) {
             is UserProfileEvent.EditProfileClicked -> emitEffect(UserProfileEffect.NavigateToEditProfile)
-            is UserProfileEvent.AddMemberClicked -> addMockMember()
+            is UserProfileEvent.AddMemberClicked -> _state.update { it.copy(isAddMemberSheetVisible = true) }
+            is UserProfileEvent.AddMemberSheetDismissed ->
+                _state.update { it.copy(isAddMemberSheetVisible = false) }
             is UserProfileEvent.FamilyMemberDetailClicked -> emitEffect(
                 UserProfileEffect.NavigateToFamilyMemberDetail(event.memberId)
             )
@@ -77,16 +88,6 @@ class UserProfileViewModel @Inject constructor(
         }
     }
 
-    private fun addMockMember() {
-        val id = nextMemberId++
-        val newMember = FamilyMemberUiModel(
-            id = "member_$id",
-            name = "Ashraf Shrief",
-            avatarUrl = "https://i.pravatar.cc/200?u=family-member-$id",
-        )
-        _state.update { it.copy(familyMembers = (it.familyMembers + newMember).toPersistentList()) }
-    }
-
     private fun requestMemberRemoval(memberId: String) {
         val member = _state.value.familyMembers.firstOrNull { it.id == memberId } ?: return
         _state.update { it.copy(memberPendingDeletion = member) }
@@ -94,11 +95,10 @@ class UserProfileViewModel @Inject constructor(
 
     private fun confirmMemberRemoval() {
         val pendingId = _state.value.memberPendingDeletion?.id ?: return
-        _state.update {
-            it.copy(
-                familyMembers = it.familyMembers.filterNot { member -> member.id == pendingId }.toPersistentList(),
-                memberPendingDeletion = null,
-            )
+        _state.update { it.copy(memberPendingDeletion = null) }
+        viewModelScope.launch {
+            familyMemberRepository.removeFamilyMember(pendingId)
+                .onFailure { emitEffect(UserProfileEffect.ShowError(it.message ?: "")) }
         }
     }
 

@@ -16,4 +16,6 @@ data class UserProfileState(
     val familyMembers: ImmutableList<FamilyMemberUiModel> = persistentListOf(),
     /** Non-null while the remove-family-member confirmation dialog is showing. */
     val memberPendingDeletion: FamilyMemberUiModel? = null,
+    /** True while the Add Family Member bottom sheet is presented. */
+    val isAddMemberSheetVisible: Boolean = false,
 )

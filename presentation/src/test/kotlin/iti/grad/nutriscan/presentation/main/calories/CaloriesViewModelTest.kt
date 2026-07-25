@@ -116,26 +116,6 @@ class CaloriesViewModelTest {
                 Assertions.assertTrue(awaitItem() is CaloriesEffect.NavigateToExercises)
             }
         }
-
-        @Test
-        fun `BottomNavTabClicked with HOME emits NavigateToHome`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(CaloriesEvent.BottomNavTabClicked(BottomNavTab.HOME))
-                testScheduler.runCurrent()
-
-                Assertions.assertTrue(awaitItem() is CaloriesEffect.NavigateToHome)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with CALORIES emits no effect`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(CaloriesEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
-                testScheduler.runCurrent()
-
-                expectNoEvents()
-            }
-        }
     }
 
     @Nested

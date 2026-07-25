@@ -12,22 +12,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
+import iti.grad.nutriscan.presentation.settings.profile.add_member.viewmodel.AddFamilyMemberViewModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileState
+import iti.grad.nutriscan.presentation.settings.profile.view.components.AddFamilyMemberBottomSheet
 import iti.grad.nutriscan.presentation.settings.profile.view.components.FamilyMembersSection
 import iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileHeaderSection
 import iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileMenuRow
@@ -54,6 +60,7 @@ fun UserProfileScreen(
     onNavigateToSettings: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -64,11 +71,40 @@ fun UserProfileScreen(
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
+                is UserProfileEffect.ShowError -> errorMessage = effect.message
             }
         }
     }
 
     UserProfileContent(state = state, onEvent = viewModel::onEvent, bottomPadding = bottomPadding)
+
+    if (state.isAddMemberSheetVisible) {
+        val addMemberViewModel: AddFamilyMemberViewModel = hiltViewModel()
+        val addMemberState by addMemberViewModel.state.collectAsState()
+
+        LaunchedEffect(Unit) {
+            addMemberViewModel.effect.collectLatest { effect ->
+                when (effect) {
+                    AddFamilyMemberEffect.Dismiss -> viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed)
+                    is AddFamilyMemberEffect.ShowError -> errorMessage = effect.message
+                }
+            }
+        }
+
+        AddFamilyMemberBottomSheet(
+            state = addMemberState,
+            onEvent = addMemberViewModel::onEvent,
+            onDismiss = { viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed) },
+        )
+    }
+
+    errorMessage?.let { message ->
+        AppErrorDialog(
+            title = stringResource(R.string.add_family_member_generic_error),
+            message = message,
+            onDismiss = { errorMessage = null },
+        )
+    }
 }
 
 @Composable

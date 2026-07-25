@@ -2,13 +2,17 @@ package iti.grad.nutriscan.presentation.settings.profile
 
 import app.cash.turbine.test
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.family.model.FamilyMember
+import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.viewmodel.UserProfileViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -32,15 +37,22 @@ class UserProfileViewModelTest {
 
     private lateinit var viewModel: UserProfileViewModel
     private val userData = MutableStateFlow<User?>(null)
+    private val familyMembersFlow = MutableStateFlow<List<FamilyMember>>(emptyList())
+
     private val userRepository: IUserRepository = mockk {
         coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
         coEvery { getUserData() } returns userData
     }
 
+    private val familyMemberRepository: IFamilyMemberRepository = mockk {
+        coEvery { getFamilyMembers() } returns familyMembersFlow
+        coEvery { removeFamilyMember(any()) } returns Result.success(Unit)
+    }
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = UserProfileViewModel(userRepository)
+        viewModel = UserProfileViewModel(userRepository, familyMemberRepository)
     }
 
     @AfterEach
@@ -53,9 +65,9 @@ class UserProfileViewModelTest {
         val state = viewModel.state.value
         assertEquals("", state.userName)
         assertEquals(15, state.streakDays)
-        assertEquals(BottomNavTab.PROFILE, state.selectedTab)
         assertTrue(state.familyMembers.isEmpty())
         assertNull(state.memberPendingDeletion)
+        assertFalse(state.isAddMemberSheetVisible)
     }
 
     @Test
@@ -89,73 +101,116 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when AddMemberClicked, a new member is appended with no effect emitted`() = runTest(testDispatcher) {
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-            expectNoEvents()
-        }
-        val members = viewModel.state.value.familyMembers
-        assertEquals(1, members.size)
-        assertEquals("Ashraf Shrief", members[0].name)
+    fun `when AddMemberClicked, isAddMemberSheetVisible is set to true`() = runTest(testDispatcher) {
+        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
+        testScheduler.advanceUntilIdle()
+        assertTrue(viewModel.state.value.isAddMemberSheetVisible)
     }
 
     @Test
-    fun `when AddMemberClicked twice, both members get unique ids`() = runTest(testDispatcher) {
+    fun `when AddMemberSheetDismissed, isAddMemberSheetVisible is set to false`() = runTest(testDispatcher) {
         viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
+        testScheduler.advanceUntilIdle()
+        assertTrue(viewModel.state.value.isAddMemberSheetVisible)
 
-        val members = viewModel.state.value.familyMembers
-        assertEquals(2, members.size)
-        assertTrue(members[0].id != members[1].id)
+        viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed)
+        testScheduler.advanceUntilIdle()
+        assertFalse(viewModel.state.value.isAddMemberSheetVisible)
+    }
+
+    @Test
+    fun `when familyMemberRepository emits members, state reflects them`() = runTest(testDispatcher) {
+        val mockMembers = listOf(
+            FamilyMember("1", "Alice", listOf(1), listOf(2)),
+            FamilyMember("2", "Bob", emptyList(), emptyList())
+        )
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals(2, state.familyMembers.size)
+        assertEquals("1", state.familyMembers[0].id)
+        assertEquals("Alice", state.familyMembers[0].name)
+        assertEquals("2", state.familyMembers[1].id)
+        assertEquals("Bob", state.familyMembers[1].name)
     }
 
     @Test
     fun `when FamilyMemberDetailClicked, effect carries the clicked member id`() = runTest(testDispatcher) {
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        val memberId = viewModel.state.value.familyMembers[0].id
+        val mockMembers = listOf(FamilyMember("123", "Alice"))
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
 
         viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.FamilyMemberDetailClicked(memberId))
-            assertEquals(UserProfileEffect.NavigateToFamilyMemberDetail(memberId), awaitItem())
+            viewModel.onEvent(UserProfileEvent.FamilyMemberDetailClicked("123"))
+            assertEquals(UserProfileEffect.NavigateToFamilyMemberDetail("123"), awaitItem())
         }
     }
 
     @Test
     fun `when FamilyMemberLongPressed, memberPendingDeletion is set to that member`() = runTest(testDispatcher) {
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        val member = viewModel.state.value.familyMembers[0]
+        val mockMembers = listOf(FamilyMember("123", "Alice"))
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
 
-        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed(member.id))
+        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed("123"))
+        testScheduler.advanceUntilIdle()
 
-        assertEquals(member, viewModel.state.value.memberPendingDeletion)
+        val pending = viewModel.state.value.memberPendingDeletion
+        assertTrue(pending != null)
+        assertEquals("123", pending?.id)
+        assertEquals("Alice", pending?.name)
     }
 
     @Test
-    fun `when ConfirmRemoveMemberClicked, the pending member is removed and dialog clears`() = runTest(testDispatcher) {
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        val members = viewModel.state.value.familyMembers
-        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed(members[0].id))
+    fun `when ConfirmRemoveMemberClicked succeeds, removeFamilyMember is invoked and state is cleared`() = runTest(testDispatcher) {
+        val mockMembers = listOf(FamilyMember("123", "Alice"))
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed("123"))
+        testScheduler.advanceUntilIdle()
+
+        coEvery { familyMemberRepository.removeFamilyMember("123") } returns Result.success(Unit)
 
         viewModel.onEvent(UserProfileEvent.ConfirmRemoveMemberClicked)
+        testScheduler.advanceUntilIdle()
 
-        val state = viewModel.state.value
-        assertEquals(1, state.familyMembers.size)
-        assertEquals(members[1].id, state.familyMembers[0].id)
-        assertNull(state.memberPendingDeletion)
+        coVerify(exactly = 1) { familyMemberRepository.removeFamilyMember("123") }
+        assertNull(viewModel.state.value.memberPendingDeletion)
     }
 
     @Test
-    fun `when CancelRemoveMemberClicked, dialog clears and no member is removed`() = runTest(testDispatcher) {
-        viewModel.onEvent(UserProfileEvent.AddMemberClicked)
-        val member = viewModel.state.value.familyMembers[0]
-        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed(member.id))
+    fun `when ConfirmRemoveMemberClicked fails, ShowError effect is emitted`() = runTest(testDispatcher) {
+        val mockMembers = listOf(FamilyMember("123", "Alice"))
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed("123"))
+        testScheduler.advanceUntilIdle()
+
+        coEvery { familyMemberRepository.removeFamilyMember("123") } returns Result.failure(Exception("Removal failed"))
+
+        viewModel.effect.test {
+            viewModel.onEvent(UserProfileEvent.ConfirmRemoveMemberClicked)
+            testScheduler.advanceUntilIdle()
+            assertEquals(UserProfileEffect.ShowError("Removal failed"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when CancelRemoveMemberClicked, memberPendingDeletion is cleared`() = runTest(testDispatcher) {
+        val mockMembers = listOf(FamilyMember("123", "Alice"))
+        familyMembersFlow.value = mockMembers
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onEvent(UserProfileEvent.FamilyMemberLongPressed("123"))
+        testScheduler.advanceUntilIdle()
 
         viewModel.onEvent(UserProfileEvent.CancelRemoveMemberClicked)
+        testScheduler.advanceUntilIdle()
 
-        val state = viewModel.state.value
-        assertEquals(1, state.familyMembers.size)
-        assertNull(state.memberPendingDeletion)
+        assertNull(viewModel.state.value.memberPendingDeletion)
     }
 
     @Test
@@ -181,48 +236,4 @@ class UserProfileViewModelTest {
             assertEquals(UserProfileEffect.NavigateToSettings, awaitItem())
         }
     }
-
-    @Test
-    fun `when BottomNavTabClicked to HOME, effect is NavigateToTab HOME and selectedTab stays PROFILE`() =
-        runTest(testDispatcher) {
-            viewModel.effect.test {
-                viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.HOME))
-                assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.HOME), awaitItem())
-            }
-            assertEquals(BottomNavTab.PROFILE, viewModel.state.value.selectedTab)
-        }
-
-    @Test
-    fun `when BottomNavTabClicked to SCAN, effect is NavigateToTab SCAN`() = runTest(testDispatcher) {
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.SCAN))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.SCAN), awaitItem())
-        }
-    }
-
-    @Test
-    fun `when BottomNavTabClicked to CALORIES, effect is NavigateToTab CALORIES`() = runTest(testDispatcher) {
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.CALORIES))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.CALORIES), awaitItem())
-        }
-    }
-
-    @Test
-    fun `when BottomNavTabClicked to SAVED, effect is NavigateToTab SAVED`() = runTest(testDispatcher) {
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.SAVED))
-            assertEquals(UserProfileEffect.NavigateToTab(BottomNavTab.SAVED), awaitItem())
-        }
-    }
-
-    @Test
-    fun `when BottomNavTabClicked to PROFILE, selectedTab stays PROFILE and no effect is emitted`() =
-        runTest(testDispatcher) {
-            viewModel.effect.test {
-                viewModel.onEvent(UserProfileEvent.BottomNavTabClicked(BottomNavTab.PROFILE))
-                expectNoEvents()
-            }
-            assertEquals(BottomNavTab.PROFILE, viewModel.state.value.selectedTab)
-        }
 }
