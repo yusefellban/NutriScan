@@ -220,8 +220,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideExercisesApiService(@Named("ExercisesRetrofit") retrofit: Retrofit): ExercisesApiService =
+    fun provideExercisesApiService(
+        @Named("ExercisesRetrofit") retrofit: Retrofit
+    ): ExercisesApiService =
         retrofit.create(ExercisesApiService::class.java)
+
+    @Provides
+    @Singleton
     @Named("NutriGptRetrofit")
     fun provideNutriGptRetrofit(
         json: Json,
@@ -234,12 +239,16 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.NUTRI_GPT_BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType())
+            )
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideNutriGptApiService(@Named("NutriGptRetrofit") retrofit: Retrofit): NutriGptApiService =
+    fun provideNutriGptApiService(
+        @Named("NutriGptRetrofit") retrofit: Retrofit
+    ): NutriGptApiService =
         retrofit.create(NutriGptApiService::class.java)
 }

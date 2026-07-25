@@ -21,11 +21,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
-import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
-import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
-import iti.grad.nutriscan.presentation.exercises.state.ExercisesState
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
