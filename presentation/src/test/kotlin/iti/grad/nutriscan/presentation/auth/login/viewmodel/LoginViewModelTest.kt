@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.auth.login.viewmodel
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
 import iti.grad.nutriscan.domain.auth.usecase.GetOidcAuthConfigUseCase
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import iti.grad.nutriscan.domain.disease.usecase.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -30,8 +32,8 @@ class LoginViewModelTest {
     private lateinit var getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase
     private lateinit var saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
     private lateinit var userRepository: IUserRepository
-    private lateinit var syncDiseasesUseCase: iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
-    private lateinit var syncAllergiesUseCase: iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+    private lateinit var syncDiseasesUseCase: SyncDiseasesUseCase
+    private lateinit var syncAllergiesUseCase: SyncAllergiesUseCase
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
 

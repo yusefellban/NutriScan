@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Response
+import org.junit.jupiter.api.Assertions.*
+import iti.grad.nutriscan.data.db.NutriScanDatabase
 
 class AuthRepositoryImplTest {
 
@@ -24,7 +26,7 @@ class AuthRepositoryImplTest {
     private lateinit var keycloakApiService: KeycloakApiService
     private lateinit var tokenRefreshApiService: TokenRefreshApiService
     private lateinit var tokenManager: TokenManager
-    private lateinit var mockDatabase: iti.grad.nutriscan.data.db.NutriScanDatabase
+    private lateinit var mockDatabase: NutriScanDatabase
     private lateinit var json: Json
     private lateinit var repository: AuthRepositoryImpl
 
@@ -107,7 +109,7 @@ class AuthRepositoryImplTest {
 
         val userId = repository.getCurrentUserId()
 
-        org.junit.jupiter.api.Assertions.assertEquals("user-123", userId)
+        assertEquals("user-123", userId)
     }
 
     @Test
@@ -116,7 +118,7 @@ class AuthRepositoryImplTest {
 
         val userId = repository.getCurrentUserId()
 
-        org.junit.jupiter.api.Assertions.assertNull(userId)
+       assertNull(userId)
     }
 
     private fun fakeJwtWithSubject(subject: String): String {
