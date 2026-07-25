@@ -7,7 +7,7 @@ import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 
 import androidx.room.TypeConverters
 import iti.grad.nutriscan.data.db.converter.IntListConverter
-import iti.grad.nutriscan.data.db.converter.StringListConverter
+import iti.grad.nutriscan.data.db.converter.JsonTypeConverters
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.dao.DiseaseDao
 import iti.grad.nutriscan.data.db.dao.AllergyDao
@@ -30,7 +30,7 @@ import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
     version = 4,
     exportSchema = false
 )
-@TypeConverters(IntListConverter::class, StringListConverter::class)
+@TypeConverters(IntListConverter::class, JsonTypeConverters::class)
 abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun foodLogDao(): FoodLogDao
     abstract fun userDao(): UserDao

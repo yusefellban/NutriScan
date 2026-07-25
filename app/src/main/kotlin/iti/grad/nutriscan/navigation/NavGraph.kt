@@ -17,6 +17,7 @@ import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlin.reflect.typeOf
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
@@ -399,7 +400,7 @@ fun AppNavGraph(
                 exerciseId = route.exerciseId,
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToCalories = {
-                    navController.navigate(MainRoute(initialTab = "CALORIES")) {
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.CALORIES)) {
                         popUpTo<MainRoute> { inclusive = true }
                     }
                 }

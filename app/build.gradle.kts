@@ -43,7 +43,7 @@ android {
         )
         buildConfigField(
             "String", "EXERCISES_API_BASE_URL",
-            "\"${localProperties.getProperty("EXERCISES_API_BASE_URL", "https://exercises-dataset-mu.vercel.app/")}\""
+            "\"${localProperties.getProperty("EXERCISES_API_BASE_URL", "")}\""
         )
 
         manifestPlaceholders["appAuthRedirectScheme"] = "nutriscan"

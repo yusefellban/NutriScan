@@ -39,9 +39,9 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToExercises: () -> Unit,
     modifier: Modifier = Modifier,
-    initialTab: String = "HOME"
+    initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
-    var selectedTab by rememberSaveable(initialTab) { mutableStateOf(BottomNavTab.valueOf(initialTab)) }
+    var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(

@@ -2,6 +2,8 @@ package iti.grad.nutriscan.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,11 +11,41 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
+import iti.grad.nutriscan.data.db.dao.ExercisesDao
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
+
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `exercises` (
+                    `id` TEXT NOT NULL, 
+                    `name` TEXT NOT NULL, 
+                    `category` TEXT NOT NULL, 
+                    `bodyPart` TEXT NOT NULL, 
+                    `equipment` TEXT NOT NULL, 
+                    `target` TEXT NOT NULL, 
+                    `secondaryMuscles` TEXT NOT NULL, 
+                    `instructions` TEXT NOT NULL, 
+                    `instructionSteps` TEXT NOT NULL, 
+                    `imageUrl` TEXT, 
+                    `gifUrl` TEXT, 
+                    `repKcal` REAL, 
+                    `minKcal` REAL, 
+                    PRIMARY KEY(`id`)
+                )
+            """)
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `exercise_categories` (
+                    `name` TEXT NOT NULL, 
+                    PRIMARY KEY(`name`)
+                )
+            """)
+        }
+    }
 
     @Provides
     @Singleton
@@ -22,7 +54,10 @@ object DatabaseModule {
             context,
             NutriScanDatabase::class.java,
             "nutriscan_db"
-        ).fallbackToDestructiveMigration().build()
+        )
+            .addMigrations(MIGRATION_3_4)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -43,5 +78,5 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideExercisesDao(db: NutriScanDatabase): iti.grad.nutriscan.data.db.dao.ExercisesDao = db.exercisesDao()
+    fun provideExercisesDao(db: NutriScanDatabase): ExercisesDao = db.exercisesDao()
 }
