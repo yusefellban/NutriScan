@@ -4,43 +4,44 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
-import iti.grad.nutriscan.presentation.common.components.AppButton
+import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
+import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
+import androidx.compose.foundation.layout.WindowInsets
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
+import iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE
+import iti.grad.presentation.R
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
-import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
-import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
+import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
+import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
+import androidx.compose.ui.platform.LocalContext
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.scan.camera.view.components.CameraPreview
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOverlay
-import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
-import iti.grad.presentation.R
-import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
+import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
+import androidx.compose.runtime.Composable
+import iti.grad.nutriscan.presentation.common.components.AppButton
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.material3.Text
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -87,7 +88,7 @@ fun CameraScanScreen(
         onEvent = viewModel::onEvent,
         onNavigateToProductDetail = { barcode ->
             // Use dummy product until CameraScanScreen has access to full ProductUiModel
-            onNavigateToProductDetail(ProductUiModel(id = barcode, productName = "", imageUrl = null, verdict = iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE, calories = "0"))
+            onNavigateToProductDetail(ProductUiModel(id = barcode, productName = "", imageUrl = null, verdict = SAFE, calories = "0"))
         },
         bottomPadding = bottomPadding,
     )

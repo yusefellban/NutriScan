@@ -8,4 +8,6 @@ sealed interface RegisterEvent {
     data object ToggleConfirmPasswordVisibility : RegisterEvent
     data object SignUpClicked : RegisterEvent
     data object SignInClicked : RegisterEvent
+    data object DismissAlert : RegisterEvent
+    data object RetryAction : RegisterEvent
 }

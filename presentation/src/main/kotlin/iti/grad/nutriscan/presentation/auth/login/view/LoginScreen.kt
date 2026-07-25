@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.domain.auth.model.AuthTokens
@@ -32,9 +34,12 @@ import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
 import iti.grad.nutriscan.presentation.auth.login.view.components.LoginFormBody
 import iti.grad.nutriscan.presentation.auth.login.viewmodel.LoginViewModel
-import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
 import iti.grad.nutriscan.presentation.common.components.AuthHeader
-import androidx.compose.material3.MaterialTheme
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import iti.grad.nutriscan.presentation.common.components.InternetAlert
+import iti.grad.nutriscan.presentation.common.components.SuccessAlert
+import iti.grad.nutriscan.presentation.common.components.WarningAlert
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -44,9 +49,8 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
-import net.openid.appauth.TokenResponse
 import net.openid.appauth.TokenRequest
-
+import net.openid.appauth.TokenResponse
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -55,7 +59,6 @@ fun LoginScreen(
     onNavigateToForgotPassword: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val authService = remember { AuthorizationService(context) }
     
@@ -111,19 +114,39 @@ fun LoginScreen(
                     val intent = authService.getAuthorizationRequestIntent(authRequest)
                     authLauncher.launch(intent)
                 }
-                is LoginEffect.ShowErrorDialog -> {
-                    errorDialogMessage = effect.messageStr
-                }
             }
         }
     }
 
-    errorDialogMessage?.let { msg ->
-        AppErrorDialog(
-            title = "Login Failed",
-            message = msg,
-            onDismiss = { errorDialogMessage = null }
-        )
+    when (val alert = state.alertState) {
+        is AuthAlertState.InternetError -> {
+            InternetAlert(
+                onRetry = { viewModel.onEvent(LoginEvent.RetryAction) },
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is AuthAlertState.Error -> {
+            ErrorAlert(
+                title = stringResource(id = R.string.alert_login_failed_title),
+                message = alert.message.asString(),
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is AuthAlertState.Warning -> {
+            WarningAlert(
+                title = stringResource(id = R.string.alert_login_failed_title),
+                message = alert.message.asString(),
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is AuthAlertState.Success -> {
+            SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.message.asString(),
+                onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
+            )
+        }
+        is AuthAlertState.None -> Unit
     }
 
     LoginScreenContent(

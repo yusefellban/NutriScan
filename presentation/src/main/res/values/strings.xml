@@ -198,6 +198,65 @@
     <string name="water">Water</string>
     <string name="cup_removed">Cup removed</string>
     <string name="exercises_title">Exercises</string>
+    <string name="exercises_categories_title">Categories</string>
+    <string name="exercises_see_all">See All</string>
+    <string name="exercise_card_subtitle">%1$d Exercises • %2$d Min</string>
+    <string name="exercises_search_hint">Search here</string>
+    <string name="exercises_category_all">All</string>
+    <string name="exercises_category_warm_up">Warm Up</string>
+    <string name="exercises_category_yoga">Yoga</string>
+    <string name="exercises_category_biceps">Biceps</string>
+    <string name="exercises_category_chest">Chest</string>
+    <string name="exercises_category_back">Back</string>
+    <string name="exercises_category_legs">Legs</string>
+    <string name="exercise_warm_up_name">Full Body Warm Up</string>
+    <string name="exercise_warm_up_equipment">equipment</string>
+    <string name="exercise_warm_up_target">target</string>
+    <string name="exercise_warm_up_instructions">Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head or cross them over your chest. Slowly lift your torso off the ground, contracting your abdominal muscles. Pause for a moment at the top, then slowly lower yourself back down.</string>
+    
+    <string name="exercise_strength_name">Strength Exercise</string>
+    <string name="exercise_strength_equipment">equipment</string>
+    <string name="exercise_strength_target">target</string>
+    <string name="exercise_strength_instructions">Perform controlled push-ups and planks to build upper body strength. Keep your core tight and back flat throughout the movements.</string>
+
+    <string name="exercise_side_plank_name">Both Side Plank</string>
+    <string name="exercise_side_plank_equipment">equipment</string>
+    <string name="exercise_side_plank_target">target</string>
+    <string name="exercise_side_plank_instructions">Lie on your side with your body fully straight. Support your weight on your forearm and the side of your foot. Hold the position while keeping your body in a straight line, then switch sides.</string>
+
+    <string name="exercise_abs_workout_name">Abs Workout</string>
+    <string name="exercise_abs_workout_equipment">equipment</string>
+    <string name="exercise_abs_workout_target">target</string>
+    <string name="exercise_abs_workout_instructions">Lie on your back, lift your knees and perform crunches or leg raises to target your abdominal muscles.</string>
+
+    <string name="exercise_torso_trap_name">Torso and Trap Workout</string>
+    <string name="exercise_torso_trap_equipment">equipment</string>
+    <string name="exercise_torso_trap_target">target</string>
+    <string name="exercise_torso_trap_instructions">Focus on upper back and shoulders. Elevate your shoulders to perform shrugs and torso extensions to target trap muscles.</string>
+
+    <string name="exercise_lower_back_name">Lower Back Exercise</string>
+    <string name="exercise_lower_back_equipment">equipment</string>
+    <string name="exercise_lower_back_target">target</string>
+    <string name="exercise_lower_back_instructions">Lie face down on the floor, lift your chest and legs off the ground to strengthen the lower back muscles.</string>
+
+    <string name="exercise_equipment_target">%1$s  •  %2$s</string>
+    <string name="exercise_instructions_title">Instructions</string>
+    <string name="action_read_more">read more</string>
+    <string name="action_start_workout">Start Workout</string>
+    <string name="exercise_workout_title">Exercise</string>
+    <string name="exercise_total_time_label">Total Time</string>
+    <string name="exercise_start_button">Start</string>
+    <string name="exercise_restart_button">Restart</string>
+    <string name="exercise_pause_button">Pause</string>
+    <string name="exercise_resume_button">Resume</string>
+    <string name="exercise_cancel_workout">Cancel workout</string>
+    <string name="exercise_finish_button">Finish</string>
+    <string name="exercise_sets_label">Sets</string>
+    <string name="exercise_reps_label">Reps</string>
+    <string name="exercise_result_title">Workout Complete!</string>
+    <string name="exercise_result_message">You burned %1$d kcal in this session.</string>
+    <string name="exercise_result_confirm">Great!</string>
+    <string name="exercise_enter_value">Enter value</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">Saved</string>
@@ -244,4 +303,28 @@
     <string name="news_time_hours_ago">%1$dh ago</string>
     <string name="news_time_days_ago">%1$dd ago</string>
     <string name="news_card_menu_content_description">More options</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">Delete Warning</string>
+    <string name="alert_success_title">Success</string>
+    <string name="alert_error_title">Error</string>
+    <string name="alert_warning_title">Warning</string>
+    <string name="alert_internet_title">No Internet</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="alert_button_delete">Delete</string>
+    <string name="alert_button_ok">ok</string>
+    <string name="alert_button_retry">Retry</string>
+    <string name="alert_test_message">Are you sure you want to delete this profile? This action cannot be undone.</string>
+    <string name="alert_internet_message">Please check your internet connection and try again.</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">Login Failed</string>
+    <string name="alert_registration_failed_title">Registration Failed</string>
+    <string name="alert_reset_failed_title">Reset Failed</string>
+    <string name="alert_verification_failed_title">Verification Failed</string>
+    <string name="error_invalid_credentials">Invalid email or password.</string>
+    <string name="error_server_down">Server is temporarily unavailable. Please try again later.</string>
+    <string name="success_account_created">Account created successfully.</string>
+    <string name="error_email_exists">This email is already in use.</string>
+    <string name="error_validation_fields">Please correct the highlighted fields and try again.</string>
 </resources>

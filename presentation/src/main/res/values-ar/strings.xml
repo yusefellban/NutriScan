@@ -178,6 +178,66 @@
     <string name="kcal_exercise">سعرة حرارية</string>
     <string name="min_today">دقيقة اليوم</string>
     <string name="water">الماء</string>
+    <string name="exercises_title">التمارين</string>
+    <string name="exercises_search_hint">ابحث هنا</string>
+    <string name="exercises_category_all">الكل</string>
+    <string name="exercises_category_warm_up">الإحماء</string>
+    <string name="exercises_category_yoga">اليوغا</string>
+    <string name="exercises_category_biceps">البايسبس</string>
+    <string name="exercises_category_chest">الصدر</string>
+    <string name="exercises_category_back">الظهر</string>
+    <string name="exercises_category_legs">الأرجل</string>
+    <string name="exercise_warm_up_name">Full Body Warm Up</string>
+    <string name="exercise_warm_up_equipment">equipment</string>
+    <string name="exercise_warm_up_target">target</string>
+    <string name="exercise_warm_up_instructions">استلقِ على ظهرك مع ثني ركبتيك وقدميك مستوية على الأرض. ضع يديك خلف رأسك أو متقاطعتين على صدرك. ارفع جذعك ببطء عن الأرض مع قبض عضلات بطنك. توقف لبرهة في الأعلى، ثم اخفض نفسك ببطء للأسفل.</string>
+    
+    <string name="exercise_strength_name">Strength Exercise</string>
+    <string name="exercise_strength_equipment">equipment</string>
+    <string name="exercise_strength_target">target</string>
+    <string name="exercise_strength_instructions">تمرين الضغط واللوح الخشبي لتقوية الجزء العلوي من الجسم.</string>
+
+    <string name="exercise_side_plank_name">Both Side Plank</string>
+    <string name="exercise_side_plank_equipment">equipment</string>
+    <string name="exercise_side_plank_target">target</string>
+    <string name="exercise_side_plank_instructions">استلقِ على جانبك مع إبقاء جسمك مستقيمًا تمامًا وادعم وزنك بكوعك.</string>
+
+    <string name="exercise_abs_workout_name">Abs Workout</string>
+    <string name="exercise_abs_workout_equipment">equipment</string>
+    <string name="exercise_abs_workout_target">target</string>
+    <string name="exercise_abs_workout_instructions">تمرين عضلات البطن لتقوية الأساس.</string>
+
+    <string name="exercise_torso_trap_name">Torso and Trap Workout</string>
+    <string name="exercise_torso_trap_equipment">equipment</string>
+    <string name="exercise_torso_trap_target">target</string>
+    <string name="exercise_torso_trap_instructions">تمرين الجزء العلوي من الظهر والكتفين.</string>
+
+    <string name="exercise_lower_back_name">Lower Back Exercise</string>
+    <string name="exercise_lower_back_equipment">equipment</string>
+    <string name="exercise_lower_back_target">target</string>
+    <string name="exercise_lower_back_instructions">تمرين أسفل الظهر لتقوية الفقرات القطنية.</string>
+
+    <string name="exercise_equipment_target">%1$s  •  %2$s</string>
+    <string name="exercise_instructions_title">التعليمات</string>
+    <string name="action_read_more">اقرأ المزيد</string>
+    <string name="action_start_workout">ابدأ التمرين</string>
+    <string name="exercises_categories_title">الفئات</string>
+    <string name="exercises_see_all">عرض الكل</string>
+    <string name="exercise_card_subtitle">%1$d تمرين • %2$d دقيقة</string>
+    <string name="exercise_workout_title">التمرين</string>
+    <string name="exercise_total_time_label">الوقت الإجمالي</string>
+    <string name="exercise_start_button">ابدأ</string>
+    <string name="exercise_restart_button">إعادة</string>
+    <string name="exercise_pause_button">إيقاف مؤقت</string>
+    <string name="exercise_resume_button">استئناف</string>
+    <string name="exercise_cancel_workout">إلغاء التمرين</string>
+    <string name="exercise_finish_button">إنهاء</string>
+    <string name="exercise_sets_label">مجموعات</string>
+    <string name="exercise_reps_label">تكرارات</string>
+    <string name="exercise_result_title">اكتمل التمرين!</string>
+    <string name="exercise_result_message">لقد حرقت %1$d سعرة حرارية في هذا التمرين.</string>
+    <string name="exercise_result_confirm">رائع!</string>
+    <string name="exercise_enter_value">أدخل القيمة</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">المحفوظات</string>
@@ -224,4 +284,22 @@
     <string name="news_time_hours_ago">منذ %1$d س</string>
     <string name="news_time_days_ago">منذ %1$d ي</string>
     <string name="news_card_menu_content_description">خيارات إضافية</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">تحذير الحذف</string>
+    <string name="alert_success_title">نجاح</string>
+    <string name="alert_error_title">خطأ</string>
+    <string name="alert_warning_title">تحذير</string>
+    <string name="alert_internet_title">لا يوجد اتصال</string>
+    <string name="alert_button_cancel">إلغاء</string>
+    <string name="alert_button_delete">حذف</string>
+    <string name="alert_button_ok">موافق</string>
+    <string name="alert_button_retry">إعادة المحاولة</string>
+    <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">فشل تسجيل الدخول</string>
+    <string name="alert_registration_failed_title">فشل التسجيل</string>
+    <string name="alert_reset_failed_title">فشل إعادة التعيين</string>
 </resources>

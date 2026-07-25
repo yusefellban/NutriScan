@@ -5,10 +5,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileState
+import iti.grad.presentation.R
+import javax.inject.Inject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.channels.Channel
@@ -42,9 +47,7 @@ class UserProfileViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        viewModelScope.launch {
-            userRepository.fetchAndSyncProfile()
-        }
+        loadProfileData()
         viewModelScope.launch {
             userRepository.getUserData().collectLatest { user ->
                 if (user != null) {
@@ -85,6 +88,36 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileEvent.ScanHistoryClicked -> emitEffect(UserProfileEffect.NavigateToScanHistory)
             is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotifications)
             is UserProfileEvent.SettingsClicked -> emitEffect(UserProfileEffect.NavigateToSettings)
+            is UserProfileEvent.BottomNavTabClicked -> {
+                // Profile is the only tab rendered by this screen; every other
+                // tab is a separate destination pushed on top, so this retained
+                // ViewModel's `selectedTab` is intentionally left at PROFILE —
+                // mutating it here would leave the wrong tab highlighted when
+                // the user navigates back.
+                if (event.tab != BottomNavTab.PROFILE) {
+                    emitEffect(UserProfileEffect.NavigateToTab(event.tab))
+                }
+            }
+            UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = ProfileAlertState.None) }
+            UserProfileEvent.RetryAction -> loadProfileData(isUserInitiated = true)
+        }
+    }
+
+    private fun loadProfileData(isUserInitiated: Boolean = false) {
+        viewModelScope.launch {
+            if (isUserInitiated) {
+                _state.update { it.copy(alertState = ProfileAlertState.None) }
+            }
+            userRepository.fetchAndSyncProfile()
+                .onFailure { error ->
+                    if (isUserInitiated) {
+                        val newAlertState = when (error) {
+                            is java.io.IOException -> ProfileAlertState.InternetError
+                            else -> ProfileAlertState.Error(messageResId = R.string.profile_setup_load_error)
+                        }
+                        _state.update { it.copy(alertState = newAlertState) }
+                    }
+                }
         }
     }
 
