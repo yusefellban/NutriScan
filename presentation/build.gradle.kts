@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.coil3.svg)
+    implementation(libs.coil3.gif)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.camera.core)

@@ -5,6 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import iti.grad.nutriscan.domain.exercises.model.Exercise
+import iti.grad.nutriscan.domain.exercises.model.ExerciseQuery
+import iti.grad.nutriscan.domain.exercises.usecase.GetExerciseCategoriesUseCase
+import iti.grad.nutriscan.domain.exercises.usecase.GetExercisesUseCase
+import iti.grad.nutriscan.presentation.common.model.ExerciseType
+import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
+import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategoryUi
+import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
+import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
+import iti.grad.nutriscan.presentation.exercises.state.ExercisesState
+import iti.grad.presentation.R
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
@@ -21,7 +36,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExercisesViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val getExercisesUseCase: GetExercisesUseCase,
+    private val getCategoriesUseCase: GetExerciseCategoriesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExercisesState())
@@ -30,25 +47,22 @@ class ExercisesViewModel @Inject constructor(
     private val _effect = Channel<ExercisesEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private var searchJob: Job? = null
+
     init {
-        _state.update {
-            it.copy(
-                categories = ExercisesMockData.categories,
-                exercises = ExercisesMockData.exercises,
-                visibleExercises = ExercisesMockData.exercises
-            )
-        }
+        loadCategories()
+        loadExercises(reset = true)
     }
 
     fun onEvent(event: ExercisesEvent) {
         when (event) {
             is ExercisesEvent.OnSearchQueryChange -> {
                 _state.update { it.copy(searchQuery = event.query) }
-                filterExercises()
+                debounceSearch()
             }
             is ExercisesEvent.OnCategorySelected -> {
                 _state.update { it.copy(selectedCategoryId = event.categoryId) }
-                filterExercises()
+                loadExercises(reset = true)
             }
             is ExercisesEvent.OnExerciseClick -> {
                 val exercise = _state.value.exercises.firstOrNull { it.id == event.exerciseId }
@@ -79,38 +93,114 @@ class ExercisesViewModel @Inject constructor(
                     _effect.send(ExercisesEffect.NavigateBack)
                 }
             }
+            ExercisesEvent.OnRetryClick -> {
+                loadExercises(reset = true)
+            }
+            ExercisesEvent.OnLoadMore -> {
+                if (!_state.value.isLoading && !_state.value.isLoadingMore && _state.value.hasNextPage) {
+                    loadExercises(reset = false)
+                }
+            }
         }
     }
 
-    private fun filterExercises() {
-        val query = _state.value.searchQuery.trim().lowercase()
-        val categoryId = _state.value.selectedCategoryId
-
-        val filtered = _state.value.exercises.filter { exercise ->
-            // Filter by Category
-            val matchesCategory = if (categoryId == "all") {
-                true
-            } else {
-                when (categoryId) {
-                    "warm_up" -> exercise.id == "1"
-                    "biceps" -> exercise.id == "4"
-                    else -> false // news/yoga/etc. can show empty state for testing
-                }
-            }
-
-            // Filter by Query
-            val matchesQuery = if (query.isEmpty()) {
-                true
-            } else {
-                val name = context.getString(exercise.nameRes).lowercase()
-                val equipment = context.getString(exercise.equipmentRes).lowercase()
-                val target = context.getString(exercise.targetRes).lowercase()
-                name.contains(query) || equipment.contains(query) || target.contains(query)
-            }
-
-            matchesCategory && matchesQuery
-        }.toImmutableList()
-
-        _state.update { it.copy(visibleExercises = filtered) }
+    private fun debounceSearch() {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(300)
+            loadExercises(reset = true)
+        }
     }
+
+    private fun loadCategories() {
+        viewModelScope.launch {
+            getCategoriesUseCase().fold(
+                onSuccess = { categoriesList ->
+                    val uiCategories = listOf(
+                        ExerciseCategoryUi(id = "all", label = context.getString(R.string.exercises_category_all))
+                    ) + categoriesList.map { category ->
+                        ExerciseCategoryUi(
+                            id = category,
+                            label = category.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+                        )
+                    }
+                    _state.update { it.copy(categories = uiCategories.toImmutableList()) }
+                },
+                onFailure = {
+                    // Fallback to static "All" if category request fails
+                    _state.update {
+                        it.copy(
+                            categories = kotlinx.collections.immutable.persistentListOf(
+                                ExerciseCategoryUi(id = "all", label = context.getString(R.string.exercises_category_all))
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun loadExercises(reset: Boolean) {
+        if (reset) {
+            _state.update { it.copy(isLoading = true, currentPage = 1, errorMessageRes = null) }
+        } else {
+            _state.update { it.copy(isLoadingMore = true, errorMessageRes = null) }
+        }
+
+        val currentState = _state.value
+        val queryParams = ExerciseQuery(
+            page = if (reset) 1 else currentState.currentPage + 1,
+            limit = 20,
+            bodyPart = if (currentState.selectedCategoryId == "all") null else currentState.selectedCategoryId,
+            query = currentState.searchQuery.takeIf { it.isNotBlank() }
+        )
+
+        viewModelScope.launch {
+            getExercisesUseCase(queryParams).fold(
+                onSuccess = { page ->
+                    _state.update {
+                        val newExercises = if (reset) {
+                            page.exercises.map { it.toUiModel() }
+                        } else {
+                            currentState.exercises + page.exercises.map { it.toUiModel() }
+                        }
+                        it.copy(
+                            isLoading = false,
+                            isLoadingMore = false,
+                            exercises = newExercises.toImmutableList(),
+                            visibleExercises = newExercises.toImmutableList(),
+                            currentPage = page.currentPage,
+                            hasNextPage = page.hasNext,
+                            errorMessageRes = null
+                        )
+                    }
+                },
+                onFailure = {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoadingMore = false,
+                            errorMessageRes = R.string.exercises_load_error
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun Exercise.toUiModel(): ExerciseUiModel = ExerciseUiModel(
+        id = id,
+        name = name,
+        equipment = equipment,
+        target = target,
+        instructions = run {
+            val lang = java.util.Locale.getDefault().language.lowercase()
+            instructions[lang] ?: instructions["en"].orEmpty()
+        },
+        type = if (category == "cardio" || minKcal != null) ExerciseType.CARDIO else ExerciseType.NORMAL_WORKOUT,
+        imageUrl = imageUrl,
+        gifUrl = gifUrl,
+        kcalPerMin = minKcal,
+        kcalPerRep = repKcal
+    )
 }

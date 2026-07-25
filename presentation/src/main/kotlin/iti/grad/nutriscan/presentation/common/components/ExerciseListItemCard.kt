@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
@@ -41,12 +42,15 @@ fun ExerciseListItemCard(
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.img_exercise_person),
+        AsyncImage(
+            model = exercise.imageUrl,
             contentDescription = null,
-            contentScale = ContentScale.Fit,
+            placeholder = painterResource(id = R.drawable.dumbell),
+            error = painterResource(id = R.drawable.dumbell),
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(64.dp)
+                .clip(RoundedCornerShape(12.dp))
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -56,7 +60,7 @@ fun ExerciseListItemCard(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(id = exercise.nameRes),
+                text = exercise.name,
                 style = AppTheme.typography.titleSmall,
                 color = AppTheme.colors.ExerciseCardTitle
             )
@@ -66,8 +70,8 @@ fun ExerciseListItemCard(
             Text(
                 text = stringResource(
                     id = R.string.exercise_equipment_target,
-                    stringResource(id = exercise.equipmentRes),
-                    stringResource(id = exercise.targetRes)
+                    exercise.equipment,
+                    exercise.target
                 ),
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.ExerciseCardSubtitle

@@ -4,13 +4,13 @@ import androidx.annotation.StringRes
 
 data class ExerciseUiModel(
     val id: String,
-    @StringRes val nameRes: Int,
-    @StringRes val equipmentRes: Int,
-    @StringRes val targetRes: Int,
-    @StringRes val instructionsRes: Int,
+    val name: String,
+    val equipment: String,
+    val target: String,
+    val instructions: String,
     val type: ExerciseType,
-    val exerciseCount: Int = 0,
-    val durationMin: Int = 0,
-    val kcalPerMin: Double? = null,
-    val kcalPerRep: Double? = null,
+    val imageUrl: String?,
+    val gifUrl: String? = null,
+    val kcalPerMin: Double?,
+    val kcalPerRep: Double?,
 )

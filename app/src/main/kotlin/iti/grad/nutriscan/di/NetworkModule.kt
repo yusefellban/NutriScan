@@ -9,6 +9,7 @@ import iti.grad.nutriscan.data.remote.api.AllergyApiService
 import iti.grad.nutriscan.data.remote.api.AuthApiService
 import iti.grad.nutriscan.data.remote.api.DiseaseApiService
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.ExercisesApiService
 import iti.grad.nutriscan.data.remote.api.NewsApiService
 import iti.grad.nutriscan.data.remote.api.UserApiService
 import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
@@ -191,6 +192,36 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("ExercisesOkHttpClient")
+    fun provideExercisesOkHttpClient(): OkHttpClient {
+        // Deliberately its own client, same reasoning as News: this public API needs no
+        // AuthInterceptor (no auth, no API key) and no ErrorInterceptor mapping.
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("ExercisesRetrofit")
+    fun provideExercisesRetrofit(
+        @Named("ExercisesOkHttpClient") client: OkHttpClient,
+        json: Json,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.EXERCISES_API_BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideExercisesApiService(@Named("ExercisesRetrofit") retrofit: Retrofit): ExercisesApiService =
+        retrofit.create(ExercisesApiService::class.java)
     @Named("NutriGptRetrofit")
     fun provideNutriGptRetrofit(
         json: Json,

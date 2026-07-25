@@ -249,9 +249,10 @@
     <string name="exercise_sets_label">Sets</string>
     <string name="exercise_reps_label">Reps</string>
     <string name="exercise_result_title">Workout Complete!</string>
-    <string name="exercise_result_message">You burned %1$d kcal in this session.</string>
+    <string name="exercise_result_message">You burned %1$s kcal in this session.</string>
     <string name="exercise_result_confirm">Great!</string>
     <string name="exercise_enter_value">Enter value</string>
+    <string name="exercises_load_error">Couldn\'t load exercises. Please try again.</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">Saved</string>

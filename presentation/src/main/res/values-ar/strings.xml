@@ -230,9 +230,10 @@
     <string name="exercise_sets_label">مجموعات</string>
     <string name="exercise_reps_label">تكرارات</string>
     <string name="exercise_result_title">اكتمل التمرين!</string>
-    <string name="exercise_result_message">لقد حرقت %1$d سعرة حرارية في هذا التمرين.</string>
+    <string name="exercise_result_message">لقد حرقت %1$s سعرة حرارية في هذا التمرين.</string>
     <string name="exercise_result_confirm">رائع!</string>
     <string name="exercise_enter_value">أدخل القيمة</string>
+    <string name="exercises_load_error">تعذّر تحميل التمارين. يرجى المحاولة مرة أخرى.</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">المحفوظات</string>

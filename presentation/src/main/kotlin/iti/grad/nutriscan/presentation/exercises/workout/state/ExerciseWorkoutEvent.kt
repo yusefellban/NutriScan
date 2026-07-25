@@ -16,4 +16,5 @@ sealed interface ExerciseWorkoutEvent {
     data object OnCongratsDialogConfirm : ExerciseWorkoutEvent
     data object OnTimerTick : ExerciseWorkoutEvent
     data object OnBackClick : ExerciseWorkoutEvent
+    data object OnRetryInitClick : ExerciseWorkoutEvent
 }
