@@ -124,21 +124,21 @@ fun LoginScreen(
         is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error -> {
             iti.grad.nutriscan.presentation.common.components.ErrorAlert(
                 title = stringResource(id = R.string.alert_login_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
             )
         }
         is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Warning -> {
             iti.grad.nutriscan.presentation.common.components.WarningAlert(
                 title = stringResource(id = R.string.alert_login_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
             )
         }
         is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success -> {
             iti.grad.nutriscan.presentation.common.components.SuccessAlert(
                 title = stringResource(id = R.string.alert_success_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(LoginEvent.DismissAlert) }
             )
         }

@@ -104,21 +104,21 @@ fun RegisterScreen(
         is AuthAlertState.Error -> {
             ErrorAlert(
                 title = stringResource(id = R.string.alert_registration_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
         is AuthAlertState.Warning -> {
             WarningAlert(
                 title = stringResource(id = R.string.alert_registration_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }
         is AuthAlertState.Success -> {
             SuccessAlert(
                 title = stringResource(id = R.string.alert_success_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                message = alert.message.asString(),
                 onDismiss = { viewModel.onEvent(RegisterEvent.DismissAlert) }
             )
         }

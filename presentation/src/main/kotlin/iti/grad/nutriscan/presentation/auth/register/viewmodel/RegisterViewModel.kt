@@ -85,7 +85,7 @@ class RegisterViewModel @Inject constructor(
         }
         
         if (emailError != null || passwordError != null || confirmPasswordError != null) {
-            _state.update { it.copy(alertState = AuthAlertState.Warning(messageResId = R.string.error_validation_fields)) }
+            _state.update { it.copy(alertState = AuthAlertState.Warning(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_validation_fields))) }
             return
         }
         
@@ -97,7 +97,7 @@ class RegisterViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isLoading = false,
-                            alertState = AuthAlertState.Success(messageResId = R.string.success_account_created)
+                            alertState = AuthAlertState.Success(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.success_account_created))
                         ) 
                     }
                 }
@@ -107,9 +107,9 @@ class RegisterViewModel @Inject constructor(
                     
                     val newAlertState = when {
                         throwable is java.io.IOException -> AuthAlertState.InternetError
-                        isConflict -> AuthAlertState.Warning(messageResId = R.string.error_email_exists)
-                        msg.contains("500") || msg.contains("Server Error") -> AuthAlertState.Error(messageResId = R.string.error_server_down)
-                        else -> AuthAlertState.Error(messageResId = R.string.register_error_generic)
+                        isConflict -> AuthAlertState.Warning(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_email_exists))
+                        msg.contains("500") || msg.contains("Server Error") -> AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.error_server_down))
+                        else -> AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.register_error_generic))
                     }
                     _state.update { it.copy(isLoading = false, alertState = newAlertState) }
                 }

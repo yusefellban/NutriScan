@@ -37,6 +37,7 @@ import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun SavedScreen(
     viewModel: SavedViewModel = hiltViewModel(),

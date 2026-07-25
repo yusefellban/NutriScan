@@ -76,45 +76,15 @@ fun EmailVerificationScreen(
         }
     }
 
-    when (val alert = state.alertState) {
-        is AuthAlertState.InternetError -> {
-            InternetAlert(
-                onRetry = { viewModel.onEvent(EmailVerificationEvent.ResendEmailClicked) },
-                onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
-            )
-        }
-        is AuthAlertState.Error -> {
-            ErrorAlert(
-                title = stringResource(id = R.string.alert_verification_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
-                onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
-            )
-        }
-        is AuthAlertState.Warning -> {
-            WarningAlert(
-                title = stringResource(id = R.string.alert_verification_failed_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
-                onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
-            )
-        }
-        is AuthAlertState.Success -> {
-            SuccessAlert(
-                title = stringResource(id = R.string.alert_success_title),
-                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
-                onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
-            )
-        }
-        is AuthAlertState.None -> Unit
-    }
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
             // ── Teal Header ──────────────────────────────────────────────────
             EmailVerificationHeader(onNavigateBack = onNavigateBack)
 
@@ -183,6 +153,38 @@ fun EmailVerificationScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        when (val alert = state.alertState) {
+            is AuthAlertState.InternetError -> {
+                InternetAlert(
+                    onRetry = { viewModel.onEvent(EmailVerificationEvent.ResendEmailClicked) },
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Error -> {
+                ErrorAlert(
+                    title = stringResource(id = R.string.alert_verification_failed_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Warning -> {
+                WarningAlert(
+                    title = stringResource(id = R.string.alert_verification_failed_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.Success -> {
+                SuccessAlert(
+                    title = stringResource(id = R.string.alert_success_title),
+                    message = alert.message.asString(),
+                    onDismiss = { viewModel.onEvent(EmailVerificationEvent.DismissAlert) }
+                )
+            }
+            is AuthAlertState.None -> Unit
+        }
         }
     }
 }

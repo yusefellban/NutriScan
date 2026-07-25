@@ -62,7 +62,7 @@ class EmailVerificationViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isResending = false,
-                            alertState = AuthAlertState.Success(messageResId = R.string.email_verification_resend_success)
+                            alertState = AuthAlertState.Success(message = iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.email_verification_resend_success))
                         ) 
                     }
                 }
@@ -70,7 +70,7 @@ class EmailVerificationViewModel @Inject constructor(
                     _state.update { 
                         it.copy(
                             isResending = false,
-                            alertState = AuthAlertState.Error(messageStr = throwable.message ?: "Failed to resend verification email.")
+                            alertState = AuthAlertState.Error(message = iti.grad.nutriscan.presentation.common.model.UiText.DynamicString(throwable.message ?: "Failed to resend verification email."))
                         ) 
                     }
                 }
