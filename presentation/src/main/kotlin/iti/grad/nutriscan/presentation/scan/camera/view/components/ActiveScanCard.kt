@@ -36,7 +36,7 @@ import iti.grad.presentation.R
 @Composable
 fun ActiveScanCard(
     scan: ActiveScanUiModel,
-    onClick: () -> Unit,
+    onBookmarkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(22.dp)
@@ -53,7 +53,6 @@ fun ActiveScanCard(
             )
             .clip(cardShape)
             .background(AppTheme.colors.PrimaryVariant)
-            .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -63,20 +62,16 @@ fun ActiveScanCard(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = scan.brand ?: stringResource(R.string.scan_brand_unknown),
-                style = AppTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = AppTheme.colors.Teal800,
-                letterSpacing = 1.sp,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = scan.productName ?: stringResource(R.string.scan_product_unknown),
+                text = stringResource(R.string.scan_product_unknown),
                 style = AppTheme.typography.titleMedium,
                 color = AppTheme.colors.OnPrimary,
             )
             Spacer(modifier = Modifier.height(6.dp))
-            if (scan.statusResId != null) {
+            if (scan.isProcessing) {
+                ProcessingBadge(statusResId = R.string.scan_status_processing)
+            } else if (scan.isFailed) {
+                HealthBadge(text = "Failed")
+            } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
             } else if (scan.healthTag != null) {
                 HealthBadge(text = scan.healthTag)
@@ -85,24 +80,26 @@ fun ActiveScanCard(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(AppTheme.colors.Teal800)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_plus),
-                contentDescription = stringResource(R.string.scan_add_to_list_content_description),
-                tint = AppTheme.colors.PrimaryVariant,
-                modifier = Modifier.size(22.dp),
-            )
+        if (!scan.isProcessing && !scan.isFailed && scan.fullResult != null) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(AppTheme.colors.Teal800)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onBookmarkClick,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_bookmark),
+                    contentDescription = "Save scan",
+                    tint = AppTheme.colors.PrimaryVariant,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
         }
     }
 }

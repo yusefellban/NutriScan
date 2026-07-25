@@ -87,8 +87,6 @@ fun MainScreen(
                     CameraScanScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProcessing = onNavigateToScanProcessing,
-                        onNavigateToProductDetail = onNavigateToProductDetail,
                     )
                 }
                 BottomNavTab.SAVED -> {

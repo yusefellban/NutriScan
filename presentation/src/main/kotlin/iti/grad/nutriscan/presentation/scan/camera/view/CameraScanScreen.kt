@@ -4,44 +4,50 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.collectLatest
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.res.stringResource
-import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
-import androidx.compose.foundation.layout.WindowInsets
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE
-import iti.grad.presentation.R
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
-import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
-import androidx.core.content.ContextCompat
-import androidx.activity.result.contract.ActivityResultContracts
-import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
-import androidx.compose.ui.platform.LocalContext
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
-import iti.grad.nutriscan.presentation.scan.camera.view.components.CameraPreview
-import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOverlay
-import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
-import androidx.compose.material3.SnackbarHostState
-import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
-import androidx.compose.runtime.Composable
-import iti.grad.nutriscan.presentation.common.components.AppButton
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
+import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
+import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
+import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
+import iti.grad.nutriscan.presentation.scan.camera.view.components.CameraPreview
+import iti.grad.nutriscan.presentation.scan.camera.view.components.CaptureButton
+import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOverlay
+import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
+import iti.grad.presentation.R
+import kotlinx.coroutines.flow.collectLatest
+import java.io.File
+import java.util.concurrent.Executors
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -49,11 +55,11 @@ fun CameraScanScreen(
     viewModel: CameraScanViewModel = hiltViewModel(),
     bottomPadding: Dp = 0.dp,
     snackbarHostState: SnackbarHostState,
-    onNavigateToProcessing: (String) -> Unit = {},
-    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val imageCapture = remember { ImageCapture.Builder().build() }
+    val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -64,10 +70,10 @@ fun CameraScanScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is CameraScanEffect.NavigateToProcessing ->
-                    onNavigateToProcessing(effect.barcode)
                 is CameraScanEffect.ShowSnackBarRes ->
                     snackbarHostState.showSnackbar(context.getString(effect.messageResId))
+                is CameraScanEffect.ShowSnackBar ->
+                    snackbarHostState.showSnackbar(effect.message)
                 is CameraScanEffect.RequestCameraPermission -> {
                     val granted = ContextCompat.checkSelfPermission(
                         context,
@@ -79,76 +85,115 @@ fun CameraScanScreen(
                         permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
                 }
+                is CameraScanEffect.TakePicture -> {
+                    val photoFile = File(context.cacheDir, "scan_${System.currentTimeMillis()}.jpg")
+                    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+                    imageCapture.takePicture(
+                        outputOptions,
+                        cameraExecutor,
+                        object : ImageCapture.OnImageSavedCallback {
+                            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                                viewModel.onEvent(CameraScanEvent.ImageCaptured(photoFile))
+                            }
+
+                            override fun onError(exception: ImageCaptureException) {
+                                viewModel.onEvent(CameraScanEvent.ImageCaptureFailed(exception))
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 
     CameraScanContent(
         state = state,
+        imageCapture = imageCapture,
         onEvent = viewModel::onEvent,
-        onNavigateToProductDetail = { barcode ->
-            // Use dummy product until CameraScanScreen has access to full ProductUiModel
-            onNavigateToProductDetail(ProductUiModel(id = barcode, productName = "", imageUrl = null, verdict = SAFE, calories = "0"))
-        },
         bottomPadding = bottomPadding,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CameraScanContent(
     state: CameraScanState,
+    imageCapture: ImageCapture,
     onEvent: (CameraScanEvent) -> Unit,
-    onNavigateToProductDetail: (String) -> Unit,
     bottomPadding: Dp,
 ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            when {
-                state.hasCameraPermission -> {
-                    CameraPreview(
-                        isScanning = state.isScanning,
-                        onBarcodeDetected = { barcode ->
-                            onEvent(CameraScanEvent.BarcodeDetected(barcode, format = 0))
-                        },
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    ScanFrameOverlay(
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-                state.permissionDenied -> {
-                    Box(
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
+                onEvent(CameraScanEvent.DismissScanClicked)
+                true
+            } else {
+                false
+            }
+        }
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        when {
+            state.hasCameraPermission -> {
+                CameraPreview(
+                    isScanning = state.isScanning,
+                    imageCapture = imageCapture,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                ScanFrameOverlay(
+                    modifier = Modifier.fillMaxSize(),
+                )
+                
+                if (state.isScanning) {
+                    CaptureButton(
+                        onClick = { onEvent(CameraScanEvent.CaptureClicked) },
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(AppTheme.colors.Background),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CameraPermissionDeniedContent(
-                            onRetry = { onEvent(CameraScanEvent.RequestPermissionClicked) },
-                        )
-                    }
-                }
-                else -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(AppTheme.colors.Background),
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = bottomPadding + 32.dp)
                     )
                 }
             }
-
-            state.activeScan?.let { scan ->
-                ActiveScanCard(
-                    scan = scan,
-                    onClick = { onNavigateToProductDetail(scan.barcode) },
+            state.permissionDenied -> {
+                Box(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = bottomPadding + 16.dp),
+                        .fillMaxSize()
+                        .background(AppTheme.colors.Background),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CameraPermissionDeniedContent(
+                        onRetry = { onEvent(CameraScanEvent.RequestPermissionClicked) },
+                    )
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(AppTheme.colors.Background),
                 )
             }
         }
+
+        state.activeScan?.let { scan ->
+            SwipeToDismissBox(
+                state = dismissState,
+                backgroundContent = {},
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = bottomPadding + 16.dp),
+            ) {
+                ActiveScanCard(
+                    scan = scan,
+                    onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
+                )
+            }
+        }
+    }
 }
 
 @Composable
