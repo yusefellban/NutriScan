@@ -18,5 +18,6 @@ data class UserProfileState(
     val memberPendingDeletion: FamilyMemberUiModel? = null,
     /** True while the Add Family Member bottom sheet is presented. */
     val isAddMemberSheetVisible: Boolean = false,
+    val editingMemberId: String? = null,
     val alertState: ProfileAlertState = ProfileAlertState.None
 )

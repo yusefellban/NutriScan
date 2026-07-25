@@ -27,4 +27,5 @@ data class AddFamilyMemberState(
     val isAllergiesLoading: Boolean = false,
     val allergiesErrorMessage: String? = null,
     val isSaving: Boolean = false,
+    val editingMemberId: String? = null,
 )

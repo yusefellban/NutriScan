@@ -8,12 +8,16 @@ import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.family.usecase.AddFamilyMemberUseCase
+import iti.grad.nutriscan.domain.family.usecase.GetFamilyMembersUseCase
+import iti.grad.nutriscan.domain.family.usecase.UpdateFamilyMemberUseCase
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEvent
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberState
 import iti.grad.presentation.R
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +44,8 @@ class AddFamilyMemberViewModel @Inject constructor(
     private val syncDiseasesUseCase: SyncDiseasesUseCase,
     private val syncAllergiesUseCase: SyncAllergiesUseCase,
     private val addFamilyMemberUseCase: AddFamilyMemberUseCase,
+    private val updateFamilyMemberUseCase: UpdateFamilyMemberUseCase,
+    private val getFamilyMembersUseCase: GetFamilyMembersUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddFamilyMemberState())
@@ -55,6 +61,8 @@ class AddFamilyMemberViewModel @Inject constructor(
 
     fun onEvent(event: AddFamilyMemberEvent) {
         when (event) {
+            is AddFamilyMemberEvent.Initialize -> initializeForm(event.memberId)
+
             is AddFamilyMemberEvent.NameChanged ->
                 _state.update { it.copy(name = event.name, nameError = null) }
 
@@ -73,6 +81,44 @@ class AddFamilyMemberViewModel @Inject constructor(
             AddFamilyMemberEvent.RetryLoadAllergies -> loadAllergies()
             AddFamilyMemberEvent.SaveClicked -> save()
             AddFamilyMemberEvent.DismissRequested -> emitEffect(AddFamilyMemberEffect.Dismiss)
+        }
+    }
+
+    private fun initializeForm(memberId: String?) {
+        if (memberId == null) {
+            _state.update {
+                it.copy(
+                    name = "",
+                    nameError = null,
+                    relation = "",
+                    relationError = null,
+                    selectedDiseaseIds = persistentListOf(),
+                    selectedAllergyIds = persistentListOf(),
+                    editingMemberId = null
+                )
+            }
+        } else {
+            viewModelScope.launch {
+                try {
+                    val members = getFamilyMembersUseCase().first()
+                    val member = members.find { it.id == memberId }
+                    if (member != null) {
+                        _state.update {
+                            it.copy(
+                                name = member.name,
+                                nameError = null,
+                                relation = member.relation,
+                                relationError = null,
+                                selectedDiseaseIds = member.diseaseIds.toImmutableList(),
+                                selectedAllergyIds = member.allergyIds.toImmutableList(),
+                                editingMemberId = member.id
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    // ignore
+                }
+            }
         }
     }
 
@@ -141,12 +187,23 @@ class AddFamilyMemberViewModel @Inject constructor(
 
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
-            val result = addFamilyMemberUseCase(
-                name = name,
-                relation = relation,
-                allergyIds = _state.value.selectedAllergyIds,
-                diseaseIds = _state.value.selectedDiseaseIds,
-            )
+            val editingId = _state.value.editingMemberId
+            val result = if (editingId != null) {
+                updateFamilyMemberUseCase(
+                    memberId = editingId,
+                    name = name,
+                    relation = relation,
+                    allergyIds = _state.value.selectedAllergyIds,
+                    diseaseIds = _state.value.selectedDiseaseIds,
+                )
+            } else {
+                addFamilyMemberUseCase(
+                    name = name,
+                    relation = relation,
+                    allergyIds = _state.value.selectedAllergyIds,
+                    diseaseIds = _state.value.selectedDiseaseIds,
+                )
+            }
             _state.update { it.copy(isSaving = false) }
             result
                 .onSuccess { emitEffect(AddFamilyMemberEffect.Dismiss) }

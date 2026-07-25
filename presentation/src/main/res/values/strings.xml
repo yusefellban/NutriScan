@@ -133,6 +133,7 @@
     <string name="user_profile_remove_member_title">Remove Family Member?</string>
     <string name="user_profile_remove_member_message">Remove %1$s from your family? Their health profile and scan history will no longer be tracked here.</string>
     <string name="add_family_member_title">Add Family Member</string>
+    <string name="edit_family_member_title">Edit Family Member</string>
     <string name="add_family_member_name_label">Full Name</string>
     <string name="add_family_member_name_placeholder">e.g. Ahmed Mostafa</string>
     <string name="add_family_member_relation_label">Relation</string>

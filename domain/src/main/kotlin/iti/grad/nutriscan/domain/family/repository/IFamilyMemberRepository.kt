@@ -13,4 +13,7 @@ interface IFamilyMemberRepository {
 
     /** Removes a member: optimistic local delete, then syncs the full list to the backend. */
     suspend fun removeFamilyMember(memberId: String): Result<Unit>
+
+    /** Updates a member: optimistic local update, then syncs the full list to the backend. */
+    suspend fun updateFamilyMember(memberId: String, input: FamilyMemberInput): Result<Unit>
 }

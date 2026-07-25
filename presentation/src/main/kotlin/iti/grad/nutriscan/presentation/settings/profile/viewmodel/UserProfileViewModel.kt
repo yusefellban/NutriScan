@@ -74,12 +74,15 @@ class UserProfileViewModel @Inject constructor(
     fun onEvent(event: UserProfileEvent) {
         when (event) {
             is UserProfileEvent.EditProfileClicked -> emitEffect(UserProfileEffect.NavigateToEditProfile)
-            is UserProfileEvent.AddMemberClicked -> _state.update { it.copy(isAddMemberSheetVisible = true) }
-            is UserProfileEvent.AddMemberSheetDismissed ->
-                _state.update { it.copy(isAddMemberSheetVisible = false) }
-            is UserProfileEvent.FamilyMemberDetailClicked -> emitEffect(
-                UserProfileEffect.NavigateToFamilyMemberDetail(event.memberId)
-            )
+            is UserProfileEvent.AddMemberClicked -> _state.update {
+                it.copy(isAddMemberSheetVisible = true, editingMemberId = null)
+            }
+            is UserProfileEvent.AddMemberSheetDismissed -> _state.update {
+                it.copy(isAddMemberSheetVisible = false, editingMemberId = null)
+            }
+            is UserProfileEvent.FamilyMemberDetailClicked -> _state.update {
+                it.copy(isAddMemberSheetVisible = true, editingMemberId = event.memberId)
+            }
             is UserProfileEvent.FamilyMemberLongPressed -> requestMemberRemoval(event.memberId)
             is UserProfileEvent.ConfirmRemoveMemberClicked -> confirmMemberRemoval()
             is UserProfileEvent.CancelRemoveMemberClicked -> _state.update { it.copy(memberPendingDeletion = null) }

@@ -61,10 +61,15 @@ fun AddFamilyMemberBottomSheet(
     effectFlow: Flow<AddFamilyMemberEffect>,
     onEvent: (AddFamilyMemberEvent) -> Unit,
     onDismiss: () -> Unit,
+    editingMemberId: String? = null,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val context = LocalContext.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(editingMemberId) {
+        onEvent(AddFamilyMemberEvent.Initialize(editingMemberId))
+    }
 
     LaunchedEffect(Unit) {
         effectFlow.collectLatest { effect ->
@@ -89,7 +94,10 @@ fun AddFamilyMemberBottomSheet(
                     .padding(horizontal = 24.dp, vertical = 8.dp)
             ) {
             Text(
-                text = stringResource(R.string.add_family_member_title),
+                text = stringResource(
+                    if (state.editingMemberId != null) R.string.edit_family_member_title
+                    else R.string.add_family_member_title
+                ),
                 style = AppTheme.typography.headlineMedium,
                 color = AppTheme.colors.Teal1000,
             )

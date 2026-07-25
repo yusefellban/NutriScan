@@ -1,6 +1,5 @@
 package iti.grad.nutriscan.data.repository
 
-import iti.grad.nutriscan.data.db.dao.FamilyMemberDao
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 import iti.grad.nutriscan.data.db.entity.UserEntity
@@ -16,8 +15,6 @@ import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.local.util.JwtDecoder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import timber.log.Timber
@@ -29,7 +26,6 @@ import javax.inject.Inject
  * pattern.
  */
 class FamilyMemberRepositoryImpl @Inject constructor(
-    private val familyMemberDao: FamilyMemberDao,
     private val userDao: UserDao,
     private val remoteDataSource: IUserRemoteDataSource,
     private val json: Json,
@@ -65,33 +61,28 @@ class FamilyMemberRepositoryImpl @Inject constructor(
     }
 
     override fun getFamilyMembers(): Flow<List<FamilyMember>> =
-        userDao.getUserFlow().flatMapLatest { user ->
-            if (user == null) {
-                flowOf(emptyList())
-            } else {
-                familyMemberDao.getFamilyMembersFlow(user.id).map { entities ->
-                    entities.map { it.toDomain() }
-                }
-            }
+        userDao.getUserFlow().map { user ->
+            user?.familyMembers.orEmpty().map { it.toDomain() }
         }
 
     override suspend fun addFamilyMember(input: FamilyMemberInput): Result<Unit> {
         val userId = getActiveUserId()
             ?: return Result.failure(IllegalStateException("No local user; cannot add family member"))
 
-        val existing = familyMemberDao.getFamilyMembersOnce(userId)
+        val user = userDao.getUserFlow().firstOrNull()
+            ?: return Result.failure(IllegalStateException("No local user; cannot add family member"))
+        val existing = user.familyMembers
 
         // OPTIMISTIC INSERT with a temporary client-side id so the UI updates instantly.
         val tempId = "local_${System.currentTimeMillis()}"
         val optimisticEntity = FamilyMemberEntity(
             id = tempId,
-            ownerUserId = userId,
             name = input.name,
             relation = input.relation,
             allergyIds = input.allergyIds,
             diseaseIds = input.diseaseIds,
         )
-        familyMemberDao.insertOrUpdateMember(optimisticEntity)
+        userDao.insertOrUpdateUser(user.copy(familyMembers = existing + optimisticEntity))
 
         val fullList = existing + optimisticEntity
         return syncListToBackend(userId = userId, fullList = fullList, rollbackTo = existing)
@@ -101,11 +92,40 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         val userId = getActiveUserId()
             ?: return Result.failure(IllegalStateException("No local user; cannot remove family member"))
 
-        val existing = familyMemberDao.getFamilyMembersOnce(userId)
-        familyMemberDao.deleteById(memberId) // optimistic removal
+        val user = userDao.getUserFlow().firstOrNull()
+            ?: return Result.failure(IllegalStateException("No local user; cannot remove family member"))
+        val existing = user.familyMembers
+        val updatedList = existing.filterNot { it.id == memberId }
 
-        val fullList = existing.filterNot { it.id == memberId }
-        return syncListToBackend(userId = userId, fullList = fullList, rollbackTo = existing)
+        userDao.insertOrUpdateUser(user.copy(familyMembers = updatedList))
+
+        return syncListToBackend(userId = userId, fullList = updatedList, rollbackTo = existing)
+    }
+
+    override suspend fun updateFamilyMember(memberId: String, input: FamilyMemberInput): Result<Unit> {
+        val userId = getActiveUserId()
+            ?: return Result.failure(IllegalStateException("No local user; cannot update family member"))
+
+        val user = userDao.getUserFlow().firstOrNull()
+            ?: return Result.failure(IllegalStateException("No local user; cannot update family member"))
+        val existing = user.familyMembers
+
+        val updatedList = existing.map { entity ->
+            if (entity.id == memberId) {
+                entity.copy(
+                    name = input.name,
+                    relation = input.relation,
+                    allergyIds = input.allergyIds,
+                    diseaseIds = input.diseaseIds
+                )
+            } else {
+                entity
+            }
+        }
+
+        userDao.insertOrUpdateUser(user.copy(familyMembers = updatedList))
+
+        return syncListToBackend(userId = userId, fullList = updatedList, rollbackTo = existing)
     }
 
     /**
@@ -135,19 +155,28 @@ class FamilyMemberRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val refreshed = remoteDataSource.getProfile()
                 val entities = refreshed.familyMembers.orEmpty().map { dto ->
-                    dto.toEntity(userId)
+                    dto.toEntity()
                 }
-                familyMemberDao.replaceAllForUser(userId, entities)
+                val user = userDao.getUserFlow().firstOrNull()
+                if (user != null) {
+                    userDao.insertOrUpdateUser(user.copy(familyMembers = entities))
+                }
                 Result.success(Unit)
             } else {
                 val rawError = response.errorBody()?.string()
                 Timber.e("Sync family members failed with code: ${response.code()}, errorBody: $rawError")
-                familyMemberDao.replaceAllForUser(userId, rollbackTo) // ROLLBACK
+                val user = userDao.getUserFlow().firstOrNull()
+                if (user != null) {
+                    userDao.insertOrUpdateUser(user.copy(familyMembers = rollbackTo))
+                }
                 Result.failure(Exception(parseErrorMessage(rawError)))
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception while syncing family members")
-            familyMemberDao.replaceAllForUser(userId, rollbackTo) // ROLLBACK (offline, timeout, etc.)
+            val user = userDao.getUserFlow().firstOrNull()
+            if (user != null) {
+                userDao.insertOrUpdateUser(user.copy(familyMembers = rollbackTo))
+            }
             Result.failure(e)
         }
     }

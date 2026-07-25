@@ -16,5 +16,6 @@ data class UserEntity(
     val weightKg: Double? = null,
     val diseaseIds: List<Int> = emptyList(),
     val allergyIds: List<Int> = emptyList(),
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+    val familyMembers: List<FamilyMemberEntity> = emptyList()
 )

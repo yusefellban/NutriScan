@@ -16,10 +16,9 @@ data class FamilyMemberDto(
     val diseases: List<DiseaseDto> = emptyList(),
 )
 
-fun FamilyMemberDto.toEntity(ownerUserId: String): FamilyMemberEntity {
+fun FamilyMemberDto.toEntity(): FamilyMemberEntity {
     return FamilyMemberEntity(
         id = id ?: UUID.randomUUID().toString(),
-        ownerUserId = ownerUserId,
         name = name,
         relation = relation ?: "",
         allergyIds = if (allergyIds.isNotEmpty()) allergyIds else allergies.map { it.id },

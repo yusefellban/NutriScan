@@ -125,6 +125,7 @@
     <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
     <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
     <string name="add_family_member_title">إضافة فرد من العائلة</string>
+    <string name="edit_family_member_title">تعديل فرد العائلة</string>
     <string name="add_family_member_name_label">الاسم الكامل</string>
     <string name="add_family_member_name_placeholder">مثال: أحمد مصطفى</string>
     <string name="add_family_member_relation_label">الصلة</string>

@@ -80,9 +80,6 @@ object UserProfileRoute
 object ManageFamilyRoute
 
 @Serializable
-data class EditConditionsRoute(val memberProfileId: String)
-
-@Serializable
 object NotificationSettingsRoute
 
 @Serializable

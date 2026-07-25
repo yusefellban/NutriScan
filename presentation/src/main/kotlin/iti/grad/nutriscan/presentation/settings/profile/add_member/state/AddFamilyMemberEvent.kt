@@ -5,6 +5,7 @@ package iti.grad.nutriscan.presentation.settings.profile.add_member.state
  * [iti.grad.nutriscan.presentation.settings.profile.add_member.viewmodel.AddFamilyMemberViewModel].
  */
 sealed interface AddFamilyMemberEvent {
+    data class Initialize(val memberId: String?) : AddFamilyMemberEvent
     data class NameChanged(val name: String) : AddFamilyMemberEvent
     data class RelationChanged(val relation: String) : AddFamilyMemberEvent
     data class ToggleDisease(val id: Int) : AddFamilyMemberEvent

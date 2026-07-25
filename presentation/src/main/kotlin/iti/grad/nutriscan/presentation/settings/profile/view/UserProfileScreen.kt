@@ -55,7 +55,6 @@ fun UserProfileScreen(
     bottomPadding: Dp = 0.dp,
     onNavigateToScanHistory: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
-    onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToTab: (iti.grad.nutriscan.presentation.common.model.BottomNavTab) -> Unit = {},
@@ -67,8 +66,6 @@ fun UserProfileScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is UserProfileEffect.NavigateToEditProfile -> onNavigateToEditProfile()
-                is UserProfileEffect.NavigateToFamilyMemberDetail ->
-                    onNavigateToFamilyMemberDetail(effect.memberId)
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
@@ -89,6 +86,7 @@ fun UserProfileScreen(
             effectFlow = addMemberViewModel.effect,
             onEvent = addMemberViewModel::onEvent,
             onDismiss = { viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed) },
+            editingMemberId = state.editingMemberId,
         )
     }
 

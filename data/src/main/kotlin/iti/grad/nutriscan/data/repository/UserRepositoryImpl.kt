@@ -1,9 +1,7 @@
 package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.UserDao
-import iti.grad.nutriscan.data.db.dao.FamilyMemberDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
-import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
@@ -20,7 +18,6 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
-    private val familyMemberDao: FamilyMemberDao,
     private val remoteDataSource: IUserRemoteDataSource,
     private val json: Json
 ) : IUserRepository {
@@ -62,16 +59,10 @@ class UserRepositoryImpl @Inject constructor(
                 diseaseIds = if (!dto.diseaseIds.isNullOrEmpty()) dto.diseaseIds else dto.diseases.map { it.id },
                 allergyIds = if (!dto.allergyIds.isNullOrEmpty()) dto.allergyIds else dto.allergies.map { it.id },
                 // If backend returns null, preserve our local offline avatar
-                avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl
+                avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
+                familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }
             )
             userDao.insertOrUpdateUser(entity)
-
-            // Keep the family-member cache in sync with every profile refresh too,
-            // not just the add/remove flows in FamilyMemberRepositoryImpl.
-            val familyMemberEntities = dto.familyMembers.orEmpty().map { memberDto ->
-                memberDto.toEntity(dto.id)
-            }
-            familyMemberDao.replaceAllForUser(dto.id, familyMemberEntities)
 
             Result.success(Unit)
         } catch (e: Exception) {

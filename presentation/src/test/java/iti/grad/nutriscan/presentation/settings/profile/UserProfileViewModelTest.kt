@@ -136,15 +136,17 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when FamilyMemberDetailClicked, effect carries the clicked member id`() = runTest(testDispatcher) {
+    fun `when FamilyMemberDetailClicked, add member bottom sheet is displayed with that member id`() = runTest(testDispatcher) {
         val mockMembers = listOf(FamilyMember("123", "Alice"))
         familyMembersFlow.value = mockMembers
         testScheduler.advanceUntilIdle()
 
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.FamilyMemberDetailClicked("123"))
-            assertEquals(UserProfileEffect.NavigateToFamilyMemberDetail("123"), awaitItem())
-        }
+        viewModel.onEvent(UserProfileEvent.FamilyMemberDetailClicked("123"))
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.isAddMemberSheetVisible)
+        assertEquals("123", state.editingMemberId)
     }
 
     @Test

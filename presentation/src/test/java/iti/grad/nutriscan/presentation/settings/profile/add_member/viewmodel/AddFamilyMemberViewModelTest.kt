@@ -11,6 +11,8 @@ import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.family.usecase.AddFamilyMemberUseCase
+import iti.grad.nutriscan.domain.family.usecase.GetFamilyMembersUseCase
+import iti.grad.nutriscan.domain.family.usecase.UpdateFamilyMemberUseCase
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEvent
 import kotlinx.collections.immutable.persistentListOf
@@ -42,6 +44,8 @@ class AddFamilyMemberViewModelTest {
     private val syncDiseasesUseCase: SyncDiseasesUseCase = mockk()
     private val syncAllergiesUseCase: SyncAllergiesUseCase = mockk()
     private val addFamilyMemberUseCase: AddFamilyMemberUseCase = mockk()
+    private val updateFamilyMemberUseCase: UpdateFamilyMemberUseCase = mockk()
+    private val getFamilyMembersUseCase: GetFamilyMembersUseCase = mockk()
 
     private val diseasesFlow = MutableStateFlow<List<Disease>>(emptyList())
     private val allergiesFlow = MutableStateFlow<List<Allergy>>(emptyList())
@@ -56,13 +60,16 @@ class AddFamilyMemberViewModelTest {
         coEvery { getDiseasesUseCase() } returns diseasesFlow
         coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
         coEvery { getAllergiesUseCase() } returns allergiesFlow
+        coEvery { getFamilyMembersUseCase() } returns MutableStateFlow(emptyList())
 
         viewModel = AddFamilyMemberViewModel(
             getDiseasesUseCase = getDiseasesUseCase,
             getAllergiesUseCase = getAllergiesUseCase,
             syncDiseasesUseCase = syncDiseasesUseCase,
             syncAllergiesUseCase = syncAllergiesUseCase,
-            addFamilyMemberUseCase = addFamilyMemberUseCase
+            addFamilyMemberUseCase = addFamilyMemberUseCase,
+            updateFamilyMemberUseCase = updateFamilyMemberUseCase,
+            getFamilyMembersUseCase = getFamilyMembersUseCase
         )
     }
 

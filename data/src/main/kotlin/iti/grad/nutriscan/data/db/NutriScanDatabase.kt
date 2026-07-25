@@ -7,33 +7,30 @@ import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 
 import androidx.room.TypeConverters
 import iti.grad.nutriscan.data.db.converter.IntListConverter
+import iti.grad.nutriscan.data.db.converter.FamilyMemberListConverter
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.dao.DiseaseDao
 import iti.grad.nutriscan.data.db.dao.AllergyDao
-import iti.grad.nutriscan.data.db.dao.FamilyMemberDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.db.entity.DiseaseEntity
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
-import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 
 @Database(
     entities = [
         FoodLogEntity::class,
         UserEntity::class,
         DiseaseEntity::class,
-        AllergyEntity::class,
-        FamilyMemberEntity::class
+        AllergyEntity::class
     ],
-    // Bumped 4 -> 5 for adding relation field to FamilyMemberEntity. Relies on fallbackToDestructiveMigration()
+    // Bumped 5 -> 6 for embedding family members list inside UserEntity. Relies on fallbackToDestructiveMigration()
     // in DatabaseModule — this clears all local tables on upgrade.
-    version = 5,
+    version = 6,
     exportSchema = false
 )
-@TypeConverters(IntListConverter::class)
+@TypeConverters(IntListConverter::class, FamilyMemberListConverter::class)
 abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun foodLogDao(): FoodLogDao
     abstract fun userDao(): UserDao
     abstract fun diseaseDao(): DiseaseDao
     abstract fun allergyDao(): AllergyDao
-    abstract fun familyMemberDao(): FamilyMemberDao
 }
