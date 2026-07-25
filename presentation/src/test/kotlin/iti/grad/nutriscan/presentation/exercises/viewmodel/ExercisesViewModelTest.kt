@@ -209,7 +209,7 @@ class ExercisesViewModelTest {
                             imageUrl = null,
                             gifUrl = null,
                             repKcal = 0.20,
-                            minKcal = 0.15
+                            minKcal = null
                         )
                     ),
                     currentPage = 1,
@@ -243,7 +243,7 @@ class ExercisesViewModelTest {
                         imageUrl = null,
                         gifUrl = null,
                         repKcal = 0.20,
-                        minKcal = 0.15
+                        minKcal = null
                     )
                 ),
                 currentPage = 1,
