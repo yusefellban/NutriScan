@@ -1,11 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
-import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
-import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,19 +12,28 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import kotlinx.coroutines.flow.collectLatest
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 
-import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
-import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
-import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
-import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
-import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
 import kotlinx.collections.immutable.toImmutableList
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error
+import androidx.lifecycle.ViewModel
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
+import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 
 /**
  * ViewModel for the Edit Profile screen.
@@ -96,6 +101,14 @@ class EditProfileViewModel @Inject constructor(
             is EditProfileEvent.SelectAvatar -> _state.update { it.copy(avatarUrl = event.avatarUrl) }
             is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
             is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
+            EditProfileEvent.DismissAlert -> {
+                val wasSuccess = _state.value.alertState is Success
+                _state.update { it.copy(alertState = None) }
+                if (wasSuccess) {
+                    emitEffect(EditProfileEffect.NavigateBack)
+                }
+            }
+            EditProfileEvent.RetryAction -> saveProfileData()
         }
     }
 
@@ -202,10 +215,21 @@ class EditProfileViewModel @Inject constructor(
                 allergyIds = currentState.selectedAllergyIds,
                 avatarUrl = finalAvatarUrl
             ).onSuccess {
-                _state.update { it.copy(isSaving = false, isEditMode = false) }
-            }.onFailure {
-                _state.update { it.copy(isSaving = false) }
-                // Handle error effect if needed
+                _state.update { 
+                    it.copy(
+                        isSaving = false, 
+                        isEditMode = false,
+                        alertState = Success(
+                            messageResId = R.string.alert_success_title // You can provide a specific string for profile updated
+                        )
+                    ) 
+                }
+            }.onFailure { error ->
+                val newAlertState = when {
+                    error is java.io.IOException -> InternetError
+                    else -> Error(messageStr = "Failed to update profile. Please try again.")
+                }
+                _state.update { it.copy(isSaving = false, alertState = newAlertState) }
             }
         }
     }

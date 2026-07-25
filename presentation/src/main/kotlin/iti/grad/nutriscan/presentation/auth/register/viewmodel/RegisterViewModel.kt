@@ -4,7 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.auth.usecase.RegisterUseCase
+import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
+import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
+import iti.grad.nutriscan.presentation.common.model.UiText
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
 import iti.grad.presentation.R
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,12 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEffect
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
-import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
-
-import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
@@ -36,13 +37,24 @@ class RegisterViewModel @Inject constructor(
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
-            is RegisterEvent.EmailChanged -> _state.update { it.copy(email = event.value, emailErrorResId = null) }
-            is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value, passwordErrorResId = null) }
-            is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null) }
+            is RegisterEvent.EmailChanged -> _state.update { it.copy(email = event.value, emailErrorResId = null, alertState = AuthAlertState.None) }
+            is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value, passwordErrorResId = null, alertState = AuthAlertState.None) }
+            is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null, alertState = AuthAlertState.None) }
             is RegisterEvent.TogglePasswordVisibility -> _state.update { it.copy(passwordVisible = !it.passwordVisible) }
             is RegisterEvent.ToggleConfirmPasswordVisibility -> _state.update { it.copy(confirmPasswordVisible = !it.confirmPasswordVisible) }
             is RegisterEvent.SignUpClicked -> handleSignUp()
             is RegisterEvent.SignInClicked -> navigateToSignIn()
+            is RegisterEvent.DismissAlert -> {
+                val wasSuccess = _state.value.alertState is AuthAlertState.Success
+                val email = _state.value.email
+                _state.update { it.copy(alertState = AuthAlertState.None) }
+                if (wasSuccess) {
+                    viewModelScope.launch {
+                        _effect.send(RegisterEffect.NavigateToEmailVerification(email))
+                    }
+                }
+            }
+            is RegisterEvent.RetryAction -> handleSignUp()
         }
     }
 
@@ -73,24 +85,34 @@ class RegisterViewModel @Inject constructor(
             )
         }
         
-        if (emailError != null || passwordError != null || confirmPasswordError != null) return
+        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+            _state.update { it.copy(alertState = AuthAlertState.Warning(message = UiText.StringResource(R.string.error_validation_fields))) }
+            return
+        }
         
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true, alertState = AuthAlertState.None) }
             registerUseCase(currentState.email, currentState.password)
                 .onSuccess {
-                    // Automatically trigger verification email after successful registration
                     resendVerificationEmailUseCase(currentState.email)
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(RegisterEffect.NavigateToEmailVerification(currentState.email))
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            alertState = AuthAlertState.Success(message = UiText.StringResource(R.string.success_account_created))
+                        ) 
+                    }
                 }
                 .onFailure { throwable ->
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(
-                        RegisterEffect.ShowErrorDialog(
-                            messageStr = throwable.message ?: "Registration failed. Please try again."
-                        )
-                    )
+                    val msg = throwable.message.orEmpty()
+                    val isConflict = msg.contains("409") || msg.contains("exists")
+                    
+                    val newAlertState = when {
+                        throwable is java.io.IOException -> AuthAlertState.InternetError
+                        isConflict -> AuthAlertState.Warning(message = UiText.StringResource(R.string.error_email_exists))
+                        msg.contains("500") || msg.contains("Server Error") -> AuthAlertState.Error(message = UiText.StringResource(R.string.error_server_down))
+                        else -> AuthAlertState.Error(message = UiText.StringResource(R.string.register_error_generic))
+                    }
+                    _state.update { it.copy(isLoading = false, alertState = newAlertState) }
                 }
         }
     }

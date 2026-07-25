@@ -9,6 +9,8 @@ import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
+import iti.grad.nutriscan.presentation.common.model.UiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -72,7 +74,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `SignInClicked with valid credentials emits ShowErrorDialog on failure`() = runTest {
+    fun `SignInClicked with valid credentials emits Error alert on failure`() = runTest {
         val email = "test@example.com"
         val password = "Password123"
         val errorMessage = "Invalid credentials"
@@ -81,14 +83,13 @@ class LoginViewModelTest {
         viewModel.onEvent(LoginEvent.EmailChanged(email))
         viewModel.onEvent(LoginEvent.PasswordChanged(password))
         
-        viewModel.effect.test {
-            viewModel.onEvent(LoginEvent.SignInClicked)
-            testDispatcher.scheduler.advanceUntilIdle()
-            
-            val effect = awaitItem()
-            assertTrue(effect is LoginEffect.ShowErrorDialog)
-            assertEquals(errorMessage, (effect as LoginEffect.ShowErrorDialog).messageStr)
-            cancelAndIgnoreRemainingEvents()
-        }
+        viewModel.onEvent(LoginEvent.SignInClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+        
+        val alertState = viewModel.state.value.alertState
+        assertTrue(alertState is AuthAlertState.Error)
+        val errorMsg = (alertState as AuthAlertState.Error).message
+        assertTrue(errorMsg is UiText.DynamicString)
+        assertEquals(errorMessage, (errorMsg as UiText.DynamicString).value)
     }
 }

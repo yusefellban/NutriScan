@@ -316,4 +316,28 @@
     <string name="nutrigpt_sparkle_content_description">AI Sparkle</string>
     <string name="nutrigpt_empty_title">Ask anything about nutrition</string>
     <string name="nutrigpt_empty_subtitle">Get answers backed by trusted health sources and research papers.</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">Delete Warning</string>
+    <string name="alert_success_title">Success</string>
+    <string name="alert_error_title">Error</string>
+    <string name="alert_warning_title">Warning</string>
+    <string name="alert_internet_title">No Internet</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="alert_button_delete">Delete</string>
+    <string name="alert_button_ok">ok</string>
+    <string name="alert_button_retry">Retry</string>
+    <string name="alert_test_message">Are you sure you want to delete this profile? This action cannot be undone.</string>
+    <string name="alert_internet_message">Please check your internet connection and try again.</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">Login Failed</string>
+    <string name="alert_registration_failed_title">Registration Failed</string>
+    <string name="alert_reset_failed_title">Reset Failed</string>
+    <string name="alert_verification_failed_title">Verification Failed</string>
+    <string name="error_invalid_credentials">Invalid email or password.</string>
+    <string name="error_server_down">Server is temporarily unavailable. Please try again later.</string>
+    <string name="success_account_created">Account created successfully.</string>
+    <string name="error_email_exists">This email is already in use.</string>
+    <string name="error_validation_fields">Please correct the highlighted fields and try again.</string>
 </resources>
