@@ -34,6 +34,7 @@ internal data class AppColorsExtension(
     val ProfileShowDetailsBackground: Color,
     val ProfileMenuLabel: Color,
     val ProfileMenuChevron: Color,
+    val ProfileAddMemberAvatarBackground: Color,
 
     // --- Edit Profile Input Fields ---
     val EditProfileInputBackground: Color,
@@ -138,6 +139,10 @@ internal data class AppColorsExtension(
     val ProductDetailNutritionPill: Color,
     val ProductDetailNutritionText: Color,
     val ProductDetailBookmarkTint: Color,
+
+    // --- Overlays ---
+    /** Modal bottom sheet / dialog scrim. Replaces ad-hoc `Color(0x66...)` literals. */
+    val ScrimOverlay: Color,
 )
 
 @Immutable
@@ -313,6 +318,7 @@ data class AppColors internal constructor(
     val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
     val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
     val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
+    val ProfileAddMemberAvatarBackground: Color get() = extension.ProfileAddMemberAvatarBackground
     val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
     val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
 
@@ -366,6 +372,7 @@ data class AppColors internal constructor(
     val ProductDetailNutritionPill: Color get() = extension.ProductDetailNutritionPill
     val ProductDetailNutritionText: Color get() = extension.ProductDetailNutritionText
     val ProductDetailBookmarkTint: Color get() = extension.ProductDetailBookmarkTint
+    val ScrimOverlay: Color get() = extension.ScrimOverlay
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -526,6 +533,7 @@ fun lightColors() = AppColors(
         ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
         ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
         ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
+        ProfileAddMemberAvatarBackground = Color(0xFF11939A), // Teal1200 - matches settings avatar in light theme
 
         // Edit Profile Input Fields
         EditProfileInputBackground = Color(0xFFFFFFFF), // White / Background
@@ -631,6 +639,8 @@ fun lightColors() = AppColors(
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
+
+        ScrimOverlay = Color(0x660F474A), // Teal1600 40% alpha — light mode scrim
     ),
 )
 
@@ -792,6 +802,7 @@ fun darkColors() = AppColors(
         ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
         ProfileMenuLabel = Color(0xFF11939A), // Teal1200
         ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
+        ProfileAddMemberAvatarBackground = Color(0xFF0F474A), // Teal1600 - darker background in dark theme
 
         // Edit Profile Input Fields
         EditProfileInputBackground = Color(0xFF0A545A), // Teal1500 / SurfaceVariant
@@ -900,5 +911,7 @@ fun darkColors() = AppColors(
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
+
+        ScrimOverlay = Color(0x99000000), // Black 60% alpha — dark mode scrim
     ),
 )
