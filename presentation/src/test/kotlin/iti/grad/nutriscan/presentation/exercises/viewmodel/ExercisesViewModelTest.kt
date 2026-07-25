@@ -13,6 +13,8 @@ import iti.grad.nutriscan.domain.exercises.usecase.GetExercisesUseCase
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
+import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.exercises.state
 import androidx.compose.runtime.Immutable
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategoryUi
+import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategory
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

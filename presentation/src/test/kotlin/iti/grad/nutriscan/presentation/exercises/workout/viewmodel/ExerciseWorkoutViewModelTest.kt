@@ -10,6 +10,10 @@ import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.common.model.ExerciseType
+import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
+import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
+import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
