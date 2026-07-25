@@ -95,21 +95,24 @@ class ExercisesRepositoryImpl @Inject constructor(
             }
         }
 
-    private fun ExerciseDto.toDomain() = Exercise(
-        id = id,
-        name = name,
-        category = category,
-        bodyPart = bodyPart,
-        equipment = equipment,
-        target = target.orEmpty(),
-        secondaryMuscles = secondaryMuscles.orEmpty(),
-        instructions = instructions.orEmpty(),
-        instructionSteps = instructionSteps.orEmpty(),
-        imageUrl = image?.let { if (it.startsWith("http")) it else "https://exercises-dataset-mu.vercel.app/$it" },
-        gifUrl = gifUrl?.let { if (it.startsWith("http")) it else "https://exercises-dataset-mu.vercel.app/$it" },
-        repKcal = repKcal ?: DEFAULT_REP_KCAL,
-        minKcal = minKcal ?: DEFAULT_MIN_KCAL,
-    )
+    private fun ExerciseDto.toDomain(): Exercise {
+        val isCardio = category.equals("cardio", ignoreCase = true) || (minKcal != null && repKcal == null)
+        return Exercise(
+            id = id,
+            name = name,
+            category = if (isCardio) "cardio" else "normal",
+            bodyPart = bodyPart,
+            equipment = equipment,
+            target = target.orEmpty(),
+            secondaryMuscles = secondaryMuscles.orEmpty(),
+            instructions = instructions.orEmpty(),
+            instructionSteps = instructionSteps.orEmpty(),
+            imageUrl = image?.let { if (it.startsWith("http")) it else "https://exercises-dataset-mu.vercel.app/$it" },
+            gifUrl = gifUrl?.let { if (it.startsWith("http")) it else "https://exercises-dataset-mu.vercel.app/$it" },
+            repKcal = if (isCardio) null else (repKcal ?: DEFAULT_REP_KCAL),
+            minKcal = if (isCardio) (minKcal ?: DEFAULT_MIN_KCAL) else null,
+        )
+    }
 
     private fun Exercise.toEntity() = ExerciseEntity(
         id = id,

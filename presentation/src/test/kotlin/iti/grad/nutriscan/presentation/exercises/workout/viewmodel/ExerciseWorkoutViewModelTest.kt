@@ -280,7 +280,7 @@ class ExerciseWorkoutViewModelTest {
                 instructionSteps = emptyList(),
                 imageUrl = null,
                 gifUrl = null,
-                repKcal = 0.20,
+                repKcal = null,
                 minKcal = 0.23
             ),
             Exercise(
@@ -296,7 +296,7 @@ class ExerciseWorkoutViewModelTest {
                 imageUrl = null,
                 gifUrl = null,
                 repKcal = 0.30,
-                minKcal = 0.15
+                minKcal = null
             )
         )
 

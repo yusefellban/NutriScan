@@ -43,8 +43,8 @@ class ExercisesRepositoryImplTest {
             instructionSteps = mapOf("en" to listOf("Step 1", "Step 2")),
             secondaryMuscles = listOf("triceps"),
             target = "pectorals",
-            repKcal = null, // Trigger default fallback
-            minKcal = null, // Trigger default fallback
+            repKcal = null,
+            minKcal = null,
             image = "image_url",
             gifUrl = "gif_url"
         )
@@ -74,13 +74,13 @@ class ExercisesRepositoryImplTest {
         Assertions.assertEquals("Instructions in English", exercise.instructions["en"])
         Assertions.assertEquals("Step 1", exercise.instructionSteps["en"]?.first())
         Assertions.assertEquals(0.20, exercise.repKcal) // DEFAULT_REP_KCAL fallback
-        Assertions.assertEquals(0.15, exercise.minKcal) // DEFAULT_MIN_KCAL fallback
+        Assertions.assertNull(exercise.minKcal)
         Assertions.assertEquals("https://exercises-dataset-mu.vercel.app/image_url", exercise.imageUrl)
         Assertions.assertEquals("https://exercises-dataset-mu.vercel.app/gif_url", exercise.gifUrl)
     }
 
     @Test
-    fun `getExerciseById parses response successfully`() = runTest(testDispatcher) {
+    fun `getExerciseById parses normal workout successfully`() = runTest(testDispatcher) {
         val mockDto = ExerciseDto(
             id = "1",
             name = "Push Up",
@@ -92,7 +92,7 @@ class ExercisesRepositoryImplTest {
             secondaryMuscles = listOf("triceps"),
             target = "pectorals",
             repKcal = 0.5,
-            minKcal = 0.4,
+            minKcal = null,
             image = "image_url",
             gifUrl = "gif_url"
         )
@@ -109,6 +109,38 @@ class ExercisesRepositoryImplTest {
         Assertions.assertEquals("1", exercise.id)
         Assertions.assertEquals("Instructions in English", exercise.instructions["en"])
         Assertions.assertEquals(0.5, exercise.repKcal)
+        Assertions.assertNull(exercise.minKcal)
+    }
+
+    @Test
+    fun `getExerciseById parses cardio workout successfully`() = runTest(testDispatcher) {
+        val mockDto = ExerciseDto(
+            id = "2",
+            name = "Running",
+            category = "cardio",
+            bodyPart = "legs",
+            equipment = "none",
+            instructions = mapOf("en" to "Cardio instructions"),
+            instructionSteps = mapOf("en" to listOf("Step 1")),
+            secondaryMuscles = listOf("quads"),
+            target = "quads",
+            repKcal = null,
+            minKcal = 0.4,
+            image = "image_url",
+            gifUrl = "gif_url"
+        )
+        
+        coEvery { api.getExerciseById("2") } returns SingleExerciseResponseDto(
+            success = true,
+            data = mockDto
+        )
+
+        val result = repository.getExerciseById("2")
+        Assertions.assertTrue(result.isSuccess)
+        
+        val exercise = result.getOrThrow()
+        Assertions.assertEquals("2", exercise.id)
+        Assertions.assertNull(exercise.repKcal)
         Assertions.assertEquals(0.4, exercise.minKcal)
     }
 
