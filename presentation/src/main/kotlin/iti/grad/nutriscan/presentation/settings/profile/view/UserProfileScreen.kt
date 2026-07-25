@@ -52,6 +52,7 @@ fun UserProfileScreen(
     onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToTab: (iti.grad.nutriscan.presentation.common.model.BottomNavTab) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -64,6 +65,7 @@ fun UserProfileScreen(
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
+                is UserProfileEffect.NavigateToTab -> onNavigateToTab(effect.tab)
             }
         }
     }

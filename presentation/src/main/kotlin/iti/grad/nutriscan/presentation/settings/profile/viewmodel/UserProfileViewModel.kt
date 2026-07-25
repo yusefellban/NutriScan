@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import kotlinx.coroutines.flow.collectLatest
 
 /**

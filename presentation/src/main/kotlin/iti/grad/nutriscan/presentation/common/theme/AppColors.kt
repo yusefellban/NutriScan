@@ -118,6 +118,11 @@ internal data class AppColorsExtension(
     val CaloriesIconOnAccent: Color,
     val ExerciseSecondaryText: Color,
 
+    
+)
+
+@Immutable
+internal data class AppColorsExtension2(
     // --- Exercise Screens (dark mode support) ---
     val ExerciseCardBackground: Color,
     val ExerciseCardTitle: Color,
@@ -330,6 +335,7 @@ data class AppColors internal constructor(
     // See AppColorsExtension's kdoc: kept out of this constructor to avoid
     // a D8 VerifyError crash from having too many constructor parameters.
     private val extension: AppColorsExtension,
+    private val extension2: AppColorsExtension2,
 ) {
     val ProfileHeaderBackground: Color get() = extension.ProfileHeaderBackground
     val ProfileHeaderAccent: Color get() = extension.ProfileHeaderAccent
@@ -382,61 +388,61 @@ data class AppColors internal constructor(
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
 
-    val ExerciseCardBackground: Color get() = extension.ExerciseCardBackground
-    val ExerciseCardTitle: Color get() = extension.ExerciseCardTitle
-    val ExerciseCardSubtitle: Color get() = extension.ExerciseCardSubtitle
-    val ExerciseCardChevron: Color get() = extension.ExerciseCardChevron
-    val ExerciseChipSelectedBg: Color get() = extension.ExerciseChipSelectedBg
-    val ExerciseChipSelectedBorder: Color get() = extension.ExerciseChipSelectedBorder
-    val ExerciseChipSelectedText: Color get() = extension.ExerciseChipSelectedText
-    val ExerciseChipUnselectedBg: Color get() = extension.ExerciseChipUnselectedBg
-    val ExerciseChipUnselectedBorder: Color get() = extension.ExerciseChipUnselectedBorder
-    val ExerciseChipUnselectedText: Color get() = extension.ExerciseChipUnselectedText
-    val ExerciseInstructionsTitle: Color get() = extension.ExerciseInstructionsTitle
-    val ExerciseInstructionsBody: Color get() = extension.ExerciseInstructionsBody
-    val ExerciseInstructionsBullet: Color get() = extension.ExerciseInstructionsBullet
-    val ExerciseCancelWorkoutText: Color get() = extension.ExerciseCancelWorkoutText
+    val ExerciseCardBackground: Color get() = extension2.ExerciseCardBackground
+    val ExerciseCardTitle: Color get() = extension2.ExerciseCardTitle
+    val ExerciseCardSubtitle: Color get() = extension2.ExerciseCardSubtitle
+    val ExerciseCardChevron: Color get() = extension2.ExerciseCardChevron
+    val ExerciseChipSelectedBg: Color get() = extension2.ExerciseChipSelectedBg
+    val ExerciseChipSelectedBorder: Color get() = extension2.ExerciseChipSelectedBorder
+    val ExerciseChipSelectedText: Color get() = extension2.ExerciseChipSelectedText
+    val ExerciseChipUnselectedBg: Color get() = extension2.ExerciseChipUnselectedBg
+    val ExerciseChipUnselectedBorder: Color get() = extension2.ExerciseChipUnselectedBorder
+    val ExerciseChipUnselectedText: Color get() = extension2.ExerciseChipUnselectedText
+    val ExerciseInstructionsTitle: Color get() = extension2.ExerciseInstructionsTitle
+    val ExerciseInstructionsBody: Color get() = extension2.ExerciseInstructionsBody
+    val ExerciseInstructionsBullet: Color get() = extension2.ExerciseInstructionsBullet
+    val ExerciseCancelWorkoutText: Color get() = extension2.ExerciseCancelWorkoutText
 
-    val ExerciseScreenTitle: Color get() = extension.ExerciseScreenTitle
-    val ExerciseBackButtonTint: Color get() = extension.ExerciseBackButtonTint
-    val ExerciseSearchPlaceholder: Color get() = extension.ExerciseSearchPlaceholder
-    val ExerciseWorkoutHeaderTitle: Color get() = extension.ExerciseWorkoutHeaderTitle
-    val ExerciseWorkoutImageBackground: Color get() = extension.ExerciseWorkoutImageBackground
-    val ExerciseWorkoutTimerText: Color get() = extension.ExerciseWorkoutTimerText
-    val ExerciseWorkoutSecondaryButton: Color get() = extension.ExerciseWorkoutSecondaryButton
-    val ExerciseWorkoutPrimaryButtonBg: Color get() = extension.ExerciseWorkoutPrimaryButtonBg
-    val ExerciseWorkoutPrimaryButtonText: Color get() = extension.ExerciseWorkoutPrimaryButtonText
-    val ExerciseWorkoutTotalTimeLabel: Color get() = extension.ExerciseWorkoutTotalTimeLabel
-    val ExerciseSetsRepsCardBg: Color get() = extension.ExerciseSetsRepsCardBg
-    val ExerciseSetsRepsCardBorder: Color get() = extension.ExerciseSetsRepsCardBorder
-    val ExerciseSetsRepsBtnBg: Color get() = extension.ExerciseSetsRepsBtnBg
-    val ExerciseSetsRepsLabelColor: Color get() = extension.ExerciseSetsRepsLabelColor
-    val ExerciseSetsRepsValueColor: Color get() = extension.ExerciseSetsRepsValueColor
-    val ExerciseSetsRepsIconTint: Color get() = extension.ExerciseSetsRepsIconTint
-    val ExerciseReadMoreColor: Color get() = extension.ExerciseReadMoreColor
+    val ExerciseScreenTitle: Color get() = extension2.ExerciseScreenTitle
+    val ExerciseBackButtonTint: Color get() = extension2.ExerciseBackButtonTint
+    val ExerciseSearchPlaceholder: Color get() = extension2.ExerciseSearchPlaceholder
+    val ExerciseWorkoutHeaderTitle: Color get() = extension2.ExerciseWorkoutHeaderTitle
+    val ExerciseWorkoutImageBackground: Color get() = extension2.ExerciseWorkoutImageBackground
+    val ExerciseWorkoutTimerText: Color get() = extension2.ExerciseWorkoutTimerText
+    val ExerciseWorkoutSecondaryButton: Color get() = extension2.ExerciseWorkoutSecondaryButton
+    val ExerciseWorkoutPrimaryButtonBg: Color get() = extension2.ExerciseWorkoutPrimaryButtonBg
+    val ExerciseWorkoutPrimaryButtonText: Color get() = extension2.ExerciseWorkoutPrimaryButtonText
+    val ExerciseWorkoutTotalTimeLabel: Color get() = extension2.ExerciseWorkoutTotalTimeLabel
+    val ExerciseSetsRepsCardBg: Color get() = extension2.ExerciseSetsRepsCardBg
+    val ExerciseSetsRepsCardBorder: Color get() = extension2.ExerciseSetsRepsCardBorder
+    val ExerciseSetsRepsBtnBg: Color get() = extension2.ExerciseSetsRepsBtnBg
+    val ExerciseSetsRepsLabelColor: Color get() = extension2.ExerciseSetsRepsLabelColor
+    val ExerciseSetsRepsValueColor: Color get() = extension2.ExerciseSetsRepsValueColor
+    val ExerciseSetsRepsIconTint: Color get() = extension2.ExerciseSetsRepsIconTint
+    val ExerciseReadMoreColor: Color get() = extension2.ExerciseReadMoreColor
 
 
 
-    val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
-    val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
-    val ProductDetailScanDateBadgeBg: Color get() = extension.ProductDetailScanDateBadgeBg
-    val ProductDetailScanDateBadgeText: Color get() = extension.ProductDetailScanDateBadgeText
-    val ProductDetailSafetyText: Color get() = extension.ProductDetailSafetyText
-    val ProductDetailTitleText: Color get() = extension.ProductDetailTitleText
-    val ProductDetailSafetyReasonText: Color get() = extension.ProductDetailSafetyReasonText
-    val ProductDetailWhyNotSafeText: Color get() = extension.ProductDetailWhyNotSafeText
-    val ProductDetailIngredientCardBg: Color get() = extension.ProductDetailIngredientCardBg
-    val ProductDetailIngredientCardBorder: Color get() = extension.ProductDetailIngredientCardBorder
-    val ProductDetailIngredientName: Color get() = extension.ProductDetailIngredientName
-    val ProductDetailIngredientReasonText: Color get() = extension.ProductDetailIngredientReasonText
-    val ProductDetailFlaggedContainerBg: Color get() = extension.ProductDetailFlaggedContainerBg
-    val ProductDetailMatchTag: Color get() = extension.ProductDetailMatchTag
-    val ProductDetailMatchTagText: Color get() = extension.ProductDetailMatchTagText
-    val ProductDetailNutritionCardBg: Color get() = extension.ProductDetailNutritionCardBg
-    val ProductDetailNutritionLabelText: Color get() = extension.ProductDetailNutritionLabelText
-    val ProductDetailNutritionPill: Color get() = extension.ProductDetailNutritionPill
-    val ProductDetailNutritionText: Color get() = extension.ProductDetailNutritionText
-    val ProductDetailBookmarkTint: Color get() = extension.ProductDetailBookmarkTint
+    val ProductDetailImageCardBg: Color get() = extension2.ProductDetailImageCardBg
+    val ProductDetailScanDate: Color get() = extension2.ProductDetailScanDate
+    val ProductDetailScanDateBadgeBg: Color get() = extension2.ProductDetailScanDateBadgeBg
+    val ProductDetailScanDateBadgeText: Color get() = extension2.ProductDetailScanDateBadgeText
+    val ProductDetailSafetyText: Color get() = extension2.ProductDetailSafetyText
+    val ProductDetailTitleText: Color get() = extension2.ProductDetailTitleText
+    val ProductDetailSafetyReasonText: Color get() = extension2.ProductDetailSafetyReasonText
+    val ProductDetailWhyNotSafeText: Color get() = extension2.ProductDetailWhyNotSafeText
+    val ProductDetailIngredientCardBg: Color get() = extension2.ProductDetailIngredientCardBg
+    val ProductDetailIngredientCardBorder: Color get() = extension2.ProductDetailIngredientCardBorder
+    val ProductDetailIngredientName: Color get() = extension2.ProductDetailIngredientName
+    val ProductDetailIngredientReasonText: Color get() = extension2.ProductDetailIngredientReasonText
+    val ProductDetailFlaggedContainerBg: Color get() = extension2.ProductDetailFlaggedContainerBg
+    val ProductDetailMatchTag: Color get() = extension2.ProductDetailMatchTag
+    val ProductDetailMatchTagText: Color get() = extension2.ProductDetailMatchTagText
+    val ProductDetailNutritionCardBg: Color get() = extension2.ProductDetailNutritionCardBg
+    val ProductDetailNutritionLabelText: Color get() = extension2.ProductDetailNutritionLabelText
+    val ProductDetailNutritionPill: Color get() = extension2.ProductDetailNutritionPill
+    val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
+    val ProductDetailBookmarkTint: Color get() = extension2.ProductDetailBookmarkTint
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -676,6 +682,8 @@ fun lightColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
+    ),
+    extension2 = AppColorsExtension2(
 
         // Exercise Screens — light values match current hardcoded colors exactly
         ExerciseCardBackground = Color(0xFFE8FAFA), // Teal100 — exercise list card bg
@@ -982,6 +990,8 @@ fun darkColors() = AppColors(
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value
+    ),
+    extension2 = AppColorsExtension2(
 
         // Exercise Screens — dark values from Figma dark mode screenshots
         ExerciseCardBackground = Color(0xFF0B5F65), // Medium-dark teal card bg (#0B5F65)
