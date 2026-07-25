@@ -9,8 +9,11 @@ import java.util.UUID
 data class FamilyMemberDto(
     val id: String? = null,
     val name: String,
-    @SerialName("allergy_ids") val allergyIds: List<Int> = emptyList(),
-    @SerialName("disease_ids") val diseaseIds: List<Int> = emptyList(),
+    val relation: String? = null,
+    @SerialName("allergyIds") val allergyIds: List<Int> = emptyList(),
+    @SerialName("diseaseIds") val diseaseIds: List<Int> = emptyList(),
+    val allergies: List<AllergyDto> = emptyList(),
+    val diseases: List<DiseaseDto> = emptyList(),
 )
 
 fun FamilyMemberDto.toEntity(ownerUserId: String): FamilyMemberEntity {
@@ -18,7 +21,8 @@ fun FamilyMemberDto.toEntity(ownerUserId: String): FamilyMemberEntity {
         id = id ?: UUID.randomUUID().toString(),
         ownerUserId = ownerUserId,
         name = name,
-        allergyIds = allergyIds,
-        diseaseIds = diseaseIds,
+        relation = relation ?: "",
+        allergyIds = if (allergyIds.isNotEmpty()) allergyIds else allergies.map { it.id },
+        diseaseIds = if (diseaseIds.isNotEmpty()) diseaseIds else diseases.map { it.id },
     )
 }

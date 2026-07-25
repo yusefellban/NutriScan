@@ -16,6 +16,7 @@ data class FamilyMemberEntity(
     val id: String,
     val ownerUserId: String,
     val name: String,
+    val relation: String = "",
     val allergyIds: List<Int> = emptyList(),
     val diseaseIds: List<Int> = emptyList(),
 )

@@ -114,13 +114,42 @@ class AddFamilyMemberViewModelTest {
 
         val state = viewModel.state.value
         assertTrue(state.nameError != null)
-        coVerify(exactly = 0) { addFamilyMemberUseCase(any(), any(), any()) }
+        coVerify(exactly = 0) { addFamilyMemberUseCase(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `when RelationChanged event, state relation is updated and relationError is cleared`() = runTest(testDispatcher) {
+        viewModel.onEvent(AddFamilyMemberEvent.SaveClicked)
+        testScheduler.advanceUntilIdle()
+        assertTrue(viewModel.state.value.relationError != null)
+
+        viewModel.onEvent(AddFamilyMemberEvent.RelationChanged("Mother"))
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals("Mother", state.relation)
+        assertNull(state.relationError)
+    }
+
+    @Test
+    fun `when SaveClicked with blank relation, relationError is set and use case is not invoked`() = runTest(testDispatcher) {
+        viewModel.onEvent(AddFamilyMemberEvent.NameChanged("Ahmed"))
+        viewModel.onEvent(AddFamilyMemberEvent.RelationChanged("   "))
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onEvent(AddFamilyMemberEvent.SaveClicked)
+        testScheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.relationError != null)
+        coVerify(exactly = 0) { addFamilyMemberUseCase(any(), any(), any(), any()) }
     }
 
     @Test
     fun `when SaveClicked succeeds, Dismiss effect is emitted`() = runTest(testDispatcher) {
         viewModel.onEvent(AddFamilyMemberEvent.NameChanged("Ahmed"))
-        coEvery { addFamilyMemberUseCase("Ahmed", any(), any()) } returns Result.success(Unit)
+        viewModel.onEvent(AddFamilyMemberEvent.RelationChanged("Mother"))
+        coEvery { addFamilyMemberUseCase("Ahmed", "Mother", any(), any()) } returns Result.success(Unit)
 
         viewModel.effect.test {
             viewModel.onEvent(AddFamilyMemberEvent.SaveClicked)
@@ -132,7 +161,8 @@ class AddFamilyMemberViewModelTest {
     @Test
     fun `when SaveClicked fails, ShowError effect is emitted with the failure message`() = runTest(testDispatcher) {
         viewModel.onEvent(AddFamilyMemberEvent.NameChanged("Ahmed"))
-        coEvery { addFamilyMemberUseCase("Ahmed", any(), any()) } returns Result.failure(Exception("Sync failed"))
+        viewModel.onEvent(AddFamilyMemberEvent.RelationChanged("Mother"))
+        coEvery { addFamilyMemberUseCase("Ahmed", "Mother", any(), any()) } returns Result.failure(Exception("Sync failed"))
 
         viewModel.effect.test {
             viewModel.onEvent(AddFamilyMemberEvent.SaveClicked)

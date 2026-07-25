@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * ViewModel for the User Profile screen.

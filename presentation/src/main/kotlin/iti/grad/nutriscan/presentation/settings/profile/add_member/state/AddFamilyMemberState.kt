@@ -16,6 +16,8 @@ import kotlinx.collections.immutable.persistentListOf
 data class AddFamilyMemberState(
     val name: String = "",
     @StringRes val nameError: Int? = null,
+    val relation: String = "",
+    @StringRes val relationError: Int? = null,
     val diseases: ImmutableList<Disease> = persistentListOf(),
     val selectedDiseaseIds: ImmutableList<Int> = persistentListOf(),
     val isDiseasesLoading: Boolean = false,

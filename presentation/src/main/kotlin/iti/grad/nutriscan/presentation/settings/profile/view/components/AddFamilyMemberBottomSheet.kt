@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.profile.view.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -28,12 +29,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.ChipSelectionFlowRow
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEvent
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberState
+import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import iti.grad.presentation.R
 
 /**
@@ -48,11 +58,22 @@ import iti.grad.presentation.R
 @Composable
 fun AddFamilyMemberBottomSheet(
     state: AddFamilyMemberState,
+    effectFlow: Flow<AddFamilyMemberEffect>,
     onEvent: (AddFamilyMemberEvent) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val context = LocalContext.current
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        effectFlow.collectLatest { effect ->
+            when (effect) {
+                AddFamilyMemberEffect.Dismiss -> onDismiss()
+                is AddFamilyMemberEffect.ShowError -> errorMessage = effect.message
+            }
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -72,28 +93,29 @@ fun AddFamilyMemberBottomSheet(
                 style = AppTheme.typography.headlineMedium,
                 color = AppTheme.colors.Teal1000,
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(AppTheme.colors.ProfileAddMemberAvatarBackground)
+                    .align(Alignment.CenterHorizontally),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_person_solid),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+            Spacer(Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .background(AppTheme.colors.ProfileAddMemberAvatarBackground),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_person_solid),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-                Spacer(Modifier.width(16.dp))
-
                 Column(modifier = Modifier.weight(1f)) {
                     EditProfileInputField(
                         value = state.name,
@@ -104,6 +126,22 @@ fun AddFamilyMemberBottomSheet(
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = stringResource(state.nameError),
+                            style = AppTheme.typography.bodySmall,
+                            color = AppTheme.colors.Error,
+                        )
+                    }
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    EditProfileInputField(
+                        value = state.relation,
+                        onValueChange = { onEvent(AddFamilyMemberEvent.RelationChanged(it)) },
+                        hint = stringResource(R.string.add_family_member_relation_placeholder),
+                    )
+                    if (state.relationError != null) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(state.relationError),
                             style = AppTheme.typography.bodySmall,
                             color = AppTheme.colors.Error,
                         )
@@ -155,6 +193,14 @@ fun AddFamilyMemberBottomSheet(
             )
             Spacer(Modifier.height(12.dp))
         }
+        }
+
+        errorMessage?.let { message ->
+            ErrorAlert(
+                title = stringResource(R.string.add_family_member_generic_error),
+                message = message,
+                onDismiss = { errorMessage = null },
+            )
         }
     }
 }

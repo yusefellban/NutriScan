@@ -135,7 +135,10 @@
     <string name="add_family_member_title">Add Family Member</string>
     <string name="add_family_member_name_label">Full Name</string>
     <string name="add_family_member_name_placeholder">e.g. Ahmed Mostafa</string>
+    <string name="add_family_member_relation_label">Relation</string>
+    <string name="add_family_member_relation_placeholder">e.g. Mother, Son</string>
     <string name="error_name_required">Please enter a name</string>
+    <string name="error_relation_required">Please enter a relation</string>
     <string name="add_family_member_generic_error">Couldn\'t save this family member. Please try again.</string>
 
     <!-- App Settings -->

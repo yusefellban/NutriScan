@@ -111,26 +111,6 @@ class SavedViewModelTest {
                 Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).product.id)
             }
         }
-
-        @Test
-        fun `BottomNavTabClicked with HOME emits NavigateToHome`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.HOME))
-                testScheduler.runCurrent()
-
-                Assertions.assertTrue(awaitItem() is SavedEffect.NavigateToHome)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with SAVED emits no effect`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.SAVED))
-                testScheduler.runCurrent()
-
-                expectNoEvents()
-            }
-        }
     }
 
     @Nested

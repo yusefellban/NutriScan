@@ -121,8 +121,8 @@ class UserProfileViewModelTest {
     @Test
     fun `when familyMemberRepository emits members, state reflects them`() = runTest(testDispatcher) {
         val mockMembers = listOf(
-            FamilyMember("1", "Alice", listOf(1), listOf(2)),
-            FamilyMember("2", "Bob", emptyList(), emptyList())
+            FamilyMember("1", "Alice", relation = "", allergyIds = listOf(1), diseaseIds = listOf(2)),
+            FamilyMember("2", "Bob", relation = "", allergyIds = emptyList(), diseaseIds = emptyList())
         )
         familyMembersFlow.value = mockMembers
         testScheduler.advanceUntilIdle()

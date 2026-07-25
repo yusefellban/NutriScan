@@ -52,15 +52,15 @@ class UserRepositoryImpl @Inject constructor(
             
             val entity = UserEntity(
                 id = dto.id,
-                firstName = dto.firstName,
+                firstName = dto.firstName ?: "",
                 lastName = dto.lastName,
                 email = dto.email,
                 gender = dto.gender,
                 dateOfBirth = dto.dateOfBirth,
                 heightCm = dto.heightCm,
                 weightKg = dto.weightKg,
-                diseaseIds = dto.diseaseIds ?: emptyList(),
-                allergyIds = dto.allergyIds ?: emptyList(),
+                diseaseIds = if (!dto.diseaseIds.isNullOrEmpty()) dto.diseaseIds else dto.diseases.map { it.id },
+                allergyIds = if (!dto.allergyIds.isNullOrEmpty()) dto.allergyIds else dto.allergies.map { it.id },
                 // If backend returns null, preserve our local offline avatar
                 avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl
             )

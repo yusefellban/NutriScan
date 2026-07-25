@@ -228,7 +228,6 @@ class FamilyMemberRepositoryImplTest {
 
         val insertedUser = io.mockk.slot<UserEntity>()
         coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } returns Unit
-        coEvery { familyMemberDao.getFamilyMembersOnce("seeded-user-123") } returns emptyList()
         coEvery { remoteDataSource.updateProfile(any()) } returns successResponse()
         coEvery { remoteDataSource.getProfile() } returns userDto(emptyList())
 

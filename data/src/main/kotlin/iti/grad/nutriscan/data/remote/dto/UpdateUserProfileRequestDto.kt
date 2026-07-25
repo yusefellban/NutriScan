@@ -20,5 +20,5 @@ data class UpdateUserProfileRequestDto(
     val allergyIds: List<Int>? = null,
     val avatarUrl: String? = null,
     /** Full replace of the family members list — see family-members plan §2. */
-    @SerialName("family_members") val familyMembers: List<FamilyMemberDto>? = null
+    @SerialName("familyMembers") val familyMembers: List<FamilyMemberDto>? = null
 )

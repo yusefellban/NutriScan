@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.components.AppErrorDialog
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
@@ -84,24 +84,16 @@ fun UserProfileScreen(
         val addMemberViewModel: AddFamilyMemberViewModel = hiltViewModel()
         val addMemberState by addMemberViewModel.state.collectAsState()
 
-        LaunchedEffect(Unit) {
-            addMemberViewModel.effect.collectLatest { effect ->
-                when (effect) {
-                    AddFamilyMemberEffect.Dismiss -> viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed)
-                    is AddFamilyMemberEffect.ShowError -> errorMessage = effect.message
-                }
-            }
-        }
-
         AddFamilyMemberBottomSheet(
             state = addMemberState,
+            effectFlow = addMemberViewModel.effect,
             onEvent = addMemberViewModel::onEvent,
             onDismiss = { viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed) },
         )
     }
 
     errorMessage?.let { message ->
-        AppErrorDialog(
+        ErrorAlert(
             title = stringResource(R.string.add_family_member_generic_error),
             message = message,
             onDismiss = { errorMessage = null },

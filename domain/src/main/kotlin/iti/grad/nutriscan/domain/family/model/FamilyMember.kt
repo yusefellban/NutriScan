@@ -8,6 +8,7 @@ package iti.grad.nutriscan.domain.family.model
 data class FamilyMember(
     val id: String,
     val name: String,
+    val relation: String = "",
     val allergyIds: List<Int> = emptyList(),
     val diseaseIds: List<Int> = emptyList(),
 )

@@ -394,27 +394,6 @@ data class AppColors internal constructor(
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
 
-    val ProductDetailImageCardBg: Color get() = extension.ProductDetailImageCardBg
-    val ProductDetailScanDate: Color get() = extension.ProductDetailScanDate
-    val ProductDetailScanDateBadgeBg: Color get() = extension.ProductDetailScanDateBadgeBg
-    val ProductDetailScanDateBadgeText: Color get() = extension.ProductDetailScanDateBadgeText
-    val ProductDetailSafetyText: Color get() = extension.ProductDetailSafetyText
-    val ProductDetailTitleText: Color get() = extension.ProductDetailTitleText
-    val ProductDetailSafetyReasonText: Color get() = extension.ProductDetailSafetyReasonText
-    val ProductDetailWhyNotSafeText: Color get() = extension.ProductDetailWhyNotSafeText
-    val ProductDetailIngredientCardBg: Color get() = extension.ProductDetailIngredientCardBg
-    val ProductDetailIngredientCardBorder: Color get() = extension.ProductDetailIngredientCardBorder
-    val ProductDetailIngredientName: Color get() = extension.ProductDetailIngredientName
-    val ProductDetailIngredientReasonText: Color get() = extension.ProductDetailIngredientReasonText
-    val ProductDetailFlaggedContainerBg: Color get() = extension.ProductDetailFlaggedContainerBg
-    val ProductDetailMatchTag: Color get() = extension.ProductDetailMatchTag
-    val ProductDetailMatchTagText: Color get() = extension.ProductDetailMatchTagText
-    val ProductDetailNutritionCardBg: Color get() = extension.ProductDetailNutritionCardBg
-    val ProductDetailNutritionLabelText: Color get() = extension.ProductDetailNutritionLabelText
-    val ProductDetailNutritionPill: Color get() = extension.ProductDetailNutritionPill
-    val ProductDetailNutritionText: Color get() = extension.ProductDetailNutritionText
-    val ProductDetailBookmarkTint: Color get() = extension.ProductDetailBookmarkTint
-    val ScrimOverlay: Color get() = extension.ScrimOverlay
     val ExerciseCardBackground: Color get() = extension2.ExerciseCardBackground
     val ExerciseCardTitle: Color get() = extension2.ExerciseCardTitle
     val ExerciseCardSubtitle: Color get() = extension2.ExerciseCardSubtitle
@@ -470,6 +449,7 @@ data class AppColors internal constructor(
     val ProductDetailNutritionPill: Color get() = extension2.ProductDetailNutritionPill
     val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
     val ProductDetailBookmarkTint: Color get() = extension2.ProductDetailBookmarkTint
+    val ScrimOverlay: Color get() = extension2.ScrimOverlay
 }
 
 /** Light theme color palette. All teal values kept identical to original. */

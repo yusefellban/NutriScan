@@ -171,4 +171,5 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCurrentUserId(): String? = JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+    override suspend fun getAccessToken(): String? = tokenManager.getAccessToken()
 }

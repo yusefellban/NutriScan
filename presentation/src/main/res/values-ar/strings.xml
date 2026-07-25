@@ -127,7 +127,10 @@
     <string name="add_family_member_title">إضافة فرد من العائلة</string>
     <string name="add_family_member_name_label">الاسم الكامل</string>
     <string name="add_family_member_name_placeholder">مثال: أحمد مصطفى</string>
+    <string name="add_family_member_relation_label">الصلة</string>
+    <string name="add_family_member_relation_placeholder">مثال: أم، ابن، زوجة</string>
     <string name="error_name_required">يرجى إدخال الاسم</string>
+    <string name="error_relation_required">يرجى إدخال الصلة</string>
     <string name="add_family_member_generic_error">تعذر حفظ فرد العائلة. يرجى المحاولة مرة أخرى.</string>
 
     <!-- App Settings -->

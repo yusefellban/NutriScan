@@ -6,6 +6,7 @@ package iti.grad.nutriscan.presentation.settings.profile.add_member.state
  */
 sealed interface AddFamilyMemberEvent {
     data class NameChanged(val name: String) : AddFamilyMemberEvent
+    data class RelationChanged(val relation: String) : AddFamilyMemberEvent
     data class ToggleDisease(val id: Int) : AddFamilyMemberEvent
     data class ToggleAllergy(val id: Int) : AddFamilyMemberEvent
     data object RetryLoadDiseases : AddFamilyMemberEvent

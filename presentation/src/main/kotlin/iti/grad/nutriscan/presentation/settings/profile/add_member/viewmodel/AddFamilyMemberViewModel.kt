@@ -58,6 +58,9 @@ class AddFamilyMemberViewModel @Inject constructor(
             is AddFamilyMemberEvent.NameChanged ->
                 _state.update { it.copy(name = event.name, nameError = null) }
 
+            is AddFamilyMemberEvent.RelationChanged ->
+                _state.update { it.copy(relation = event.relation, relationError = null) }
+
             is AddFamilyMemberEvent.ToggleDisease -> _state.update {
                 it.copy(selectedDiseaseIds = it.selectedDiseaseIds.toggle(event.id).toImmutableList())
             }
@@ -75,61 +78,72 @@ class AddFamilyMemberViewModel @Inject constructor(
 
     private fun loadDiseases() {
         viewModelScope.launch {
+            getDiseasesUseCase().collectLatest { diseases ->
+                _state.update { it.copy(diseases = diseases.toImmutableList()) }
+            }
+        }
+
+        viewModelScope.launch {
             _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
 
             val syncResult = syncDiseasesUseCase()
-            if (syncResult.isFailure) {
-                _state.update {
-                    it.copy(
-                        isDiseasesLoading = false,
-                        diseasesErrorMessage = syncResult.exceptionOrNull()?.message
-                            ?: "Failed to load diseases"
-                    )
-                }
-            } else {
-                _state.update { it.copy(isDiseasesLoading = false) }
-            }
+            _state.update { state ->
+                val error = if (state.diseases.isEmpty()) {
+                    syncResult.exceptionOrNull()?.message ?: "Failed to load diseases"
+                } else null
 
-            getDiseasesUseCase().collectLatest { diseases ->
-                _state.update { it.copy(diseases = diseases.toImmutableList()) }
+                state.copy(
+                    isDiseasesLoading = false,
+                    diseasesErrorMessage = if (syncResult.isFailure) error else null
+                )
             }
         }
     }
 
     private fun loadAllergies() {
         viewModelScope.launch {
+            getAllergiesUseCase().collectLatest { allergies ->
+                _state.update { it.copy(allergies = allergies.toImmutableList()) }
+            }
+        }
+
+        viewModelScope.launch {
             _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
 
             val syncResult = syncAllergiesUseCase()
-            if (syncResult.isFailure) {
-                _state.update {
-                    it.copy(
-                        isAllergiesLoading = false,
-                        allergiesErrorMessage = syncResult.exceptionOrNull()?.message
-                            ?: "Failed to load allergies"
-                    )
-                }
-            } else {
-                _state.update { it.copy(isAllergiesLoading = false) }
-            }
+            _state.update { state ->
+                val error = if (state.allergies.isEmpty()) {
+                    syncResult.exceptionOrNull()?.message ?: "Failed to load allergies"
+                } else null
 
-            getAllergiesUseCase().collectLatest { allergies ->
-                _state.update { it.copy(allergies = allergies.toImmutableList()) }
+                state.copy(
+                    isAllergiesLoading = false,
+                    allergiesErrorMessage = if (syncResult.isFailure) error else null
+                )
             }
         }
     }
 
     private fun save() {
         val name = _state.value.name.trim()
+        val relation = _state.value.relation.trim()
+
+        var hasError = false
         if (name.isBlank()) {
             _state.update { it.copy(nameError = R.string.error_name_required) }
-            return
+            hasError = true
         }
+        if (relation.isBlank()) {
+            _state.update { it.copy(relationError = R.string.error_relation_required) }
+            hasError = true
+        }
+        if (hasError) return
 
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
             val result = addFamilyMemberUseCase(
                 name = name,
+                relation = relation,
                 allergyIds = _state.value.selectedAllergyIds,
                 diseaseIds = _state.value.selectedDiseaseIds,
             )

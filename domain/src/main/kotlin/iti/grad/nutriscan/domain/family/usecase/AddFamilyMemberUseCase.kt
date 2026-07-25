@@ -9,9 +9,10 @@ class AddFamilyMemberUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         name: String,
+        relation: String,
         allergyIds: List<Int>,
         diseaseIds: List<Int>,
     ): Result<Unit> = familyMemberRepository.addFamilyMember(
-        FamilyMemberInput(name = name, allergyIds = allergyIds, diseaseIds = diseaseIds)
+        FamilyMemberInput(name = name, relation = relation, allergyIds = allergyIds, diseaseIds = diseaseIds)
     )
 }

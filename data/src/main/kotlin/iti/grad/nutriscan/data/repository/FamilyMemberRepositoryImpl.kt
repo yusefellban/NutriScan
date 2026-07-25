@@ -87,6 +87,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
             id = tempId,
             ownerUserId = userId,
             name = input.name,
+            relation = input.relation,
             allergyIds = input.allergyIds,
             diseaseIds = input.diseaseIds,
         )
@@ -123,6 +124,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
                     FamilyMemberDto(
                         id = entity.id.takeUnless { it.startsWith("local_") },
                         name = entity.name,
+                        relation = entity.relation,
                         allergyIds = entity.allergyIds,
                         diseaseIds = entity.diseaseIds,
                     )
@@ -153,6 +155,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
     private fun FamilyMemberEntity.toDomain() = FamilyMember(
         id = id,
         name = name,
+        relation = relation,
         allergyIds = allergyIds,
         diseaseIds = diseaseIds,
     )

@@ -24,10 +24,9 @@ import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
         AllergyEntity::class,
         FamilyMemberEntity::class
     ],
-    // Bumped 3 -> 4 for FamilyMemberEntity. Relies on fallbackToDestructiveMigration()
-    // in DatabaseModule (same as prior entity additions) — this clears all local
-    // tables on upgrade, not just the new one. Flagged per family-members plan §3.7.
-    version = 4,
+    // Bumped 4 -> 5 for adding relation field to FamilyMemberEntity. Relies on fallbackToDestructiveMigration()
+    // in DatabaseModule — this clears all local tables on upgrade.
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class)
