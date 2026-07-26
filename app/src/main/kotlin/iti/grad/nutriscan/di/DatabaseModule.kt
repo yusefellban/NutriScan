@@ -57,7 +57,6 @@ object DatabaseModule {
             "nutriscan_db"
         )
             .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
-            .fallbackToDestructiveMigration()
             .build()
     }
 

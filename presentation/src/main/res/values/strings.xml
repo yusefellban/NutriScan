@@ -144,6 +144,7 @@
     <string name="user_profile_bmi_overweight">Overweight</string>
     <string name="user_profile_bmi_obese">Obese</string>
     <string name="user_profile_metrics_not_available">Not yet available</string>
+    <string name="bmi_tdee_not_available">Health metrics will appear after your first profile sync.</string>
 
     <!-- App Settings -->
     <string name="app_settings_title">App Settings</string>

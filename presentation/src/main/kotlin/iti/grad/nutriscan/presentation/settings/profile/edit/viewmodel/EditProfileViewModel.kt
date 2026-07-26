@@ -35,6 +35,7 @@ import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
+import timber.log.Timber
 
 /**
  * ViewModel for the Edit Profile screen.
@@ -222,7 +223,12 @@ class EditProfileViewModel @Inject constructor(
                 // re-computed BMI and TDEE (which depend on heightCm / weightKg).
                 // This is fire-and-forget: a sync failure is non-fatal here
                 // because the save itself already succeeded.
-                launch { userRepository.fetchAndSyncProfile() }
+                launch {
+                    userRepository.fetchAndSyncProfile()
+                        .onFailure { error ->
+                            Timber.w(error, "BMI/TDEE sync failed after profile save — stale metrics may be shown")
+                        }
+                }
 
                 _state.update {
                     it.copy(

@@ -113,6 +113,7 @@
     <string name="edit_profile_dob_hint">تاريخ الميلاد</string>
     <string name="edit_profile_height_label">الطول</string>
     <string name="edit_profile_weight_label">الوزن</string>
+    <string name="action_edit">تعديل</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_remove">إزالة</string>
 
@@ -141,6 +142,7 @@
     <string name="user_profile_bmi_overweight">زيادة الوزن</string>
     <string name="user_profile_bmi_obese">سمنة</string>
     <string name="user_profile_metrics_not_available">غير متاح بعد</string>
+    <string name="bmi_tdee_not_available">ستظهر المقاييس الصحية بعد أول مزامنة للملف الشخصي.</string>
 
     <!-- App Settings -->
     <string name="app_settings_title">إعدادات التطبيق</string>
