@@ -113,7 +113,6 @@ fun MainScreen(
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToSettings = onNavigateToSettings,
                         onNavigateToEditProfile = onNavigateToEditProfile,
-                        onNavigateToFamilyMemberDetail = onNavigateToFamilyMemberDetail,
                     )
                 }
             }

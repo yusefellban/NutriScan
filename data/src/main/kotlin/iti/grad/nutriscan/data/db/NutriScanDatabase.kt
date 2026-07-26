@@ -9,6 +9,7 @@ import iti.grad.nutriscan.data.db.entity.SavedScanEntity
 
 import androidx.room.TypeConverters
 import iti.grad.nutriscan.data.db.converter.IntListConverter
+import iti.grad.nutriscan.data.db.converter.FamilyMemberListConverter
 import iti.grad.nutriscan.data.db.converter.JsonTypeConverters
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.dao.DiseaseDao
@@ -30,10 +31,12 @@ import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
         ExerciseCategoryEntity::class,
         SavedScanEntity::class
     ],
-    version = 5,
+    // Bumped 5 -> 6 for embedding family members list inside UserEntity. Relies on fallbackToDestructiveMigration()
+    // in DatabaseModule — this clears all local tables on upgrade.
+    version = 6,
     exportSchema = false
 )
-@TypeConverters(IntListConverter::class, JsonTypeConverters::class)
+@TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)
 abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun foodLogDao(): FoodLogDao
     abstract fun userDao(): UserDao

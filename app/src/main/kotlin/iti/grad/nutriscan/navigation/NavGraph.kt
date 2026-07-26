@@ -199,9 +199,7 @@ fun AppNavGraph(
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
-                onNavigateToFamilyMemberDetail = { memberId ->
-                    navController.navigate(EditConditionsRoute(memberId))
-                },
+                onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
             )
@@ -315,17 +313,6 @@ fun AppNavGraph(
         composable<ManageFamilyRoute> {
             PlaceholderScreen(
                 title = "Manage Family",
-                buttonText = "Edit Conditions"
-            ) {
-                navController.navigate(EditConditionsRoute("family_member_456"))
-            }
-        }
-
-        // 21. Edit Conditions (Placeholder)
-        composable<EditConditionsRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<EditConditionsRoute>()
-            PlaceholderScreen(
-                title = "Edit Conditions\nMember ID: ${route.memberProfileId}",
                 buttonText = "Go Back"
             ) {
                 navController.navigateUp()

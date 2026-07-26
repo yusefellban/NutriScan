@@ -5,6 +5,7 @@ import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
+import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -58,9 +59,11 @@ class UserRepositoryImpl @Inject constructor(
                 diseaseIds = dto.diseases?.map { it.id } ?: localUser?.diseaseIds ?: emptyList(),
                 allergyIds = dto.allergies?.map { it.id } ?: localUser?.allergyIds ?: emptyList(),
                 // If backend returns null, preserve our local offline avatar
-                avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl
+                avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
+                familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }
             )
             userDao.insertOrUpdateUser(entity)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

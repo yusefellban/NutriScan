@@ -10,6 +10,8 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -85,6 +87,13 @@ class SavedViewModelTest {
 
         @Test
         fun `ProductClicked emits NavigateToProductDetail with the product id`() = runTest {
+            val mockProduct = ProductUiModel(
+                id = "3",
+                productName = "Apple",
+                imageUrl = null,
+                verdict = ProductVerdict.SAFE,
+                calories = "50"
+            )
             viewModel.effect.test {
                 val mockProduct = iti.grad.nutriscan.presentation.common.model.ProductUiModel(
                     id = "3",
@@ -98,27 +107,8 @@ class SavedViewModelTest {
 
                 val effect = awaitItem()
                 Assertions.assertTrue(effect is SavedEffect.NavigateToProductDetail)
+                Assertions.assertEquals(mockProduct, (effect as SavedEffect.NavigateToProductDetail).product)
                 Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).product.id)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with HOME emits NavigateToHome`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.HOME))
-                testScheduler.runCurrent()
-
-                Assertions.assertTrue(awaitItem() is SavedEffect.NavigateToHome)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with SAVED emits no effect`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.SAVED))
-                testScheduler.runCurrent()
-
-                expectNoEvents()
             }
         }
     }

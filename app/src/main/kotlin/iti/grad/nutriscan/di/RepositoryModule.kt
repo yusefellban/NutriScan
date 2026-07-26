@@ -27,6 +27,8 @@ import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 import iti.grad.nutriscan.domain.news.repository.INewsRepository
 import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
+import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.data.repository.FamilyMemberRepositoryImpl
 import iti.grad.nutriscan.domain.exercises.repository.IExercisesRepository
 import iti.grad.nutriscan.data.repository.ExercisesRepositoryImpl
 import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
@@ -103,6 +105,11 @@ abstract class RepositoryModule {
         impl: NewsRepositoryImpl
     ): INewsRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindFamilyMemberRepository(
+        impl: FamilyMemberRepositoryImpl
+    ): IFamilyMemberRepository
     @Binds
     @Singleton
     abstract fun bindExercisesRepository(
