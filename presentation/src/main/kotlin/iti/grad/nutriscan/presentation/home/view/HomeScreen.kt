@@ -83,6 +83,10 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(HomeEvent.RefreshHistorySilently)
+    }
+
     HomeScreenContent(
         state = state,
         bottomPadding = bottomPadding,

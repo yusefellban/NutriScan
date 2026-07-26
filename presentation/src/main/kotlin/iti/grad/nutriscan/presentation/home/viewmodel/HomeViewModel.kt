@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.UiText
@@ -13,6 +14,7 @@ import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.state.VerdictType
 import iti.grad.presentation.R
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
@@ -75,6 +77,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.HealthNewsClicked -> emitEffect(HomeEffect.NavigateToNews)
             is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
             is HomeEvent.RetryLoadHistory -> loadRecentScans()
+            is HomeEvent.RefreshHistorySilently -> refreshHistorySilently()
         }
     }
 
@@ -87,34 +90,7 @@ class HomeViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             isHistoryLoading = false,
-                            recentHistory = scans.map { entry ->
-                                val verdictType = when (entry.verdict) {
-                                    ProductVerdict.SAFE -> VerdictType.GREEN
-                                    ProductVerdict.CAUTION -> VerdictType.YELLOW
-                                    ProductVerdict.UNSAFE -> VerdictType.RED
-                                    null -> VerdictType.CYAN
-                                }
-                                val verdictLabelResId = when (entry.verdict) {
-                                    ProductVerdict.SAFE -> R.string.verdict_safe
-                                    ProductVerdict.CAUTION -> R.string.verdict_caution
-                                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                                    null -> R.string.verdict_safe
-                                }
-                                
-                                val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")
-                                val productName = entry.productName?.takeIf { it.isNotBlank() && it.lowercase() != "unknown" }
-                                    ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } 
-                                    ?: "Unknown Product"
-
-                                HomeHistoryItem(
-                                    id = entry.scanId,
-                                    productName = productName,
-                                    scanDate = scanDate,
-                                    verdictLabelResId = verdictLabelResId,
-                                    verdictType = verdictType,
-                                    imageUrl = entry.imageUrl
-                                )
-                            }.toImmutableList()
+                            recentHistory = mapScansToUi(scans)
                         )
                     }
                 }
@@ -127,6 +103,50 @@ class HomeViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    private fun refreshHistorySilently() {
+        viewModelScope.launch {
+            getRecentScansUseCase(page = 0, size = 3)
+                .onSuccess { scans ->
+                    _state.update { state ->
+                        state.copy(
+                            recentHistory = mapScansToUi(scans)
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun mapScansToUi(scans: List<ScanHistoryEntry>): ImmutableList<HomeHistoryItem> {
+        return scans.map { entry ->
+            val verdictType = when (entry.verdict) {
+                ProductVerdict.SAFE -> VerdictType.GREEN
+                ProductVerdict.CAUTION -> VerdictType.YELLOW
+                ProductVerdict.UNSAFE -> VerdictType.RED
+                null -> VerdictType.CYAN
+            }
+            val verdictLabelResId = when (entry.verdict) {
+                ProductVerdict.SAFE -> R.string.verdict_safe
+                ProductVerdict.CAUTION -> R.string.verdict_caution
+                ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                null -> R.string.verdict_safe
+            }
+            
+            val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")
+            val productName = entry.productName?.takeIf { it.isNotBlank() && it.lowercase() != "unknown" }
+                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } 
+                ?: "Unknown Product"
+
+            HomeHistoryItem(
+                id = entry.scanId,
+                productName = productName,
+                scanDate = scanDate,
+                verdictLabelResId = verdictLabelResId,
+                verdictType = verdictType,
+                imageUrl = entry.imageUrl
+            )
+        }.toImmutableList()
     }
 
     private fun formatRelativeDate(isoString: String): UiText {

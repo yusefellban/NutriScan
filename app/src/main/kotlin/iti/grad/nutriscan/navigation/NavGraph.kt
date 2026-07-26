@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
-import kotlin.reflect.typeOf
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
@@ -185,14 +184,11 @@ fun AppNavGraph(
             val route = backStackEntry.toRoute<MainRoute>()
             MainScreen(
                 initialTab = route.initialTab,
-                onNavigateToScanResult = { scanId ->
-                    navController.navigate(ScanResultRoute(scanId))
-                },
                 onNavigateToScanProcessing = { barcode ->
                     navController.navigate(ScanProcessingRoute(barcode = barcode))
                 },
-                onNavigateToProductDetail = { product ->
-                    navController.navigate(ProductDetailsRoute(product = product))
+                onNavigateToProductDetail = { scanId ->
+                    navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
                 onNavigateToNews = { navController.navigate(NewsRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
@@ -212,20 +208,8 @@ fun AppNavGraph(
                 title = "Scan Processing\nCode: ${route.barcode}",
                 buttonText = "View Results"
             ) {
-                navController.navigate(ScanResultRoute(route.imageUri ?: "")) {
-                    popUpTo(ScanProcessingRoute(barcode = route.barcode, imageUri = route.imageUri)) { inclusive = true }
-                }
-            }
-        }
-
-        // 10. Scan Result (Placeholder)
-        composable<ScanResultRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ScanResultRoute>()
-            PlaceholderScreen(
-                title = "Scan Result\nImage URI: ${route.imageUri}",
-                buttonText = "Chat with NutriGPT"
-            ) {
-                navController.navigate(NutriGptRoute)
+                // Navigate to Product Details directly if processing completes, currently this is just placeholder.
+                navController.navigateUp()
             }
         }
 
@@ -391,9 +375,7 @@ fun AppNavGraph(
             )
         }
         // 29. Product Details
-        composable<ProductDetailsRoute>(
-            typeMap = mapOf(typeOf<ProductUiModel>() to ProductUiModelNavType)
-        ) {
+        composable<ProductDetailsRoute> {
             ProductDetailsScreen(
                 onNavigateBack = { navController.navigateUp() }
             )

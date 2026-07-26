@@ -17,12 +17,16 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 import androidx.core.graphics.scale
+import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
     private val scanApiService: ScanApiService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IScanRepository {
+
+    private var localRecentScans: MutableList<ScanHistoryEntry>? = null
 
     override suspend fun getProductByBarcode(barcode: String): Result<ProductResult> {
         return withContext(ioDispatcher) {
@@ -96,7 +100,9 @@ class ScanRepositoryImpl @Inject constructor(
                     compressedFile.delete()
                 }
                 
-                Result.success(response.toDomain())
+                val domainResult = response.toDomain()
+                
+                Result.success(domainResult)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -107,7 +113,25 @@ class ScanRepositoryImpl @Inject constructor(
         return withContext(ioDispatcher) {
             try {
                 val response = scanApiService.getScanResult(scanId)
-                Result.success(response.toDomain())
+                val domainResult = response.toDomain()
+                
+                if (domainResult.status == ScanStatus.COMPLETED) {
+                    localRecentScans?.let { cache ->
+                        val newEntry = ScanHistoryEntry(
+                            scanId = domainResult.scanId,
+                            productName = domainResult.productName,
+                            imageUrl = domainResult.imageUrl,
+                            verdict = domainResult.foodSafetyResponse?.verdict,
+                            scannedAt = domainResult.scannedAt,
+                            calories = domainResult.nutritionFacts?.calories,
+                            status = domainResult.status
+                        )
+                        cache.removeAll { it.scanId == newEntry.scanId }
+                        cache.add(0, newEntry)
+                    }
+                }
+                
+                Result.success(domainResult)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Result.failure(e)
@@ -115,13 +139,24 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecentScans(page: Int, size: Int): Result<List<iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry>> {
+    override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
+            if (page == 0 && localRecentScans != null) {
+                return@withContext Result.success(localRecentScans!!.take(size))
+            }
             try {
                 val response = scanApiService.getRecentScans(page, size)
-                Result.success(response.content.map { it.toDomain() })
+                val domainScans = response.content.map { it.toDomain() }
+                if (page == 0) {
+                    localRecentScans = domainScans.toMutableList()
+                }
+                Result.success(domainScans)
             } catch (e: Exception) {
-                Result.failure(e)
+                if (page == 0 && localRecentScans != null) {
+                    Result.success(localRecentScans!!.take(size))
+                } else {
+                    Result.failure(e)
+                }
             }
         }
     }
