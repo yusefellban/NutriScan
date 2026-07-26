@@ -31,6 +31,7 @@ object DatabaseModule {
                     PRIMARY KEY(`id`)
                 )
             """)
+            db.execSQL("""
                 CREATE TABLE IF NOT EXISTS `exercises` (
                     `id` TEXT NOT NULL, 
                     `name` TEXT NOT NULL, 

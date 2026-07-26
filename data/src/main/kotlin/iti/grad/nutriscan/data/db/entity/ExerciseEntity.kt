@@ -2,8 +2,11 @@ package iti.grad.nutriscan.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import iti.grad.nutriscan.data.db.converter.JsonTypeConverters
 
 @Entity(tableName = "exercises")
+@TypeConverters(JsonTypeConverters::class)
 data class ExerciseEntity(
     @PrimaryKey val id: String,
     val name: String,

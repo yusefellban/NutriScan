@@ -110,7 +110,8 @@ abstract class RepositoryModule {
     abstract fun bindFamilyMemberRepository(
         impl: FamilyMemberRepositoryImpl
     ): IFamilyMemberRepository
-  
+    @Binds
+    @Singleton
     abstract fun bindExercisesRepository(
         impl: ExercisesRepositoryImpl
     ): IExercisesRepository

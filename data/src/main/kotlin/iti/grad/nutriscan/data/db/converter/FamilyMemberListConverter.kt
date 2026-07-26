@@ -7,12 +7,14 @@ import kotlinx.serialization.json.Json
 
 class FamilyMemberListConverter {
     @TypeConverter
-    fun fromFamilyMemberList(value: List<FamilyMemberEntity>?): String? {
-        return value?.let { Json.encodeToString(it) }
+    fun fromFamilyMemberList(value: List<FamilyMemberEntity>?): String {
+        return Json.encodeToString(value ?: emptyList())
     }
 
     @TypeConverter
-    fun toFamilyMemberList(value: String?): List<FamilyMemberEntity>? {
-        return value?.let { Json.decodeFromString(it) }
+    fun toFamilyMemberList(value: String?): List<FamilyMemberEntity> {
+        return value?.let {
+            try { Json.decodeFromString<List<FamilyMemberEntity>>(it) } catch (_: Exception) { emptyList() }
+        } ?: emptyList()
     }
 }

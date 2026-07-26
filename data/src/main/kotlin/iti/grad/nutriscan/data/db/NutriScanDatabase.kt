@@ -36,7 +36,7 @@ import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
     version = 6,
     exportSchema = false
 )
-@TypeConverters(IntListConverter::class, FamilyMemberListConverter::class)
+@TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)
 abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun foodLogDao(): FoodLogDao
     abstract fun userDao(): UserDao
