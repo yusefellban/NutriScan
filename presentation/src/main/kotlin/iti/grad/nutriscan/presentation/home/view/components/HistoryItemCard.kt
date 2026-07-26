@@ -96,7 +96,7 @@ fun HistoryItemCard(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = item.scanDate,
+                text = item.scanDate.asString(),
                 style = HomeTypography.historyItemDate,
                 color = AppTheme.colors.HistoryItemDateColor,
             )

@@ -3,6 +3,8 @@ package iti.grad.nutriscan.presentation.home.state
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
+import iti.grad.nutriscan.presentation.common.model.UiText
+
 /**
  * Represents a single item in the Recent History section of the Home screen.
  *
@@ -12,7 +14,7 @@ import androidx.annotation.StringRes
 data class HomeHistoryItem(
     val id: String,
     val productName: String,
-    val scanDate: String,
+    val scanDate: UiText,
     @StringRes val verdictLabelResId: Int,
     val verdictType: VerdictType,
     val imageUrl: String? = null,

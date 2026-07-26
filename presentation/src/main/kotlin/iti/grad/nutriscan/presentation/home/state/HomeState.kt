@@ -14,5 +14,7 @@ data class HomeState(
     val firstName: String = "",
     val avatarUrl: String? = null,
     val isLoading: Boolean = false,
+    val isHistoryLoading: Boolean = false,
+    val historyError: String? = null,
     val recentHistory: ImmutableList<HomeHistoryItem> = persistentListOf(),
 )

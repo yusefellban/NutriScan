@@ -14,7 +14,17 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
 
-    private val sharedPreferences = EncryptedSharedPreferences.create(
+    private val sharedPreferences = try {
+        createEncryptedPrefs(context)
+    } catch (e: Exception) {
+        // If Keystore key is invalidated (e.g. app reinstall without clearing backup), 
+        // EncryptedSharedPreferences throws AEADBadTagException/SecurityException.
+        // Recovery: delete the corrupted preferences file and try again.
+        context.deleteSharedPreferences("nutriscan_secure_prefs")
+        createEncryptedPrefs(context)
+    }
+
+    private fun createEncryptedPrefs(context: Context) = EncryptedSharedPreferences.create(
         context,
         "nutriscan_secure_prefs",
         masterKey,

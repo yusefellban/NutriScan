@@ -3,6 +3,10 @@ package iti.grad.nutriscan.presentation.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
@@ -10,27 +14,25 @@ import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.state.VerdictType
 import iti.grad.presentation.R
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-
-/**
- * ViewModel for the Home screen.
- *
- * Currently uses dummy data matching the Figma screenshots.
- * In a future sprint this will inject use cases to load real data from the API.
- */
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import kotlinx.coroutines.flow.collectLatest
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val getRecentScansUseCase: GetRecentScansUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -40,6 +42,8 @@ class HomeViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
+        loadRecentScans()
+        
         viewModelScope.launch {
             // Trigger fetch from remote on load
             userRepository.fetchAndSyncProfile()
@@ -70,6 +74,76 @@ class HomeViewModel @Inject constructor(
             )
             is HomeEvent.HealthNewsClicked -> emitEffect(HomeEffect.NavigateToNews)
             is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
+            is HomeEvent.RetryLoadHistory -> loadRecentScans()
+        }
+    }
+
+    private fun loadRecentScans() {
+        viewModelScope.launch {
+            _state.update { it.copy(isHistoryLoading = true, historyError = null) }
+            
+            getRecentScansUseCase(page = 0, size = 3)
+                .onSuccess { scans ->
+                    _state.update { state ->
+                        state.copy(
+                            isHistoryLoading = false,
+                            recentHistory = scans.map { entry ->
+                                val verdictType = when (entry.verdict) {
+                                    ProductVerdict.SAFE -> VerdictType.GREEN
+                                    ProductVerdict.CAUTION -> VerdictType.YELLOW
+                                    ProductVerdict.UNSAFE -> VerdictType.RED
+                                    null -> VerdictType.CYAN
+                                }
+                                val verdictLabelResId = when (entry.verdict) {
+                                    ProductVerdict.SAFE -> R.string.verdict_safe
+                                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                                    null -> R.string.verdict_safe
+                                }
+                                
+                                val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")
+                                val productName = entry.productName?.takeIf { it.isNotBlank() && it.lowercase() != "unknown" }
+                                    ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } 
+                                    ?: "Unknown Product"
+
+                                HomeHistoryItem(
+                                    id = entry.scanId,
+                                    productName = productName,
+                                    scanDate = scanDate,
+                                    verdictLabelResId = verdictLabelResId,
+                                    verdictType = verdictType,
+                                    imageUrl = entry.imageUrl
+                                )
+                            }.toImmutableList()
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update { 
+                        it.copy(
+                            isHistoryLoading = false, 
+                            historyError = error.message ?: "Failed to load recent scans"
+                        ) 
+                    }
+                }
+        }
+    }
+
+    private fun formatRelativeDate(isoString: String): UiText {
+        return try {
+            val zonedDateTime = ZonedDateTime.parse(isoString)
+            val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+            val today = LocalDate.now()
+            val datePart = localDateTime.toLocalDate()
+            val timeString = localDateTime.format(DateTimeFormatter.ofPattern("h:mm a"))
+            
+            when (datePart) {
+                today -> UiText.StringResource(R.string.date_today, timeString)
+                today.minusDays(1) -> UiText.StringResource(R.string.date_yesterday, timeString)
+                else -> UiText.DynamicString(localDateTime.format(DateTimeFormatter.ofPattern("MMM d, yyyy, h:mm a")))
+            }
+        } catch (e: Exception) {
+            UiText.DynamicString(isoString)
         }
     }
 
@@ -77,32 +151,5 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private fun createInitialState(): HomeState = HomeState(
-        recentHistory = persistentListOf(
-            HomeHistoryItem(
-                id = "scan_001",
-                productName = "Orange Juice",
-                scanDate = "Today, 9:24 AM",
-                verdictLabelResId = R.string.verdict_healthy,
-                verdictType = VerdictType.CYAN,
-                imageUrl = "https://picsum.photos/seed/juice/200/200"
-            ),
-            HomeHistoryItem(
-                id = "scan_002",
-                productName = "Greek Yogurt",
-                scanDate = "Yesterday, 4:15 PM",
-                verdictLabelResId = R.string.verdict_probiotic,
-                verdictType = VerdictType.CYAN,
-                imageUrl = "https://picsum.photos/seed/yogurt/200/200"
-            ),
-            HomeHistoryItem(
-                id = "scan_003",
-                productName = "Granola Bar",
-                scanDate = "Yesterday, 11:30 AM",
-                verdictLabelResId = R.string.verdict_high_sugar,
-                verdictType = VerdictType.RED,
-                imageUrl = "https://picsum.photos/seed/granola/200/200"
-            ),
-        ),
-    )
+    private fun createInitialState(): HomeState = HomeState()
 }

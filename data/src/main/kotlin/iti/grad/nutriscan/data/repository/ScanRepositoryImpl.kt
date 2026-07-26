@@ -114,4 +114,15 @@ class ScanRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getRecentScans(page: Int, size: Int): Result<List<iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry>> {
+        return withContext(ioDispatcher) {
+            try {
+                val response = scanApiService.getRecentScans(page, size)
+                Result.success(response.content.map { it.toDomain() })
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 }

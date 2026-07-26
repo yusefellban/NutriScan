@@ -11,4 +11,5 @@ sealed interface HomeEvent {
     data class HistoryItemClicked(val itemId: String) : HomeEvent
     data object HealthNewsClicked : HomeEvent
     data object ChatWithAiClicked : HomeEvent
+    data object RetryLoadHistory : HomeEvent
 }

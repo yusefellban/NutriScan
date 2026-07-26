@@ -6,9 +6,11 @@ import iti.grad.nutriscan.data.remote.dto.NutritionFactsDto
 import iti.grad.nutriscan.data.remote.dto.ScanResultResponseDto
 import iti.grad.nutriscan.data.remote.dto.ScanSubmissionResponseDto
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
 import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
 import iti.grad.nutriscan.domain.scan.model.NutritionFacts
 import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
+import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 
@@ -38,7 +40,19 @@ fun ScanResultResponseDto.toDomain(): ScanResult {
     )
 }
 
-private fun mapStatus(status: String): ScanStatus {
+fun ScanHistoryItemDto.toDomain(): ScanHistoryEntry {
+    return ScanHistoryEntry(
+        scanId = scanId,
+        imageUrl = imageUrl,
+        verdict = verdict,
+        scannedAt = scannedAt,
+        productName = productName,
+        calories = calories,
+        status = mapStatus(status),
+    )
+}
+
+internal fun mapStatus(status: String): ScanStatus {
     return when (status.uppercase()) {
         "COMPLETED" -> ScanStatus.COMPLETED
         "FAILED" -> ScanStatus.FAILED
@@ -54,7 +68,7 @@ private fun FoodSafetyResponseDto.toDomain(): FoodSafetyResponse {
     )
 }
 
-private fun mapVerdict(verdict: String): ProductVerdict {
+internal fun mapVerdict(verdict: String): ProductVerdict {
     return when (verdict.uppercase()) {
         "SAFE" -> ProductVerdict.SAFE
         "CAUTION" -> ProductVerdict.CAUTION
