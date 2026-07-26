@@ -17,6 +17,7 @@ import iti.grad.nutriscan.data.db.entity.DiseaseEntity
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
 import iti.grad.nutriscan.data.db.entity.ExerciseEntity
 import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
+import iti.grad.nutriscan.data.db.MIGRATION_4_5
 
 @Database(
     entities = [
@@ -27,7 +28,7 @@ import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
         ExerciseEntity::class,
         ExerciseCategoryEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, JsonTypeConverters::class)

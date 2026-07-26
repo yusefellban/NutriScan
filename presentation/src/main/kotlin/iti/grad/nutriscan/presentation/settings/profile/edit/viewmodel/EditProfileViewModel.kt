@@ -33,6 +33,7 @@ import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 
 /**
@@ -48,6 +49,8 @@ class EditProfileViewModel @Inject constructor(
     private val getAllergiesUseCase: GetAllergiesUseCase,
     private val syncDiseasesUseCase: SyncDiseasesUseCase,
     private val syncAllergiesUseCase: SyncAllergiesUseCase,
+    /** Used to re-fetch server-computed BMI and TDEE after a successful profile update. */
+    private val userRepository: IUserRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -215,14 +218,20 @@ class EditProfileViewModel @Inject constructor(
                 allergyIds = currentState.selectedAllergyIds,
                 avatarUrl = finalAvatarUrl
             ).onSuccess {
-                _state.update { 
+                // Re-fetch the profile so the backend can return the newly
+                // re-computed BMI and TDEE (which depend on heightCm / weightKg).
+                // This is fire-and-forget: a sync failure is non-fatal here
+                // because the save itself already succeeded.
+                launch { userRepository.fetchAndSyncProfile() }
+
+                _state.update {
                     it.copy(
-                        isSaving = false, 
+                        isSaving = false,
                         isEditMode = false,
                         alertState = Success(
-                            messageResId = R.string.alert_success_title // You can provide a specific string for profile updated
+                            messageResId = R.string.alert_success_title
                         )
-                    ) 
+                    )
                 }
             }.onFailure { error ->
                 val newAlertState = when {

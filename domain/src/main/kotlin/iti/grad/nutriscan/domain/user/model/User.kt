@@ -11,5 +11,9 @@ data class User(
     val weightKg: Double?,
     val diseaseIds: List<Int>,
     val allergyIds: List<Int>,
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+    /** Server-computed Body Mass Index. Read-only — never sent to the backend. */
+    val bmi: Double? = null,
+    /** Server-computed Total Daily Energy Expenditure in kcal/day. Read-only — never sent to the backend. */
+    val tdee: Double? = null,
 )
