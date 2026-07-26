@@ -36,7 +36,9 @@ class UserRepositoryImpl @Inject constructor(
                     weightKg = it.weightKg,
                     diseaseIds = it.diseaseIds,
                     allergyIds = it.allergyIds,
-                    avatarUrl = it.avatarUrl
+                    avatarUrl = it.avatarUrl,
+                    bmi = it.bmi,
+                    tdee = it.tdee,
                 )
             }
         }
@@ -60,6 +62,10 @@ class UserRepositoryImpl @Inject constructor(
                 allergyIds = dto.allergies?.map { it.id } ?: localUser?.allergyIds ?: emptyList(),
                 // If backend returns null, preserve our local offline avatar
                 avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
+                // Server-computed: always take the latest value from the backend;
+                // preserve local if the backend omits them (null-coalescing).
+                bmi = dto.bmi ?: localUser?.bmi,
+                tdee = dto.tdee ?: localUser?.tdee,
                 familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }
             )
             userDao.insertOrUpdateUser(entity)
@@ -83,7 +89,10 @@ class UserRepositoryImpl @Inject constructor(
                 weightKg = profileUpdate.weightKg ?: currentUser.weightKg,
                 diseaseIds = profileUpdate.diseaseIds ?: currentUser.diseaseIds,
                 allergyIds = profileUpdate.allergyIds ?: currentUser.allergyIds,
-                avatarUrl = profileUpdate.avatarUrl ?: currentUser.avatarUrl
+                avatarUrl = profileUpdate.avatarUrl ?: currentUser.avatarUrl,
+                // bmi and tdee are server-computed — never overwrite with null on optimistic update.
+                bmi = currentUser.bmi,
+                tdee = currentUser.tdee,
             ) ?: UserEntity(
                 id = "local_temp_id",
                 firstName = profileUpdate.firstName ?: "",
@@ -95,7 +104,10 @@ class UserRepositoryImpl @Inject constructor(
                 weightKg = profileUpdate.weightKg,
                 diseaseIds = profileUpdate.diseaseIds ?: emptyList(),
                 allergyIds = profileUpdate.allergyIds ?: emptyList(),
-                avatarUrl = profileUpdate.avatarUrl
+                avatarUrl = profileUpdate.avatarUrl,
+                // No bmi/tdee yet — will be populated on next fetchAndSyncProfile()
+                bmi = null,
+                tdee = null,
             )
             userDao.insertOrUpdateUser(updatedUser)
 

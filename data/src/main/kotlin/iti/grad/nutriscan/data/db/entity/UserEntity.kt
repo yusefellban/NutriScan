@@ -17,5 +17,9 @@ data class UserEntity(
     val diseaseIds: List<Int> = emptyList(),
     val allergyIds: List<Int> = emptyList(),
     val avatarUrl: String? = null,
+    /** Server-computed BMI — stored locally, never written by the client. */
+    val bmi: Double? = null,
+    /** Server-computed TDEE (kcal/day) — stored locally, never written by the client. */
+    val tdee: Double? = null,
     val familyMembers: List<FamilyMemberEntity> = emptyList()
 )

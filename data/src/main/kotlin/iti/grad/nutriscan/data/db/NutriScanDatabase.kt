@@ -20,6 +20,7 @@ import iti.grad.nutriscan.data.db.entity.DiseaseEntity
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
 import iti.grad.nutriscan.data.db.entity.ExerciseEntity
 import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
+import iti.grad.nutriscan.data.db.MIGRATION_4_5
 
 @Database(
     entities = [

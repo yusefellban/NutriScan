@@ -52,7 +52,9 @@ class UserProfileViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
-                            avatarUrl = user.avatarUrl
+                            avatarUrl = user.avatarUrl,
+                            bmi = user.bmi,
+                            tdee = user.tdee,
                         )
                     }
                 }

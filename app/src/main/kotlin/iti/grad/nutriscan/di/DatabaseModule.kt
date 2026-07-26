@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import iti.grad.nutriscan.data.db.MIGRATION_4_5
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.ExercisesDao
@@ -66,7 +67,7 @@ object DatabaseModule {
             NutriScanDatabase::class.java,
             "nutriscan_db"
         )
-            .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
             .fallbackToDestructiveMigration()
             .build()
     }

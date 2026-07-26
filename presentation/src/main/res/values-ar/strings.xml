@@ -108,6 +108,12 @@
     <string name="edit_profile_password_hint">كلمة المرور</string>
     <string name="edit_profile_confirm_title">حفظ تغييرات الملف الشخصي؟</string>
     <string name="edit_profile_confirm_message">هل أنت متأكد من رغبتك في تعديل ملفك الصحي؟ سيؤدي ذلك إلى تحديث قرارات فحص سلامة الغذاء المستقبلية.</string>
+    <string name="edit_profile_first_name_hint">الاسم الأول</string>
+    <string name="edit_profile_last_name_hint">اسم العائلة</string>
+    <string name="edit_profile_dob_hint">تاريخ الميلاد</string>
+    <string name="edit_profile_height_label">الطول</string>
+    <string name="edit_profile_weight_label">الوزن</string>
+    <string name="action_edit">تعديل</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_remove">إزالة</string>
 
@@ -133,6 +139,19 @@
     <string name="error_name_required">يرجى إدخال الاسم</string>
     <string name="error_relation_required">يرجى إدخال الصلة</string>
     <string name="add_family_member_generic_error">تعذر حفظ فرد العائلة. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Health Metrics (BMI / TDEE) — قراءة فقط، محسوبة من الخادم -->
+    <string name="user_profile_health_metrics_title">المقاييس الصحية</string>
+    <string name="user_profile_health_metrics_subtitle">محسوبة من الخادم · للقراءة فقط</string>
+    <string name="user_profile_bmi_label">مؤشر كتلة الجسم</string>
+    <string name="user_profile_tdee_label">إجمالي الحرق اليومي</string>
+    <string name="user_profile_tdee_unit">سعرة/يوم</string>
+    <string name="user_profile_bmi_underweight">نقص الوزن</string>
+    <string name="user_profile_bmi_normal">طبيعي</string>
+    <string name="user_profile_bmi_overweight">زيادة الوزن</string>
+    <string name="user_profile_bmi_obese">سمنة</string>
+    <string name="user_profile_metrics_not_available">غير متاح بعد</string>
+    <string name="bmi_tdee_not_available">ستظهر المقاييس الصحية بعد أول مزامنة للملف الشخصي.</string>
 
     <!-- App Settings -->
     <string name="app_settings_title">إعدادات التطبيق</string>
