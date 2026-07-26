@@ -48,16 +48,16 @@ class UserRepositoryImpl @Inject constructor(
             val localUser = userDao.getUserFlow().firstOrNull()
             
             val entity = UserEntity(
-                id = dto.id,
-                firstName = dto.firstName ?: "",
-                lastName = dto.lastName,
-                email = dto.email,
+                id = dto.id.takeIf { it.isNotBlank() } ?: localUser?.id ?: "unknown",
+                firstName = dto.firstName ?: dto.name ?: localUser?.firstName ?: "",
+                lastName = dto.lastName ?: localUser?.lastName,
+                email = dto.email.takeIf { it.isNotBlank() } ?: localUser?.email ?: "",
                 gender = dto.gender,
                 dateOfBirth = dto.dateOfBirth,
                 heightCm = dto.heightCm,
                 weightKg = dto.weightKg,
-                diseaseIds = if (!dto.diseaseIds.isNullOrEmpty()) dto.diseaseIds else dto.diseases.map { it.id },
-                allergyIds = if (!dto.allergyIds.isNullOrEmpty()) dto.allergyIds else dto.allergies.map { it.id },
+                diseaseIds = dto.diseases?.map { it.id } ?: localUser?.diseaseIds ?: emptyList(),
+                allergyIds = dto.allergies?.map { it.id } ?: localUser?.allergyIds ?: emptyList(),
                 // If backend returns null, preserve our local offline avatar
                 avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
                 familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }

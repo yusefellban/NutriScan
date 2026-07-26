@@ -29,12 +29,17 @@ import iti.grad.nutriscan.presentation.common.Validation
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginWithEmailUseCase: LoginWithEmailUseCase,
     private val getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase,
     private val saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase,
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val syncDiseasesUseCase: SyncDiseasesUseCase,
+    private val syncAllergiesUseCase: SyncAllergiesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -91,13 +96,15 @@ class LoginViewModel @Inject constructor(
             
             val result = loginWithEmailUseCase(_state.value.email, _state.value.password)
             
-            _state.update { it.copy(isLoading = false) }
-            
             result.onSuccess {
                 // Fetch profile immediately after login so we have it offline
                 userRepository.fetchAndSyncProfile()
+                syncDiseasesUseCase()
+                syncAllergiesUseCase()
+                _state.update { it.copy(isLoading = false) }
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
+                _state.update { it.copy(isLoading = false) }
                 val msg = error.message.orEmpty()
                 val isUnauthorized = error.javaClass.simpleName == "UnauthorizedException" || msg.contains("401") || msg.contains("invalid_grant")
                 
@@ -127,12 +134,15 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             val result = saveGoogleLoginTokensUseCase(event.authTokens)
-            _state.update { it.copy(isLoading = false) }
             
             result.onSuccess {
                 userRepository.fetchAndSyncProfile()
+                syncDiseasesUseCase()
+                syncAllergiesUseCase()
+                _state.update { it.copy(isLoading = false) }
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
+                _state.update { it.copy(isLoading = false) }
                 _state.update { it.copy(alertState = Error(message = DynamicString("Failed to complete Google login. Please try again."))) }
             }
         }

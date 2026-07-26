@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.ExercisesDao
+import iti.grad.nutriscan.data.db.dao.SavedScanDao
 import javax.inject.Singleton
 
 @Module
@@ -88,4 +89,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideExercisesDao(db: NutriScanDatabase): ExercisesDao = db.exercisesDao()
+
+    @Provides
+    @Singleton
+    fun provideSavedScanDao(db: NutriScanDatabase): SavedScanDao = db.savedScanDao()
 }

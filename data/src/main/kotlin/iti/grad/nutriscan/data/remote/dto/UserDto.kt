@@ -5,18 +5,26 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserDto(
-    val id: String,
-    @SerialName("firstName") val firstName: String? = null,
-    @SerialName("lastName") val lastName: String? = null,
-    val email: String,
+    val id: String = "",
+    val email: String = "",
+    val username: String? = null,
+    val name: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val dateOfBirth: String? = null,
     val gender: String? = null,
-    @SerialName("dateOfBirth") val dateOfBirth: String? = null,
-    @SerialName("heightCm") val heightCm: Double? = null,
-    @SerialName("weightKg") val weightKg: Double? = null,
-    @SerialName("diseaseIds") val diseaseIds: List<Int>? = null,
-    @SerialName("allergyIds") val allergyIds: List<Int>? = null,
-    @SerialName("avatarUrl") val avatarUrl: String? = null,
-    @SerialName("familyMembers") val familyMembers: List<FamilyMemberDto>? = null,
-    val allergies: List<AllergyDto> = emptyList(),
-    val diseases: List<DiseaseDto> = emptyList()
+    val heightCm: Double? = null,
+    val weightKg: Double? = null,
+    val bmi: Double? = null,
+    val tdee: Double? = null,
+    val allergies: List<DiseaseOrAllergyDto>? = null,
+    val diseases: List<DiseaseOrAllergyDto>? = null,
+    val familyMembers: List<FamilyMemberDto>? = null,
+    val avatarUrl: String? = null
+)
+
+@Serializable
+data class DiseaseOrAllergyDto(
+    val id: Int,
+    val name: String
 )

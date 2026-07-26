@@ -24,6 +24,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
+import iti.grad.nutriscan.data.remote.api.ScanApiService
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
@@ -114,6 +115,12 @@ object NetworkModule {
     @Singleton
     fun provideUserApiService(retrofit: Retrofit): UserApiService {
         return retrofit.create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideScanApiService(retrofit: Retrofit): ScanApiService {
+        return retrofit.create(ScanApiService::class.java)
     }
 
     @Provides
