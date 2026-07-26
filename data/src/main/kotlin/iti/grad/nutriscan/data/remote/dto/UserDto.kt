@@ -19,7 +19,7 @@ data class UserDto(
     val tdee: Double? = null,
     val allergies: List<DiseaseOrAllergyDto>? = null,
     val diseases: List<DiseaseOrAllergyDto>? = null,
-    val familyMembers: List<String>? = null, // Adjust type if known
+    val familyMembers: List<FamilyMemberDto>? = null,
     val avatarUrl: String? = null
 )
 

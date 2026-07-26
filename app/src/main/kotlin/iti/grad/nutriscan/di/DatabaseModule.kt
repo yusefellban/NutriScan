@@ -13,6 +13,7 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.ExercisesDao
+import iti.grad.nutriscan.data.db.dao.SavedScanDao
 import javax.inject.Singleton
 
 @Module
@@ -21,6 +22,16 @@ object DatabaseModule {
 
     private val MIGRATION_3_4 = object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `family_members` (
+                    `id` TEXT NOT NULL, 
+                    `ownerUserId` TEXT NOT NULL, 
+                    `name` TEXT NOT NULL, 
+                    `allergyIds` TEXT NOT NULL, 
+                    `diseaseIds` TEXT NOT NULL, 
+                    PRIMARY KEY(`id`)
+                )
+            """)
             db.execSQL("""
                 CREATE TABLE IF NOT EXISTS `exercises` (
                     `id` TEXT NOT NULL, 
@@ -57,6 +68,7 @@ object DatabaseModule {
             "nutriscan_db"
         )
             .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -79,4 +91,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideExercisesDao(db: NutriScanDatabase): ExercisesDao = db.exercisesDao()
+
+    @Provides
+    @Singleton
+    fun provideSavedScanDao(db: NutriScanDatabase): SavedScanDao = db.savedScanDao()
 }

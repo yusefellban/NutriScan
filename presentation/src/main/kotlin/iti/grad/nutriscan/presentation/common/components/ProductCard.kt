@@ -125,7 +125,7 @@ fun ProductCard(
             ) {
                 if (caloriesOverlayOnImage) {
                     Text(
-                        text = productName,
+                        text = productName.ifBlank { stringResource(R.string.scan_product_unknown) },
                         style = AppTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp
@@ -148,7 +148,7 @@ fun ProductCard(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = productName,
+                                text = productName.ifBlank { stringResource(R.string.scan_product_unknown) },
                                 style = AppTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp

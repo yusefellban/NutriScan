@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,11 +41,11 @@ fun NutritionFactsRow(
     data class MacroItem(val label: String, val value: String)
 
     val items = buildList {
-        if (!calories.isNullOrBlank()) add(MacroItem("Calories", calories))
-        if (!servingSize.isNullOrBlank()) add(MacroItem("Serving", servingSize))
-        if (!sugar.isNullOrBlank()) add(MacroItem("Sugar", sugar))
-        if (!fat.isNullOrBlank()) add(MacroItem("Fat", fat))
-        if (!saturatedFat.isNullOrBlank()) add(MacroItem("Sat. Fat", saturatedFat))
+        if (!calories.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_calories), stringResource(iti.grad.presentation.R.string.unit_kcal, calories)))
+        if (!servingSize.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_serving_size), stringResource(iti.grad.presentation.R.string.unit_serving, servingSize)))
+        if (!sugar.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_sugar), stringResource(iti.grad.presentation.R.string.unit_g, sugar)))
+        if (!fat.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_fat), stringResource(iti.grad.presentation.R.string.unit_g, fat)))
+        if (!saturatedFat.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_saturated_fat), stringResource(iti.grad.presentation.R.string.unit_g, saturatedFat)))
     }
 
     if (items.isEmpty()) return

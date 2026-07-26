@@ -1,23 +1,17 @@
 package iti.grad.nutriscan.presentation.profile_setup.view.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,12 +22,12 @@ import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.domain.allergy.model.Allergy
 import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.components.ChipSelectionFlowRow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerState
 import iti.grad.presentation.R
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HealthProfileContent(
     state: ProfileSetupPagerState,
@@ -151,7 +145,6 @@ fun HealthProfileContent(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun DiseasesSection(
     diseases: List<Disease>,
@@ -161,27 +154,18 @@ private fun DiseasesSection(
     onToggle: (Int) -> Unit,
     onRetry: () -> Unit
 ) {
-    when {
-        isLoading -> LoadingRow()
-        errorMessage != null -> ErrorRow(onRetry = onRetry)
-        else -> FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            diseases.forEach { disease ->
-                val isSelected = selectedDiseaseIds.contains(disease.id)
-                SelectableChip(
-                    text = disease.name,
-                    isSelected = isSelected,
-                    onClick = { onToggle(disease.id) }
-                )
-            }
-        }
-    }
+    ChipSelectionFlowRow(
+        items = diseases,
+        selectedIds = selectedDiseaseIds,
+        isLoading = isLoading,
+        errorMessage = errorMessage?.let { stringResource(R.string.profile_setup_load_error) },
+        idOf = { it.id },
+        labelOf = { it.name },
+        onToggle = onToggle,
+        onRetry = onRetry,
+    )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AllergiesSection(
     allergies: List<Allergy>,
@@ -191,49 +175,14 @@ private fun AllergiesSection(
     onToggle: (Int) -> Unit,
     onRetry: () -> Unit
 ) {
-    when {
-        isLoading -> LoadingRow()
-        errorMessage != null -> ErrorRow(onRetry = onRetry)
-        else -> FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            allergies.forEach { allergy ->
-                val isSelected = selectedAllergyIds.contains(allergy.id)
-                SelectableChip(
-                    text = allergy.name,
-                    isSelected = isSelected,
-                    onClick = { onToggle(allergy.id) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoadingRow() {
-    CircularProgressIndicator(
-        modifier = Modifier.size(24.dp),
-        color = AppTheme.colors.Primary,
-        strokeWidth = 2.dp
+    ChipSelectionFlowRow(
+        items = allergies,
+        selectedIds = selectedAllergyIds,
+        isLoading = isLoading,
+        errorMessage = errorMessage?.let { stringResource(R.string.profile_setup_load_error) },
+        idOf = { it.id },
+        labelOf = { it.name },
+        onToggle = onToggle,
+        onRetry = onRetry,
     )
-}
-
-@Composable
-private fun ErrorRow(onRetry: () -> Unit) {
-    Column {
-        Text(
-            text = stringResource(R.string.profile_setup_load_error),
-            style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.Error
-        )
-        TextButton(onClick = onRetry) {
-            Text(
-                text = stringResource(R.string.action_retry),
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.colors.Primary
-            )
-        }
-    }
 }

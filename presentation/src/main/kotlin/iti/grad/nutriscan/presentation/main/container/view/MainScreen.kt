@@ -9,6 +9,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -42,6 +43,7 @@ fun MainScreen(
     initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
     var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
+    var captureTrigger by remember { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -50,7 +52,13 @@ fun MainScreen(
         bottomBar = {
             AppBottomNavBar(
                 selectedTab = selectedTab,
-                onTabClick = { tab -> selectedTab = tab }
+                onTabClick = { tab -> 
+                    if (tab == BottomNavTab.SCAN && selectedTab == BottomNavTab.SCAN) {
+                        captureTrigger++
+                    } else {
+                        selectedTab = tab 
+                    }
+                }
             )
         },
         snackbarHost = {
@@ -87,8 +95,8 @@ fun MainScreen(
                     CameraScanScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProcessing = onNavigateToScanProcessing,
-                        onNavigateToProductDetail = onNavigateToProductDetail,
+                        captureTrigger = captureTrigger,
+                        onNavigateToProductDetail = onNavigateToProductDetail
                     )
                 }
                 BottomNavTab.SAVED -> {
@@ -105,7 +113,6 @@ fun MainScreen(
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToSettings = onNavigateToSettings,
                         onNavigateToEditProfile = onNavigateToEditProfile,
-                        onNavigateToFamilyMemberDetail = onNavigateToFamilyMemberDetail,
                     )
                 }
             }

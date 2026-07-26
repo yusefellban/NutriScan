@@ -5,6 +5,7 @@ import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
+import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -65,8 +66,10 @@ class UserRepositoryImpl @Inject constructor(
                 // preserve local if the backend omits them (null-coalescing).
                 bmi = dto.bmi ?: localUser?.bmi,
                 tdee = dto.tdee ?: localUser?.tdee,
+                familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }
             )
             userDao.insertOrUpdateUser(entity)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

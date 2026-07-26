@@ -27,10 +27,14 @@ import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 import iti.grad.nutriscan.domain.news.repository.INewsRepository
 import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
+import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.data.repository.FamilyMemberRepositoryImpl
 import iti.grad.nutriscan.domain.exercises.repository.IExercisesRepository
 import iti.grad.nutriscan.data.repository.ExercisesRepositoryImpl
 import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
 import iti.grad.nutriscan.data.repository.NutriGptRepositoryImpl
+import iti.grad.nutriscan.data.repository.SavedScanRepositoryImpl
+import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -103,6 +107,11 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindFamilyMemberRepository(
+        impl: FamilyMemberRepositoryImpl
+    ): IFamilyMemberRepository
+    @Binds
+    @Singleton
     abstract fun bindExercisesRepository(
         impl: ExercisesRepositoryImpl
     ): IExercisesRepository
@@ -112,4 +121,10 @@ abstract class RepositoryModule {
     abstract fun bindNutriGptRepository(
         impl: NutriGptRepositoryImpl
     ): INutriGptRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSavedScanRepository(
+        impl: SavedScanRepositoryImpl
+    ): ISavedScanRepository
 }

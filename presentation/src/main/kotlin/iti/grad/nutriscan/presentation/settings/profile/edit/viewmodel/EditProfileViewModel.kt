@@ -149,12 +149,20 @@ class EditProfileViewModel @Inject constructor(
             val diseasesResult = syncDiseasesUseCase()
             val allergiesResult = syncAllergiesUseCase()
             
-            _state.update {
-                it.copy(
+            _state.update { state ->
+                val diseasesError = if (state.diseases.isEmpty()) {
+                    diseasesResult.exceptionOrNull()?.message
+                } else null
+
+                val allergiesError = if (state.allergies.isEmpty()) {
+                    allergiesResult.exceptionOrNull()?.message
+                } else null
+
+                state.copy(
                     isDiseasesLoading = false,
                     isAllergiesLoading = false,
-                    diseasesErrorMessage = diseasesResult.exceptionOrNull()?.message,
-                    allergiesErrorMessage = allergiesResult.exceptionOrNull()?.message
+                    diseasesErrorMessage = if (diseasesResult.isFailure) diseasesError else null,
+                    allergiesErrorMessage = if (allergiesResult.isFailure) allergiesError else null
                 )
             }
         }

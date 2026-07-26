@@ -45,7 +45,7 @@ fun FlaggedIngredientsRow(
 
         Text(
             text = stringResource(titleResId),
-            style = AppTheme.typography.bodyMedium,
+            style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             color = AppTheme.colors.ProductDetailWhyNotSafeText,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )

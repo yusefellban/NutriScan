@@ -1,5 +1,13 @@
 package iti.grad.nutriscan.presentation.scan.camera.view.components
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.alpha
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,7 +44,8 @@ import iti.grad.presentation.R
 @Composable
 fun ActiveScanCard(
     scan: ActiveScanUiModel,
-    onClick: () -> Unit,
+    onBookmarkClick: () -> Unit,
+    onCardClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(22.dp)
@@ -53,56 +62,57 @@ fun ActiveScanCard(
             )
             .clip(cardShape)
             .background(AppTheme.colors.PrimaryVariant)
-            .clickable { onClick() }
+            .clickable(onClick = onCardClick)
             .padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ScanThumbnail(thumbnailUrl = scan.thumbnailUrl)
+        ScanThumbnail(thumbnailUrl = scan.thumbnailUrl, isProcessing = scan.isProcessing)
 
         Spacer(modifier = Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = scan.brand ?: stringResource(R.string.scan_brand_unknown),
-                style = AppTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = AppTheme.colors.Teal800,
-                letterSpacing = 1.sp,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = scan.productName ?: stringResource(R.string.scan_product_unknown),
+                text = scan.fullResult?.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() }
+                    ?: stringResource(R.string.scan_product_unknown),
                 style = AppTheme.typography.titleMedium,
                 color = AppTheme.colors.OnPrimary,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
             Spacer(modifier = Modifier.height(6.dp))
-            if (scan.statusResId != null) {
+            if (scan.isProcessing) {
+                ProcessingBadge(statusResId = R.string.scan_status_processing)
+            } else if (scan.isFailed) {
+                HealthBadge(text = stringResource(R.string.scan_status_failed))
+            } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
-            } else if (scan.healthTag != null) {
-                HealthBadge(text = scan.healthTag)
+            } else if (scan.healthTagResId != null) {
+                HealthBadge(text = stringResource(scan.healthTagResId))
             }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(AppTheme.colors.Teal800)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_plus),
-                contentDescription = stringResource(R.string.scan_add_to_list_content_description),
-                tint = AppTheme.colors.PrimaryVariant,
-                modifier = Modifier.size(22.dp),
-            )
+        if (!scan.isProcessing && !scan.isFailed && scan.fullResult != null) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(AppTheme.colors.Teal800)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onBookmarkClick,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
+                    contentDescription = "Save scan",
+                    tint = AppTheme.colors.PrimaryVariant,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
         }
     }
 }
@@ -110,6 +120,7 @@ fun ActiveScanCard(
 @Composable
 private fun ScanThumbnail(
     thumbnailUrl: String?,
+    isProcessing: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(14.dp)
@@ -124,8 +135,20 @@ private fun ScanThumbnail(
                 .background(AppTheme.colors.Divider),
         )
     } else {
+        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+        val alpha by infiniteTransition.animateFloat(
+            initialValue = 0.4f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(800, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "pulseAlpha"
+        )
+        
         Box(
             modifier = modifier
+                .alpha(if (isProcessing) alpha else 1f)
                 .size(56.dp)
                 .clip(shape)
                 .background(AppTheme.colors.Divider),
@@ -146,8 +169,20 @@ private fun ProcessingBadge(
     statusResId: Int,
     modifier: Modifier = Modifier,
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "badgePulse")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "badgePulseAlpha"
+    )
+
     Box(
         modifier = modifier
+            .alpha(alpha)
             .clip(RoundedCornerShape(6.dp))
             .background(AppTheme.colors.VerdictYellow)
             .padding(horizontal = 8.dp, vertical = 3.dp),

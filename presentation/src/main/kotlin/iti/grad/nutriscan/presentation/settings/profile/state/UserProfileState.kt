@@ -16,7 +16,6 @@ data class UserProfileState(
     val familyMembers: ImmutableList<FamilyMemberUiModel> = persistentListOf(),
     /** Non-null while the remove-family-member confirmation dialog is showing. */
     val memberPendingDeletion: FamilyMemberUiModel? = null,
-    val alertState: ProfileAlertState = ProfileAlertState.None,
     /**
      * Server-computed Body Mass Index. Null until the first successful profile sync.
      * Read-only: the user cannot edit this value.
@@ -27,4 +26,8 @@ data class UserProfileState(
      * Read-only: the user cannot edit this value.
      */
     val tdee: Double? = null,
+    /** True while the Add Family Member bottom sheet is presented. */
+    val isAddMemberSheetVisible: Boolean = false,
+    val editingMemberId: String? = null,
+    val alertState: ProfileAlertState = ProfileAlertState.None
 )
