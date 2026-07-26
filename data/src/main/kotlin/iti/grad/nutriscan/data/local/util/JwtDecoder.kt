@@ -11,17 +11,19 @@ import java.util.Base64
  */
 object JwtDecoder {
 
-    fun extractSubjectClaim(jwt: String?): String? {
+    fun extractClaim(jwt: String?, claimKey: String): String? {
         if (jwt.isNullOrBlank()) return null
         val parts = jwt.split(".")
         if (parts.size < 2) return null
         return try {
             val payloadJson = decodeBase64Url(parts[1])
-            Json.parseToJsonElement(payloadJson).jsonObject["sub"]?.jsonPrimitive?.content
+            Json.parseToJsonElement(payloadJson).jsonObject[claimKey]?.jsonPrimitive?.content
         } catch (_: Exception) {
             null
         }
     }
+
+    fun extractSubjectClaim(jwt: String?): String? = extractClaim(jwt, "sub")
 
     private fun decodeBase64Url(segment: String): String {
         val padded = when (segment.length % 4) {

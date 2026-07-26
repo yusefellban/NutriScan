@@ -22,6 +22,16 @@ object DatabaseModule {
     private val MIGRATION_3_4 = object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `family_members` (
+                    `id` TEXT NOT NULL, 
+                    `ownerUserId` TEXT NOT NULL, 
+                    `name` TEXT NOT NULL, 
+                    `allergyIds` TEXT NOT NULL, 
+                    `diseaseIds` TEXT NOT NULL, 
+                    PRIMARY KEY(`id`)
+                )
+            """)
+            db.execSQL("""
                 CREATE TABLE IF NOT EXISTS `exercises` (
                     `id` TEXT NOT NULL, 
                     `name` TEXT NOT NULL, 

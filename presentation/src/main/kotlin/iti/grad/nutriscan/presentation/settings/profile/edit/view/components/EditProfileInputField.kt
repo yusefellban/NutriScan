@@ -38,7 +38,7 @@ fun EditProfileInputField(
     value: String,
     onValueChange: (String) -> Unit,
     hint: String,
-    trailingIconRes: Int,
+    trailingIconRes: Int? = null,
     modifier: Modifier = Modifier,
     isPassword: Boolean = false,
     isReadOnly: Boolean = false,
@@ -104,11 +104,13 @@ fun EditProfileInputField(
             }
         )
 
-        Icon(
-            painter = painterResource(trailingIconRes),
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(24.dp)
-        )
+        if (trailingIconRes != null) {
+            Icon(
+                painter = painterResource(trailingIconRes),
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }

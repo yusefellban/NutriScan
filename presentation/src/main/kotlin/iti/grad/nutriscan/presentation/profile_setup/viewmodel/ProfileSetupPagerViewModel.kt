@@ -111,56 +111,48 @@ class ProfileSetupPagerViewModel @Inject constructor(
 
     private fun loadDiseases() {
         viewModelScope.launch {
+            getDiseasesUseCase().collectLatest { diseases ->
+                _state.update { it.copy(diseases = diseases.toImmutableList()) }
+            }
+        }
+
+        viewModelScope.launch {
             _state.update { it.copy(isDiseasesLoading = true, diseasesErrorMessage = null) }
             
-            // First, trigger a network sync
             val syncResult = syncDiseasesUseCase()
-            if (syncResult.isFailure) {
-                _state.update {
-                    it.copy(
-                        isDiseasesLoading = false,
-                        diseasesErrorMessage = syncResult.exceptionOrNull()?.message ?: "Failed to load diseases"
-                    )
-                }
-            } else {
-                _state.update { it.copy(isDiseasesLoading = false) }
-            }
-            
-            // Collect the local cache Flow to update UI
-            getDiseasesUseCase().collectLatest { diseases ->
-                _state.update {
-                    it.copy(
-                        diseases = diseases.toImmutableList()
-                    )
-                }
+            _state.update { state ->
+                val error = if (state.diseases.isEmpty()) {
+                    syncResult.exceptionOrNull()?.message ?: "Failed to load diseases"
+                } else null
+
+                state.copy(
+                    isDiseasesLoading = false,
+                    diseasesErrorMessage = if (syncResult.isFailure) error else null
+                )
             }
         }
     }
 
     private fun loadAllergies() {
         viewModelScope.launch {
+            getAllergiesUseCase().collectLatest { allergies ->
+                _state.update { it.copy(allergies = allergies.toImmutableList()) }
+            }
+        }
+
+        viewModelScope.launch {
             _state.update { it.copy(isAllergiesLoading = true, allergiesErrorMessage = null) }
             
-            // Trigger network sync
             val syncResult = syncAllergiesUseCase()
-            if (syncResult.isFailure) {
-                _state.update {
-                    it.copy(
-                        isAllergiesLoading = false,
-                        allergiesErrorMessage = syncResult.exceptionOrNull()?.message ?: "Failed to load allergies"
-                    )
-                }
-            } else {
-                _state.update { it.copy(isAllergiesLoading = false) }
-            }
-            
-            // Collect from flow
-            getAllergiesUseCase().collectLatest { allergies ->
-                _state.update {
-                    it.copy(
-                        allergies = allergies.toImmutableList()
-                    )
-                }
+            _state.update { state ->
+                val error = if (state.allergies.isEmpty()) {
+                    syncResult.exceptionOrNull()?.message ?: "Failed to load allergies"
+                } else null
+
+                state.copy(
+                    isAllergiesLoading = false,
+                    allergiesErrorMessage = if (syncResult.isFailure) error else null
+                )
             }
         }
     }
