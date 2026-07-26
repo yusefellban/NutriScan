@@ -35,6 +35,7 @@ class SavedScanRepositoryImpl @Inject constructor(
                     imageUrl = scanResult.imageUrl,
                     verdict = scanResult.foodSafetyResponse?.verdict?.name,
                     summary = scanResult.foodSafetyResponse?.summary,
+                    productName = scanResult.productName,
                     flaggedIngredientsJson = scanResult.foodSafetyResponse?.flaggedIngredients?.let { ingredients ->
                         val mapped = ingredients.map { ing ->
                             FlaggedIngredientLocalModel(
@@ -114,6 +115,7 @@ class SavedScanRepositoryImpl @Inject constructor(
                     status = ScanStatus.COMPLETED,
                     scannedAt = entity.scannedAt,
                     imageUrl = entity.imageUrl,
+                    productName = entity.productName,
                     foodSafetyResponse = if (verdict != null) {
                         FoodSafetyResponse(
                             verdict = verdict,
@@ -187,6 +189,7 @@ class SavedScanRepositoryImpl @Inject constructor(
                     status = ScanStatus.COMPLETED,
                     scannedAt = entity.scannedAt,
                     imageUrl = entity.imageUrl,
+                    productName = entity.productName,
                     foodSafetyResponse = if (verdict != null) {
                         FoodSafetyResponse(
                             verdict = verdict,

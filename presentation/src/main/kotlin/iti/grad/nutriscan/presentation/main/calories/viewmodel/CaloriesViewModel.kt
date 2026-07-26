@@ -164,7 +164,7 @@ class CaloriesViewModel @Inject constructor(
     }
 
     private fun FoodLogEntry.toProductUiModel() = ProductUiModel(
-        id = id,
+        id = productId ?: id,
         productName = name,
         imageUrl = imageUrl,
         verdict = verdict,
