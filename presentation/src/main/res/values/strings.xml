@@ -156,6 +156,8 @@
 
     <!-- Camera Scan Screen -->
     <string name="scan_status_processing">Processing</string>
+    <string name="scan_status_failed">Failed</string>
+    <string name="scan_status_completed">Completed</string>
     <string name="scan_product_unknown">Scanned product</string>
     <string name="scan_brand_unknown">Unknown brand</string>
     <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
@@ -276,6 +278,15 @@
 
     <!-- Product Details -->
     <string name="product_details_title">Product Details</string>
+    <string name="nutrition_calories">Calories</string>
+    <string name="nutrition_serving_size">Serving</string>
+    <string name="nutrition_sugar">Sugar</string>
+    <string name="nutrition_fat">Fat</string>
+    <string name="nutrition_saturated_fat">Sat. Fat</string>
+    <string name="unit_kcal">%s kcal</string>
+    <string name="unit_serving">%s serving</string>
+    <string name="unit_g">%s g</string>
+    <string name="no_specific_match_found">No specific match found.</string>
     <string name="product_details_scanned_at">Scanned at</string>
     <string name="product_details_for_you">For you</string>
     <string name="product_details_why_unsafe">Why It\'s Unsafe?</string>
@@ -320,6 +331,8 @@
 
     <!-- Custom Alerts -->
     <string name="alert_delete_warning_title">Delete Warning</string>
+    <string name="alert_remove_saved_title">Remove from Saved?</string>
+    <string name="alert_remove_saved_message">Are you sure you want to remove this scan from your saved list?</string>
     <string name="alert_success_title">Success</string>
     <string name="alert_error_title">Error</string>
     <string name="alert_warning_title">Warning</string>

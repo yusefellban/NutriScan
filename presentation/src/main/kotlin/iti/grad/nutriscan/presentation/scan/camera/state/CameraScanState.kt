@@ -6,4 +6,5 @@ data class CameraScanState(
     val isScanning: Boolean = true,
     val activeScan: ActiveScanUiModel? = null,
     val permissionDenied: Boolean = false,
+    val showDeleteDialog: Boolean = false,
 )

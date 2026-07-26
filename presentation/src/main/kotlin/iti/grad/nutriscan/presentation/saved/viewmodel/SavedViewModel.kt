@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
+import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
@@ -26,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SavedViewModel @Inject constructor(
     private val addFoodEntryUseCase: AddFoodEntryUseCase,
+    private val getSavedScansUseCase: GetSavedScansUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SavedState())
@@ -35,7 +36,7 @@ class SavedViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadMockData()
+        loadSavedScans()
     }
 
     fun onEvent(event: SavedEvent) {
@@ -79,7 +80,7 @@ class SavedViewModel @Inject constructor(
                 imageUrl = product.imageUrl,
                 verdict = product.verdict,
                 loggedDate = LocalDate.now(),
-                addedAt = Instant.now(),
+                addedAt = java.time.Instant.now(),
             )
             addFoodEntryUseCase(entry)
                 .onSuccess { _effect.send(SavedEffect.ShowAddedToFoodLogSnackbar(product.productName)) }
@@ -93,57 +94,33 @@ class SavedViewModel @Inject constructor(
         }
     }
 
-    private fun loadMockData() {
-        val mockProducts = listOf(
-            ProductUiModel(
-                id = "1",
-                productName = "Almarai Milk Full Fat",
-                imageUrl = "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.SAFE,
-                calories = "150"
-            ),
-            ProductUiModel(
-                id = "2",
-                productName = "Peanut Butter",
-                imageUrl = "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.CAUTION,
-                calories = "190"
-            ),
-            ProductUiModel(
-                id = "3",
-                productName = "Chocolate Bar",
-                imageUrl = "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.UNSAFE,
-                calories = "220"
-            ),
-            ProductUiModel(
-                id = "4",
-                productName = "Oatmeal Cookies",
-                imageUrl = "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.SAFE,
-                calories = "120"
-            ),
-            ProductUiModel(
-                id = "5",
-                productName = "Energy Drink",
-                imageUrl = "https://images.unsplash.com/photo-1622543925917-763c34d1a86e?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.UNSAFE,
-                calories = "110"
-            ),
-            ProductUiModel(
-                id = "6",
-                productName = "Greek Yogurt",
-                imageUrl = "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&q=80",
-                verdict = ProductVerdict.SAFE,
-                calories = "90"
-            )
-        ).toImmutableList()
+    private fun loadSavedScans() {
+        viewModelScope.launch {
+            getSavedScansUseCase().collect { scans ->
+                val uiModels = scans.map { scan ->
+                    ProductUiModel(
+                        id = scan.scanId,
+                        productName = scan.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() } ?: "",
+                        imageUrl = scan.imageUrl,
+                        verdict = scan.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
+                        calories = scan.nutritionFacts?.calories?.toString() ?: "0"
+                    )
+                }.toImmutableList()
 
-        _state.update {
-            it.copy(
-                products = mockProducts,
-                filteredProducts = mockProducts
-            )
+                _state.update { currentState ->
+                    val filtered = if (currentState.searchQuery.isBlank()) {
+                        uiModels
+                    } else {
+                        uiModels.filter {
+                            it.productName.contains(currentState.searchQuery, ignoreCase = true)
+                        }.toImmutableList()
+                    }
+                    currentState.copy(
+                        products = uiModels,
+                        filteredProducts = filtered
+                    )
+                }
+            }
         }
     }
 }
