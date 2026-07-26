@@ -1,5 +1,7 @@
 package iti.grad.nutriscan.data.repository
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
 import iti.grad.nutriscan.domain.scan.model.ProductResult
@@ -14,6 +16,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
+import androidx.core.graphics.scale
 
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
@@ -54,12 +57,45 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun compressImage(imageFile: File): File {
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath) ?: return imageFile
+        
+        val maxDimension = 1024
+        val ratio =
+            (maxDimension.toFloat() / bitmap.width).coerceAtMost(maxDimension.toFloat() / bitmap.height)
+        
+        val compressedBitmap = if (ratio < 1) {
+            bitmap.scale((bitmap.width * ratio).toInt(), (bitmap.height * ratio).toInt())
+        } else {
+            bitmap
+        }
+        
+        val outputFile = File(imageFile.parent, "compressed_${imageFile.name}")
+        val fos = java.io.FileOutputStream(outputFile)
+        compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos)
+        fos.flush()
+        fos.close()
+        
+        if (compressedBitmap != bitmap) {
+            compressedBitmap.recycle()
+        }
+        bitmap.recycle()
+        
+        return outputFile
+    }
+
     override suspend fun submitScanImage(imageFile: File): Result<ScanResult> {
         return withContext(ioDispatcher) {
             try {
-                val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                val body = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+                val compressedFile = compressImage(imageFile)
+                val requestFile = compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("image", compressedFile.name, requestFile)
                 val response = scanApiService.submitScan(body)
+                
+                if (compressedFile.absolutePath != imageFile.absolutePath) {
+                    compressedFile.delete()
+                }
+                
                 Result.success(response.toDomain())
             } catch (e: Exception) {
                 Result.failure(e)

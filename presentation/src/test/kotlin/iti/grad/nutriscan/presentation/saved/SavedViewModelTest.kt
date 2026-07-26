@@ -4,9 +4,11 @@ import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
@@ -86,11 +88,11 @@ class SavedViewModelTest {
         @Test
         fun `ProductClicked emits NavigateToProductDetail with the product id`() = runTest {
             viewModel.effect.test {
-                val mockProduct = iti.grad.nutriscan.presentation.common.model.ProductUiModel(
+                val mockProduct = ProductUiModel(
                     id = "3",
                     productName = "Sample",
                     imageUrl = null,
-                    verdict = iti.grad.nutriscan.domain.common.model.ProductVerdict.SAFE,
+                    verdict = ProductVerdict.SAFE,
                     calories = "100"
                 )
                 viewModel.onEvent(SavedEvent.ProductClicked(mockProduct))

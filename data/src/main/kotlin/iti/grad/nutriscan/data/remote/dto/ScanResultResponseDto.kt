@@ -20,5 +20,7 @@ data class ScanResultResponseDto(
     val scannedAt: String? = null,
     val imageUrl: String? = null,
     val foodSafetyResponse: FoodSafetyResponseDto? = null,
-    val nutritionFacts: NutritionFactsDto? = null
+    val nutritionFacts: NutritionFactsDto? = null,
+    val productName: String? = null,
+    val favorite: Boolean? = false
 )

@@ -30,7 +30,7 @@ import iti.grad.nutriscan.data.db.entity.ExerciseCategoryEntity
         ExerciseCategoryEntity::class,
         SavedScanEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, JsonTypeConverters::class)

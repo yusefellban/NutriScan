@@ -36,6 +36,7 @@ class ProductDetailsViewModel @Inject constructor(
     private val saveScanUseCase: SaveScanUseCase,
     private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
     private val getSavedScanByIdUseCase: GetSavedScanByIdUseCase,
+    private val getScanResultUseCase: iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase,
 ) : ViewModel() {
 
     private val productJson: String = checkNotNull(savedStateHandle["product"])
@@ -97,19 +98,20 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun loadProductDetail() {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             val savedScan = getSavedScanByIdUseCase(product.id).getOrNull()
             
-            val detail = if (savedScan != null) {
-                mapToProductDetail(savedScan)
+            if (savedScan != null) {
+                val detail = mapToProductDetail(savedScan).copy(isBookmarked = true)
+                _state.update { it.copy(isLoading = false, productDetail = detail) }
             } else {
-                buildFallbackDetail(product)
-            }
-
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    productDetail = detail,
-                )
+                val apiResult = getScanResultUseCase(product.id).getOrNull()
+                val detail = if (apiResult != null) {
+                    mapToProductDetail(apiResult).copy(isBookmarked = false)
+                } else {
+                    buildFallbackDetail(product)
+                }
+                _state.update { it.copy(isLoading = false, productDetail = detail) }
             }
         }
     }
@@ -117,7 +119,7 @@ class ProductDetailsViewModel @Inject constructor(
     private fun mapToProductDetail(scanResult: ScanResult): ProductDetail {
         return ProductDetail(
             id = scanResult.scanId,
-            productName = product.productName,
+            productName = scanResult.productName ?: product.productName,
             brand = "Unknown Brand",
             imageUrl = scanResult.imageUrl ?: product.imageUrl,
             verdict = scanResult.foodSafetyResponse?.verdict ?: product.verdict,
@@ -165,6 +167,7 @@ class ProductDetailsViewModel @Inject constructor(
             status = ScanStatus.COMPLETED,
             scannedAt = java.time.Instant.now().toString(),
             imageUrl = detail.imageUrl,
+            productName = detail.productName,
             foodSafetyResponse = FoodSafetyResponse(
                 verdict = detail.verdict,
                 summary = detail.safetyReasonText,
