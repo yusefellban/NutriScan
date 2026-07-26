@@ -9,6 +9,7 @@ import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
@@ -25,13 +26,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class CameraScanViewModel @Inject constructor(
     private val submitScanImageUseCase: SubmitScanImageUseCase,
     private val getScanResultUseCase: GetScanResultUseCase,
     private val saveScanUseCase: SaveScanUseCase,
-    private val deleteSavedScanUseCase: DeleteSavedScanUseCase
+    private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
+    private val getSavedScansUseCase: iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CameraScanState())
@@ -45,6 +48,19 @@ class CameraScanViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _effect.send(CameraScanEffect.RequestCameraPermission)
+        }
+        viewModelScope.launch {
+            getSavedScansUseCase().collect { savedScans ->
+                val savedIds = savedScans.map { it.scanId }.toSet()
+                _state.update { state ->
+                    val active = state.activeScan
+                    if (active != null) {
+                        state.copy(activeScan = active.copy(isSaved = savedIds.contains(active.scanId)))
+                    } else {
+                        state
+                    }
+                }
+            }
         }
     }
 
@@ -80,12 +96,6 @@ class CameraScanViewModel @Inject constructor(
     }
 
     private fun handleCaptureClicked() {
-        viewModelScope.launch {
-            _effect.send(CameraScanEffect.TakePicture)
-        }
-    }
-
-    private fun handleImageCaptured(file: File) {
         _state.update {
             it.copy(
                 isScanning = true,
@@ -96,7 +106,12 @@ class CameraScanViewModel @Inject constructor(
                 ),
             )
         }
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.TakePicture)
+        }
+    }
 
+    private fun handleImageCaptured(file: File) {
         currentScanJob?.cancel()
         currentScanJob = viewModelScope.launch {
             val submitResult = submitScanImageUseCase(file)
@@ -120,6 +135,12 @@ class CameraScanViewModel @Inject constructor(
     }
 
     private fun handleImageCaptureFailed(error: Exception) {
+        _state.update {
+            it.copy(
+                isScanning = false,
+                activeScan = null
+            )
+        }
         viewModelScope.launch {
             _effect.send(CameraScanEffect.ShowSnackBar("Image capture failed: ${error.message}"))
         }
@@ -165,7 +186,7 @@ class CameraScanViewModel @Inject constructor(
                     }
                 }
             }
-            delay(3000)
+            delay(3000.milliseconds)
         }
     }
 
@@ -213,9 +234,9 @@ class CameraScanViewModel @Inject constructor(
         val currentScan = _state.value.activeScan ?: return
         if (currentScan.isProcessing || currentScan.isFailed) return
         
-        val uiModel = iti.grad.nutriscan.presentation.common.model.ProductUiModel(
+        val uiModel = ProductUiModel(
             id = currentScan.fullResult?.scanId ?: "",
-            productName = currentScan.fullResult?.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() } ?: "",
+            productName = currentScan.fullResult?.productName ?: "",
             imageUrl = currentScan.fullResult?.imageUrl,
             verdict = currentScan.fullResult?.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
             calories = currentScan.fullResult?.nutritionFacts?.calories?.toString() ?: "0"

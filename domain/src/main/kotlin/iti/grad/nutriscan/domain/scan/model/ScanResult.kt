@@ -14,4 +14,6 @@ data class ScanResult(
     val imageUrl: String?,
     val foodSafetyResponse: FoodSafetyResponse?,
     val nutritionFacts: NutritionFacts?,
+    val productName: String? = null,
+    val favorite: Boolean = false
 )

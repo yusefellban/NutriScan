@@ -100,7 +100,7 @@ class SavedViewModel @Inject constructor(
                 val uiModels = scans.map { scan ->
                     ProductUiModel(
                         id = scan.scanId,
-                        productName = scan.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() } ?: "",
+                        productName = scan.productName ?: "",
                         imageUrl = scan.imageUrl,
                         verdict = scan.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
                         calories = scan.nutritionFacts?.calories?.toString() ?: "0"

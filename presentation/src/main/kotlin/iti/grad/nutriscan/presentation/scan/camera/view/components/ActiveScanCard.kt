@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.VerdictBadge
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
@@ -72,7 +73,7 @@ fun ActiveScanCard(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = scan.fullResult?.foodSafetyResponse?.summary?.takeIf { it.isNotBlank() }
+                text = scan.fullResult?.productName?.takeIf { it.isNotBlank() }
                     ?: stringResource(R.string.scan_product_unknown),
                 style = AppTheme.typography.titleMedium,
                 color = AppTheme.colors.OnPrimary,
@@ -80,12 +81,15 @@ fun ActiveScanCard(
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
             Spacer(modifier = Modifier.height(6.dp))
+            val verdict = scan.fullResult?.foodSafetyResponse?.verdict
             if (scan.isProcessing) {
                 ProcessingBadge(statusResId = R.string.scan_status_processing)
             } else if (scan.isFailed) {
                 HealthBadge(text = stringResource(R.string.scan_status_failed))
             } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
+            } else if (verdict != null) {
+                VerdictBadge(verdict = verdict)
             } else if (scan.healthTagResId != null) {
                 HealthBadge(text = stringResource(scan.healthTagResId))
             }

@@ -69,7 +69,11 @@ fun CameraScanScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-    val imageCapture = remember { ImageCapture.Builder().build() }
+    val imageCapture = remember { 
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build() 
+    }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
     val mediaActionSound = remember { MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) } }
     val flashAlpha = remember { Animatable(0f) }

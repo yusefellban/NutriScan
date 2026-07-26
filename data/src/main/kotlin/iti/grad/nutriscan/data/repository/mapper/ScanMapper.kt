@@ -19,7 +19,9 @@ fun ScanSubmissionResponseDto.toDomain(): ScanResult {
         scannedAt = null,
         imageUrl = null,
         foodSafetyResponse = null,
-        nutritionFacts = null
+        nutritionFacts = null,
+        productName = null,
+        favorite = false
     )
 }
 
@@ -30,7 +32,9 @@ fun ScanResultResponseDto.toDomain(): ScanResult {
         scannedAt = scannedAt,
         imageUrl = imageUrl,
         foodSafetyResponse = foodSafetyResponse?.toDomain(),
-        nutritionFacts = nutritionFacts?.toDomain()
+        nutritionFacts = nutritionFacts?.toDomain(),
+        productName = productName,
+        favorite = favorite ?: false
     )
 }
 
