@@ -1,5 +1,7 @@
 package iti.grad.nutriscan.presentation.exercises.workout.view
 import androidx.compose.ui.graphics.Color
+import androidx.activity.compose.BackHandler
+import iti.grad.nutriscan.presentation.common.components.ActionConfirmAlert
 
 import androidx.compose.foundation.Image
 import coil3.compose.AsyncImage
@@ -88,6 +90,13 @@ fun ExerciseWorkoutScreen(
 
     var showSetsDialog by remember { mutableStateOf(false) }
     var showRepsDialog by remember { mutableStateOf(false) }
+    var showBackWarningDialog by remember { mutableStateOf(false) }
+    var showCancelWarningDialog by remember { mutableStateOf(false) }
+    var showRestartWarningDialog by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = state.hasStarted) {
+        showBackWarningDialog = true
+    }
 
     LaunchedEffect(exerciseId) {
         viewModel.onEvent(ExerciseWorkoutEvent.InitExercise(exerciseId))
@@ -164,7 +173,13 @@ fun ExerciseWorkoutScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             AppBackButton(
-                onClick = { viewModel.onEvent(ExerciseWorkoutEvent.OnBackClick) },
+                onClick = {
+                    if (state.hasStarted) {
+                        showBackWarningDialog = true
+                    } else {
+                        viewModel.onEvent(ExerciseWorkoutEvent.OnBackClick)
+                    }
+                },
                 iconTint = AppTheme.colors.ExerciseBackButtonTint,
                 borderColor = AppTheme.colors.ExerciseBackButtonTint
             )
@@ -306,7 +321,13 @@ fun ExerciseWorkoutScreen(
                     text = stringResource(id = R.string.exercise_cancel_workout),
                     style = ExerciseWorkoutTypography.controlButtonLabel,
                     color = AppTheme.colors.ExerciseCancelWorkoutText,
-                    modifier = Modifier.clickable { viewModel.onEvent(ExerciseWorkoutEvent.OnCancelClick) }
+                    modifier = Modifier.clickable {
+                        if (state.hasStarted) {
+                            showCancelWarningDialog = true
+                        } else {
+                            viewModel.onEvent(ExerciseWorkoutEvent.OnCancelClick)
+                        }
+                    }
                 )
             } else if (state.isTimerRunning) {
                 // Running State: Restart (outlined) and Pause (filled)
@@ -318,7 +339,13 @@ fun ExerciseWorkoutScreen(
                 ) {
                     WorkoutSecondaryButton(
                         text = stringResource(id = R.string.exercise_restart_button), // Named Restart
-                        onClick = { viewModel.onEvent(ExerciseWorkoutEvent.OnRestartClick) },
+                        onClick = {
+                            if (state.hasStarted) {
+                                showRestartWarningDialog = true
+                            } else {
+                                viewModel.onEvent(ExerciseWorkoutEvent.OnRestartClick)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         enabled = true
                     )
@@ -334,7 +361,13 @@ fun ExerciseWorkoutScreen(
                     text = stringResource(id = R.string.exercise_cancel_workout),
                     style = ExerciseWorkoutTypography.controlButtonLabel,
                     color = AppTheme.colors.ExerciseCancelWorkoutText,
-                    modifier = Modifier.clickable { viewModel.onEvent(ExerciseWorkoutEvent.OnCancelClick) }
+                    modifier = Modifier.clickable {
+                        if (state.hasStarted) {
+                            showCancelWarningDialog = true
+                        } else {
+                            viewModel.onEvent(ExerciseWorkoutEvent.OnCancelClick)
+                        }
+                    }
                 )
             } else {
                 // Paused / Finish State: restart, pause, and cancel buttons are REMOVED.
@@ -385,6 +418,51 @@ fun ExerciseWorkoutScreen(
             }
         )
     }
+
+    // Back Button Discard Warning Dialog
+    if (showBackWarningDialog) {
+        ActionConfirmAlert(
+            title = stringResource(id = R.string.exercise_discard_confirm_title),
+            message = stringResource(id = R.string.exercise_discard_confirm_message),
+            confirmText = stringResource(id = R.string.exercise_discard_confirm_action),
+            cancelText = stringResource(id = R.string.onboarding_back),
+            onConfirm = {
+                showBackWarningDialog = false
+                viewModel.onEvent(ExerciseWorkoutEvent.OnBackClick)
+            },
+            onDismiss = { showBackWarningDialog = false }
+        )
+    }
+
+    // Cancel Workout Warning Dialog
+    if (showCancelWarningDialog) {
+        ActionConfirmAlert(
+            title = stringResource(id = R.string.exercise_discard_confirm_title),
+            message = stringResource(id = R.string.exercise_discard_confirm_message),
+            confirmText = stringResource(id = R.string.exercise_discard_confirm_action),
+            cancelText = stringResource(id = R.string.onboarding_back),
+            onConfirm = {
+                showCancelWarningDialog = false
+                viewModel.onEvent(ExerciseWorkoutEvent.OnCancelClick)
+            },
+            onDismiss = { showCancelWarningDialog = false }
+        )
+    }
+
+    // Restart Workout Dialog
+    if (showRestartWarningDialog) {
+        ActionConfirmAlert(
+            title = stringResource(id = R.string.exercise_restart_confirm_title),
+            message = stringResource(id = R.string.exercise_restart_confirm_message),
+            confirmText = stringResource(id = R.string.exercise_restart_confirm_action),
+            cancelText = stringResource(id = R.string.onboarding_back),
+            onConfirm = {
+                showRestartWarningDialog = false
+                viewModel.onEvent(ExerciseWorkoutEvent.OnRestartClick)
+            },
+            onDismiss = { showRestartWarningDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -401,7 +479,7 @@ fun WorkoutControlCard(
             .clip(RoundedCornerShape(14.dp))
             .background(AppTheme.colors.ExerciseSetsRepsCardBg)
             .border(width = 1.dp, color = AppTheme.colors.ExerciseSetsRepsCardBorder, shape = RoundedCornerShape(14.dp))
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -409,12 +487,16 @@ fun WorkoutControlCard(
             text = label,
             style = ExerciseWorkoutTypography.setsRepsLabel,
             color = AppTheme.colors.ExerciseSetsRepsLabelColor,
-            modifier = Modifier.clickable { onValueClick() }
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f)
+                .clickable { onValueClick() }
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             // Minus Button
             Box(
@@ -467,14 +549,26 @@ fun WorkoutPrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val isDark = AppTheme.isDark
+    val disabledContainerColor = if (isDark) {
+        AppTheme.colors.ExerciseWorkoutPrimaryButtonBg.copy(alpha = 0.15f)
+    } else {
+        AppTheme.colors.ExerciseWorkoutPrimaryButtonBg.copy(alpha = 0.4f)
+    }
+    val disabledContentColor = if (isDark) {
+        AppTheme.colors.ExerciseWorkoutPrimaryButtonText.copy(alpha = 0.3f)
+    } else {
+        AppTheme.colors.ExerciseWorkoutPrimaryButtonText.copy(alpha = 0.6f)
+    }
+
     Button(
         onClick = onClick,
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonBg,
             contentColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonText,
-            disabledContainerColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonBg.copy(alpha = 0.4f),
-            disabledContentColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonText.copy(alpha = 0.6f)
+            disabledContainerColor = disabledContainerColor,
+            disabledContentColor = disabledContentColor
         ),
         shape = RoundedCornerShape(14.dp),
         modifier = modifier.height(56.dp)
