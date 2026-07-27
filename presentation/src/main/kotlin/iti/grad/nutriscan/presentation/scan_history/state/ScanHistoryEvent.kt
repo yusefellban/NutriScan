@@ -6,4 +6,7 @@ sealed interface ScanHistoryEvent {
     data class ItemClicked(val scanId: String) : ScanHistoryEvent
     object BackClicked : ScanHistoryEvent
     object RetryLoad : ScanHistoryEvent
+    data class DateSelected(val dateMillis: Long?) : ScanHistoryEvent
+    data class ShowDatePicker(val show: Boolean) : ScanHistoryEvent
+    object ResetFilters : ScanHistoryEvent
 }

@@ -140,20 +140,21 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
+    override suspend fun getRecentScans(page: Int, size: Int, date: String?, verdict: String?): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
-            if (page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
+            val isFiltered = date != null || verdict != null
+            if (!isFiltered && page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
             try {
-                val response = scanApiService.getRecentScans(page, size)
+                val response = scanApiService.getRecentScans(page, size, date, verdict)
                 val domainScans = response.content.map { it.toDomain() }
-                if (page == 0) {
+                if (!isFiltered && page == 0) {
                     localRecentScans = domainScans.toMutableList()
                 }
                 Result.success(domainScans)
             } catch (e: Exception) {
-                if (page == 0 && localRecentScans != null) {
+                if (!isFiltered && page == 0 && localRecentScans != null) {
                     Result.success(localRecentScans!!.take(size))
                 } else {
                     Result.failure(e)

@@ -35,7 +35,7 @@ import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import iti.grad.nutriscan.presentation.exercises.view.components.ExerciseInstructionsBottomSheet
 import iti.grad.nutriscan.presentation.exercises.viewmodel.ExercisesViewModel
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest

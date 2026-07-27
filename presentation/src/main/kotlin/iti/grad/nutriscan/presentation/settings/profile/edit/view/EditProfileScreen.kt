@@ -41,7 +41,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEf
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning
 import androidx.compose.material3.DatePicker
 import androidx.compose.foundation.layout.FlowRow
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
 import iti.grad.presentation.R

@@ -26,6 +26,7 @@ import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
@@ -90,7 +91,10 @@ private fun ScanHistoryContent(
         ) {
             AppTopHeader(
                 title = stringResource(R.string.scan_history_title),
-                onBackClick = { onEvent(ScanHistoryEvent.BackClicked) }
+                onBackClick = { onEvent(ScanHistoryEvent.BackClicked) },
+                actionIconResId = R.drawable.ic_date,
+                actionIconContentDescription = "Filter by date",
+                onActionClick = { onEvent(ScanHistoryEvent.ShowDatePicker(true)) }
             )
         }
 
@@ -101,7 +105,9 @@ private fun ScanHistoryContent(
                 // Filters
                 FilterRow(
                     selectedFilter = state.selectedFilter,
-                    onFilterSelected = { onEvent(ScanHistoryEvent.FilterSelected(it)) }
+                    selectedDate = state.selectedDate,
+                    onFilterSelected = { onEvent(ScanHistoryEvent.FilterSelected(it)) },
+                    onReset = { onEvent(ScanHistoryEvent.ResetFilters) }
                 )
 
                 if (state.isLoading) {
@@ -176,12 +182,21 @@ private fun ScanHistoryContent(
             }
         }
     }
+
+    if (state.showDatePicker) {
+        ScanDatePickerDialog(
+            onDateSelected = { dateMillis -> onEvent(ScanHistoryEvent.DateSelected(dateMillis)) },
+            onDismiss = { onEvent(ScanHistoryEvent.ShowDatePicker(false)) }
+        )
+    }
 }
 
 @Composable
 private fun FilterRow(
     selectedFilter: HistoryFilter,
-    onFilterSelected: (HistoryFilter) -> Unit
+    selectedDate: String?,
+    onFilterSelected: (HistoryFilter) -> Unit,
+    onReset: () -> Unit
 ) {
     val filters = listOf(
         HistoryFilter.ALL to stringResource(R.string.filter_all),
@@ -194,29 +209,68 @@ private fun FilterRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        items(filters) { (filter, label) ->
-            val isSelected = selectedFilter == filter
-            val backgroundColor = if (isSelected) AppTheme.colors.Primary else AppTheme.colors.Surface
-            val textColor = if (isSelected) Color.White else AppTheme.colors.TextSecondary
-            
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(backgroundColor)
-                    .clickable { onFilterSelected(filter) }
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = label,
-                    color = textColor,
-                    style = AppTheme.typography.labelLarge.copy(
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                    )
+        if (selectedFilter != HistoryFilter.ALL || selectedDate != null) {
+            item {
+                SelectableChip(
+                    text = "Reset",
+                    isSelected = false,
+                    onClick = onReset,
+                    selectedBgColor = Color.Transparent,
+                    unselectedBgColor = Color.Transparent,
+                    selectedBorderColor = Color.Red,
+                    unselectedBorderColor = Color.Red,
+                    selectedTextColor = Color.Red,
+                    unselectedTextColor = Color.Red
                 )
             }
         }
+        
+        items(filters) { (filter, label) ->
+            SelectableChip(
+                text = label,
+                isSelected = selectedFilter == filter,
+                onClick = { onFilterSelected(filter) },
+                selectedBgColor = AppTheme.colors.ExerciseChipSelectedBg,
+                unselectedBgColor = AppTheme.colors.ExerciseChipUnselectedBg,
+                selectedBorderColor = AppTheme.colors.ExerciseChipSelectedBorder,
+                unselectedBorderColor = AppTheme.colors.ExerciseChipUnselectedBorder,
+                selectedTextColor = AppTheme.colors.ExerciseChipSelectedText,
+                unselectedTextColor = AppTheme.colors.ExerciseChipUnselectedText
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScanDatePickerDialog(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+        }
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }

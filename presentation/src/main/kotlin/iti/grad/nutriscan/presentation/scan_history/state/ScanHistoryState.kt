@@ -20,4 +20,6 @@ data class ScanHistoryState(
     val error: String? = null,
     val page: Int = 0,
     val isLastPage: Boolean = false,
+    val selectedDate: String? = null,
+    val showDatePicker: Boolean = false,
 )

@@ -23,5 +23,5 @@ interface IScanRepository {
     /**
      * Get a paginated list of recent scans.
      */
-    suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>>
+    suspend fun getRecentScans(page: Int, size: Int, date: String? = null, verdict: String? = null): Result<List<ScanHistoryEntry>>
 }

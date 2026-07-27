@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetRecentScansUseCase @Inject constructor(
     private val scanRepository: IScanRepository
 ) {
-    suspend operator fun invoke(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
-        return scanRepository.getRecentScans(page, size)
+    suspend operator fun invoke(page: Int, size: Int, date: String? = null, verdict: String? = null): Result<List<ScanHistoryEntry>> {
+        return scanRepository.getRecentScans(page, size, date, verdict)
     }
 }

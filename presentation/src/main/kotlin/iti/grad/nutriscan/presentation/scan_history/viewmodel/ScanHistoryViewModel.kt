@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -52,25 +53,56 @@ class ScanHistoryViewModel @Inject constructor(
             is ScanHistoryEvent.ItemClicked -> emitEffect(ScanHistoryEffect.NavigateToProductDetails(event.scanId))
             is ScanHistoryEvent.BackClicked -> emitEffect(ScanHistoryEffect.NavigateBack)
             is ScanHistoryEvent.RetryLoad -> loadInitial()
+            is ScanHistoryEvent.DateSelected -> handleDateSelected(event.dateMillis)
+            is ScanHistoryEvent.ShowDatePicker -> _state.update { it.copy(showDatePicker = event.show) }
+            is ScanHistoryEvent.ResetFilters -> handleResetFilters()
         }
+    }
+
+    private fun handleDateSelected(dateMillis: Long?) {
+        _state.update { it.copy(showDatePicker = false) }
+        if (dateMillis != null) {
+            // Convert millis to YYYY-MM-DD
+            val date = Instant.ofEpochMilli(dateMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            _state.update { it.copy(selectedDate = date) }
+            loadInitial()
+        }
+    }
+
+    private fun handleResetFilters() {
+        _state.update { it.copy(selectedFilter = HistoryFilter.ALL, selectedDate = null) }
+        loadInitial()
+    }
+
+    private fun getVerdictParam(filter: HistoryFilter): String? = when (filter) {
+        HistoryFilter.ALL -> null
+        HistoryFilter.SAFE -> "SAFE"
+        HistoryFilter.CAUTION -> "CAUTION"
+        HistoryFilter.UNSAFE -> "UNSAFE"
     }
 
     private fun loadInitial() {
         if (_state.value.isLoading) return
-        _state.update { it.copy(isLoading = true, error = null, page = 0, isLastPage = false, allHistoryItems = emptyList()) }
+        _state.update { it.copy(isLoading = true, error = null, page = 0, isLastPage = false, allHistoryItems = emptyList(), displayedHistoryItems = emptyList<HistoryItemUiModel>().toImmutableList()) }
         
         viewModelScope.launch {
-            getRecentScansUseCase(page = 0, size = pageSize)
+            val currentState = _state.value
+            val verdictParam = getVerdictParam(currentState.selectedFilter)
+            
+            getRecentScansUseCase(page = 0, size = pageSize, date = currentState.selectedDate, verdict = verdictParam)
                 .onSuccess { scans ->
                     val uiItems = mapScansToUi(scans)
                     _state.update { state ->
                         state.copy(
                             isLoading = false,
                             allHistoryItems = uiItems,
+                            displayedHistoryItems = uiItems.toImmutableList(),
                             isLastPage = scans.size < pageSize,
                         )
                     }
-                    updateDisplayedItems()
                 }
                 .onFailure { error ->
                     _state.update { 
@@ -93,17 +125,20 @@ class ScanHistoryViewModel @Inject constructor(
         _state.update { it.copy(isPaginationLoading = true, page = nextPage) }
 
         viewModelScope.launch {
-            getRecentScansUseCase(page = nextPage, size = pageSize)
+            val currentVerdictParam = getVerdictParam(currentState.selectedFilter)
+            
+            getRecentScansUseCase(page = nextPage, size = pageSize, date = currentState.selectedDate, verdict = currentVerdictParam)
                 .onSuccess { scans ->
                     val newUiItems = mapScansToUi(scans)
                     _state.update { state ->
+                        val combined = state.allHistoryItems + newUiItems
                         state.copy(
                             isPaginationLoading = false,
-                            allHistoryItems = state.allHistoryItems + newUiItems,
+                            allHistoryItems = combined,
+                            displayedHistoryItems = combined.toImmutableList(),
                             isLastPage = scans.size < pageSize
                         )
                     }
-                    updateDisplayedItems()
                 }
                 .onFailure {
                     // Revert page increment on failure
@@ -119,18 +154,7 @@ class ScanHistoryViewModel @Inject constructor(
 
     private fun applyFilter(filter: HistoryFilter) {
         _state.update { it.copy(selectedFilter = filter) }
-        updateDisplayedItems()
-    }
-
-    private fun updateDisplayedItems() {
-        val currentState = _state.value
-        val filtered = when (currentState.selectedFilter) {
-            HistoryFilter.ALL -> currentState.allHistoryItems
-            HistoryFilter.SAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.GREEN || it.verdictType == VerdictType.CYAN }
-            HistoryFilter.CAUTION -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.YELLOW }
-            HistoryFilter.UNSAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.RED }
-        }
-        _state.update { it.copy(displayedHistoryItems = filtered.toImmutableList()) }
+        loadInitial() // Trigger a reload from API with the new filter
     }
 
     private fun mapScansToUi(scans: List<ScanHistoryEntry>): List<HistoryItemUiModel> {
