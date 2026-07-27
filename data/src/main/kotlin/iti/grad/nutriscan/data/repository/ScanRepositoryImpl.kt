@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.remote.api.ScanApiService
 import iti.grad.nutriscan.domain.scan.model.ProductResult
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
+import java.time.LocalDate
 import iti.grad.nutriscan.data.repository.mapper.toDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -160,4 +161,7 @@ class ScanRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    // ponytail: returns null until scan history is persisted (no scan-history storage exists yet)
+    override suspend fun getLastScanDate(): LocalDate? = null
 }

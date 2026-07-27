@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -57,6 +58,7 @@ class FoodLogRepositoryImplTest {
 
     private lateinit var dao: FakeFoodLogDao
     private lateinit var authRepository: IAuthRepository
+    private lateinit var streakRepository: IStreakRepository
     private lateinit var dailyTrackingRepository: IDailyTrackingRepository
     private lateinit var repository: FoodLogRepositoryImpl
 
@@ -75,10 +77,17 @@ class FoodLogRepositoryImplTest {
     fun setup() {
         dao = FakeFoodLogDao()
         authRepository = mockk()
+        streakRepository = mockk(relaxed = true)
         dailyTrackingRepository = mockk()
         coEvery { dailyTrackingRepository.pushMeal(any(), any(), any()) } returns Result.success(Unit)
         coEvery { dailyTrackingRepository.deleteMeal(any(), any()) } returns Result.success(Unit)
-        repository = FoodLogRepositoryImpl(dao, authRepository, dailyTrackingRepository, UnconfinedTestDispatcher())
+        repository = FoodLogRepositoryImpl(
+            dao,
+            authRepository,
+            streakRepository,
+            dailyTrackingRepository,
+            UnconfinedTestDispatcher()
+        )
     }
 
     @Test

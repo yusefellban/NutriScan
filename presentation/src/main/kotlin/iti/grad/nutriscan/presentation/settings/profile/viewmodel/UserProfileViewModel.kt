@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.domain.streak.usecase.ObserveStreakUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 class UserProfileViewModel @Inject constructor(
     private val userRepository: IUserRepository,
     private val familyMemberRepository: IFamilyMemberRepository,
+    private val observeStreak: ObserveStreakUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -58,6 +60,11 @@ class UserProfileViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+        viewModelScope.launch {
+            observeStreak().collectLatest { streak ->
+                _state.update { it.copy(streakDays = streak.currentStreak) }
             }
         }
         viewModelScope.launch {
@@ -143,7 +150,6 @@ class UserProfileViewModel @Inject constructor(
     }
 
     private fun createInitialState(): UserProfileState = UserProfileState(
-        streakDays = 15,
         familyMembers = persistentListOf(),
     )
 }

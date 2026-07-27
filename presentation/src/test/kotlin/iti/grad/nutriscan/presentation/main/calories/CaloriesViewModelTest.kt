@@ -332,7 +332,7 @@ class CaloriesViewModelTest {
         // mirroring what the real repository would emit after a successful write.
 
         @Test
-        fun `AddWaterClicked adds an empty cup without filling it`() = runTest {
+        fun `AddWaterClicked adds an empty cup and persists the new goal`() = runTest {
             viewModel.onEvent(CaloriesEvent.AddWaterClicked)
             testScheduler.runCurrent()
 
@@ -340,7 +340,7 @@ class CaloriesViewModelTest {
         }
 
         @Test
-        fun `WaterCupClicked on the next empty cup fills it`() = runTest {
+        fun `WaterCupClicked on the next empty cup fills it and logs a glass`() = runTest {
             // waterConsumed=4, waterGoal=8 by default — index 4 is the next empty cup
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(4))
             testScheduler.runCurrent()
@@ -349,7 +349,7 @@ class CaloriesViewModelTest {
         }
 
         @Test
-        fun `WaterCupClicked on the last filled cup unfills it`() = runTest {
+        fun `WaterCupClicked on the last filled cup unfills it and unlogs a glass`() = runTest {
             // waterConsumed=4 by default — index 3 is the last filled cup
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(3))
             testScheduler.runCurrent()
@@ -395,7 +395,7 @@ class CaloriesViewModelTest {
         }
 
         @Test
-        fun `WaterCupLongPressed on the last empty cup deletes it`() = runTest {
+        fun `WaterCupLongPressed on the last empty cup deletes it and persists the new goal`() = runTest {
             // waterGoal=8 by default — index 7 is the last cup (empty, since waterConsumed=4)
             viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(7))
             testScheduler.runCurrent()
@@ -461,7 +461,7 @@ class CaloriesViewModelTest {
          * until [CaloriesEvent.StepsCardClicked] is dispatched (the screen fires it once on
          * start); the outer shared viewModel never sees it.
          */
-        private fun createViewModel(
+        private fun createStepsViewModel(
             permissionGranted: Boolean = true,
             steps: Flow<Int> = flowOf(0),
         ): Triple<CaloriesViewModel, CheckStepsPermissionUseCase, ObserveTodayStepsUseCase> {
@@ -485,7 +485,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `when permission already granted, steps load from the sensor`() = runTest {
-            val (vm, _, _) = createViewModel(permissionGranted = true, steps = flowOf(4321))
+            val (vm, _, _) = createStepsViewModel(permissionGranted = true, steps = flowOf(4321))
 
             vm.onEvent(CaloriesEvent.StepsCardClicked)
             testScheduler.runCurrent()
@@ -497,7 +497,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `steps update live as new sensor readings arrive`() = runTest {
-            val (vm, _, _) = createViewModel(permissionGranted = true, steps = flowOf(10, 25, 40))
+            val (vm, _, _) = createStepsViewModel(permissionGranted = true, steps = flowOf(10, 25, 40))
 
             vm.onEvent(CaloriesEvent.StepsCardClicked)
             testScheduler.runCurrent()
@@ -508,7 +508,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `when permission not granted, requests it via effect`() = runTest {
-            val (vm, _, _) = createViewModel(permissionGranted = false)
+            val (vm, _, _) = createStepsViewModel(permissionGranted = false)
 
             vm.effect.test {
                 vm.onEvent(CaloriesEvent.StepsCardClicked)
@@ -519,7 +519,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `StepsPermissionResult granted loads steps and starts tracking`() = runTest {
-            val (vm, _, _) = createViewModel(permissionGranted = false, steps = flowOf(1500))
+            val (vm, _, _) = createStepsViewModel(permissionGranted = false, steps = flowOf(1500))
             vm.onEvent(CaloriesEvent.StepsCardClicked)
             testScheduler.runCurrent()
 
@@ -532,7 +532,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `StepsPermissionResult denied leaves steps unloaded`() = runTest {
-            val (vm, _, _) = createViewModel(permissionGranted = false)
+            val (vm, _, _) = createStepsViewModel(permissionGranted = false)
             vm.onEvent(CaloriesEvent.StepsCardClicked)
             testScheduler.runCurrent()
 
@@ -545,7 +545,7 @@ class CaloriesViewModelTest {
 
         @Test
         fun `StepsCardClicked re-checks permission`() = runTest {
-            val (vm, permissionUseCase, _) = createViewModel(permissionGranted = false)
+            val (vm, permissionUseCase, _) = createStepsViewModel(permissionGranted = false)
             vm.onEvent(CaloriesEvent.StepsCardClicked)
             testScheduler.runCurrent()
 

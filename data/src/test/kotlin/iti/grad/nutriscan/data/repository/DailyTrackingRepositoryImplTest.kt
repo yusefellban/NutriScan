@@ -8,8 +8,10 @@ import iti.grad.nutriscan.data.remote.api.DailyTrackingApiService
 import iti.grad.nutriscan.data.remote.dto.DailyTrackingMealResponseDto
 import iti.grad.nutriscan.data.remote.dto.DailyTrackingRequestDto
 import iti.grad.nutriscan.data.remote.dto.DailyTrackingResponseDto
+import io.mockk.coVerify
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.CairoDateProvider
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +55,7 @@ class DailyTrackingRepositoryImplTest {
     private lateinit var api: DailyTrackingApiService
     private lateinit var authRepository: IAuthRepository
     private lateinit var userRepository: IUserRepository
+    private lateinit var streakRepository: IStreakRepository
     private lateinit var repository: DailyTrackingRepositoryImpl
 
     // Shared across the class (not recreated per test) so its scheduler can be passed into
@@ -80,9 +83,10 @@ class DailyTrackingRepositoryImplTest {
         api = mockk()
         authRepository = mockk()
         userRepository = mockk()
+        streakRepository = mockk(relaxed = true)
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
         coEvery { userRepository.getUserData() } returns MutableStateFlow(user())
-        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, testDispatcher)
+        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, streakRepository, testDispatcher)
     }
 
     @Test
@@ -105,6 +109,20 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
+    fun `updateWaterCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
+        repository.updateWaterCnt(1)
+
+        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
+    }
+
+    @Test
+    fun `updateWaterCnt back to zero does not recompute the streak`() = runTest(testDispatcher.scheduler) {
+        repository.updateWaterCnt(0)
+
+        coVerify(exactly = 0) { streakRepository.recomputeStreak() }
+    }
+
+    @Test
     fun `updateStepsCnt derives caloriesBurnedSteps from the user's weight`() = runTest(testDispatcher.scheduler) {
         repository.updateStepsCnt(1000)
 
@@ -112,6 +130,20 @@ class DailyTrackingRepositoryImplTest {
         assertEquals(1000, today.stepsCnt)
         // 1000 steps * 70kg * 0.0005 = 35
         assertEquals(35, today.caloriesBurnedSteps)
+    }
+
+    @Test
+    fun `updateStepsCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
+        repository.updateStepsCnt(500)
+
+        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
+    }
+
+    @Test
+    fun `addExerciseWorkout recomputes the streak`() = runTest(testDispatcher.scheduler) {
+        repository.addExerciseWorkout(kcalBurned = 200, minutes = 20)
+
+        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
     }
 
     @Test

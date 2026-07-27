@@ -149,6 +149,49 @@
     <string name="user_profile_bmi_obese">Obese</string>
     <string name="bmi_tdee_not_available">Health metrics will appear after your first profile sync.</string>
 
+    <!-- Notification Settings -->
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_toggles_header">Notification Types</string>
+    <string name="notification_type_steps">Steps</string>
+    <string name="notification_type_water">Water</string>
+    <string name="notification_type_workout">Workout</string>
+    <string name="notification_type_food">Food Log</string>
+    <string name="notification_type_news">Health News</string>
+    <string name="notification_type_quote">Health Quotes</string>
+    <string name="notification_type_scan">Scan Reminders</string>
+    <string name="notification_type_streak">Streak</string>
+    <string name="notification_type_break">Break Reminders</string>
+    <string name="notification_settings_quiet_hours_header">Quiet Hours</string>
+    <string name="notification_settings_quiet_hours_label">Do not disturb</string>
+    <string name="notification_settings_progress_header">Today\'s Progress</string>
+    <string name="notification_settings_water_progress">%1$d / %2$d glasses</string>
+    <string name="notification_settings_log_water_glass">+1 glass</string>
+    <string name="notification_settings_workout_done">Workout done</string>
+    <string name="notification_settings_mark_workout_done">Mark done</string>
+    <string name="notification_settings_streak_days">%1$d day streak</string>
+    <string name="notification_settings_steps_progress">%1$d / %2$d steps</string>
+    <string name="notification_push_water_title">Stay hydrated</string>
+    <string name="notification_push_water_body">You\'re at %1$d/%2$d glasses today.</string>
+    <string name="notification_push_workout_title">Time to move</string>
+    <string name="notification_push_workout_body">You haven\'t logged a workout today — even a short walk counts.</string>
+    <string name="notification_push_steps_title">Keep going</string>
+    <string name="notification_push_steps_body">You\'re at %1$d/%2$d steps today.</string>
+    <string name="notification_push_streak_title">Don\'t lose your streak</string>
+    <string name="notification_push_streak_body">You\'re on a %1$d-day streak — log a meal before midnight to keep it alive.</string>
+    <string name="notification_push_food_title">Log today\'s meals</string>
+    <string name="notification_push_food_body">You haven\'t logged any food today — a quick scan or entry keeps your record accurate.</string>
+    <string name="notification_push_news_title">Today\'s health news</string>
+    <string name="notification_push_news_body">New nutrition and safety articles are waiting for you.</string>
+    <string name="notification_push_quote_title">Health tip</string>
+    <string name="notification_push_scan_title">Scan before you buy</string>
+    <string name="notification_push_scan_body">It\'s been a few days since your last scan — check your next purchase for safety.</string>
+    <string name="notification_push_break_title">Time for a break</string>
+    <string name="notification_push_break_body">Stand up, stretch, drink some water, and rest your eyes for a minute.</string>
+    <string name="notification_push_test_title">Test notification</string>
+    <string name="notification_push_test_body">If you can see this, notifications are working correctly.</string>
+    <string name="notification_settings_send_test">Send test notification</string>
+    <string name="notification_settings_test_sent">Test notification sent</string>
+
     <!-- App Settings -->
     <string name="app_settings_title">App Settings</string>
     <string name="app_settings_subtitle">Change application settings here</string>

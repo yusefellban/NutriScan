@@ -4,15 +4,18 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.gif.GifDecoder
+import iti.grad.nutriscan.notification.NotificationChannels
+import iti.grad.nutriscan.notification.NotificationScheduler
+import iti.grad.nutriscan.steps.StepsScheduler
 import iti.grad.nutriscan.work.DailyTrackingSyncScheduler
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltAndroidApp
 class NutriScanApplication : Application(), SingletonImageLoader.Factory, Configuration.Provider {
@@ -28,6 +31,9 @@ class NutriScanApplication : Application(), SingletonImageLoader.Factory, Config
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        NotificationChannels.createAll(this)
+        NotificationScheduler.scheduleAll(this)
+        StepsScheduler.schedule(this)
         DailyTrackingSyncScheduler.schedule(this)
     }
 

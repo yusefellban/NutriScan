@@ -211,7 +211,6 @@ class CaloriesViewModel @Inject constructor(
         navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
     }
 
-
     private fun navigate(effect: CaloriesEffect) {
         viewModelScope.launch { _effect.send(effect) }
     }

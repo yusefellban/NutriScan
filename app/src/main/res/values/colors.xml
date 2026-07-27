@@ -2,4 +2,6 @@
 <resources>
     <!-- Starting Window teal background — must match AppColors.Teal1000 exactly -->
     <color name="splash_background">#FF13A4AB</color>
+    <!-- Notification accent — must match AppColors.Primary (light) exactly -->
+    <color name="notification_accent">#FF13A4AB</color>
 </resources>

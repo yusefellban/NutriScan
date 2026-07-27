@@ -27,6 +27,18 @@ import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 import iti.grad.nutriscan.domain.news.repository.INewsRepository
 import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
+import iti.grad.nutriscan.domain.water.repository.IWaterRepository
+import iti.grad.nutriscan.data.repository.WaterRepositoryImpl
+import iti.grad.nutriscan.domain.workout.repository.IWorkoutRepository
+import iti.grad.nutriscan.data.repository.WorkoutRepositoryImpl
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
+import iti.grad.nutriscan.data.repository.StreakRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationRepository
+import iti.grad.nutriscan.data.repository.NotificationRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.IQuoteRepository
+import iti.grad.nutriscan.repository.QuoteRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.ITestNotificationSender
+import iti.grad.nutriscan.notification.TestNotificationSenderImpl
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.data.repository.FamilyMemberRepositoryImpl
 import iti.grad.nutriscan.domain.exercises.repository.IExercisesRepository
@@ -109,15 +121,52 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindWaterRepository(
+        impl: WaterRepositoryImpl
+    ): IWaterRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkoutRepository(
+        impl: WorkoutRepositoryImpl
+    ): IWorkoutRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStreakRepository(
+        impl: StreakRepositoryImpl
+    ): IStreakRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationRepository(
+        impl: NotificationRepositoryImpl
+    ): INotificationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindQuoteRepository(
+        impl: QuoteRepositoryImpl
+    ): IQuoteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTestNotificationSender(
+        impl: TestNotificationSenderImpl
+    ): ITestNotificationSender
+
+    @Binds
+    @Singleton
     abstract fun bindFamilyMemberRepository(
         impl: FamilyMemberRepositoryImpl
     ): IFamilyMemberRepository
+
     @Binds
     @Singleton
     abstract fun bindExercisesRepository(
         impl: ExercisesRepositoryImpl
     ): IExercisesRepository
-  
+
     @Binds
     @Singleton
     abstract fun bindNutriGptRepository(

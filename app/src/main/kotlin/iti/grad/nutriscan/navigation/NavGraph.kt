@@ -30,6 +30,7 @@ import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
@@ -304,14 +305,11 @@ fun AppNavGraph(
             }
         }
 
-        // 22. Notification Settings (Placeholder)
+        // 22. Notification Settings
         composable<NotificationSettingsRoute> {
-            PlaceholderScreen(
-                title = "Notification Settings",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+            NotificationSettingsScreen(
+                onNavigateBack = { navController.navigateUp() },
+            )
         }
 
         // 23. App Settings

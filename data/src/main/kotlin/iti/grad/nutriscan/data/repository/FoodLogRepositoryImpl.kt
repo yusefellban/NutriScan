@@ -10,6 +10,7 @@ import iti.grad.nutriscan.domain.common.runCatchingCancellable
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class FoodLogRepositoryImpl @Inject constructor(
     private val dao: FoodLogDao,
     private val authRepository: IAuthRepository,
+    private val streakRepository: IStreakRepository,
     private val dailyTrackingRepository: IDailyTrackingRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IFoodLogRepository {
@@ -52,6 +54,8 @@ class FoodLogRepositoryImpl @Inject constructor(
     override suspend fun addFoodEntryLocalOnly(entry: FoodLogEntry): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             dao.insert(entry.toEntity(resolveUserId()))
+        }.also {
+            if (it.isSuccess) streakRepository.recomputeStreak()
         }
     }
 
