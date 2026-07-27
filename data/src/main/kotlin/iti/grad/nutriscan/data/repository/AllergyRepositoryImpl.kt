@@ -2,12 +2,13 @@ package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.AllergyDao
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IAllergyRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.domain.allergy.model.Allergy
 import iti.grad.nutriscan.domain.allergy.repository.IAllergyRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -24,10 +25,11 @@ import javax.inject.Inject
 class AllergyRepositoryImpl @Inject constructor(
     private val remoteDataSource: IAllergyRemoteDataSource,
     private val allergyDao: AllergyDao,
-    private val json: Json
+    private val json: Json,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IAllergyRepository {
 
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     /** Polls the backend catalog every [SYNC_INTERVAL_MS] for as long as at least one collector is
      * subscribed, so an allergy added/edited server-side shows up without an app restart. Catalog

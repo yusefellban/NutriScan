@@ -3,6 +3,7 @@ package iti.grad.nutriscan.data.repository
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.entity.FamilyMemberEntity
 import iti.grad.nutriscan.data.db.entity.UserEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.FamilyMemberDto
@@ -14,8 +15,8 @@ import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.local.util.JwtDecoder
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -41,9 +42,10 @@ class FamilyMemberRepositoryImpl @Inject constructor(
     private val json: Json,
     private val tokenManager: TokenManager,
     private val userRepository: IUserRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IFamilyMemberRepository {
 
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     private suspend fun getActiveUserId(): String? {
         val dbUser = userDao.getUserFlow().firstOrNull()

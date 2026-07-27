@@ -2,6 +2,7 @@ package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
@@ -9,8 +10,8 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -28,10 +29,11 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val remoteDataSource: IUserRemoteDataSource,
-    private val json: Json
+    private val json: Json,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IUserRepository {
 
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     /** Polls the backend every [SYNC_INTERVAL_MS] for as long as at least one collector is
      * subscribed, so a profile edit made on another device shows up here without an app restart.
