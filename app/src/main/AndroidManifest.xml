@@ -41,6 +41,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".notification.DebugNotificationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="iti.grad.nutriscan.DEBUG_SEND_ALL_NOTIFICATIONS" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

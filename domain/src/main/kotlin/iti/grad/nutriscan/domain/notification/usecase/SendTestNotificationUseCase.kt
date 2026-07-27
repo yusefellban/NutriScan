@@ -7,4 +7,5 @@ class SendTestNotificationUseCase @Inject constructor(
     private val sender: ITestNotificationSender
 ) {
     operator fun invoke() = sender.sendNow()
+    fun sendAllTypes() = sender.sendAllTypesNow()
 }
