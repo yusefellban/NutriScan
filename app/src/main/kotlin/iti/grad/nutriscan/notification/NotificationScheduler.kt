@@ -5,6 +5,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import iti.grad.nutriscan.notification.worker.BreakNotificationWorker
 import iti.grad.nutriscan.notification.worker.FoodNotificationWorker
 import iti.grad.nutriscan.notification.worker.NewsNotificationWorker
 import iti.grad.nutriscan.notification.worker.QuoteNotificationWorker
@@ -27,6 +28,7 @@ object NotificationScheduler {
         schedule<QuoteNotificationWorker>(workManager, QuoteNotificationWorker.WORK_NAME, 1, TimeUnit.DAYS)
         schedule<ScanNotificationWorker>(workManager, ScanNotificationWorker.WORK_NAME, 1, TimeUnit.DAYS)
         schedule<StreakNotificationWorker>(workManager, StreakNotificationWorker.WORK_NAME, 1, TimeUnit.DAYS)
+        schedule<BreakNotificationWorker>(workManager, BreakNotificationWorker.WORK_NAME, 2, TimeUnit.HOURS)
     }
 
     private inline fun <reified W : ListenableWorker> schedule(

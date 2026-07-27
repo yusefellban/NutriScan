@@ -133,6 +133,7 @@ private fun iconFor(type: NotificationType): Int = when (type) {
     NotificationType.QUOTE -> R.drawable.bell
     NotificationType.SCAN -> R.drawable.bell
     NotificationType.STREAK -> R.drawable.bell
+    NotificationType.BREAK -> R.drawable.bell
 }
 
 private fun labelFor(type: NotificationType): Int = when (type) {
@@ -144,6 +145,7 @@ private fun labelFor(type: NotificationType): Int = when (type) {
     NotificationType.QUOTE -> R.string.notification_type_quote
     NotificationType.SCAN -> R.string.notification_type_scan
     NotificationType.STREAK -> R.string.notification_type_streak
+    NotificationType.BREAK -> R.string.notification_type_break
 }
 
 @Preview(name = "Light", showBackground = true)

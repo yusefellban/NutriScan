@@ -18,6 +18,7 @@ object NotificationChannels {
         NotificationType.QUOTE -> "Health Quotes"
         NotificationType.SCAN -> "Scan Reminders"
         NotificationType.STREAK -> "Streak"
+        NotificationType.BREAK -> "Break Reminders"
     }
 
     fun createAll(context: Context) {

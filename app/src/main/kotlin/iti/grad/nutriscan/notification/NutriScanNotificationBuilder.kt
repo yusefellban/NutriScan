@@ -29,12 +29,26 @@ object NutriScanNotificationBuilder {
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setSmallIcon(PresentationR.drawable.ic_notification)
+            .setSmallIcon(iconFor(type))
             .setColor(ContextCompat.getColor(context, R.color.notification_accent))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
+    }
+
+    /** Each type gets a small icon that matches its content instead of the generic bell,
+     * so the status bar / notification shade signal what kind of nudge just arrived. */
+    private fun iconFor(type: NotificationType): Int = when (type) {
+        NotificationType.STEPS -> PresentationR.drawable.steps
+        NotificationType.WATER -> PresentationR.drawable.ic_water_dot
+        NotificationType.WORKOUT -> PresentationR.drawable.ic_notification_workout
+        NotificationType.FOOD -> PresentationR.drawable.calorie
+        NotificationType.NEWS -> PresentationR.drawable.ic_health_news
+        NotificationType.QUOTE -> PresentationR.drawable.ic_notification_quote
+        NotificationType.SCAN -> PresentationR.drawable.ic_scan
+        NotificationType.STREAK -> PresentationR.drawable.ic_fire
+        NotificationType.BREAK -> PresentationR.drawable.hour
     }
 
     const val EXTRA_NOTIFICATION_TYPE = "extra_notification_type"

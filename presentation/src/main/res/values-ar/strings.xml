@@ -163,6 +163,7 @@
     <string name="notification_type_quote">اقتباسات صحية</string>
     <string name="notification_type_scan">تذكير المسح</string>
     <string name="notification_type_streak">التتابع اليومي</string>
+    <string name="notification_type_break">تذكير الاستراحة</string>
     <string name="notification_settings_quiet_hours_header">ساعات الهدوء</string>
     <string name="notification_settings_quiet_hours_label">عدم الإزعاج</string>
     <string name="notification_settings_progress_header">تقدم اليوم</string>
@@ -187,6 +188,8 @@
     <string name="notification_push_quote_title">نصيحة صحية</string>
     <string name="notification_push_scan_title">امسح قبل الشراء</string>
     <string name="notification_push_scan_body">مرت أيام منذ آخر مسح لك — تحقق من سلامة مشترياتك القادمة.</string>
+    <string name="notification_push_break_title">حان وقت الاستراحة</string>
+    <string name="notification_push_break_body">قف، تمدد، اشرب بعض الماء، وأرح عينيك لدقيقة.</string>
     <string name="notification_push_test_title">إشعار تجريبي</string>
     <string name="notification_push_test_body">إذا كنت ترى هذا، فالإشعارات تعمل بشكل صحيح.</string>
     <string name="notification_settings_send_test">إرسال إشعار تجريبي</string>
