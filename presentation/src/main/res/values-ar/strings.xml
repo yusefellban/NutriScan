@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">نيوتري سكان</string>
     <string name="signup_title">سجل مجاناً!</string>
+    <string name="first_name_label">الاسم الأول</string>
+    <string name="first_name_hint">أدخل اسمك الأول…</string>
+    <string name="last_name_label">اسم العائلة</string>
+    <string name="last_name_hint">أدخل اسم عائلتك…</string>
     <string name="email_label">البريد الإلكتروني</string>
     <string name="email_hint">أدخل بريدك الإلكتروني...</string>
     <string name="password_label">كلمة المرور</string>

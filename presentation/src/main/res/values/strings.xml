@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">NutriScan</string>
     <string name="signup_title">Sign Up For Free!</string>
+    <string name="first_name_label">First Name</string>
+    <string name="first_name_hint">Enter your first name…</string>
+    <string name="last_name_label">Last Name</string>
+    <string name="last_name_hint">Enter your last name…</string>
     <string name="email_label">Email Address</string>
     <string name="email_hint">Enter your email address...</string>
     <string name="password_label">Password</string>

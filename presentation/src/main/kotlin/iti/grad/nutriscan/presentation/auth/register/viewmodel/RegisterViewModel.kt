@@ -37,6 +37,8 @@ class RegisterViewModel @Inject constructor(
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
+            is RegisterEvent.FirstNameChanged -> _state.update { it.copy(firstName = event.value, firstNameErrorResId = null, alertState = AuthAlertState.None) }
+            is RegisterEvent.LastNameChanged -> _state.update { it.copy(lastName = event.value, lastNameErrorResId = null, alertState = AuthAlertState.None) }
             is RegisterEvent.EmailChanged -> _state.update { it.copy(email = event.value, emailErrorResId = null, alertState = AuthAlertState.None) }
             is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value, passwordErrorResId = null, alertState = AuthAlertState.None) }
             is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null, alertState = AuthAlertState.None) }
@@ -60,7 +62,10 @@ class RegisterViewModel @Inject constructor(
 
     private fun handleSignUp() {
         val currentState = _state.value
-        
+
+        val firstNameError = if (currentState.firstName.isBlank()) R.string.error_empty_field else null
+        val lastNameError  = if (currentState.lastName.isBlank())  R.string.error_empty_field else null
+
         val emailError = when {
             currentState.email.isBlank() -> R.string.error_empty_field
             !currentState.email.matches(emailRegex) -> R.string.error_invalid_email
@@ -79,20 +84,22 @@ class RegisterViewModel @Inject constructor(
         
         _state.update { 
             it.copy(
+                firstNameErrorResId = firstNameError,
+                lastNameErrorResId = lastNameError,
                 emailErrorResId = emailError,
                 passwordErrorResId = passwordError,
                 confirmPasswordErrorResId = confirmPasswordError
             )
         }
         
-        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+        if (firstNameError != null || lastNameError != null || emailError != null || passwordError != null || confirmPasswordError != null) {
             _state.update { it.copy(alertState = AuthAlertState.Warning(message = UiText.StringResource(R.string.error_validation_fields))) }
             return
         }
         
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, alertState = AuthAlertState.None) }
-            registerUseCase(currentState.email, currentState.password)
+            registerUseCase(currentState.firstName, currentState.lastName, currentState.email, currentState.password)
                 .onSuccess {
                     resendVerificationEmailUseCase(currentState.email)
                     _state.update { 

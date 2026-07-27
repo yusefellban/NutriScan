@@ -31,14 +31,14 @@ class AuthRepositoryImpl @Inject constructor(
     private val database: NutriScanDatabase
 ) : IAuthRepository {
 
-    override suspend fun register(email: String, password: String): Result<Unit> {
+    override suspend fun register(firstName: String, lastName: String, email: String, password: String): Result<Unit> {
         return try {
-            val emailPrefix = email.substringBefore("@")
+            val username = email.substringBefore("@")
             val request = RegisterRequestDto(
-                firstName = emailPrefix,
-                lastName = "",
+                firstName = firstName,
+                lastName = lastName,
                 email = email,
-                username = email,
+                username = username,
                 password = password,
                 dateOfBirth = "2000-01-01",
                 gender = "MALE",
@@ -48,7 +48,7 @@ class AuthRepositoryImpl @Inject constructor(
                 diseases = emptyList()
             )
 
-            Timber.d("Registration attempt for email: $email, username: $email")
+            Timber.d("Registration attempt for email: $email, username: $username")
             val response = remoteDataSource.register(request)
 
             if (response.isSuccessful) {
