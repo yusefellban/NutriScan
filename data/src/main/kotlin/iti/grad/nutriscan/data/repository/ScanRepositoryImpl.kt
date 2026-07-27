@@ -141,7 +141,7 @@ class ScanRepositoryImpl @Inject constructor(
 
     override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
-            if (page == 0 && localRecentScans != null) {
+            if (page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
             try {

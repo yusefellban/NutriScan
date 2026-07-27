@@ -379,4 +379,12 @@
     <string name="common_retry">Retry</string>
     <string name="date_today">Today, %1$s</string>
     <string name="date_yesterday">Yesterday, %1$s</string>
+    <string name="scan_history_title">Scan History</string>
+    <string name="filter_all">All</string>
+    <string name="filter_safe">Safe</string>
+    <string name="filter_caution">Caution</string>
+    <string name="filter_unsafe">Unsafe</string>
+    <string name="scan_history_empty">No history found</string>
+    <string name="scan_history_error_load">Failed to load history</string>
+
 </resources>

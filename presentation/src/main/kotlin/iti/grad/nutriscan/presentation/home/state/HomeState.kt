@@ -2,6 +2,7 @@ package iti.grad.nutriscan.presentation.home.state
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
 
 /**
  * Immutable UI state for the Home screen.
@@ -16,5 +17,5 @@ data class HomeState(
     val isLoading: Boolean = false,
     val isHistoryLoading: Boolean = false,
     val historyError: String? = null,
-    val recentHistory: ImmutableList<HomeHistoryItem> = persistentListOf(),
+    val recentHistory: ImmutableList<HistoryItemUiModel> = persistentListOf(),
 )

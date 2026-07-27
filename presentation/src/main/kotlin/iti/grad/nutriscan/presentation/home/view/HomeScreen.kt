@@ -42,7 +42,7 @@ import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
-import iti.grad.nutriscan.presentation.home.view.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel

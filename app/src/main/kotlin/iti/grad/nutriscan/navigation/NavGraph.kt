@@ -35,6 +35,7 @@ import iti.grad.nutriscan.presentation.news.view.NewsScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
+import iti.grad.nutriscan.presentation.scan_history.view.ScanHistoryScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
@@ -255,14 +256,14 @@ fun AppNavGraph(
             }
         }
 
-        // 15. Scan History (Placeholder)
+        // 15. Scan History
         composable<ScanHistoryRoute> {
-            PlaceholderScreen(
-                title = "Scan History",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+            ScanHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToProductDetails = { scanId ->
+                    navController.navigate(ProductDetailsRoute(scanId = scanId))
+                }
+            )
         }
 
         // 16. Report List (Placeholder)

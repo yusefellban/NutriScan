@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.home.viewmodel
+package iti.grad.nutriscan.presentation.scan_history.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,22 +6,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
-import iti.grad.nutriscan.presentation.common.model.UiText
-import iti.grad.nutriscan.presentation.home.state.HomeEffect
-import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
+import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.common.model.VerdictType
-import iti.grad.nutriscan.presentation.home.state.HomeState
+import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.presentation.R
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,93 +29,111 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val userRepository: IUserRepository,
+class ScanHistoryViewModel @Inject constructor(
     private val getRecentScansUseCase: GetRecentScansUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(createInitialState())
-    val state: StateFlow<HomeState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(ScanHistoryState())
+    val state: StateFlow<ScanHistoryState> = _state.asStateFlow()
 
-    private val _effect = Channel<HomeEffect>(Channel.BUFFERED)
+    private val _effect = Channel<ScanHistoryEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private val pageSize = 8
+
     init {
-        loadRecentScans()
+        loadInitial()
+    }
+
+    fun onEvent(event: ScanHistoryEvent) {
+        when (event) {
+            is ScanHistoryEvent.LoadMore -> loadMore()
+            is ScanHistoryEvent.FilterSelected -> applyFilter(event.filter)
+            is ScanHistoryEvent.ItemClicked -> emitEffect(ScanHistoryEffect.NavigateToProductDetails(event.scanId))
+            is ScanHistoryEvent.BackClicked -> emitEffect(ScanHistoryEffect.NavigateBack)
+            is ScanHistoryEvent.RetryLoad -> loadInitial()
+        }
+    }
+
+    private fun loadInitial() {
+        if (_state.value.isLoading) return
+        _state.update { it.copy(isLoading = true, error = null, page = 0, isLastPage = false, allHistoryItems = emptyList()) }
         
         viewModelScope.launch {
-            // Trigger fetch from remote on load
-            userRepository.fetchAndSyncProfile()
-        }
-
-        viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
-                if (user != null) {
-                    _state.update {
-                        it.copy(
-                            firstName = user.firstName,
-                            userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
-                            avatarUrl = user.avatarUrl
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    fun onEvent(event: HomeEvent) {
-        when (event) {
-            is HomeEvent.ScanCardClicked -> emitEffect(HomeEffect.NavigateToScan)
-            is HomeEvent.ViewAllHistoryClicked -> emitEffect(HomeEffect.NavigateToHistory)
-            is HomeEvent.NotificationClicked -> emitEffect(HomeEffect.NavigateToNotifications)
-            is HomeEvent.HistoryItemClicked -> emitEffect(
-                HomeEffect.NavigateToScanResult(event.itemId)
-            )
-            is HomeEvent.HealthNewsClicked -> emitEffect(HomeEffect.NavigateToNews)
-            is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
-            is HomeEvent.RetryLoadHistory -> loadRecentScans()
-            is HomeEvent.RefreshHistorySilently -> refreshHistorySilently()
-        }
-    }
-
-    private fun loadRecentScans() {
-        viewModelScope.launch {
-            _state.update { it.copy(isHistoryLoading = true, historyError = null) }
-            
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = pageSize)
                 .onSuccess { scans ->
+                    val uiItems = mapScansToUi(scans)
                     _state.update { state ->
                         state.copy(
-                            isHistoryLoading = false,
-                            recentHistory = mapScansToUi(scans)
+                            isLoading = false,
+                            allHistoryItems = uiItems,
+                            isLastPage = scans.size < pageSize,
                         )
                     }
+                    updateDisplayedItems()
                 }
                 .onFailure { error ->
                     _state.update { 
                         it.copy(
-                            isHistoryLoading = false, 
-                            historyError = error.message ?: "Failed to load recent scans"
+                            isLoading = false, 
+                            error = error.message ?: "Failed to load history"
                         ) 
                     }
                 }
         }
     }
 
-    private fun refreshHistorySilently() {
+    private fun loadMore() {
+        val currentState = _state.value
+        if (currentState.isLoading || currentState.isPaginationLoading || currentState.isLastPage || currentState.error != null) {
+            return
+        }
+
+        val nextPage = currentState.page + 1
+        _state.update { it.copy(isPaginationLoading = true, page = nextPage) }
+
         viewModelScope.launch {
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = nextPage, size = pageSize)
                 .onSuccess { scans ->
+                    val newUiItems = mapScansToUi(scans)
                     _state.update { state ->
                         state.copy(
-                            recentHistory = mapScansToUi(scans)
+                            isPaginationLoading = false,
+                            allHistoryItems = state.allHistoryItems + newUiItems,
+                            isLastPage = scans.size < pageSize
+                        )
+                    }
+                    updateDisplayedItems()
+                }
+                .onFailure {
+                    // Revert page increment on failure
+                    _state.update { state -> 
+                        state.copy(
+                            isPaginationLoading = false,
+                            page = state.page - 1
                         )
                     }
                 }
         }
     }
 
-    private fun mapScansToUi(scans: List<ScanHistoryEntry>): ImmutableList<HistoryItemUiModel> {
+    private fun applyFilter(filter: HistoryFilter) {
+        _state.update { it.copy(selectedFilter = filter) }
+        updateDisplayedItems()
+    }
+
+    private fun updateDisplayedItems() {
+        val currentState = _state.value
+        val filtered = when (currentState.selectedFilter) {
+            HistoryFilter.ALL -> currentState.allHistoryItems
+            HistoryFilter.SAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.GREEN || it.verdictType == VerdictType.CYAN }
+            HistoryFilter.CAUTION -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.YELLOW }
+            HistoryFilter.UNSAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.RED }
+        }
+        _state.update { it.copy(displayedHistoryItems = filtered.toImmutableList()) }
+    }
+
+    private fun mapScansToUi(scans: List<ScanHistoryEntry>): List<HistoryItemUiModel> {
         return scans.map { entry ->
             val verdictType = when (entry.verdict) {
                 ProductVerdict.SAFE -> VerdictType.GREEN
@@ -146,7 +161,7 @@ class HomeViewModel @Inject constructor(
                 verdictType = verdictType,
                 imageUrl = entry.imageUrl
             )
-        }.toImmutableList()
+        }
     }
 
     private fun formatRelativeDate(isoString: String): UiText {
@@ -167,9 +182,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun emitEffect(effect: HomeEffect) {
+    private fun emitEffect(effect: ScanHistoryEffect) {
         viewModelScope.launch { _effect.send(effect) }
     }
-
-    private fun createInitialState(): HomeState = HomeState()
 }
