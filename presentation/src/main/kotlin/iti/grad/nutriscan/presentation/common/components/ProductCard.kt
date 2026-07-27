@@ -65,6 +65,9 @@ fun ProductCard(
     swipeAction: ProductCardSwipeAction? = null,
     /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
     caloriesOverlayOnImage: Boolean = false,
+    /** Times this product was logged today. Shows an "x2"-style badge next to the calorie badge
+     * instead of duplicating the card; 1 (the default) shows no badge. */
+    quantity: Int = 1,
 ) {
     val density = LocalDensity.current
     val shadowBlurPx = with(density) { 12.dp.toPx() }
@@ -117,6 +120,18 @@ fun ProductCard(
                         background = AppTheme.colors.ProductCardNameText.copy(alpha = 0.55f),
                         textColor = Color.White,
                     )
+
+                    if (quantity > 1) {
+                        QuantityBadge(
+                            quantity = quantity,
+                            background = AppTheme.colors.ProductCardNameText.copy(alpha = 0.55f),
+                            textColor = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .zIndex(1f)
+                                .padding(6.dp),
+                        )
+                    }
                 }
             }
 
@@ -166,12 +181,24 @@ fun ProductCard(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        CaloriesBadge(
-                            calories = calories,
-                            background = AppTheme.colors.ProductCardCaloriesBackground,
-                            textColor = AppTheme.colors.ProductCardCaloriesText,
-                            cornerRadius = 4.dp,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (quantity > 1) {
+                                QuantityBadge(
+                                    quantity = quantity,
+                                    background = AppTheme.colors.ProductCardCaloriesBackground,
+                                    textColor = AppTheme.colors.ProductCardCaloriesText,
+                                )
+                            }
+                            CaloriesBadge(
+                                calories = calories,
+                                background = AppTheme.colors.ProductCardCaloriesBackground,
+                                textColor = AppTheme.colors.ProductCardCaloriesText,
+                                cornerRadius = 4.dp,
+                            )
+                        }
                     }
                 }
 
@@ -215,6 +242,26 @@ private fun CaloriesBadge(
             color = textColor
         )
     }
+}
+
+@Composable
+private fun QuantityBadge(
+    quantity: Int,
+    background: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(id = R.string.product_card_quantity_badge, quantity),
+        style = AppTheme.typography.labelSmall.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = 11.sp,
+        ),
+        color = textColor,
+        modifier = modifier
+            .background(background, RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 3.dp),
+    )
 }
 
 @Composable

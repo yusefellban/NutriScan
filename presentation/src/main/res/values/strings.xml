@@ -209,6 +209,7 @@
     <string name="calorie_goals">Calorie Goals</string>
     <string name="your_tdee">Your TDEE</string>
     <string name="calories_gained">Calories Gained</string>
+    <string name="calories_burned">Calories Burned</string>
     <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
@@ -285,6 +286,7 @@
     <string name="saved_empty_state">No saved products yet</string>
     <string name="product_card_swipe_hint">Swipe right to add</string>
     <string name="product_card_kcal_unit">Kcal</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
     <string name="food_log_swipe_remove_hint">Swipe to remove</string>

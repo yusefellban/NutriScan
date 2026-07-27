@@ -21,12 +21,19 @@ import iti.grad.nutriscan.presentation.onboarding.carousel.view.components.Onboa
 fun CalorieGoalsPager(
     tdee: Int,
     caloriesGained: Int,
+    caloriesBurned: Int,
     bmi: Double?,
     modifier: Modifier = Modifier,
 ) {
     var currentPage by remember { mutableIntStateOf(0) }
     val pages = listOf<@Composable () -> Unit>(
-        { CalorieGoalsCard(tdee = tdee, caloriesGained = caloriesGained) },
+        {
+            CalorieGoalsCard(
+                tdee = tdee,
+                caloriesGained = caloriesGained,
+                caloriesBurned = caloriesBurned,
+            )
+        },
         { BmiGoalCard(bmi = bmi) },
     )
 

@@ -213,6 +213,7 @@
     <string name="calorie_goals">أهداف السعرات</string>
     <string name="your_tdee">إجمالي الحرق</string>
     <string name="calories_gained">السعرات المكتسبة</string>
+    <string name="calories_burned">السعرات المحروقة</string>
     <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
@@ -288,6 +289,7 @@
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
     <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>

@@ -86,6 +86,7 @@ class CaloriesViewModel @Inject constructor(
                         steps = tracking.stepsCnt,
                         exerciseKcal = tracking.exerciseKcal,
                         exerciseMinutes = tracking.exerciseMinutes,
+                        caloriesBurned = tracking.caloriesBurnedSteps + tracking.exerciseKcal,
                     )
                 }
             }
@@ -112,11 +113,17 @@ class CaloriesViewModel @Inject constructor(
         }
     }
 
-    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in sync. */
+    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in
+     * sync. Entries for the same product are grouped into one card with a quantity badge instead
+     * of duplicating the card — see [toGroupedProductUiModel]. */
     private fun observeFoodLog() {
         viewModelScope.launch {
             observeTodayFoodLog().collect { entries ->
-                val products = entries.map { it.toProductUiModel() }.toImmutableList()
+                val products = entries
+                    .groupBy { it.productId ?: it.id }
+                    .values
+                    .map { it.toGroupedProductUiModel() }
+                    .toImmutableList()
                 _state.update {
                     it.copy(
                         addedFoods = products,
@@ -209,11 +216,19 @@ class CaloriesViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private fun FoodLogEntry.toProductUiModel() = ProductUiModel(
-        id = productId ?: id,
-        productName = name,
-        imageUrl = imageUrl,
-        verdict = verdict,
-        calories = calories.toString(),
-    )
+    /** One card per distinct product: [quantity] is the group size, and swiping to remove
+     * targets [logEntryId] — the most-recently-added entry — so each swipe removes one instance
+     * and decrements the badge instead of deleting every logged copy at once. */
+    private fun List<FoodLogEntry>.toGroupedProductUiModel(): ProductUiModel {
+        val mostRecent = maxBy { it.addedAt }
+        return ProductUiModel(
+            id = mostRecent.productId ?: mostRecent.id,
+            productName = mostRecent.name,
+            imageUrl = mostRecent.imageUrl,
+            verdict = mostRecent.verdict,
+            calories = mostRecent.calories.toString(),
+            quantity = size,
+            logEntryId = mostRecent.id,
+        )
+    }
 }

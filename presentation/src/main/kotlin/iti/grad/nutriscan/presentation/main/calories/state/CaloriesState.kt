@@ -10,6 +10,8 @@ data class CaloriesState(
     val tdee: Int = 0,
     val bmi: Double? = null,
     val caloriesGained: Int = 0,
+    /** steps + exercise kcal burned today — see CaloriesViewModel.observeDailyTracking. */
+    val caloriesBurned: Int = 0,
     val addedFoods: ImmutableList<ProductUiModel> = persistentListOf(),
     /** Food-log entry pending user confirmation before removal — gates the ConfirmationDialog. */
     val pendingRemoveFoodId: String? = null,

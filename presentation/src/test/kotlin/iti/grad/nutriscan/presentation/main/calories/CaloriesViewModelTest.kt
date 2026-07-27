@@ -56,9 +56,13 @@ class CaloriesViewModelTest {
     private lateinit var viewModel: CaloriesViewModel
     private val testDispatcher = StandardTestDispatcher()
 
-    private fun foodEntry(id: String = "entry-1", calories: Int = 95) = FoodLogEntry(
+    private fun foodEntry(
+        id: String = "entry-1",
+        calories: Int = 95,
+        productId: String = "product-1",
+    ) = FoodLogEntry(
         id = id,
-        productId = "product-1",
+        productId = productId,
         name = "Apple",
         calories = calories,
         imageUrl = null,
@@ -67,13 +71,18 @@ class CaloriesViewModelTest {
         addedAt = Instant.now(),
     )
 
-    private fun defaultDailyTracking(waterCnt: Int = 4, targetWaterCnt: Int = 8) = DailyTracking(
+    private fun defaultDailyTracking(
+        waterCnt: Int = 4,
+        targetWaterCnt: Int = 8,
+        caloriesBurnedSteps: Int = 0,
+        exerciseKcal: Int = 0,
+    ) = DailyTracking(
         date = LocalDate.now(),
         targetWaterCnt = targetWaterCnt,
         waterCnt = waterCnt,
         stepsCnt = 0,
-        caloriesBurnedSteps = 0,
-        exerciseKcal = 0,
+        caloriesBurnedSteps = caloriesBurnedSteps,
+        exerciseKcal = exerciseKcal,
         exerciseMinutes = 0,
         syncedToBackend = false,
     )
@@ -127,6 +136,7 @@ class CaloriesViewModelTest {
             Assertions.assertEquals(0, state.tdee)
             Assertions.assertNull(state.bmi)
             Assertions.assertEquals(0, state.caloriesGained)
+            Assertions.assertEquals(0, state.caloriesBurned)
             Assertions.assertTrue(state.addedFoods.isEmpty())
             Assertions.assertEquals(0, state.steps)
             Assertions.assertEquals(10000, state.stepsGoal)
@@ -188,11 +198,71 @@ class CaloriesViewModelTest {
 
         @Test
         fun `observed food log populates addedFoods and caloriesGained`() = runTest {
-            val vm = createViewModel(flowOf(listOf(foodEntry(calories = 95), foodEntry(id = "entry-2", calories = 105))))
+            val vm = createViewModel(
+                flowOf(
+                    listOf(
+                        foodEntry(calories = 95, productId = "product-1"),
+                        foodEntry(id = "entry-2", calories = 105, productId = "product-2"),
+                    )
+                )
+            )
             testScheduler.runCurrent()
 
             Assertions.assertEquals(2, vm.state.value.addedFoods.size)
             Assertions.assertEquals(200, vm.state.value.caloriesGained)
+        }
+
+        @Test
+        fun `logging the same product twice groups into one card with a quantity badge`() = runTest {
+            val older = foodEntry(id = "entry-1", calories = 95).copy(addedAt = Instant.parse("2026-01-01T10:00:00Z"))
+            val newer = foodEntry(id = "entry-2", calories = 95).copy(addedAt = Instant.parse("2026-01-01T10:05:00Z"))
+            val vm = createViewModel(flowOf(listOf(older, newer)))
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(1, vm.state.value.addedFoods.size)
+            val card = vm.state.value.addedFoods.first()
+            Assertions.assertEquals(2, card.quantity)
+            Assertions.assertEquals("entry-2", card.logEntryId)
+            Assertions.assertEquals("95", card.calories)
+            Assertions.assertEquals(190, vm.state.value.caloriesGained)
+        }
+
+        @Test
+        fun `swiping a grouped card targets the most recent entry and decrements the quantity`() = runTest {
+            val older = foodEntry(id = "entry-1", calories = 95).copy(addedAt = Instant.parse("2026-01-01T10:00:00Z"))
+            val newer = foodEntry(id = "entry-2", calories = 95).copy(addedAt = Instant.parse("2026-01-01T10:05:00Z"))
+            val entriesFlow = MutableStateFlow(listOf(older, newer))
+            val foodLogUseCase = mockk<ObserveTodayFoodLogUseCase>()
+            every { foodLogUseCase() } returns entriesFlow
+            coEvery { removeFoodEntry("entry-2") } returns Result.success(Unit)
+            val vm = CaloriesViewModel(
+                checkStepsPermission,
+                observeTodaySteps,
+                foodLogUseCase,
+                removeFoodEntry,
+                observeTodayDailyTracking,
+                updateWaterCnt,
+                updateTargetWaterCnt,
+                updateStepsCnt,
+                userRepository,
+            )
+            testScheduler.runCurrent()
+
+            val card = vm.state.value.addedFoods.first()
+            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove(card.logEntryId!!))
+            vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
+            testScheduler.runCurrent()
+
+            coVerify(exactly = 1) { removeFoodEntry("entry-2") }
+
+            // Simulate the repository's next emission once the entry is actually gone.
+            entriesFlow.value = listOf(older)
+            testScheduler.runCurrent()
+
+            val remaining = vm.state.value.addedFoods.first()
+            Assertions.assertEquals(1, vm.state.value.addedFoods.size)
+            Assertions.assertEquals(1, remaining.quantity)
+            Assertions.assertEquals("entry-1", remaining.logEntryId)
         }
 
         @Test
@@ -500,6 +570,14 @@ class CaloriesViewModelTest {
             val state = viewModel.state.value
             Assertions.assertEquals(120, state.exerciseKcal)
             Assertions.assertEquals(15, state.exerciseMinutes)
+        }
+
+        @Test
+        fun `caloriesBurned sums steps and exercise kcal from the daily tracking flow`() = runTest {
+            dailyTrackingFlow.update { it.copy(caloriesBurnedSteps = 35, exerciseKcal = 120) }
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(155, viewModel.state.value.caloriesBurned)
         }
     }
 
