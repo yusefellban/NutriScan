@@ -1,8 +1,11 @@
 package iti.grad.nutriscan.presentation.settings.notifications.viewmodel
 
+import android.content.Context
+import android.os.PowerManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.domain.notification.usecase.SendTestNotificationUseCase
 import iti.grad.nutriscan.domain.notification.usecase.SetNotificationPrefUseCase
@@ -22,6 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationSettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val setPref: SetNotificationPrefUseCase,
     private val setQuietHoursEnabled: SetQuietHoursEnabledUseCase,
@@ -35,6 +39,7 @@ class NotificationSettingsViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
+        refreshBatteryOptimizationState()
         viewModelScope.launch {
             observePrefs().collectLatest { prefs ->
                 _state.update {
@@ -57,8 +62,17 @@ class NotificationSettingsViewModel @Inject constructor(
                 sendTestNotification()
                 emitEffect(NotificationSettingsEffect.TestNotificationSent)
             }
+            is NotificationSettingsEvent.AllowBackgroundNotificationsClicked ->
+                emitEffect(NotificationSettingsEffect.RequestIgnoreBatteryOptimizations)
             is NotificationSettingsEvent.BackClicked -> emitEffect(NotificationSettingsEffect.NavigateBack)
         }
+    }
+
+    /** Re-checked whenever the screen resumes (e.g. after returning from the system battery
+     * settings), so the "allow background notifications" prompt disappears once granted. */
+    fun refreshBatteryOptimizationState() {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        _state.update { it.copy(isIgnoringBatteryOptimizations = powerManager.isIgnoringBatteryOptimizations(context.packageName)) }
     }
 
     private fun toggleType(event: NotificationSettingsEvent.ToggleType) {
