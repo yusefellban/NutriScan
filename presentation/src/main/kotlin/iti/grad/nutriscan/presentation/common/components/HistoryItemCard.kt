@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.home.view.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.HomeTypography
-import iti.grad.nutriscan.presentation.home.state.HomeHistoryItem
-import iti.grad.nutriscan.presentation.home.state.VerdictType
+import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
+import iti.grad.nutriscan.presentation.common.model.VerdictType
 import iti.grad.presentation.R
 
 /**
@@ -38,7 +38,7 @@ import iti.grad.presentation.R
  */
 @Composable
 fun HistoryItemCard(
-    item: HomeHistoryItem,
+    item: HistoryItemUiModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +96,7 @@ fun HistoryItemCard(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = item.scanDate,
+                text = item.scanDate.asString(),
                 style = HomeTypography.historyItemDate,
                 color = AppTheme.colors.HistoryItemDateColor,
             )
@@ -109,7 +109,7 @@ fun HistoryItemCard(
 
 @Composable
 private fun VerdictBadge(
-    item: HomeHistoryItem,
+    item: HistoryItemUiModel,
     modifier: Modifier = Modifier,
 ) {
     val (badgeColor, iconResId) = when (item.verdictType) {

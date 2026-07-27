@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,8 +37,7 @@ class ProductDetailsViewModel @Inject constructor(
     private val getScanResultUseCase: iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase,
 ) : ViewModel() {
 
-    private val productJson: String = checkNotNull(savedStateHandle["product"])
-    private val product: ProductUiModel = Json.decodeFromString(productJson)
+    private val scanId: String = checkNotNull(savedStateHandle["scanId"])
 
     private val _state = MutableStateFlow(ProductDetailsState())
     val state: StateFlow<ProductDetailsState> = _state.asStateFlow()
@@ -98,20 +95,20 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun loadProductDetail() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            val savedScan = getSavedScanByIdUseCase(product.id).getOrNull()
+            _state.update { it.copy(isLoading = true, error = null) }
+            val savedScan = getSavedScanByIdUseCase(scanId).getOrNull()
             
             if (savedScan != null) {
                 val detail = mapToProductDetail(savedScan).copy(isBookmarked = true)
                 _state.update { it.copy(isLoading = false, productDetail = detail) }
             } else {
-                val apiResult = getScanResultUseCase(product.id).getOrNull()
-                val detail = if (apiResult != null) {
-                    mapToProductDetail(apiResult).copy(isBookmarked = false)
+                val apiResult = getScanResultUseCase(scanId).getOrNull()
+                if (apiResult != null) {
+                    val detail = mapToProductDetail(apiResult).copy(isBookmarked = false)
+                    _state.update { it.copy(isLoading = false, productDetail = detail) }
                 } else {
-                    buildFallbackDetail(product)
+                    _state.update { it.copy(isLoading = false, error = "Failed to load product details") }
                 }
-                _state.update { it.copy(isLoading = false, productDetail = detail) }
             }
         }
     }
@@ -119,10 +116,10 @@ class ProductDetailsViewModel @Inject constructor(
     private fun mapToProductDetail(scanResult: ScanResult): ProductDetail {
         return ProductDetail(
             id = scanResult.scanId,
-            productName = scanResult.productName ?: product.productName,
+            productName = scanResult.productName ?: "Unknown Product",
             brand = "Unknown Brand",
-            imageUrl = scanResult.imageUrl ?: product.imageUrl,
-            verdict = scanResult.foodSafetyResponse?.verdict ?: product.verdict,
+            imageUrl = scanResult.imageUrl ?: "",
+            verdict = scanResult.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
             scanDate = scanResult.scannedAt?.let { 
                 try { LocalDate.parse(it.substringBefore("T")) } catch (e: Exception) { LocalDate.now() } 
             } ?: LocalDate.now(),
@@ -134,7 +131,7 @@ class ProductDetailsViewModel @Inject constructor(
                     reason = it.reason
                 )
             } ?: emptyList(),
-            calories = scanResult.nutritionFacts?.calories?.toString() ?: product.calories?.replace(Regex("[^0-9.]"), ""),
+            calories = scanResult.nutritionFacts?.calories?.toString() ?: "0",
             servingSize = "1",
             sugar = scanResult.nutritionFacts?.sugarG?.toString() ?: "0",
             fat = scanResult.nutritionFacts?.fatG?.toString() ?: "0",
@@ -142,24 +139,6 @@ class ProductDetailsViewModel @Inject constructor(
             isBookmarked = true
         )
     }
-
-
-    private fun buildFallbackDetail(uiModel: ProductUiModel): ProductDetail = ProductDetail(
-        id = uiModel.id,
-        productName = uiModel.productName,
-        brand = "Unknown Brand",
-        imageUrl = uiModel.imageUrl,
-        verdict = uiModel.verdict,
-        scanDate = LocalDate.now(),
-        safetyReasonText = null,
-        flaggedIngredients = emptyList(),
-        calories = uiModel.calories.replace(Regex("[^0-9.]"), ""),
-        servingSize = "1",
-        sugar = "0",
-        fat = "0",
-        saturatedFat = "0",
-        isBookmarked = false,
-    )
 
     private fun mapToScanResult(detail: ProductDetail): ScanResult {
         return ScanResult(

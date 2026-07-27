@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
@@ -28,9 +27,8 @@ import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 
 @Composable
 fun MainScreen(
-    onNavigateToScanResult: (String) -> Unit,
     onNavigateToScanProcessing: (String) -> Unit,
-    onNavigateToProductDetail: (ProductUiModel) -> Unit,
+    onNavigateToProductDetail: (String) -> Unit,
     onNavigateToNews: () -> Unit,
     onNavigateToChatWithAi: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -75,7 +73,7 @@ fun MainScreen(
                 BottomNavTab.HOME -> {
                     HomeScreen(
                         bottomPadding = bottomPadding,
-                        onNavigateToScanResult = onNavigateToScanResult,
+                        onNavigateToScanResult = onNavigateToProductDetail,
                         onNavigateToHistory = onNavigateToHistory,
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToNews = onNavigateToNews,
@@ -86,7 +84,7 @@ fun MainScreen(
                     CaloriesScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = onNavigateToProductDetail,
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) },
                         onNavigateToExercises = onNavigateToExercises,
                         onNavigateToSavedProducts = { selectedTab = BottomNavTab.SAVED }
                     )
@@ -96,14 +94,14 @@ fun MainScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
                         captureTrigger = captureTrigger,
-                        onNavigateToProductDetail = onNavigateToProductDetail
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
                     )
                 }
                 BottomNavTab.SAVED -> {
                     SavedScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = onNavigateToProductDetail
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
                     )
                 }
                 BottomNavTab.PROFILE -> {
