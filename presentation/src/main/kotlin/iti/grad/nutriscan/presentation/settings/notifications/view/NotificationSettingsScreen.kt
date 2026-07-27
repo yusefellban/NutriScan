@@ -2,7 +2,6 @@ package iti.grad.nutriscan.presentation.settings.notifications.view
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -67,12 +66,12 @@ fun NotificationSettingsScreen(
                 is NotificationSettingsEffect.TestNotificationSent ->
                     Toast.makeText(context, testNotificationSentMessage, Toast.LENGTH_SHORT).show()
                 is NotificationSettingsEffect.RequestIgnoreBatteryOptimizations -> {
-                    context.startActivity(
-                        Intent(
-                            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                            Uri.parse("package:${context.packageName}"),
-                        )
-                    )
+                    // Opens the system's battery-optimization list rather than firing
+                    // ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS directly — that action needs the
+                    // REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission, which Google Play restricts
+                    // and requires a Play Console justification declaration for. This action needs
+                    // no special permission; the user just finds NutriScan in the list themselves.
+                    context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
                 }
             }
         }

@@ -66,14 +66,17 @@ per page) — a user with 100+ favorited scans won't get the rest mirrored
 locally. Add real pagination if that ever becomes real usage; not worth it
 now.
 
-## 6. Release blocker: Play Console declaration
+## 6. Resolved: dropped the restricted battery-optimization permission
 
 A later fix in this same branch (background notification delivery, see
-`NotificationSettingsViewModel`/`NotificationSettingsScreen`) requests the
-`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission. This is a restricted/
-"special" permission on Google Play — it requires filling out a
-justification/declaration form in Play Console before a release using it
-can be submitted, and Google can reject the update without one. **Whoever
-manages the Play Console listing needs to file that declaration before this
-branch ships to production.** Flagged in code review (external reviewer),
-not yet actioned — no owner assigned as of this note.
+`NotificationSettingsViewModel`/`NotificationSettingsScreen`) originally
+requested `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` directly via
+`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`. Code review flagged that
+permission as restricted on Google Play — it needs a justification
+declaration in Play Console, and Google can reject the update without one,
+which wasn't worth the risk for a "help notifications fire reliably" use
+case. Replaced with `ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`, which
+opens the system's battery-optimization list instead of prompting directly
+— needs no special permission or Play declaration, just one extra tap from
+the user to find NutriScan in the list themselves. Permission removed from
+`AndroidManifest.xml`.
