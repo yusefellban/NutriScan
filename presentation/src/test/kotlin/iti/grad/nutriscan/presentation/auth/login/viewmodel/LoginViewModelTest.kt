@@ -3,11 +3,11 @@ package iti.grad.nutriscan.presentation.auth.login.viewmodel
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
-import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
 import iti.grad.nutriscan.domain.auth.usecase.GetOidcAuthConfigUseCase
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.user.usecase.FetchAndSyncUserDataUseCase
+import iti.grad.nutriscan.domain.common.model.DomainException
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import iti.grad.nutriscan.domain.disease.usecase.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -31,9 +30,7 @@ class LoginViewModelTest {
     private lateinit var loginWithEmailUseCase: LoginWithEmailUseCase
     private lateinit var getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase
     private lateinit var saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
-    private lateinit var userRepository: IUserRepository
-    private lateinit var syncDiseasesUseCase: SyncDiseasesUseCase
-    private lateinit var syncAllergiesUseCase: SyncAllergiesUseCase
+    private lateinit var fetchAndSyncUserDataUseCase: FetchAndSyncUserDataUseCase
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -43,19 +40,13 @@ class LoginViewModelTest {
         loginWithEmailUseCase = mockk()
         getOidcAuthConfigUseCase = mockk()
         saveGoogleLoginTokensUseCase = mockk()
-        userRepository = mockk()
-        syncDiseasesUseCase = mockk()
-        syncAllergiesUseCase = mockk()
-        coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
-        coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
-        coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
+        fetchAndSyncUserDataUseCase = mockk()
+        coEvery { fetchAndSyncUserDataUseCase() } returns Result.success(Unit)
         viewModel = LoginViewModel(
             loginWithEmailUseCase,
             getOidcAuthConfigUseCase,
             saveGoogleLoginTokensUseCase,
-            userRepository,
-            syncDiseasesUseCase,
-            syncAllergiesUseCase
+            fetchAndSyncUserDataUseCase
         )
     }
 
@@ -88,7 +79,7 @@ class LoginViewModelTest {
         val email = "test@example.com"
         val password = "Password123"
         val errorMessage = "Invalid credentials"
-        coEvery { loginWithEmailUseCase(email, password) } returns Result.failure(Exception(errorMessage))
+        coEvery { loginWithEmailUseCase(email, password) } returns Result.failure(DomainException.UnauthorizedException(errorMessage))
 
         viewModel.onEvent(LoginEvent.EmailChanged(email))
         viewModel.onEvent(LoginEvent.PasswordChanged(password))
@@ -99,7 +90,7 @@ class LoginViewModelTest {
         val alertState = viewModel.state.value.alertState
         assertTrue(alertState is AuthAlertState.Error)
         val errorMsg = (alertState as AuthAlertState.Error).message
-        assertTrue(errorMsg is UiText.DynamicString)
-        assertEquals(errorMessage, (errorMsg as UiText.DynamicString).value)
+        assertTrue(errorMsg is UiText.StringResource)
+        assertEquals(iti.grad.presentation.R.string.error_invalid_credentials, (errorMsg as UiText.StringResource).resId)
     }
 }

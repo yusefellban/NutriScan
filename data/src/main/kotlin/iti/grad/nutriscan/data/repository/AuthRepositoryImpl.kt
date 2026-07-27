@@ -13,6 +13,7 @@ import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
 import iti.grad.nutriscan.domain.auth.model.AuthTokens
 import iti.grad.nutriscan.domain.auth.model.OidcAuthConfig
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.domain.common.model.DomainException
 import kotlinx.serialization.json.Json
 
 import timber.log.Timber
@@ -58,11 +59,11 @@ class AuthRepositoryImpl @Inject constructor(
                 val rawError = response.errorBody()?.string()
                 Timber.e("Registration failed with code: ${response.code()}, errorBody: $rawError")
                 val errorMessage = parseErrorMessage(rawError)
-                Result.failure(Exception(errorMessage))
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception during registration")
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -74,11 +75,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -96,11 +98,12 @@ class AuthRepositoryImpl @Inject constructor(
                 )
                 saveTokens(authTokens)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -120,7 +123,7 @@ class AuthRepositoryImpl @Inject constructor(
             tokenManager.saveTokens(access, refresh, authTokens.idToken)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -132,11 +135,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -155,6 +159,22 @@ class AuthRepositoryImpl @Inject constructor(
             apiError.message + detailSuffix
         } catch (_: Exception) {
             "An unexpected error occurred."
+        }
+    }
+
+    private fun mapToDomainException(code: Int, rawError: String?, parsedMessage: String): DomainException {
+        return when {
+            code == 401 || rawError?.contains("invalid_grant") == true -> DomainException.UnauthorizedException(parsedMessage)
+            code >= 500 -> DomainException.ServerException(parsedMessage)
+            else -> DomainException.UnknownException(parsedMessage)
+        }
+    }
+
+    private fun mapExceptionToDomain(e: Exception): DomainException {
+        return if (e is java.io.IOException) {
+            DomainException.NetworkException(cause = e)
+        } else {
+            DomainException.UnknownException(cause = e)
         }
     }
 
