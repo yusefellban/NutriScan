@@ -23,14 +23,32 @@ private class FakeFoodLogDao : FoodLogDao {
     private val entries = MutableStateFlow<List<FoodLogEntity>>(emptyList())
 
     override fun observeByUserAndDate(userId: String, date: String): Flow<List<FoodLogEntity>> =
-        MutableStateFlow(entries.value.filter { it.userId == userId && it.loggedDate == date })
+        MutableStateFlow(entries.value.filter { it.userId == userId && it.loggedDate == date && !it.deleted })
 
     override suspend fun insert(entity: FoodLogEntity) {
         entries.value = entries.value.filterNot { it.id == entity.id } + entity
     }
 
-    override suspend fun deleteByIdForUser(id: String, userId: String) {
-        entries.value = entries.value.filterNot { it.id == id && it.userId == userId }
+    override suspend fun getByIdForUser(id: String, userId: String): FoodLogEntity? =
+        entries.value.find { it.id == id && it.userId == userId }
+
+    override suspend fun markDeletedForUser(id: String, userId: String) {
+        entries.value = entries.value.map {
+            if (it.id == id && it.userId == userId) it.copy(deleted = true, pendingSync = true) else it
+        }
+    }
+
+    override suspend fun getPendingSyncEntries(): List<FoodLogEntity> =
+        entries.value.filter { it.pendingSync }
+
+    override suspend fun clearPendingSync(id: String) {
+        entries.value = entries.value.map {
+            if (it.id == id) it.copy(pendingSync = false) else it
+        }
+    }
+
+    override suspend fun hardDelete(id: String) {
+        entries.value = entries.value.filterNot { it.id == id }
     }
 }
 

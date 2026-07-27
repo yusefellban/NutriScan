@@ -4,8 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.SavedScanDao
+import iti.grad.nutriscan.data.db.dao.DailyTrackingDao
 import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 import iti.grad.nutriscan.data.db.entity.SavedScanEntity
+import iti.grad.nutriscan.data.db.entity.DailyTrackingEntity
 
 import androidx.room.TypeConverters
 import iti.grad.nutriscan.data.db.converter.IntListConverter
@@ -30,11 +32,13 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
         AllergyEntity::class,
         ExerciseEntity::class,
         ExerciseCategoryEntity::class,
-        SavedScanEntity::class
+        SavedScanEntity::class,
+        DailyTrackingEntity::class,
     ],
-    // Bumped 5 -> 6 for embedding family members list inside UserEntity. Relies on fallbackToDestructiveMigration()
-    // in DatabaseModule — this clears all local tables on upgrade.
-    version = 6,
+    // Bumped 6 -> 7 for FoodLogEntity's new pendingSync/deleted columns and the new
+    // daily_tracking table. Relies on fallbackToDestructiveMigration() in
+    // DatabaseModule, same as the 5 -> 6 bump — this clears all local tables on upgrade.
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)
@@ -45,4 +49,5 @@ abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun allergyDao(): AllergyDao
     abstract fun exercisesDao(): ExercisesDao
     abstract fun savedScanDao(): SavedScanDao
+    abstract fun dailyTrackingDao(): DailyTrackingDao
 }

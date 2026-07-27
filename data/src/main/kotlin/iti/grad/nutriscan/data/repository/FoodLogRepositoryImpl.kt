@@ -39,7 +39,7 @@ class FoodLogRepositoryImpl @Inject constructor(
 
     override suspend fun removeFoodEntry(entryId: String): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
-            dao.deleteByIdForUser(entryId, resolveUserId())
+            dao.markDeletedForUser(entryId, resolveUserId())
         }
     }
 
