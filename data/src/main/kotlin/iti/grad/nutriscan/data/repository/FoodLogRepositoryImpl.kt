@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.repository.mapper.toDomain
 import iti.grad.nutriscan.data.repository.mapper.toEntity
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.runCatchingCancellable
+import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class FoodLogRepositoryImpl @Inject constructor(
     private val dao: FoodLogDao,
     private val authRepository: IAuthRepository,
+    private val dailyTrackingRepository: IDailyTrackingRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IFoodLogRepository {
 
@@ -33,13 +35,37 @@ class FoodLogRepositoryImpl @Inject constructor(
 
     override suspend fun addFoodEntry(entry: FoodLogEntry): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
+            val userId = resolveUserId()
+            // The backend's scanId is FoodLogEntry.productId (the scanned product's id) — id is a
+            // locally-generated UUID, never sent to the backend. See SavedViewModel.addToFoodLog,
+            // which sets id = UUID.randomUUID() and productId = the scanned product's own id.
+            val scanId = entry.productId ?: entry.id
+            dao.insert(entry.toEntity(userId))
+
+            val pushResult = dailyTrackingRepository.pushMeal(entry.loggedDate, scanId, mealCnt = 1)
+            if (pushResult.isFailure) {
+                dao.insert(entry.toEntity(userId).copy(pendingSync = true))
+            }
+        }
+    }
+
+    override suspend fun addFoodEntryLocalOnly(entry: FoodLogEntry): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
             dao.insert(entry.toEntity(resolveUserId()))
         }
     }
 
     override suspend fun removeFoodEntry(entryId: String): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
-            dao.markDeletedForUser(entryId, resolveUserId())
+            val userId = resolveUserId()
+            val existing = dao.getByIdForUser(entryId, userId)
+            val scanId = existing?.productId ?: entryId
+            dao.markDeletedForUser(entryId, userId)
+
+            val deleteResult = dailyTrackingRepository.deleteMeal(today(), scanId)
+            if (deleteResult.isSuccess) {
+                dao.hardDelete(entryId)
+            }
         }
     }
 
