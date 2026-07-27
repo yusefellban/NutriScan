@@ -6,10 +6,15 @@ import iti.grad.nutriscan.data.remote.datasource.IDiseaseRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.domain.disease.repository.IDiseaseRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -22,10 +27,15 @@ class DiseaseRepositoryImpl @Inject constructor(
     private val json: Json
 ) : IDiseaseRepository {
 
-    /** Polls the backend catalog every [SYNC_INTERVAL_MS] for as long as this flow is collected,
-     * so a disease added/edited server-side shows up without an app restart. Catalog data rarely
-     * changes, so the interval is long — this is cheap insurance, not a live feed. */
-    override fun getDiseasesOffline(): Flow<List<Disease>> = channelFlow {
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** Polls the backend catalog every [SYNC_INTERVAL_MS] for as long as at least one collector is
+     * subscribed, so a disease added/edited server-side shows up without an app restart. Catalog
+     * data rarely changes, so the interval is long — this is cheap insurance, not a live feed.
+     * [shareIn] multicasts this single poll loop to every collector — [DiseaseRepositoryImpl] is a
+     * singleton, so without it, two screens observing diseases at once would each spin up their
+     * own independent poller. */
+    private val diseasesFlow: Flow<List<Disease>> = channelFlow {
         syncDiseases()
         launch {
             while (isActive) {
@@ -36,7 +46,9 @@ class DiseaseRepositoryImpl @Inject constructor(
         diseaseDao.getDiseasesFlow()
             .map { entities -> entities.map { entity -> Disease(id = entity.id, name = entity.name, description = entity.description) } }
             .collect { send(it) }
-    }
+    }.shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getDiseasesOffline(): Flow<List<Disease>> = diseasesFlow
 
     override suspend fun syncDiseases(): Result<Unit> {
         return try {
@@ -89,5 +101,6 @@ class DiseaseRepositoryImpl @Inject constructor(
 
     private companion object {
         const val SYNC_INTERVAL_MS = 300_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

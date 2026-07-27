@@ -14,11 +14,16 @@ import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.local.util.JwtDecoder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -37,6 +42,8 @@ class FamilyMemberRepositoryImpl @Inject constructor(
     private val tokenManager: TokenManager,
     private val userRepository: IUserRepository,
 ) : IFamilyMemberRepository {
+
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private suspend fun getActiveUserId(): String? {
         val dbUser = userDao.getUserFlow().firstOrNull()
@@ -66,11 +73,14 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         return null
     }
 
-    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as this flow is collected, so a
-     * family member added by another account holder on their own device shows up here without an
-     * app restart. Reuses [IUserRepository.fetchAndSyncProfile] — family members are part of the
-     * same `/profile` payload, no separate endpoint. */
-    override fun getFamilyMembers(): Flow<List<FamilyMember>> = channelFlow {
+    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as at least one collector is
+     * subscribed, so a family member added by another account holder on their own device shows up
+     * here without an app restart. Reuses [IUserRepository.fetchAndSyncProfile] — family members
+     * are part of the same `/profile` payload, no separate endpoint. [shareIn] multicasts this
+     * single poll loop to every collector — [FamilyMemberRepositoryImpl] is a singleton, so
+     * without it, two screens observing family members at once would each spin up their own
+     * independent poller. */
+    private val familyMembersFlow: Flow<List<FamilyMember>> = channelFlow {
         userRepository.fetchAndSyncProfile()
         launch {
             while (isActive) {
@@ -81,7 +91,9 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         userDao.getUserFlow()
             .map { user -> user?.familyMembers.orEmpty().map { it.toDomain() } }
             .collect { send(it) }
-    }
+    }.shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getFamilyMembers(): Flow<List<FamilyMember>> = familyMembersFlow
 
     override suspend fun addFamilyMember(input: FamilyMemberInput): Result<Unit> {
         val userId = getActiveUserId()
@@ -219,5 +231,6 @@ class FamilyMemberRepositoryImpl @Inject constructor(
 
     private companion object {
         const val SYNC_INTERVAL_MS = 15_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

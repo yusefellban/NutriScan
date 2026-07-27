@@ -19,14 +19,18 @@ import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingReposito
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +44,7 @@ private const val DEFAULT_TARGET_WATER_CNT = 8
 private const val DEFAULT_WEIGHT_KG = 70.0
 private const val STEP_KCAL_FACTOR = 0.0005
 private const val RECONCILE_INTERVAL_MS = 20_000L
+private const val SHARE_STOP_TIMEOUT_MS = 5_000L
 
 class DailyTrackingRepositoryImpl @Inject constructor(
     private val dao: DailyTrackingDao,
@@ -50,10 +55,15 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IDailyTrackingRepository {
 
-    /** Polls [fetchAndSeedToday] every [RECONCILE_INTERVAL_MS] for as long as this flow is
-     * collected, so water/steps logged on another device show up here without an app restart —
-     * see [fetchAndSeedToday] for why an unsynced local edit is never clobbered by this. */
-    override fun observeToday(): Flow<DailyTracking> = channelFlow {
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+    /** Polls [fetchAndSeedToday] every [RECONCILE_INTERVAL_MS] for as long as at least one
+     * collector is subscribed, so water/steps logged on another device show up here without an
+     * app restart — see [fetchAndSeedToday] for why an unsynced local edit is never clobbered by
+     * this. [shareIn] multicasts this single poll loop to every collector — [DailyTrackingRepositoryImpl]
+     * is a singleton, so without it, two screens observing today's tracking at once would each
+     * spin up their own independent poller. */
+    private val todayFlow: Flow<DailyTracking> = channelFlow {
         val userId = resolveUserId()
         fetchAndSeedToday()
         launch {
@@ -65,7 +75,9 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         todayTicker().flatMapLatest { date ->
             dao.observeByUserAndDate(userId, date.toString()).map { it?.toDomain() ?: defaultDailyTracking(date) }
         }.collect { send(it) }
-    }.flowOn(ioDispatcher)
+    }.flowOn(ioDispatcher).shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun observeToday(): Flow<DailyTracking> = todayFlow
 
     /** Re-emits [CairoDateProvider.today()] immediately, then again at every Cairo-midnight
      * boundary, so [observeToday]'s [flatMapLatest] re-subscribes to the new day's row instead of

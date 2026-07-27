@@ -9,11 +9,16 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -26,9 +31,14 @@ class UserRepositoryImpl @Inject constructor(
     private val json: Json
 ) : IUserRepository {
 
-    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as this flow is collected, so a
-     * profile edit made on another device shows up here without an app restart. */
-    override fun getUserData(): Flow<User?> = channelFlow {
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as at least one collector is
+     * subscribed, so a profile edit made on another device shows up here without an app restart.
+     * [shareIn] multicasts this single poll loop to every collector — [UserRepositoryImpl] is a
+     * singleton, so without it, two screens observing the profile at once would each spin up their
+     * own independent poller. */
+    private val userDataFlow: Flow<User?> = channelFlow {
         fetchAndSyncProfile()
         launch {
             while (isActive) {
@@ -37,7 +47,9 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         userDao.getUserFlow().map { entity -> entity?.toDomain() }.collect { send(it) }
-    }
+    }.shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getUserData(): Flow<User?> = userDataFlow
 
     private fun UserEntity.toDomain() = User(
         id = id,
@@ -173,5 +185,6 @@ class UserRepositoryImpl @Inject constructor(
 
     private companion object {
         const val SYNC_INTERVAL_MS = 15_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

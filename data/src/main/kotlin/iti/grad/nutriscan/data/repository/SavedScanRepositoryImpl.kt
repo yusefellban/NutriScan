@@ -18,11 +18,15 @@ import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,6 +42,8 @@ class SavedScanRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ISavedScanRepository {
 
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
     override suspend fun saveScan(scanResult: ScanResult): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             val userId = resolveUserId()
@@ -50,12 +56,14 @@ class SavedScanRepositoryImpl @Inject constructor(
         }
     }
 
-    /** Polls the backend every [RECONCILE_INTERVAL_MS] for as long as this flow is collected (i.e.
-     * while a screen showing saved scans is open), so a favorite added/removed on another device
-     * shows up here without needing an app restart — this backend is plain REST, no
-     * push/WebSocket to listen on instead. Each reconcile writes into Room, and Room's own flow
-     * (collected concurrently below) emits the update immediately. */
-    override fun getSavedScans(): Flow<List<ScanResult>> = channelFlow {
+    /** Polls the backend every [RECONCILE_INTERVAL_MS] for as long as at least one collector is
+     * subscribed (i.e. a screen showing saved scans is open), so a favorite added/removed on
+     * another device shows up here without needing an app restart — this backend is plain REST,
+     * no push/WebSocket to listen on instead. Each reconcile writes into Room, and Room's own flow
+     * (collected concurrently below) emits the update immediately. [shareIn] multicasts this single
+     * poll loop to every collector — [SavedScanRepositoryImpl] is a singleton, so without it, two
+     * screens observing saved scans at once would each spin up their own independent poller. */
+    private val savedScansFlow: Flow<List<ScanResult>> = channelFlow {
         val userId = resolveUserId()
         reconcileFromBackend(userId)
         launch {
@@ -67,7 +75,9 @@ class SavedScanRepositoryImpl @Inject constructor(
         savedScanDao.getAllSavedScans(userId)
             .map { entities -> entities.map { it.toDomain() } }
             .collect { send(it) }
-    }.flowOn(ioDispatcher)
+    }.flowOn(ioDispatcher).shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getSavedScans(): Flow<List<ScanResult>> = savedScansFlow
 
     override suspend fun deleteScan(scanId: String): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
@@ -198,5 +208,6 @@ class SavedScanRepositoryImpl @Inject constructor(
         const val LOCAL_USER_ID = "local_device_user"
         const val FAVORITES_PAGE_SIZE = 100
         const val RECONCILE_INTERVAL_MS = 15_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

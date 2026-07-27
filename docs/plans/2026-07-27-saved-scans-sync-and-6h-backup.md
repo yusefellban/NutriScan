@@ -61,6 +61,19 @@ Tests: new `SavedScanRepositoryImplTest.kt`, update `DailyTrackingSyncEngineTest
 
 ## 5. Known limitation (accepted, ponytail-flagged)
 
-Favorites reconciliation fetches one page (`size = 200`) — a user with 200+
-favorited scans won't get the rest mirrored locally. Add real pagination if
-that ever becomes real usage; not worth it now.
+Favorites reconciliation fetches one page (`size = 100`, the backend's max
+per page) — a user with 100+ favorited scans won't get the rest mirrored
+locally. Add real pagination if that ever becomes real usage; not worth it
+now.
+
+## 6. Release blocker: Play Console declaration
+
+A later fix in this same branch (background notification delivery, see
+`NotificationSettingsViewModel`/`NotificationSettingsScreen`) requests the
+`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission. This is a restricted/
+"special" permission on Google Play — it requires filling out a
+justification/declaration form in Play Console before a release using it
+can be submitted, and Google can reject the update without one. **Whoever
+manages the Play Console listing needs to file that declaration before this
+branch ships to production.** Flagged in code review (external reviewer),
+not yet actioned — no owner assigned as of this note.
