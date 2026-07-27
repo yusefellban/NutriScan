@@ -3,7 +3,9 @@ package iti.grad.nutriscan.data.repository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.data.db.dao.DailyTrackingDao
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
+import iti.grad.nutriscan.data.db.entity.DailyTrackingEntity
 import iti.grad.nutriscan.data.db.dao.StreakDao
 import iti.grad.nutriscan.data.db.entity.StreakEntity
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
@@ -22,8 +24,12 @@ class StreakRepositoryImplTest {
 
     private val streakDao: StreakDao = mockk()
     private val foodLogDao: FoodLogDao = mockk()
+    private val dailyTrackingDao: DailyTrackingDao = mockk {
+        coEvery { getByUserAndDate(any(), any()) } returns null
+    }
     private val authRepository: IAuthRepository = mockk()
-    private val repository = StreakRepositoryImpl(streakDao, foodLogDao, authRepository, Dispatchers.Unconfined)
+    private val repository =
+        StreakRepositoryImpl(streakDao, foodLogDao, dailyTrackingDao, authRepository, Dispatchers.Unconfined)
 
     @Test
     fun `observeStreak returns zeroed streak when no row exists`() = runTest {
@@ -69,6 +75,46 @@ class StreakRepositoryImplTest {
 
         assertTrue(result.isSuccess)
         coVerify { streakDao.upsert(match { it.currentStreak == 1 }) }
+    }
+
+    @Test
+    fun `recomputeStreak extends streak from water logging alone, without any food logged`() = runTest {
+        val yesterday = LocalDate.now().minusDays(1).toString()
+        coEvery { streakDao.observe() } returns flowOf(
+            StreakEntity(currentStreak = 2, longestStreak = 4, lastActiveDate = yesterday)
+        )
+        coEvery { authRepository.getCurrentUserId() } returns null
+        coEvery { foodLogDao.observeByUserAndDate(any(), any()) } returns flowOf(emptyList())
+        coEvery { dailyTrackingDao.getByUserAndDate(any(), any()) } returns
+            DailyTrackingEntity(
+                userId = "local_device_user",
+                date = LocalDate.now().toString(),
+                targetWaterCnt = 8,
+                waterCnt = 2,
+                stepsCnt = 0,
+                caloriesBurnedSteps = 0,
+                exerciseKcal = 0,
+                exerciseMinutes = 0,
+                syncedToBackend = false,
+            )
+        coEvery { streakDao.upsert(any()) } returns Unit
+
+        val result = repository.recomputeStreak()
+
+        assertTrue(result.isSuccess)
+        coVerify { streakDao.upsert(match { it.currentStreak == 3 }) }
+    }
+
+    @Test
+    fun `recomputeStreak is a no-op when neither food nor daily-tracking activity happened today`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns null
+        coEvery { foodLogDao.observeByUserAndDate(any(), any()) } returns flowOf(emptyList())
+        coEvery { dailyTrackingDao.getByUserAndDate(any(), any()) } returns null
+
+        val result = repository.recomputeStreak()
+
+        assertTrue(result.isSuccess)
+        coVerify(exactly = 0) { streakDao.upsert(any()) }
     }
 
     @Test

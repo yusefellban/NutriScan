@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.data.repository
 
+import iti.grad.nutriscan.data.db.dao.DailyTrackingDao
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.StreakDao
 import iti.grad.nutriscan.data.db.entity.StreakEntity
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class StreakRepositoryImpl @Inject constructor(
     private val streakDao: StreakDao,
     private val foodLogDao: FoodLogDao,
+    private val dailyTrackingDao: DailyTrackingDao,
     private val authRepository: IAuthRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IStreakRepository {
@@ -40,9 +42,13 @@ class StreakRepositoryImpl @Inject constructor(
     override suspend fun recomputeStreak(): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             val today = LocalDate.now()
-            val loggedToday = foodLogDao.observeByUserAndDate(resolveUserId(), today.toString())
+            val userId = resolveUserId()
+            val loggedFood = foodLogDao.observeByUserAndDate(userId, today.toString())
                 .first().isNotEmpty()
-            if (!loggedToday) return@runCatchingCancellable
+            val tracking = dailyTrackingDao.getByUserAndDate(userId, today.toString())
+            val trackedActivity = tracking != null &&
+                (tracking.waterCnt > 0 || tracking.stepsCnt > 0 || tracking.exerciseMinutes > 0)
+            if (!loggedFood && !trackedActivity) return@runCatchingCancellable
 
             val existing = streakDao.observe().first()
             val lastActive = existing?.lastActiveDate?.let(LocalDate::parse)

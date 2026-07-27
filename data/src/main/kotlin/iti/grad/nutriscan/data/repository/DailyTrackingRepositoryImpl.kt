@@ -16,6 +16,7 @@ import iti.grad.nutriscan.domain.dailytracking.model.DailyTracking
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
+import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -42,6 +43,7 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     private val api: DailyTrackingApiService,
     private val authRepository: IAuthRepository,
     private val userRepository: IUserRepository,
+    private val streakRepository: IStreakRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IDailyTrackingRepository {
 
@@ -84,6 +86,7 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         runCatchingCancellable {
             val current = currentOrDefault()
             dao.upsert(current.copy(waterCnt = waterCnt, syncedToBackend = false).toEntity(resolveUserId()))
+            if (waterCnt > 0) streakRepository.recomputeStreak()
         }
     }
 
@@ -106,6 +109,7 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
+            if (stepsCnt > 0) streakRepository.recomputeStreak()
         }
     }
 
@@ -118,6 +122,8 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     exerciseMinutes = current.exerciseMinutes + minutes,
                 ).toEntity(resolveUserId())
             )
+            streakRepository.recomputeStreak()
+            Unit
         }
     }
 

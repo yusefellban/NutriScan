@@ -3,9 +3,12 @@ package iti.grad.nutriscan.presentation.settings.profile
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import iti.grad.nutriscan.domain.family.model.FamilyMember
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.domain.streak.model.StreakInfo
+import iti.grad.nutriscan.domain.streak.usecase.ObserveStreakUseCase
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.settings.profile.state.FamilyMemberUiModel
@@ -38,6 +41,7 @@ class UserProfileViewModelTest {
     private lateinit var viewModel: UserProfileViewModel
     private val userData = MutableStateFlow<User?>(null)
     private val familyMembersFlow = MutableStateFlow<List<FamilyMember>>(emptyList())
+    private val streakFlow = MutableStateFlow(StreakInfo(currentStreak = 0, longestStreak = 0))
 
     private val userRepository: IUserRepository = mockk {
         coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
@@ -49,10 +53,14 @@ class UserProfileViewModelTest {
         coEvery { removeFamilyMember(any()) } returns Result.success(Unit)
     }
 
+    private val observeStreak: ObserveStreakUseCase = mockk {
+        every { this@mockk() } returns streakFlow
+    }
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = UserProfileViewModel(userRepository, familyMemberRepository)
+        viewModel = UserProfileViewModel(userRepository, familyMemberRepository, observeStreak)
     }
 
     @AfterEach
@@ -64,10 +72,18 @@ class UserProfileViewModelTest {
     fun `initial state has empty user name and starts with no family members`() = runTest(testDispatcher) {
         val state = viewModel.state.value
         assertEquals("", state.userName)
-        assertEquals(15, state.streakDays)
+        assertEquals(0, state.streakDays)
         assertTrue(state.familyMembers.isEmpty())
         assertNull(state.memberPendingDeletion)
         assertFalse(state.isAddMemberSheetVisible)
+    }
+
+    @Test
+    fun `when the streak use case emits, streakDays updates`() = runTest(testDispatcher) {
+        streakFlow.value = StreakInfo(currentStreak = 7, longestStreak = 12)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(7, viewModel.state.value.streakDays)
     }
 
     @Test
