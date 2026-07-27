@@ -145,17 +145,11 @@
     <string name="error_relation_required">يرجى إدخال الصلة</string>
     <string name="add_family_member_generic_error">تعذر حفظ فرد العائلة. يرجى المحاولة مرة أخرى.</string>
 
-    <!-- Health Metrics (BMI / TDEE) — قراءة فقط، محسوبة من الخادم -->
-    <string name="user_profile_health_metrics_title">المقاييس الصحية</string>
-    <string name="user_profile_health_metrics_subtitle">محسوبة من الخادم · للقراءة فقط</string>
-    <string name="user_profile_bmi_label">مؤشر كتلة الجسم</string>
-    <string name="user_profile_tdee_label">إجمالي الحرق اليومي</string>
-    <string name="user_profile_tdee_unit">سعرة/يوم</string>
+    <!-- BMI categories — تُستخدم في بطاقة مؤشر كتلة الجسم بشاشة السعرات (انظر BmiCategory.kt) -->
     <string name="user_profile_bmi_underweight">نقص الوزن</string>
     <string name="user_profile_bmi_normal">طبيعي</string>
     <string name="user_profile_bmi_overweight">زيادة الوزن</string>
     <string name="user_profile_bmi_obese">سمنة</string>
-    <string name="user_profile_metrics_not_available">غير متاح بعد</string>
     <string name="bmi_tdee_not_available">ستظهر المقاييس الصحية بعد أول مزامنة للملف الشخصي.</string>
 
     <!-- App Settings -->

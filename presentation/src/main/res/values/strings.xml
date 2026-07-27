@@ -142,17 +142,11 @@
     <string name="error_relation_required">Please enter a relation</string>
     <string name="add_family_member_generic_error">Couldn\'t save this family member. Please try again.</string>
 
-    <!-- Health Metrics (BMI / TDEE) — read-only, server-computed -->
-    <string name="user_profile_health_metrics_title">Health Metrics</string>
-    <string name="user_profile_health_metrics_subtitle">Calculated by server · read-only</string>
-    <string name="user_profile_bmi_label">BMI</string>
-    <string name="user_profile_tdee_label">TDEE</string>
-    <string name="user_profile_tdee_unit">kcal/day</string>
+    <!-- BMI categories — used by the Calories screen's BMI card (see BmiCategory.kt) -->
     <string name="user_profile_bmi_underweight">Underweight</string>
     <string name="user_profile_bmi_normal">Normal</string>
     <string name="user_profile_bmi_overweight">Overweight</string>
     <string name="user_profile_bmi_obese">Obese</string>
-    <string name="user_profile_metrics_not_available">Not yet available</string>
     <string name="bmi_tdee_not_available">Health metrics will appear after your first profile sync.</string>
 
     <!-- App Settings -->
