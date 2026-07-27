@@ -41,6 +41,9 @@ class ExerciseWorkoutViewModel @Inject constructor(
     fun onEvent(event: ExerciseWorkoutEvent) {
         when (event) {
             is ExerciseWorkoutEvent.InitExercise -> {
+                if (exerciseId == event.id && _state.value.exercise != null) {
+                    return
+                }
                 _state.update {
                     it.copy(
                         isLoading = true,
