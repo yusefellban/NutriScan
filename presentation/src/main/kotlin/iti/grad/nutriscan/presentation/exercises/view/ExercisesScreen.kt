@@ -162,10 +162,11 @@ fun ExercisesScreen(
                 }
                 state.visibleExercises.isEmpty() -> {
                     EmptyStateWidget(
-                        message = stringResource(id = R.string.saved_empty_state),
+                        message = stringResource(id = R.string.exercises_empty_state),
+                        iconResId = R.drawable.dumbell,
                         modifier = Modifier
+                            .align(Alignment.Center)
                             .fillMaxWidth()
-                            .padding(top = 32.dp)
                     )
                 }
                 else -> {

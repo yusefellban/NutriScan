@@ -20,19 +20,28 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 @Composable
 fun EmptyStateWidget(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconResId: Int = R.drawable.ic_scanner
 ) {
     Column(
         modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_scanner), // Use scanner icon as generic empty state
-            contentDescription = null,
-            tint = AppTheme.colors.TextPrimary.copy(alpha = 0.3f),
-            modifier = Modifier.size(64.dp)
-        )
+        if (iconResId == R.drawable.ic_scanner) {
+            Icon(
+                painter = painterResource(id = iconResId),
+                contentDescription = null,
+                tint = AppTheme.colors.TextPrimary.copy(alpha = 0.3f),
+                modifier = Modifier.size(64.dp)
+            )
+        } else {
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = null,
+                modifier = Modifier.size(64.dp)
+            )
+        }
         
         Spacer(modifier = Modifier.height(16.dp))
         
