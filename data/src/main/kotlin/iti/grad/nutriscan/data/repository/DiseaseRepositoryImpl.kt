@@ -6,8 +6,12 @@ import iti.grad.nutriscan.data.remote.datasource.IDiseaseRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.domain.disease.repository.IDiseaseRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,12 +22,20 @@ class DiseaseRepositoryImpl @Inject constructor(
     private val json: Json
 ) : IDiseaseRepository {
 
-    override fun getDiseasesOffline(): Flow<List<Disease>> {
-        return diseaseDao.getDiseasesFlow().map { entities ->
-            entities.map { entity ->
-                Disease(id = entity.id, name = entity.name, description = entity.description)
+    /** Polls the backend catalog every [SYNC_INTERVAL_MS] for as long as this flow is collected,
+     * so a disease added/edited server-side shows up without an app restart. Catalog data rarely
+     * changes, so the interval is long — this is cheap insurance, not a live feed. */
+    override fun getDiseasesOffline(): Flow<List<Disease>> = channelFlow {
+        syncDiseases()
+        launch {
+            while (isActive) {
+                delay(SYNC_INTERVAL_MS)
+                syncDiseases()
             }
         }
+        diseaseDao.getDiseasesFlow()
+            .map { entities -> entities.map { entity -> Disease(id = entity.id, name = entity.name, description = entity.description) } }
+            .collect { send(it) }
     }
 
     override suspend fun syncDiseases(): Result<Unit> {
@@ -73,5 +85,9 @@ class DiseaseRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             "An unexpected error occurred."
         }
+    }
+
+    private companion object {
+        const val SYNC_INTERVAL_MS = 300_000L
     }
 }

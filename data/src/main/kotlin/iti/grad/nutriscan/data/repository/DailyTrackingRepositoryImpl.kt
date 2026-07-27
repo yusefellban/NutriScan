@@ -21,12 +21,14 @@ import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.LocalDate
@@ -37,6 +39,7 @@ import kotlin.math.roundToInt
 private const val DEFAULT_TARGET_WATER_CNT = 8
 private const val DEFAULT_WEIGHT_KG = 70.0
 private const val STEP_KCAL_FACTOR = 0.0005
+private const val RECONCILE_INTERVAL_MS = 20_000L
 
 class DailyTrackingRepositoryImpl @Inject constructor(
     private val dao: DailyTrackingDao,
@@ -47,13 +50,21 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IDailyTrackingRepository {
 
-    override fun observeToday(): Flow<DailyTracking> = flow {
+    /** Polls [fetchAndSeedToday] every [RECONCILE_INTERVAL_MS] for as long as this flow is
+     * collected, so water/steps logged on another device show up here without an app restart —
+     * see [fetchAndSeedToday] for why an unsynced local edit is never clobbered by this. */
+    override fun observeToday(): Flow<DailyTracking> = channelFlow {
         val userId = resolveUserId()
-        emitAll(
-            todayTicker().flatMapLatest { date ->
-                dao.observeByUserAndDate(userId, date.toString()).map { it?.toDomain() ?: defaultDailyTracking(date) }
+        fetchAndSeedToday()
+        launch {
+            while (isActive) {
+                delay(RECONCILE_INTERVAL_MS)
+                fetchAndSeedToday()
             }
-        )
+        }
+        todayTicker().flatMapLatest { date ->
+            dao.observeByUserAndDate(userId, date.toString()).map { it?.toDomain() ?: defaultDailyTracking(date) }
+        }.collect { send(it) }
     }.flowOn(ioDispatcher)
 
     /** Re-emits [CairoDateProvider.today()] immediately, then again at every Cairo-midnight
@@ -171,22 +182,30 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         }
     }
 
+    /** Seeds/refreshes today's row from the backend — called once at login/cold-start, and
+     * periodically by [observeToday] while it's collected so water/steps logged on another device
+     * show up here without an app restart. Only overwrites Room when there's no local row yet, or
+     * the local row is already [DailyTracking.syncedToBackend] — an unsynced local edit (not yet
+     * pushed by the nightly worker) always wins until it syncs, so a pull never loses it. */
     override suspend fun fetchAndSeedToday(): Result<DailyTrackingRemoteSnapshot> = withContext(ioDispatcher) {
         runCatchingCancellable {
             val userId = resolveUserId()
             val response = api.getToday()
             val snapshot = response.toRemoteSnapshot()
+            val existing = dao.getByUserAndDate(userId, snapshot.date.toString())
 
-            if (dao.getByUserAndDate(userId, snapshot.date.toString()) == null) {
+            if (existing == null || existing.syncedToBackend) {
+                val weightKg = userRepository.getUserData().first()?.weightKg ?: DEFAULT_WEIGHT_KG
+                val caloriesBurnedSteps = (snapshot.stepsCnt * weightKg * STEP_KCAL_FACTOR).roundToInt()
                 dao.upsert(
                     DailyTracking(
                         date = snapshot.date,
                         targetWaterCnt = snapshot.targetWaterCnt.takeIf { it > 0 } ?: DEFAULT_TARGET_WATER_CNT,
                         waterCnt = snapshot.waterCnt,
                         stepsCnt = snapshot.stepsCnt,
-                        caloriesBurnedSteps = 0,
-                        exerciseKcal = 0,
-                        exerciseMinutes = 0,
+                        caloriesBurnedSteps = caloriesBurnedSteps,
+                        exerciseKcal = existing?.exerciseKcal ?: 0,
+                        exerciseMinutes = existing?.exerciseMinutes ?: 0,
                         syncedToBackend = true,
                     ).toEntity(userId)
                 )

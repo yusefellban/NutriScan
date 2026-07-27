@@ -9,9 +9,13 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,27 +26,34 @@ class UserRepositoryImpl @Inject constructor(
     private val json: Json
 ) : IUserRepository {
 
-    override fun getUserData(): Flow<User?> {
-        return userDao.getUserFlow().map { entity ->
-            entity?.let {
-                User(
-                    id = it.id,
-                    firstName = it.firstName,
-                    lastName = it.lastName,
-                    email = it.email,
-                    gender = it.gender,
-                    dateOfBirth = it.dateOfBirth,
-                    heightCm = it.heightCm,
-                    weightKg = it.weightKg,
-                    diseaseIds = it.diseaseIds,
-                    allergyIds = it.allergyIds,
-                    avatarUrl = it.avatarUrl,
-                    bmi = it.bmi,
-                    tdee = it.tdee,
-                )
+    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as this flow is collected, so a
+     * profile edit made on another device shows up here without an app restart. */
+    override fun getUserData(): Flow<User?> = channelFlow {
+        fetchAndSyncProfile()
+        launch {
+            while (isActive) {
+                delay(SYNC_INTERVAL_MS)
+                fetchAndSyncProfile()
             }
         }
+        userDao.getUserFlow().map { entity -> entity?.toDomain() }.collect { send(it) }
     }
+
+    private fun UserEntity.toDomain() = User(
+        id = id,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        gender = gender,
+        dateOfBirth = dateOfBirth,
+        heightCm = heightCm,
+        weightKg = weightKg,
+        diseaseIds = diseaseIds,
+        allergyIds = allergyIds,
+        avatarUrl = avatarUrl,
+        bmi = bmi,
+        tdee = tdee,
+    )
 
     override suspend fun fetchAndSyncProfile(): Result<Unit> {
         return try {
@@ -158,5 +169,9 @@ class UserRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             "An unexpected error occurred."
         }
+    }
+
+    private companion object {
+        const val SYNC_INTERVAL_MS = 15_000L
     }
 }

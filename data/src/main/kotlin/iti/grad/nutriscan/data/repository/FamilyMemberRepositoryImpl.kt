@@ -11,11 +11,16 @@ import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.domain.family.model.FamilyMember
 import iti.grad.nutriscan.domain.family.model.FamilyMemberInput
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.data.local.datasource.TokenManager
 import iti.grad.nutriscan.data.local.util.JwtDecoder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,6 +35,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
     private val remoteDataSource: IUserRemoteDataSource,
     private val json: Json,
     private val tokenManager: TokenManager,
+    private val userRepository: IUserRepository,
 ) : IFamilyMemberRepository {
 
     private suspend fun getActiveUserId(): String? {
@@ -60,10 +66,22 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         return null
     }
 
-    override fun getFamilyMembers(): Flow<List<FamilyMember>> =
-        userDao.getUserFlow().map { user ->
-            user?.familyMembers.orEmpty().map { it.toDomain() }
+    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as this flow is collected, so a
+     * family member added by another account holder on their own device shows up here without an
+     * app restart. Reuses [IUserRepository.fetchAndSyncProfile] — family members are part of the
+     * same `/profile` payload, no separate endpoint. */
+    override fun getFamilyMembers(): Flow<List<FamilyMember>> = channelFlow {
+        userRepository.fetchAndSyncProfile()
+        launch {
+            while (isActive) {
+                delay(SYNC_INTERVAL_MS)
+                userRepository.fetchAndSyncProfile()
+            }
         }
+        userDao.getUserFlow()
+            .map { user -> user?.familyMembers.orEmpty().map { it.toDomain() } }
+            .collect { send(it) }
+    }
 
     override suspend fun addFamilyMember(input: FamilyMemberInput): Result<Unit> {
         val userId = getActiveUserId()
@@ -197,5 +215,9 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             "An unexpected error occurred."
         }
+    }
+
+    private companion object {
+        const val SYNC_INTERVAL_MS = 15_000L
     }
 }

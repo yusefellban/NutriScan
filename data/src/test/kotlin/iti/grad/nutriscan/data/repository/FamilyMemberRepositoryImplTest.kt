@@ -13,6 +13,7 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.data.remote.dto.UserDto
 import iti.grad.nutriscan.domain.family.model.FamilyMemberInput
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -33,6 +34,7 @@ class FamilyMemberRepositoryImplTest {
     private lateinit var remoteDataSource: IUserRemoteDataSource
     private lateinit var tokenManager: TokenManager
     private lateinit var json: Json
+    private lateinit var userRepository: IUserRepository
     private lateinit var repository: FamilyMemberRepositoryImpl
 
     private var currentUserEntity = UserEntity(
@@ -66,6 +68,8 @@ class FamilyMemberRepositoryImplTest {
         remoteDataSource = mockk()
         tokenManager = mockk(relaxed = true)
         json = Json { ignoreUnknownKeys = true }
+        userRepository = mockk()
+        coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
 
         currentUserEntity = userEntity()
         coEvery { userDao.getUserFlow() } answers { MutableStateFlow(currentUserEntity) }
@@ -79,6 +83,7 @@ class FamilyMemberRepositoryImplTest {
             remoteDataSource = remoteDataSource,
             json = json,
             tokenManager = tokenManager,
+            userRepository = userRepository,
         )
     }
 
