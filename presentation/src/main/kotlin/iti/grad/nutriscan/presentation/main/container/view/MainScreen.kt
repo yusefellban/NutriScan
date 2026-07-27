@@ -9,6 +9,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -17,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
@@ -27,9 +27,8 @@ import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 
 @Composable
 fun MainScreen(
-    onNavigateToScanResult: (String) -> Unit,
     onNavigateToScanProcessing: (String) -> Unit,
-    onNavigateToProductDetail: (ProductUiModel) -> Unit,
+    onNavigateToProductDetail: (String) -> Unit,
     onNavigateToNews: () -> Unit,
     onNavigateToChatWithAi: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -38,9 +37,11 @@ fun MainScreen(
     onNavigateToFamilyMemberDetail: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToExercises: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(BottomNavTab.HOME) }
+    var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
+    var captureTrigger by remember { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -49,7 +50,13 @@ fun MainScreen(
         bottomBar = {
             AppBottomNavBar(
                 selectedTab = selectedTab,
-                onTabClick = { tab -> selectedTab = tab }
+                onTabClick = { tab -> 
+                    if (tab == BottomNavTab.SCAN && selectedTab == BottomNavTab.SCAN) {
+                        captureTrigger++
+                    } else {
+                        selectedTab = tab 
+                    }
+                }
             )
         },
         snackbarHost = {
@@ -66,7 +73,7 @@ fun MainScreen(
                 BottomNavTab.HOME -> {
                     HomeScreen(
                         bottomPadding = bottomPadding,
-                        onNavigateToScanResult = onNavigateToScanResult,
+                        onNavigateToScanResult = onNavigateToProductDetail,
                         onNavigateToHistory = onNavigateToHistory,
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToNews = onNavigateToNews,
@@ -77,23 +84,24 @@ fun MainScreen(
                     CaloriesScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = onNavigateToProductDetail,
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) },
                         onNavigateToExercises = onNavigateToExercises,
+                        onNavigateToSavedProducts = { selectedTab = BottomNavTab.SAVED }
                     )
                 }
                 BottomNavTab.SCAN -> {
                     CameraScanScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProcessing = onNavigateToScanProcessing,
-                        onNavigateToProductDetail = onNavigateToProductDetail,
+                        captureTrigger = captureTrigger,
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
                     )
                 }
                 BottomNavTab.SAVED -> {
                     SavedScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = onNavigateToProductDetail
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
                     )
                 }
                 BottomNavTab.PROFILE -> {
@@ -103,7 +111,6 @@ fun MainScreen(
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToSettings = onNavigateToSettings,
                         onNavigateToEditProfile = onNavigateToEditProfile,
-                        onNavigateToFamilyMemberDetail = onNavigateToFamilyMemberDetail,
                     )
                 }
             }

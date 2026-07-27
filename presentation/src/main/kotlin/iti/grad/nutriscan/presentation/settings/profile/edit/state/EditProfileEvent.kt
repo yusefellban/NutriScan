@@ -16,4 +16,6 @@ sealed interface EditProfileEvent {
     object DismissSaveConfirmation : EditProfileEvent
     object BackClicked : EditProfileEvent
     data class SelectAvatar(val avatarUrl: String) : EditProfileEvent
+    object DismissAlert : EditProfileEvent
+    object RetryAction : EditProfileEvent
 }

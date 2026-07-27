@@ -48,7 +48,7 @@ fun ProductInfoHeader(
             verticalAlignment = Alignment.Bottom,
         ) {
             Text(
-                text = productName,
+                text = productName.ifBlank { stringResource(R.string.scan_product_unknown) },
                 style = ProductDetailsTypography.productTitle,
                 color = AppTheme.colors.ProductDetailTitleText,
                 modifier = Modifier.weight(1f),
@@ -93,22 +93,26 @@ fun ProductInfoHeader(
         }
 
         // ── Safety Reason ──
-        if (!safetyReasonText.isNullOrBlank()) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Row {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 7.dp)
-                        .size(5.dp)
-                        .background(AppTheme.colors.ProductDetailSafetyReasonText, CircleShape),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = safetyReasonText,
-                    style = CaloriesTypography.badgeText,
-                    color = AppTheme.colors.ProductDetailSafetyReasonText,
-                )
-            }
+        val reasonText = if (!safetyReasonText.isNullOrBlank()) {
+            safetyReasonText
+        } else {
+            stringResource(R.string.no_specific_match_found)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+        Row {
+            Box(
+                modifier = Modifier
+                    .padding(top = 7.dp)
+                    .size(5.dp)
+                    .background(AppTheme.colors.ProductDetailSafetyReasonText, CircleShape),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = reasonText,
+                style = CaloriesTypography.badgeText,
+                color = AppTheme.colors.ProductDetailSafetyReasonText,
+            )
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,14 +33,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
+import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
-import iti.grad.nutriscan.presentation.home.view.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
@@ -78,6 +81,10 @@ fun HomeScreen(
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(HomeEvent.RefreshHistorySilently)
     }
 
     HomeScreenContent(
@@ -192,14 +199,52 @@ private fun HomeFeedContent(
             }
 
             // ── History Items ──
-            items(
-                items = state.recentHistory,
-                key = { it.id },
-            ) { historyItem ->
-                HistoryItemCard(
-                    item = historyItem,
-                    onClick = { onEvent(HomeEvent.HistoryItemClicked(historyItem.id)) },
-                )
+            when {
+                state.isHistoryLoading -> {
+                    item {
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = AppTheme.colors.Primary)
+                        }
+                    }
+                }
+                state.historyError != null -> {
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = state.historyError, color = AppTheme.colors.VerdictRedText)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            AppButton(
+                                textResId = R.string.common_retry,
+                                isLoading = false,
+                                onClick = { onEvent(HomeEvent.RetryLoadHistory) }
+                            )
+                        }
+                    }
+                }
+                state.recentHistory.isEmpty() -> {
+                    item {
+                        EmptyStateWidget(
+                            message = "No recent scans found",
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                else -> {
+                    items(
+                        items = state.recentHistory,
+                        key = { it.id },
+                    ) { historyItem ->
+                        HistoryItemCard(
+                            item = historyItem,
+                            onClick = { onEvent(HomeEvent.HistoryItemClicked(historyItem.id)) },
+                        )
+                    }
+                }
             }
 
             // Bottom spacing to account for the bottom nav bar overflow

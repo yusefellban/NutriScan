@@ -7,8 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import iti.grad.nutriscan.data.db.MIGRATION_4_5
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
+import iti.grad.nutriscan.data.db.dao.ExercisesDao
+import iti.grad.nutriscan.data.db.dao.SavedScanDao
 import iti.grad.nutriscan.data.db.migration.MIGRATION_3_4
 import javax.inject.Singleton
 
@@ -23,7 +26,10 @@ object DatabaseModule {
             context,
             NutriScanDatabase::class.java,
             "nutriscan_db"
-        ).addMigrations(MIGRATION_3_4).fallbackToDestructiveMigration().build()
+        )
+            .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -53,4 +59,17 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideStreakDao(db: NutriScanDatabase) = db.streakDao()
+
+    @Provides
+    @Singleton
+    fun provideExercisesDao(db: NutriScanDatabase): ExercisesDao = db.exercisesDao()
+
+    @Provides
+    @Singleton
+    fun provideSavedScanDao(db: NutriScanDatabase): SavedScanDao = db.savedScanDao()
+
+    @Provides
+    @Singleton
+    fun provideDailyTrackingDao(db: NutriScanDatabase): iti.grad.nutriscan.data.db.dao.DailyTrackingDao =
+        db.dailyTrackingDao()
 }

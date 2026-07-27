@@ -15,8 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
-import kotlin.reflect.typeOf
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
 import iti.grad.nutriscan.presentation.auth.email_verification.view.EmailVerificationScreen
 import iti.grad.nutriscan.presentation.auth.register.view.RegisterScreen
@@ -33,6 +33,12 @@ import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
+import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
+import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
+import iti.grad.nutriscan.presentation.scan_history.view.ScanHistoryScreen
+import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
+import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
 
 @Composable
@@ -61,7 +67,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 }
@@ -99,7 +105,7 @@ fun AppNavGraph(
                             popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
                         }
                     } else {
-                        navController.navigate(MainRoute) {
+                        navController.navigate(MainRoute()) {
                             popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
                         }
                     }
@@ -156,7 +162,7 @@ fun AppNavGraph(
             ProfileSetupPagerScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToHome = {
-                    navController.navigate(MainRoute) {
+                    navController.navigate(MainRoute()) {
                         popUpTo(ProfileSetupPagerRoute) { inclusive = true }
                     }
                 }
@@ -169,32 +175,29 @@ fun AppNavGraph(
                 title = "Family Profile Setup",
                 buttonText = "Complete Setup"
             ) {
-                navController.navigate(MainRoute) {
+                navController.navigate(MainRoute()) {
                     popUpTo(LoginRoute::class) { inclusive = true }
                 }
             }
         }
 
         // 7. Main Screen (Container for Home, Scan, Calories, Saved, Profile)
-        composable<MainRoute> {
+        composable<MainRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<MainRoute>()
             MainScreen(
-                onNavigateToScanResult = { scanId ->
-                    navController.navigate(ScanResultRoute(scanId))
-                },
+                initialTab = route.initialTab,
                 onNavigateToScanProcessing = { barcode ->
                     navController.navigate(ScanProcessingRoute(barcode = barcode))
                 },
-                onNavigateToProductDetail = { product ->
-                    navController.navigate(ProductDetailsRoute(product = product))
+                onNavigateToProductDetail = { scanId ->
+                    navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
                 onNavigateToNews = { navController.navigate(NewsRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
-                onNavigateToFamilyMemberDetail = { memberId ->
-                    navController.navigate(EditConditionsRoute(memberId))
-                },
+                onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
             )
@@ -207,34 +210,17 @@ fun AppNavGraph(
                 title = "Scan Processing\nCode: ${route.barcode}",
                 buttonText = "View Results"
             ) {
-                navController.navigate(ScanResultRoute(route.imageUri ?: "")) {
-                    popUpTo(ScanProcessingRoute(barcode = route.barcode, imageUri = route.imageUri)) { inclusive = true }
-                }
+                // Navigate to Product Details directly if processing completes, currently this is just placeholder.
+                navController.navigateUp()
             }
         }
 
-        // 10. Scan Result (Placeholder)
-        composable<ScanResultRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ScanResultRoute>()
-            PlaceholderScreen(
-                title = "Scan Result\nImage URI: ${route.imageUri}",
-                buttonText = "Chat with NutriGPT"
-            ) {
-                navController.navigate(NutriGptRoute("dummy_scan_id"))
-            }
-        }
-
-        // 11. NutriGPT Chat (Placeholder)
-        composable<NutriGptRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<NutriGptRoute>()
-            PlaceholderScreen(
-                title = "NutriGPT Chat\nScan ID: ${route.scanResultId}",
-                buttonText = "Back to Home"
-            ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
-                }
-            }
+        // 11. NutriGPT Chat
+        composable<NutriGptRoute> {
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
         }
 
         // 12. Ingredient Detail (Placeholder)
@@ -265,20 +251,20 @@ fun AppNavGraph(
                 title = "Receipt Result\nURI: ${route.receiptImageUri}",
                 buttonText = "Back to Home"
             ) {
-                navController.navigate(MainRoute) {
-                    popUpTo(MainRoute) { inclusive = false }
+                navController.navigate(MainRoute()) {
+                    popUpTo<MainRoute> { inclusive = false }
                 }
             }
         }
 
-        // 15. Scan History (Placeholder)
+        // 15. Scan History
         composable<ScanHistoryRoute> {
-            PlaceholderScreen(
-                title = "Scan History",
-                buttonText = "Go Back"
-            ) {
-                navController.navigateUp()
-            }
+            ScanHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToProductDetails = { scanId ->
+                    navController.navigate(ProductDetailsRoute(scanId = scanId))
+                }
+            )
         }
 
         // 16. Report List (Placeholder)
@@ -313,17 +299,6 @@ fun AppNavGraph(
         composable<ManageFamilyRoute> {
             PlaceholderScreen(
                 title = "Manage Family",
-                buttonText = "Edit Conditions"
-            ) {
-                navController.navigate(EditConditionsRoute("family_member_456"))
-            }
-        }
-
-        // 21. Edit Conditions (Placeholder)
-        composable<EditConditionsRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<EditConditionsRoute>()
-            PlaceholderScreen(
-                title = "Edit Conditions\nMember ID: ${route.memberProfileId}",
                 buttonText = "Go Back"
             ) {
                 navController.navigateUp()
@@ -375,18 +350,31 @@ fun AppNavGraph(
         }
 
 
+        // 28. Exercises
         composable<ExercisesRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.exercises_title),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            ExercisesScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToWorkout = { exerciseId ->
+                    navController.navigate(ExerciseWorkoutRoute(exerciseId))
+                }
+            )
+        }
+
+        // 28b. Exercise Workout Screen
+        composable<ExerciseWorkoutRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ExerciseWorkoutRoute>()
+            ExerciseWorkoutScreen(
+                exerciseId = route.exerciseId,
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToCalories = {
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.CALORIES)) {
+                        popUpTo<MainRoute> { inclusive = true }
+                    }
+                }
+            )
         }
         // 29. Product Details
-        composable<ProductDetailsRoute>(
-            typeMap = mapOf(typeOf<ProductUiModel>() to ProductUiModelNavType)
-        ) {
+        composable<ProductDetailsRoute> {
             ProductDetailsScreen(
                 onNavigateBack = { navController.navigateUp() }
             )
@@ -399,17 +387,22 @@ fun AppNavGraph(
             )
         }
 
-        // 31. Chat with AI (Placeholder)
+        // 31. Chat with AI
         composable<ChatWithAiRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.home_chat_with_ai),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            NutriGptScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToVoice = { navController.navigate(NutriGptVoiceRoute) }
+            )
         }
 
-        // 29. Product Details Placeholder
+        // 32. Voice Chat with AI
+        composable<NutriGptVoiceRoute> {
+            NutriGptVoiceScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
+        }
+
+
 
     }
 }

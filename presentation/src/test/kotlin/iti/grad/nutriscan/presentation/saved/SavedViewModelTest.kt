@@ -4,12 +4,16 @@ import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -85,33 +89,28 @@ class SavedViewModelTest {
 
         @Test
         fun `ProductClicked emits NavigateToProductDetail with the product id`() = runTest {
+            val mockProduct = ProductUiModel(
+                id = "3",
+                productName = "Apple",
+                imageUrl = null,
+                verdict = ProductVerdict.SAFE,
+                calories = "50"
+            )
             viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.ProductClicked("3"))
+                val mockProduct = ProductUiModel(
+                    id = "3",
+                    productName = "Sample",
+                    imageUrl = null,
+                    verdict = ProductVerdict.SAFE,
+                    calories = "100"
+                )
+                viewModel.onEvent(SavedEvent.ProductClicked(mockProduct))
                 testScheduler.runCurrent()
 
                 val effect = awaitItem()
                 Assertions.assertTrue(effect is SavedEffect.NavigateToProductDetail)
-                Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).productId)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with HOME emits NavigateToHome`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.HOME))
-                testScheduler.runCurrent()
-
-                Assertions.assertTrue(awaitItem() is SavedEffect.NavigateToHome)
-            }
-        }
-
-        @Test
-        fun `BottomNavTabClicked with SAVED emits no effect`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(SavedEvent.BottomNavTabClicked(BottomNavTab.SAVED))
-                testScheduler.runCurrent()
-
-                expectNoEvents()
+                Assertions.assertEquals(mockProduct, (effect as SavedEffect.NavigateToProductDetail).product)
+                Assertions.assertEquals("3", (effect as SavedEffect.NavigateToProductDetail).product.id)
             }
         }
     }

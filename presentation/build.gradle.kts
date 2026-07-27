@@ -48,6 +48,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
 
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    
     implementation(project(":domain"))
     
     implementation(libs.hilt.android)
@@ -58,7 +61,9 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.coil3.svg)
+    implementation(libs.coil3.gif)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.timber)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
@@ -66,6 +71,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.androidx.browser)
+    implementation(libs.compose.markdown)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

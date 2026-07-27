@@ -1,43 +1,44 @@
 package iti.grad.nutriscan.presentation.profile_setup.view
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.activity.compose.BackHandler
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppBackButton
-import iti.grad.nutriscan.presentation.common.components.AppSnackbar
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
-import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
-import iti.grad.nutriscan.presentation.profile_setup.view.components.DateOfBirthPage
-import iti.grad.nutriscan.presentation.profile_setup.view.components.GenderSelectionPage
-import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfileContent
-import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPage
-import iti.grad.nutriscan.presentation.profile_setup.view.components.ProfileSetupPageIndicator
-import iti.grad.nutriscan.presentation.profile_setup.view.components.ProgressNextButton
-import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPage
-import iti.grad.nutriscan.presentation.profile_setup.viewmodel.ProfileSetupPagerViewModel
-import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
+import androidx.compose.foundation.shape.CircleShape
+import iti.grad.nutriscan.presentation.profile_setup.viewmodel.ProfileSetupPagerViewModel
+import androidx.compose.runtime.LaunchedEffect
+import iti.grad.nutriscan.presentation.profile_setup.view.components.ProgressNextButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.foundation.layout.WindowInsets
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfileContent
+import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
+import androidx.compose.ui.Alignment
+import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPage
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import androidx.compose.ui.platform.LocalContext
+import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPage
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.profile_setup.view.components.DateOfBirthPage
+import androidx.compose.runtime.Composable
+import iti.grad.nutriscan.presentation.profile_setup.view.components.GenderSelectionPage
+import iti.grad.nutriscan.presentation.profile_setup.view.components.ProfileSetupPageIndicator
+import androidx.compose.foundation.layout.Box
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 
 @Composable
 fun ProfileSetupPagerScreen(
@@ -88,7 +89,7 @@ fun ProfileSetupPagerScreen(
             }
         },
         containerColor = AppTheme.colors.Background,
-        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0)
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         Box(
             modifier = Modifier

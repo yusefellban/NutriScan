@@ -1,7 +1,7 @@
 package iti.grad.nutriscan.navigation
 
 import kotlinx.serialization.Serializable
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
@@ -32,7 +32,7 @@ object FamilyProfileSetupRoute
 object HomeRoute
 
 @Serializable
-object MainRoute
+data class MainRoute(val initialTab: BottomNavTab = BottomNavTab.HOME)
 
 @Serializable
 object CameraScanRoute
@@ -47,10 +47,7 @@ data class ScanProcessingRoute(
 )
 
 @Serializable
-data class ScanResultRoute(val imageUri: String)
-
-@Serializable
-data class NutriGptRoute(val scanResultId: String)
+object NutriGptRoute
 
 @Serializable
 data class IngredientDetailRoute(val ingredientName: String)
@@ -80,9 +77,6 @@ object UserProfileRoute
 object ManageFamilyRoute
 
 @Serializable
-data class EditConditionsRoute(val memberProfileId: String)
-
-@Serializable
 object NotificationSettingsRoute
 
 @Serializable
@@ -98,23 +92,8 @@ object TermsAndConditionsRoute
 @Serializable
 object HelpRoute
 
-val ProductUiModelNavType = object : NavType<ProductUiModel>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): ProductUiModel? {
-        return bundle.getString(key)?.let { Json.decodeFromString(it) }
-    }
-    override fun parseValue(value: String): ProductUiModel {
-        return Json.decodeFromString(Uri.decode(value))
-    }
-    override fun put(bundle: Bundle, key: String, value: ProductUiModel) {
-        bundle.putString(key, Json.encodeToString(value))
-    }
-    override fun serializeAsValue(value: ProductUiModel): String {
-        return Uri.encode(Json.encodeToString(value))
-    }
-}
-
 @Serializable
-data class ProductDetailsRoute(val product: ProductUiModel)
+data class ProductDetailsRoute(val scanId: String)
 @Serializable
 data class EmailVerificationRoute(val email: String)
 
@@ -125,7 +104,13 @@ object CaloriesRoute
 object ExercisesRoute
 
 @Serializable
+data class ExerciseWorkoutRoute(val exerciseId: String)
+
+@Serializable
 object NewsRoute
 
 @Serializable
 object ChatWithAiRoute
+
+@Serializable
+object NutriGptVoiceRoute

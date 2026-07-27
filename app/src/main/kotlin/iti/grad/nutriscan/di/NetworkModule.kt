@@ -9,12 +9,14 @@ import iti.grad.nutriscan.data.remote.api.AllergyApiService
 import iti.grad.nutriscan.data.remote.api.AuthApiService
 import iti.grad.nutriscan.data.remote.api.DiseaseApiService
 import iti.grad.nutriscan.data.remote.api.KeycloakApiService
+import iti.grad.nutriscan.data.remote.api.ExercisesApiService
 import iti.grad.nutriscan.data.remote.api.NewsApiService
 import iti.grad.nutriscan.data.remote.api.UserApiService
 import iti.grad.nutriscan.data.remote.interceptor.AuthInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.ErrorInterceptor
 import iti.grad.nutriscan.data.remote.interceptor.NutriScanAuthenticator
 import iti.grad.nutriscan.data.remote.api.TokenRefreshApiService
+import iti.grad.nutriscan.data.remote.api.NutriGptApiService
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -22,6 +24,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
+import iti.grad.nutriscan.data.remote.api.ScanApiService
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
@@ -61,8 +64,9 @@ object NetworkModule {
             .addInterceptor(errorInterceptor)
             .authenticator(authenticator)
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
@@ -112,6 +116,18 @@ object NetworkModule {
     @Singleton
     fun provideUserApiService(retrofit: Retrofit): UserApiService {
         return retrofit.create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideScanApiService(retrofit: Retrofit): ScanApiService {
+        return retrofit.create(ScanApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDailyTrackingApiService(retrofit: Retrofit): iti.grad.nutriscan.data.remote.api.DailyTrackingApiService {
+        return retrofit.create(iti.grad.nutriscan.data.remote.api.DailyTrackingApiService::class.java)
     }
 
     @Provides
@@ -187,4 +203,66 @@ object NetworkModule {
     @Singleton
     fun provideNewsApiService(@Named("NewsRetrofit") retrofit: Retrofit): NewsApiService =
         retrofit.create(NewsApiService::class.java)
+
+    @Provides
+    @Singleton
+    @Named("ExercisesOkHttpClient")
+    fun provideExercisesOkHttpClient(): OkHttpClient {
+        // Deliberately its own client, same reasoning as News: this public API needs no
+        // AuthInterceptor (no auth, no API key) and no ErrorInterceptor mapping.
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("ExercisesRetrofit")
+    fun provideExercisesRetrofit(
+        @Named("ExercisesOkHttpClient") client: OkHttpClient,
+        json: Json,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.EXERCISES_API_BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideExercisesApiService(
+        @Named("ExercisesRetrofit") retrofit: Retrofit
+    ): ExercisesApiService =
+        retrofit.create(ExercisesApiService::class.java)
+
+    @Provides
+    @Singleton
+    @Named("NutriGptRetrofit")
+    fun provideNutriGptRetrofit(
+        json: Json,
+    ): Retrofit {
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.NUTRI_GPT_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType())
+            )
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNutriGptApiService(
+        @Named("NutriGptRetrofit") retrofit: Retrofit
+    ): NutriGptApiService =
+        retrofit.create(NutriGptApiService::class.java)
 }

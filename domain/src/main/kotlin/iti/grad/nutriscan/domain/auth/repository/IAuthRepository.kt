@@ -15,4 +15,5 @@ interface IAuthRepository {
 
     /** Decodes the `sub` claim from the stored ID token. Null if not logged in or undecodable. */
     suspend fun getCurrentUserId(): String?
+    suspend fun getAccessToken(): String?
 }

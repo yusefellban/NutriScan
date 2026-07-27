@@ -21,16 +21,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import iti.grad.nutriscan.presentation.common.components.AppTopHeader
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
-import iti.grad.nutriscan.presentation.product_details.view.components.ProductDetailsTopBar
+
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
 import iti.grad.nutriscan.presentation.product_details.viewmodel.ProductDetailsViewModel
@@ -61,6 +65,17 @@ private fun ProductDetailsContent(
     state: ProductDetailsState,
     onEvent: (ProductDetailsEvent) -> Unit,
 ) {
+    if (state.showDeleteDialog) {
+        DeleteWarningAlert(
+            title = stringResource(id = R.string.alert_remove_saved_title),
+            message = stringResource(id = R.string.alert_remove_saved_message),
+            confirmText = stringResource(id = R.string.action_remove),
+            cancelText = stringResource(id = R.string.action_cancel),
+            onConfirm = { onEvent(ProductDetailsEvent.ConfirmDeleteBookmark) },
+            onDismiss = { onEvent(ProductDetailsEvent.DismissDeleteBookmark) },
+        )
+    }
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -78,10 +93,14 @@ private fun ProductDetailsContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // ── Top Bar ──
-                ProductDetailsTopBar(
-                    isBookmarked = state.productDetail?.isBookmarked == true,
+                AppTopHeader(
+                    title = stringResource(R.string.product_details_title),
                     onBackClick = { onEvent(ProductDetailsEvent.BackClicked) },
-                    onBookmarkClick = { onEvent(ProductDetailsEvent.BookmarkToggled) },
+                    actionIconResId = if (state.productDetail?.isBookmarked == true) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark_outline,
+                    actionIconContentDescription = stringResource(
+                        if (state.productDetail?.isBookmarked == true) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
+                    ),
+                    onActionClick = { onEvent(ProductDetailsEvent.BookmarkToggled) }
                 )
 
                 // ── White Body Container ──

@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Response
+import org.junit.jupiter.api.Assertions.*
+import iti.grad.nutriscan.data.db.NutriScanDatabase
 
 class AuthRepositoryImplTest {
 
@@ -24,6 +26,7 @@ class AuthRepositoryImplTest {
     private lateinit var keycloakApiService: KeycloakApiService
     private lateinit var tokenRefreshApiService: TokenRefreshApiService
     private lateinit var tokenManager: TokenManager
+    private lateinit var mockDatabase: NutriScanDatabase
     private lateinit var json: Json
     private lateinit var repository: AuthRepositoryImpl
 
@@ -33,13 +36,15 @@ class AuthRepositoryImplTest {
         keycloakApiService = mockk()
         tokenRefreshApiService = mockk(relaxed = true)
         tokenManager = mockk(relaxed = true)
+        mockDatabase = mockk(relaxed = true)
         json = Json { ignoreUnknownKeys = true }
         repository = AuthRepositoryImpl(
             remoteDataSource,
             keycloakApiService,
             tokenRefreshApiService,
             tokenManager,
-            json
+            json,
+            mockDatabase
         )
     }
 
@@ -62,8 +67,8 @@ class AuthRepositoryImplTest {
         val email = "test@example.com"
         val password = "pwd"
         val request = RegisterRequestDto(
-            firstName = "string",
-            lastName = "string",
+            firstName = "test",
+            lastName = "",
             email = email,
             username = email,
             password = password,
@@ -104,7 +109,7 @@ class AuthRepositoryImplTest {
 
         val userId = repository.getCurrentUserId()
 
-        org.junit.jupiter.api.Assertions.assertEquals("user-123", userId)
+        assertEquals("user-123", userId)
     }
 
     @Test
@@ -113,7 +118,7 @@ class AuthRepositoryImplTest {
 
         val userId = repository.getCurrentUserId()
 
-        org.junit.jupiter.api.Assertions.assertNull(userId)
+       assertNull(userId)
     }
 
     private fun fakeJwtWithSubject(subject: String): String {

@@ -97,8 +97,9 @@ fun StepsGaugeCard(
                     style = CaloriesTypography.badgeText,
                     color = innerTextColor,
                 )
+                val currentLocale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
                 Text(
-                    text = String.format(Locale.getDefault(), "%,d", steps),
+                    text = String.format(currentLocale, "%,d", steps),
                     style = AppTheme.typography.titleMedium,
                     color = innerValueColor,
                 )

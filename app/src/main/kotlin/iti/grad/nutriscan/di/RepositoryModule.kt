@@ -39,6 +39,16 @@ import iti.grad.nutriscan.domain.notification.repository.IQuoteRepository
 import iti.grad.nutriscan.repository.QuoteRepositoryImpl
 import iti.grad.nutriscan.domain.notification.repository.ITestNotificationSender
 import iti.grad.nutriscan.notification.TestNotificationSenderImpl
+import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
+import iti.grad.nutriscan.data.repository.FamilyMemberRepositoryImpl
+import iti.grad.nutriscan.domain.exercises.repository.IExercisesRepository
+import iti.grad.nutriscan.data.repository.ExercisesRepositoryImpl
+import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
+import iti.grad.nutriscan.data.repository.NutriGptRepositoryImpl
+import iti.grad.nutriscan.data.repository.SavedScanRepositoryImpl
+import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
+import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
+import iti.grad.nutriscan.data.repository.DailyTrackingRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -144,4 +154,34 @@ abstract class RepositoryModule {
     abstract fun bindTestNotificationSender(
         impl: TestNotificationSenderImpl
     ): ITestNotificationSender
+
+    @Binds
+    @Singleton
+    abstract fun bindFamilyMemberRepository(
+        impl: FamilyMemberRepositoryImpl
+    ): IFamilyMemberRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindExercisesRepository(
+        impl: ExercisesRepositoryImpl
+    ): IExercisesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNutriGptRepository(
+        impl: NutriGptRepositoryImpl
+    ): INutriGptRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSavedScanRepository(
+        impl: SavedScanRepositoryImpl
+    ): ISavedScanRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDailyTrackingRepository(
+        impl: DailyTrackingRepositoryImpl
+    ): IDailyTrackingRepository
 }

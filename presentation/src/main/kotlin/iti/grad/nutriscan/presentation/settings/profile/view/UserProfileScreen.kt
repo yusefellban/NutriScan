@@ -12,22 +12,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
+import iti.grad.nutriscan.presentation.settings.profile.add_member.viewmodel.AddFamilyMemberViewModel
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileState
+import iti.grad.nutriscan.presentation.settings.profile.view.components.AddFamilyMemberBottomSheet
 import iti.grad.nutriscan.presentation.settings.profile.view.components.FamilyMembersSection
 import iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileHeaderSection
 import iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileMenuRow
@@ -49,26 +55,48 @@ fun UserProfileScreen(
     bottomPadding: Dp = 0.dp,
     onNavigateToScanHistory: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
-    onNavigateToFamilyMemberDetail: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToTab: (iti.grad.nutriscan.presentation.common.model.BottomNavTab) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is UserProfileEffect.NavigateToEditProfile -> onNavigateToEditProfile()
-                is UserProfileEffect.NavigateToFamilyMemberDetail ->
-                    onNavigateToFamilyMemberDetail(effect.memberId)
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
+                is UserProfileEffect.ShowError -> errorMessage = effect.message
+                is UserProfileEffect.NavigateToTab -> onNavigateToTab(effect.tab)
             }
         }
     }
 
     UserProfileContent(state = state, onEvent = viewModel::onEvent, bottomPadding = bottomPadding)
+
+    if (state.isAddMemberSheetVisible) {
+        val addMemberViewModel: AddFamilyMemberViewModel = hiltViewModel()
+        val addMemberState by addMemberViewModel.state.collectAsState()
+
+        AddFamilyMemberBottomSheet(
+            state = addMemberState,
+            effectFlow = addMemberViewModel.effect,
+            onEvent = addMemberViewModel::onEvent,
+            onDismiss = { viewModel.onEvent(UserProfileEvent.AddMemberSheetDismissed) },
+            editingMemberId = state.editingMemberId,
+        )
+    }
+
+    errorMessage?.let { message ->
+        ErrorAlert(
+            title = stringResource(R.string.add_family_member_generic_error),
+            message = message,
+            onDismiss = { errorMessage = null },
+        )
+    }
 }
 
 @Composable
@@ -144,13 +172,44 @@ private fun UserProfileContent(
         }
 
     state.memberPendingDeletion?.let { member ->
-        ConfirmationDialog(
+        iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert(
             title = stringResource(R.string.user_profile_remove_member_title),
             message = stringResource(R.string.user_profile_remove_member_message, member.name),
-            confirmLabel = stringResource(R.string.action_remove),
-            cancelLabel = stringResource(R.string.action_cancel),
+            confirmText = stringResource(R.string.action_remove),
+            cancelText = stringResource(R.string.action_cancel),
             onConfirm = { onEvent(UserProfileEvent.ConfirmRemoveMemberClicked) },
             onDismiss = { onEvent(UserProfileEvent.CancelRemoveMemberClicked) },
         )
+    }
+
+    when (val alert = state.alertState) {
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError -> {
+            iti.grad.nutriscan.presentation.common.components.InternetAlert(
+                onRetry = { onEvent(UserProfileEvent.RetryAction) },
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error -> {
+            iti.grad.nutriscan.presentation.common.components.ErrorAlert(
+                title = stringResource(id = R.string.alert_error_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning -> {
+            iti.grad.nutriscan.presentation.common.components.WarningAlert(
+                title = stringResource(id = R.string.alert_warning_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success -> {
+            iti.grad.nutriscan.presentation.common.components.SuccessAlert(
+                title = stringResource(id = R.string.alert_success_title),
+                message = alert.messageStr ?: alert.messageResId?.let { stringResource(id = it) } ?: "",
+                onDismiss = { onEvent(UserProfileEvent.DismissAlert) }
+            )
+        }
+        is iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None -> Unit
     }
 }

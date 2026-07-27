@@ -12,4 +12,12 @@ data class ProductUiModel(
     val imageUrl: String?,
     val verdict: ProductVerdict,
     val calories: String,
+    /** How many times this product was logged today — shown as an "x2"-style badge instead of
+     * duplicating the card. 1 means no badge. */
+    val quantity: Int = 1,
+    /** The single most-recently-added [iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry.id]
+     * behind this grouped card — swiping to remove deletes just this one entry, decrementing
+     * [quantity] rather than removing the whole product. Null outside the food log (e.g. the
+     * Saved catalog, which has no log entry to target). */
+    val logEntryId: String? = null,
 )

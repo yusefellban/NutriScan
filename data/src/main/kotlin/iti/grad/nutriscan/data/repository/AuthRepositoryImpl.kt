@@ -18,19 +18,25 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
 
+import iti.grad.nutriscan.data.db.NutriScanDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 class AuthRepositoryImpl @Inject constructor(
     private val remoteDataSource: IAuthRemoteDataSource,
     private val keycloakApiService: KeycloakApiService,
     private val tokenRefreshApiService: TokenRefreshApiService,
     private val tokenManager: TokenManager,
-    private val json: Json
+    private val json: Json,
+    private val database: NutriScanDatabase
 ) : IAuthRepository {
 
     override suspend fun register(email: String, password: String): Result<Unit> {
         return try {
+            val emailPrefix = email.substringBefore("@")
             val request = RegisterRequestDto(
-                firstName = "string",
-                lastName = "string",
+                firstName = emailPrefix,
+                lastName = "",
                 email = email,
                 username = email,
                 password = password,
@@ -163,12 +169,19 @@ class AuthRepositoryImpl @Inject constructor(
                 tokenRefreshApiService.logout(refreshToken = refreshToken)
             }
             tokenManager.clearTokens()
+            withContext(Dispatchers.IO) {
+                database.clearAllTables()
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             tokenManager.clearTokens()
+            withContext(Dispatchers.IO) {
+                database.clearAllTables()
+            }
             Result.success(Unit)
         }
     }
 
     override suspend fun getCurrentUserId(): String? = JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+    override suspend fun getAccessToken(): String? = tokenManager.getAccessToken()
 }

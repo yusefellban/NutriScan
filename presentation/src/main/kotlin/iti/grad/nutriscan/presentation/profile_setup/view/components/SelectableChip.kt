@@ -16,30 +16,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun SelectableChip(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    selectedBgColor: Color = AppTheme.colors.ChipBackgroundSelected,
+    unselectedBgColor: Color = AppTheme.colors.ChipBackgroundUnselected,
+    selectedBorderColor: Color = AppTheme.colors.ChipBorderSelected,
+    unselectedBorderColor: Color = AppTheme.colors.ChipBorderUnselected,
+    selectedTextColor: Color = AppTheme.colors.ChipTextSelected,
+    unselectedTextColor: Color = AppTheme.colors.ChipTextUnselected,
 ) {
     val backgroundColor = if (isSelected) {
-        AppTheme.colors.ChipBackgroundSelected
+        selectedBgColor
     } else {
-        AppTheme.colors.ChipBackgroundUnselected
+        unselectedBgColor
     }
 
     val borderColor = if (isSelected) {
-        AppTheme.colors.ChipBorderSelected
+        selectedBorderColor
     } else {
-        AppTheme.colors.ChipBorderUnselected
+        unselectedBorderColor
     }
 
     val textColor = if (isSelected) {
-        AppTheme.colors.ChipTextSelected
+        selectedTextColor
     } else {
-        AppTheme.colors.ChipTextUnselected
+        unselectedTextColor
     }
 
     Box(

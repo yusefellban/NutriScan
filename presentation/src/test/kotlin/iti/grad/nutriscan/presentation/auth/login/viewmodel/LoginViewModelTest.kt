@@ -3,12 +3,15 @@ package iti.grad.nutriscan.presentation.auth.login.viewmodel
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
 import iti.grad.nutriscan.domain.auth.usecase.GetOidcAuthConfigUseCase
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 import iti.grad.nutriscan.domain.auth.usecase.SaveGoogleLoginTokensUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
+import iti.grad.nutriscan.presentation.common.model.UiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import iti.grad.nutriscan.domain.disease.usecase.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -28,6 +32,8 @@ class LoginViewModelTest {
     private lateinit var getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase
     private lateinit var saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase
     private lateinit var userRepository: IUserRepository
+    private lateinit var syncDiseasesUseCase: SyncDiseasesUseCase
+    private lateinit var syncAllergiesUseCase: SyncAllergiesUseCase
     private lateinit var viewModel: LoginViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -38,12 +44,18 @@ class LoginViewModelTest {
         getOidcAuthConfigUseCase = mockk()
         saveGoogleLoginTokensUseCase = mockk()
         userRepository = mockk()
+        syncDiseasesUseCase = mockk()
+        syncAllergiesUseCase = mockk()
         coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
+        coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
+        coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
         viewModel = LoginViewModel(
             loginWithEmailUseCase,
             getOidcAuthConfigUseCase,
             saveGoogleLoginTokensUseCase,
             userRepository,
+            syncDiseasesUseCase,
+            syncAllergiesUseCase
         )
     }
 
@@ -72,7 +84,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `SignInClicked with valid credentials emits ShowErrorDialog on failure`() = runTest {
+    fun `SignInClicked with valid credentials emits Error alert on failure`() = runTest {
         val email = "test@example.com"
         val password = "Password123"
         val errorMessage = "Invalid credentials"
@@ -81,14 +93,13 @@ class LoginViewModelTest {
         viewModel.onEvent(LoginEvent.EmailChanged(email))
         viewModel.onEvent(LoginEvent.PasswordChanged(password))
         
-        viewModel.effect.test {
-            viewModel.onEvent(LoginEvent.SignInClicked)
-            testDispatcher.scheduler.advanceUntilIdle()
-            
-            val effect = awaitItem()
-            assertTrue(effect is LoginEffect.ShowErrorDialog)
-            assertEquals(errorMessage, (effect as LoginEffect.ShowErrorDialog).messageStr)
-            cancelAndIgnoreRemainingEvents()
-        }
+        viewModel.onEvent(LoginEvent.SignInClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+        
+        val alertState = viewModel.state.value.alertState
+        assertTrue(alertState is AuthAlertState.Error)
+        val errorMsg = (alertState as AuthAlertState.Error).message
+        assertTrue(errorMsg is UiText.DynamicString)
+        assertEquals(errorMessage, (errorMsg as UiText.DynamicString).value)
     }
 }
