@@ -22,8 +22,8 @@ interface FoodLogDao {
     @Query("UPDATE food_log SET deleted = 1, pendingSync = 1 WHERE id = :id AND userId = :userId")
     suspend fun markDeletedForUser(id: String, userId: String)
 
-    @Query("SELECT * FROM food_log WHERE pendingSync = 1")
-    suspend fun getPendingSyncEntries(): List<FoodLogEntity>
+    @Query("SELECT * FROM food_log WHERE pendingSync = 1 AND userId = :userId")
+    suspend fun getPendingSyncEntries(userId: String): List<FoodLogEntity>
 
     @Query("UPDATE food_log SET pendingSync = 0 WHERE id = :id")
     suspend fun clearPendingSync(id: String)

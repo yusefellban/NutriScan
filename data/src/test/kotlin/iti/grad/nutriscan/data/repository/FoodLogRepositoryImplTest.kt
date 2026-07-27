@@ -39,8 +39,8 @@ private class FakeFoodLogDao : FoodLogDao {
         }
     }
 
-    override suspend fun getPendingSyncEntries(): List<FoodLogEntity> =
-        entries.value.filter { it.pendingSync }
+    override suspend fun getPendingSyncEntries(userId: String): List<FoodLogEntity> =
+        entries.value.filter { it.pendingSync && it.userId == userId }
 
     override suspend fun clearPendingSync(id: String) {
         entries.value = entries.value.map {
@@ -144,6 +144,6 @@ class FoodLogRepositoryImplTest {
 
         repository.addFoodEntry(entry())
 
-        assertEquals(1, dao.getPendingSyncEntries().size)
+        assertEquals(1, dao.getPendingSyncEntries("user-1").size)
     }
 }

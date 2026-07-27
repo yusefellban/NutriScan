@@ -40,11 +40,11 @@ class FoodLogRepositoryImpl @Inject constructor(
             // locally-generated UUID, never sent to the backend. See SavedViewModel.addToFoodLog,
             // which sets id = UUID.randomUUID() and productId = the scanned product's own id.
             val scanId = entry.productId ?: entry.id
-            dao.insert(entry.toEntity(userId))
+            dao.insert(entry.toEntity(userId).copy(pendingSync = true))
 
             val pushResult = dailyTrackingRepository.pushMeal(entry.loggedDate, scanId, mealCnt = 1)
-            if (pushResult.isFailure) {
-                dao.insert(entry.toEntity(userId).copy(pendingSync = true))
+            if (pushResult.isSuccess) {
+                dao.clearPendingSync(entry.id)
             }
         }
     }

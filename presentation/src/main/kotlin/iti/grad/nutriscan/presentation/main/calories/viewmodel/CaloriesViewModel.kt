@@ -24,10 +24,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class CaloriesViewModel @Inject constructor(
@@ -144,16 +146,22 @@ class CaloriesViewModel @Inject constructor(
         if (granted) startObservingSteps()
     }
 
-    /** Collects the live sensor-backed steps flow, mirrors each new value into Room via
-     * [updateStepsCnt] so it's there for the nightly sync job, and still updates local state
-     * directly (rather than waiting on [observeDailyTracking]'s round-trip) so the gauge feels
-     * instant. */
+    /** Collects the live sensor-backed steps flow and updates local state directly on every
+     * emission so the gauge feels instant. The Room mirror (via [updateStepsCnt]) is only read
+     * once a night by the sync worker, so it's collected separately and debounced by 30s to
+     * avoid a DB read + write per single step (bursts of rapid emissions collapse to one write). */
     private fun startObservingSteps() {
         if (stepsObservationJob?.isActive == true) return
         stepsObservationJob = viewModelScope.launch {
-            observeTodaySteps().collect { steps ->
-                _state.update { it.copy(steps = steps) }
-                updateStepsCnt(steps)
+            launch {
+                observeTodaySteps().collect { steps ->
+                    _state.update { it.copy(steps = steps) }
+                }
+            }
+            launch {
+                observeTodaySteps().debounce(30.seconds).collect { steps ->
+                    updateStepsCnt(steps)
+                }
             }
         }
     }

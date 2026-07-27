@@ -9,6 +9,7 @@ import iti.grad.nutriscan.data.remote.dto.DailyTrackingMealResponseDto
 import iti.grad.nutriscan.data.remote.dto.DailyTrackingRequestDto
 import iti.grad.nutriscan.data.remote.dto.DailyTrackingResponseDto
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 private class FakeDailyTrackingDao : DailyTrackingDao {
     private val rows = MutableStateFlow<List<DailyTrackingEntity>>(emptyList())
@@ -55,6 +55,12 @@ class DailyTrackingRepositoryImplTest {
     private lateinit var userRepository: IUserRepository
     private lateinit var repository: DailyTrackingRepositoryImpl
 
+    // Shared across the class (not recreated per test) so its scheduler can be passed into
+    // runTest(...) below — observeToday() now runs a delay()-based midnight ticker, and delay()
+    // requires the TestDispatcher it runs on to share the same TestCoroutineScheduler as the
+    // runTest {} that's driving virtual time, or it throws "different schedulers".
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     private fun user(weightKg: Double? = 70.0) = User(
         id = "user-1",
         firstName = "Test",
@@ -76,11 +82,11 @@ class DailyTrackingRepositoryImplTest {
         userRepository = mockk()
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
         coEvery { userRepository.getUserData() } returns MutableStateFlow(user())
-        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, UnconfinedTestDispatcher())
+        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, testDispatcher)
     }
 
     @Test
-    fun `observeToday returns defaults when no row exists yet`() = runTest {
+    fun `observeToday returns defaults when no row exists yet`() = runTest(testDispatcher.scheduler) {
         val today = repository.observeToday().first()
 
         assertEquals(0, today.waterCnt)
@@ -90,7 +96,7 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `updateWaterCnt persists locally and marks unsynced`() = runTest {
+    fun `updateWaterCnt persists locally and marks unsynced`() = runTest(testDispatcher.scheduler) {
         repository.updateWaterCnt(3)
 
         val today = repository.observeToday().first()
@@ -99,7 +105,7 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `updateStepsCnt derives caloriesBurnedSteps from the user's weight`() = runTest {
+    fun `updateStepsCnt derives caloriesBurnedSteps from the user's weight`() = runTest(testDispatcher.scheduler) {
         repository.updateStepsCnt(1000)
 
         val today = repository.observeToday().first()
@@ -109,8 +115,8 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `syncPendingDay calls PATCH and marks synced on success`() = runTest {
-        val date = LocalDate.parse("2026-07-27")
+    fun `syncPendingDay calls PATCH and marks synced on success`() = runTest(testDispatcher.scheduler) {
+        val date = CairoDateProvider.today()
         repository.updateWaterCnt(4)
         coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
 
@@ -122,8 +128,8 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `syncPendingDay leaves the row unsynced when the API call fails`() = runTest {
-        val date = LocalDate.parse("2026-07-27")
+    fun `syncPendingDay leaves the row unsynced when the API call fails`() = runTest(testDispatcher.scheduler) {
+        val date = CairoDateProvider.today()
         repository.updateWaterCnt(4)
         coEvery { api.updateDay(date.toString(), any()) } throws RuntimeException("network error")
 
@@ -135,9 +141,9 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `fetchAndSeedToday seeds Room only when no row exists yet`() = runTest {
+    fun `fetchAndSeedToday seeds Room only when no row exists yet`() = runTest(testDispatcher.scheduler) {
         coEvery { api.getToday() } returns DailyTrackingResponseDto(
-            date = "2026-07-27",
+            date = CairoDateProvider.today().toString(),
             targetWaterCnt = 6,
             waterCnt = 2,
             stepsCnt = 500,
@@ -154,9 +160,9 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `fetchAndSeedToday does not overwrite an existing local row`() = runTest {
+    fun `fetchAndSeedToday does not overwrite an existing local row`() = runTest(testDispatcher.scheduler) {
         repository.updateWaterCnt(9)
-        coEvery { api.getToday() } returns DailyTrackingResponseDto(date = "2026-07-27", waterCnt = 2)
+        coEvery { api.getToday() } returns DailyTrackingResponseDto(date = CairoDateProvider.today().toString(), waterCnt = 2)
 
         repository.fetchAndSeedToday()
 

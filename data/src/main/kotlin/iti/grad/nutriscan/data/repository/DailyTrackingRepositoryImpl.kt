@@ -18,14 +18,18 @@ import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Duration
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -44,10 +48,25 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     override fun observeToday(): Flow<DailyTracking> = flow {
         val userId = resolveUserId()
         emitAll(
-            dao.observeByUserAndDate(userId, CairoDateProvider.today().toString())
-                .map { it?.toDomain() ?: defaultDailyTracking(CairoDateProvider.today()) }
+            todayTicker().flatMapLatest { date ->
+                dao.observeByUserAndDate(userId, date.toString()).map { it?.toDomain() ?: defaultDailyTracking(date) }
+            }
         )
     }.flowOn(ioDispatcher)
+
+    /** Re-emits [CairoDateProvider.today()] immediately, then again at every Cairo-midnight
+     * boundary, so [observeToday]'s [flatMapLatest] re-subscribes to the new day's row instead of
+     * observing a fixed date string pinned at collection start — otherwise a Calories screen left
+     * open across midnight would keep watching yesterday's now-stale row. */
+    private fun todayTicker(): Flow<LocalDate> = flow {
+        while (true) {
+            val today = CairoDateProvider.today()
+            emit(today)
+            val now = ZonedDateTime.now(CairoDateProvider.ZONE)
+            val nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay(CairoDateProvider.ZONE)
+            delay(Duration.between(now, nextMidnight).toMillis().coerceAtLeast(0))
+        }
+    }
 
     override suspend fun getByDate(date: LocalDate): Result<DailyTracking> = withContext(ioDispatcher) {
         runCatchingCancellable {
