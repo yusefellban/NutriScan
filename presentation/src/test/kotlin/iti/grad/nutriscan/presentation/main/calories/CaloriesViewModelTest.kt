@@ -16,6 +16,7 @@ import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
@@ -50,6 +51,7 @@ class CaloriesViewModelTest {
     private lateinit var updateWaterCnt: UpdateWaterCntUseCase
     private lateinit var updateTargetWaterCnt: UpdateTargetWaterCntUseCase
     private lateinit var updateStepsCnt: UpdateStepsCntUseCase
+    private lateinit var userRepository: IUserRepository
     private lateinit var dailyTrackingFlow: MutableStateFlow<DailyTracking>
     private lateinit var viewModel: CaloriesViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -87,9 +89,11 @@ class CaloriesViewModelTest {
         updateWaterCnt = mockk()
         updateTargetWaterCnt = mockk()
         updateStepsCnt = mockk()
+        userRepository = mockk()
         dailyTrackingFlow = MutableStateFlow(defaultDailyTracking())
         every { observeTodayFoodLog() } returns flowOf(emptyList())
         every { observeTodayDailyTracking() } returns dailyTrackingFlow
+        every { userRepository.getUserData() } returns flowOf(null)
         coEvery { updateWaterCnt(any()) } returns Result.success(Unit)
         coEvery { updateTargetWaterCnt(any()) } returns Result.success(Unit)
         coEvery { updateStepsCnt(any()) } returns Result.success(Unit)
@@ -102,6 +106,7 @@ class CaloriesViewModelTest {
             updateWaterCnt,
             updateTargetWaterCnt,
             updateStepsCnt,
+            userRepository,
         )
     }
 
@@ -119,7 +124,8 @@ class CaloriesViewModelTest {
             testScheduler.runCurrent()
             val state = viewModel.state.value
 
-            Assertions.assertEquals(2350, state.tdee)
+            Assertions.assertEquals(0, state.tdee)
+            Assertions.assertNull(state.bmi)
             Assertions.assertEquals(0, state.caloriesGained)
             Assertions.assertTrue(state.addedFoods.isEmpty())
             Assertions.assertEquals(0, state.steps)
@@ -176,6 +182,7 @@ class CaloriesViewModelTest {
                 updateWaterCnt,
                 updateTargetWaterCnt,
                 updateStepsCnt,
+                userRepository,
             )
         }
 
@@ -401,6 +408,7 @@ class CaloriesViewModelTest {
                 updateWaterCnt,
                 updateTargetWaterCnt,
                 updateStepsCnt,
+                userRepository,
             )
             return Triple(vm, permissionUseCase, stepsUseCase)
         }
@@ -492,6 +500,53 @@ class CaloriesViewModelTest {
             val state = viewModel.state.value
             Assertions.assertEquals(120, state.exerciseKcal)
             Assertions.assertEquals(15, state.exerciseMinutes)
+        }
+    }
+
+    @Nested
+    @DisplayName("TDEE / BMI Observation")
+    inner class UserMetricsObservation {
+
+        @Test
+        fun `CaloriesViewModel state populates tdee and bmi from the user profile`() = runTest {
+            val user = iti.grad.nutriscan.domain.user.model.User(
+                id = "user-1",
+                firstName = "Test",
+                lastName = null,
+                email = "test@test.com",
+                gender = null,
+                dateOfBirth = null,
+                heightCm = 170.0,
+                weightKg = 70.0,
+                diseaseIds = emptyList(),
+                allergyIds = emptyList(),
+                bmi = 24.2,
+                tdee = 2350.0,
+            )
+            every { userRepository.getUserData() } returns flowOf(user)
+            val vm = CaloriesViewModel(
+                checkStepsPermission,
+                observeTodaySteps,
+                observeTodayFoodLog,
+                removeFoodEntry,
+                observeTodayDailyTracking,
+                updateWaterCnt,
+                updateTargetWaterCnt,
+                updateStepsCnt,
+                userRepository,
+            )
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(2350, vm.state.value.tdee)
+            Assertions.assertEquals(24.2, vm.state.value.bmi)
+        }
+
+        @Test
+        fun `tdee and bmi stay at defaults when the user has no computed metrics yet`() = runTest {
+            testScheduler.runCurrent()
+
+            Assertions.assertEquals(0, viewModel.state.value.tdee)
+            Assertions.assertNull(viewModel.state.value.bmi)
         }
     }
 }

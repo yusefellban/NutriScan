@@ -31,6 +31,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.common.model.bmiCategory
+import iti.grad.nutriscan.presentation.common.model.pillColor
+import iti.grad.nutriscan.presentation.common.model.textColor
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -242,36 +245,4 @@ private fun AnimatedMetricValue(value: String) {
         ),
         color = AppTheme.colors.TextPrimary.copy(alpha = alpha),
     )
-}
-
-// ── BMI Category ────────────────────────────────────────────────────────────
-
-private enum class BmiCategory(val labelRes: Int) {
-    UNDERWEIGHT(R.string.user_profile_bmi_underweight),
-    NORMAL(R.string.user_profile_bmi_normal),
-    OVERWEIGHT(R.string.user_profile_bmi_overweight),
-    OBESE(R.string.user_profile_bmi_obese),
-}
-
-private fun bmiCategory(bmi: Double): BmiCategory = when {
-    bmi < 18.5 -> BmiCategory.UNDERWEIGHT
-    bmi < 25.0 -> BmiCategory.NORMAL
-    bmi < 30.0 -> BmiCategory.OVERWEIGHT
-    else       -> BmiCategory.OBESE
-}
-
-@Composable
-private fun BmiCategory.pillColor() = when (this) {
-    BmiCategory.UNDERWEIGHT -> AppTheme.colors.Teal200
-    BmiCategory.NORMAL      -> AppTheme.colors.VerdictGreen.copy(alpha = 0.15f)
-    BmiCategory.OVERWEIGHT  -> AppTheme.colors.VerdictYellow.copy(alpha = 0.20f)
-    BmiCategory.OBESE       -> AppTheme.colors.VerdictRed.copy(alpha = 0.15f)
-}
-
-@Composable
-private fun BmiCategory.textColor() = when (this) {
-    BmiCategory.UNDERWEIGHT -> AppTheme.colors.Teal1300
-    BmiCategory.NORMAL      -> AppTheme.colors.VerdictGreen
-    BmiCategory.OVERWEIGHT  -> AppTheme.colors.VerdictYellow
-    BmiCategory.OBESE       -> AppTheme.colors.VerdictRed
 }

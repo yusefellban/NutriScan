@@ -213,6 +213,7 @@
     <string name="calorie_goals">أهداف السعرات</string>
     <string name="your_tdee">إجمالي الحرق</string>
     <string name="calories_gained">السعرات المكتسبة</string>
+    <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
     <string name="your_exercise">تمارينك</string>

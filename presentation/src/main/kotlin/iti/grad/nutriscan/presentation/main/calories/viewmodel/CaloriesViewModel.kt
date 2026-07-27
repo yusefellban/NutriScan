@@ -12,6 +12,7 @@ import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
@@ -40,6 +41,7 @@ class CaloriesViewModel @Inject constructor(
     private val updateWaterCnt: UpdateWaterCntUseCase,
     private val updateTargetWaterCnt: UpdateTargetWaterCntUseCase,
     private val updateStepsCnt: UpdateStepsCntUseCase,
+    private val userRepository: IUserRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CaloriesState())
@@ -53,6 +55,23 @@ class CaloriesViewModel @Inject constructor(
     init {
         observeFoodLog()
         observeDailyTracking()
+        observeUserMetrics()
+    }
+
+    /** Server-computed TDEE/BMI (see [iti.grad.nutriscan.domain.user.model.User]) — null until
+     * the first profile sync completes. The Calories screen shows a placeholder in that gap
+     * rather than hiding the BMI page. */
+    private fun observeUserMetrics() {
+        viewModelScope.launch {
+            userRepository.getUserData().collect { user ->
+                _state.update {
+                    it.copy(
+                        tdee = user?.tdee?.toInt() ?: 0,
+                        bmi = user?.bmi,
+                    )
+                }
+            }
+        }
     }
 
     /** Collects today's Room-backed water/steps/exercise (offline-first, synced nightly for

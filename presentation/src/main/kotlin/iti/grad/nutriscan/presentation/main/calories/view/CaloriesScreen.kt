@@ -58,7 +58,7 @@ import androidx.compose.runtime.Composable
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
-import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
+import iti.grad.nutriscan.presentation.common.components.CalorieGoalsPager
 import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
 import androidx.compose.ui.Modifier
 import iti.grad.nutriscan.presentation.common.components.AlertButton
@@ -189,9 +189,10 @@ private fun CaloriesContent(
             }
 
             item {
-                CalorieGoalsCard(
+                CalorieGoalsPager(
                     tdee = state.tdee,
                     caloriesGained = (state.caloriesGained - state.exerciseKcal).coerceAtLeast(0),
+                    bmi = state.bmi,
                 )
             }
 

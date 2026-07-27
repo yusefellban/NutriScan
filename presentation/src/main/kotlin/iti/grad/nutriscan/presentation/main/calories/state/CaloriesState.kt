@@ -7,7 +7,8 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class CaloriesState(
-    val tdee: Int = 2350,
+    val tdee: Int = 0,
+    val bmi: Double? = null,
     val caloriesGained: Int = 0,
     val addedFoods: ImmutableList<ProductUiModel> = persistentListOf(),
     /** Food-log entry pending user confirmation before removal — gates the ConfirmationDialog. */

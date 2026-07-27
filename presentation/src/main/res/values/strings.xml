@@ -209,6 +209,7 @@
     <string name="calorie_goals">Calorie Goals</string>
     <string name="your_tdee">Your TDEE</string>
     <string name="calories_gained">Calories Gained</string>
+    <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
     <string name="your_exercise">Your Exercise</string>
