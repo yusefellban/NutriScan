@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">نيوتري سكان</string>
     <string name="signup_title">سجل مجاناً!</string>
+    <string name="first_name_label">الاسم الأول</string>
+    <string name="first_name_hint">أدخل اسمك الأول…</string>
+    <string name="last_name_label">اسم العائلة</string>
+    <string name="last_name_hint">أدخل اسم عائلتك…</string>
     <string name="email_label">البريد الإلكتروني</string>
     <string name="email_hint">أدخل بريدك الإلكتروني...</string>
     <string name="password_label">كلمة المرور</string>
@@ -9,6 +13,8 @@
     <string name="success_account_created">تم إنشاء الحساب بنجاح.</string>
     <string name="error_email_exists">هذا البريد الإلكتروني مستخدم بالفعل.</string>
     <string name="error_validation_fields">يرجى تصحيح الحقول المظللة والمحاولة مرة أخرى.</string>
+    <string name="error_login_failed">فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.</string>
+    <string name="error_google_login_failed">فشل إكمال تسجيل الدخول عبر جوجل. يرجى المحاولة مرة أخرى.</string>
     <string name="date_today">اليوم، %1$s</string>
     <string name="date_yesterday">أمس، %1$s</string>
     <string name="error_password_mismatch">خطأ: كلمات المرور غير متطابقة!</string>

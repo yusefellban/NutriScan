@@ -19,7 +19,8 @@ import iti.grad.nutriscan.presentation.auth.login.state.LoginEffect
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.None
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.InternetError
-import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.user.usecase.FetchAndSyncUserDataUseCase
+import iti.grad.nutriscan.domain.common.model.DomainException
 import iti.grad.nutriscan.presentation.auth.login.state.LoginState
 import iti.grad.nutriscan.presentation.auth.login.state.LoginEvent
 import iti.grad.nutriscan.presentation.common.model.UiText.DynamicString
@@ -29,17 +30,12 @@ import iti.grad.nutriscan.presentation.common.Validation
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 
-import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
-import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
-
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginWithEmailUseCase: LoginWithEmailUseCase,
     private val getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase,
     private val saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase,
-    private val userRepository: IUserRepository,
-    private val syncDiseasesUseCase: SyncDiseasesUseCase,
-    private val syncAllergiesUseCase: SyncAllergiesUseCase
+    private val fetchAndSyncUserDataUseCase: FetchAndSyncUserDataUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -97,24 +93,17 @@ class LoginViewModel @Inject constructor(
             val result = loginWithEmailUseCase(_state.value.email, _state.value.password)
             
             result.onSuccess {
-                // Fetch profile immediately after login so we have it offline
-                userRepository.fetchAndSyncProfile()
-                syncDiseasesUseCase()
-                syncAllergiesUseCase()
+                fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _state.update { it.copy(isLoading = false) }
-                val msg = error.message.orEmpty()
-                val isUnauthorized = error.javaClass.simpleName == "UnauthorizedException" || msg.contains("401") || msg.contains("invalid_grant")
-                
-                val newAlertState = when {
-                    error is java.io.IOException -> InternetError
-                    isUnauthorized -> Error(message = StringResource(R.string.error_invalid_credentials))
-                    msg.contains("500") || msg.contains("Server Error") -> Error(message = StringResource(R.string.error_server_down))
-                    else -> Error(message = DynamicString("Login failed. Please try again."))
+                val newAlertState = when (error) {
+                    is DomainException.NetworkException -> InternetError
+                    is DomainException.UnauthorizedException -> Error(message = StringResource(R.string.error_invalid_credentials))
+                    is DomainException.ServerException -> Error(message = StringResource(R.string.error_server_down))
+                    else -> Error(message = StringResource(R.string.error_login_failed))
                 }
-                _state.update { it.copy(alertState = newAlertState) }
+                _state.update { it.copy(isLoading = false, alertState = newAlertState) }
             }
         }
     }
@@ -136,14 +125,16 @@ class LoginViewModel @Inject constructor(
             val result = saveGoogleLoginTokensUseCase(event.authTokens)
             
             result.onSuccess {
-                userRepository.fetchAndSyncProfile()
-                syncDiseasesUseCase()
-                syncAllergiesUseCase()
+                fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
                 _effect.send(LoginEffect.NavigateToHome)
             }.onFailure { error ->
-                _state.update { it.copy(isLoading = false) }
-                _state.update { it.copy(alertState = Error(message = DynamicString("Failed to complete Google login. Please try again."))) }
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        alertState = Error(message = StringResource(R.string.error_google_login_failed))
+                    )
+                }
             }
         }
     }
