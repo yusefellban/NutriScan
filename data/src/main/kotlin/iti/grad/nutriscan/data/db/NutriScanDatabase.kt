@@ -36,9 +36,10 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
         DailyTrackingEntity::class,
     ],
     // Bumped 6 -> 7 for FoodLogEntity's new pendingSync/deleted columns and the new
-    // daily_tracking table. Relies on fallbackToDestructiveMigration() in
+    // daily_tracking table. Bumped 7 -> 8 for DailyTrackingEntity's new exerciseKcal/
+    // exerciseMinutes columns. Relies on fallbackToDestructiveMigration() in
     // DatabaseModule, same as the 5 -> 6 bump — this clears all local tables on upgrade.
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)

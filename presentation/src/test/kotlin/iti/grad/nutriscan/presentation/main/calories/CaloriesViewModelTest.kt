@@ -20,7 +20,6 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
-import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -72,13 +71,14 @@ class CaloriesViewModelTest {
         waterCnt = waterCnt,
         stepsCnt = 0,
         caloriesBurnedSteps = 0,
+        exerciseKcal = 0,
+        exerciseMinutes = 0,
         syncedToBackend = false,
     )
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        ExercisesSharedTracker.reset()
         checkStepsPermission = mockk()
         observeTodaySteps = mockk()
         observeTodayFoodLog = mockk()
@@ -125,8 +125,8 @@ class CaloriesViewModelTest {
             Assertions.assertEquals(0, state.steps)
             Assertions.assertEquals(10000, state.stepsGoal)
             Assertions.assertFalse(state.stepsPermissionGranted)
-            Assertions.assertEquals(250, state.exerciseKcal)
-            Assertions.assertEquals(45, state.exerciseMinutes)
+            Assertions.assertEquals(0, state.exerciseKcal)
+            Assertions.assertEquals(0, state.exerciseMinutes)
             Assertions.assertEquals(4, state.waterConsumed)
             Assertions.assertEquals(8, state.waterGoal)
             Assertions.assertFalse(state.isLoading)
@@ -483,15 +483,15 @@ class CaloriesViewModelTest {
     inner class ExerciseStatsObservation {
 
         @Test
-        fun `CaloriesViewModel state updates when ExercisesSharedTracker updates`() = runTest {
-            // Act
-            ExercisesSharedTracker.addWorkout(120, 15)
+        fun `CaloriesViewModel state updates when the daily tracking flow emits new exercise totals`() = runTest {
             testScheduler.runCurrent()
 
-            // Assert
+            dailyTrackingFlow.update { it.copy(exerciseKcal = 120, exerciseMinutes = 15) }
+            testScheduler.runCurrent()
+
             val state = viewModel.state.value
-            Assertions.assertEquals(250 + 120, state.exerciseKcal)
-            Assertions.assertEquals(45 + 15, state.exerciseMinutes)
+            Assertions.assertEquals(120, state.exerciseKcal)
+            Assertions.assertEquals(15, state.exerciseMinutes)
         }
     }
 }

@@ -22,6 +22,10 @@ interface IDailyTrackingRepository {
     /** Updates stepsCnt and derives+persists caloriesBurnedSteps from the user's weightKg. */
     suspend fun updateStepsCnt(stepsCnt: Int): Result<Unit>
 
+    /** Adds a finished workout's kcal/minutes onto today's running total. Local-only — no
+     * backend field exists for exercise yet, so this never marks the row unsynced. */
+    suspend fun addExerciseWorkout(kcalBurned: Int, minutes: Int): Result<Unit>
+
     suspend fun deleteDay(date: LocalDate): Result<Unit>
 
     /** Live, best-effort backend call — no local state of its own (FoodLogEntity owns that). */

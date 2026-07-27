@@ -109,6 +109,18 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun addExerciseWorkout(kcalBurned: Int, minutes: Int): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val current = currentOrDefault()
+            dao.upsert(
+                current.copy(
+                    exerciseKcal = current.exerciseKcal + kcalBurned,
+                    exerciseMinutes = current.exerciseMinutes + minutes,
+                ).toEntity(resolveUserId())
+            )
+        }
+    }
+
     override suspend fun deleteDay(date: LocalDate): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             api.deleteDay(date.toString())
@@ -167,6 +179,8 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                         waterCnt = snapshot.waterCnt,
                         stepsCnt = snapshot.stepsCnt,
                         caloriesBurnedSteps = 0,
+                        exerciseKcal = 0,
+                        exerciseMinutes = 0,
                         syncedToBackend = true,
                     ).toEntity(userId)
                 )
@@ -186,6 +200,8 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         waterCnt = 0,
         stepsCnt = 0,
         caloriesBurnedSteps = 0,
+        exerciseKcal = 0,
+        exerciseMinutes = 0,
         syncedToBackend = false,
     )
 

@@ -169,4 +169,27 @@ class DailyTrackingRepositoryImplTest {
         val today = repository.observeToday().first()
         assertEquals(9, today.waterCnt)
     }
+
+    @Test
+    fun `addExerciseWorkout accumulates kcal and minutes onto today's total`() = runTest(testDispatcher.scheduler) {
+        repository.addExerciseWorkout(kcalBurned = 100, minutes = 10)
+        repository.addExerciseWorkout(kcalBurned = 50, minutes = 5)
+
+        val today = repository.observeToday().first()
+        assertEquals(150, today.exerciseKcal)
+        assertEquals(15, today.exerciseMinutes)
+    }
+
+    @Test
+    fun `addExerciseWorkout does not mark the row unsynced`() = runTest(testDispatcher.scheduler) {
+        val date = CairoDateProvider.today()
+        repository.updateWaterCnt(4)
+        coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+        repository.syncPendingDay(date)
+
+        repository.addExerciseWorkout(kcalBurned = 100, minutes = 10)
+
+        val today = repository.observeToday().first()
+        assertTrue(today.syncedToBackend)
+    }
 }

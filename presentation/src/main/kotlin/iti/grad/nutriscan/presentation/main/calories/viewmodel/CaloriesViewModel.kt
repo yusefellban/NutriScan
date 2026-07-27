@@ -17,7 +17,6 @@ import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -53,25 +52,11 @@ class CaloriesViewModel @Inject constructor(
 
     init {
         observeFoodLog()
-        observeWorkoutStats()
         observeDailyTracking()
     }
 
-    private fun observeWorkoutStats() {
-        viewModelScope.launch {
-            ExercisesSharedTracker.exerciseKcal.collect { kcal ->
-                _state.update { it.copy(exerciseKcal = kcal) }
-            }
-        }
-        viewModelScope.launch {
-            ExercisesSharedTracker.exerciseMinutes.collect { mins ->
-                _state.update { it.copy(exerciseMinutes = mins) }
-            }
-        }
-    }
-
-    /** Collects today's Room-backed water/steps (offline-first, synced nightly) — see
-     * DailyTrackingRepositoryImpl. Replaces the previous pure in-memory mutation. */
+    /** Collects today's Room-backed water/steps/exercise (offline-first, synced nightly for
+     * water/steps only — exercise has no backend field yet) — see DailyTrackingRepositoryImpl. */
     private fun observeDailyTracking() {
         viewModelScope.launch {
             observeTodayDailyTracking().collect { tracking ->
@@ -80,6 +65,8 @@ class CaloriesViewModel @Inject constructor(
                         waterConsumed = tracking.waterCnt,
                         waterGoal = tracking.targetWaterCnt,
                         steps = tracking.stepsCnt,
+                        exerciseKcal = tracking.exerciseKcal,
+                        exerciseMinutes = tracking.exerciseMinutes,
                     )
                 }
             }

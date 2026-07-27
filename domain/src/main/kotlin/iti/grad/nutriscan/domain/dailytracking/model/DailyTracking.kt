@@ -8,5 +8,7 @@ data class DailyTracking(
     val waterCnt: Int,
     val stepsCnt: Int,
     val caloriesBurnedSteps: Int,
+    val exerciseKcal: Int,
+    val exerciseMinutes: Int,
     val syncedToBackend: Boolean,
 )

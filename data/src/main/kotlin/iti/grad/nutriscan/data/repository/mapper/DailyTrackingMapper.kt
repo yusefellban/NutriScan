@@ -15,6 +15,8 @@ fun DailyTrackingEntity.toDomain(): DailyTracking = DailyTracking(
     waterCnt = waterCnt,
     stepsCnt = stepsCnt,
     caloriesBurnedSteps = caloriesBurnedSteps,
+    exerciseKcal = exerciseKcal,
+    exerciseMinutes = exerciseMinutes,
     syncedToBackend = syncedToBackend,
 )
 
@@ -25,6 +27,8 @@ fun DailyTracking.toEntity(userId: String): DailyTrackingEntity = DailyTrackingE
     waterCnt = waterCnt,
     stepsCnt = stepsCnt,
     caloriesBurnedSteps = caloriesBurnedSteps,
+    exerciseKcal = exerciseKcal,
+    exerciseMinutes = exerciseMinutes,
     syncedToBackend = syncedToBackend,
 )
 

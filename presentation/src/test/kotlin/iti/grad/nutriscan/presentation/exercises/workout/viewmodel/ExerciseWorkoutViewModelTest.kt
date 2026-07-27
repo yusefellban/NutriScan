@@ -1,6 +1,10 @@
 package iti.grad.nutriscan.presentation.exercises.workout.viewmodel
 
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import iti.grad.nutriscan.domain.dailytracking.usecase.AddExerciseWorkoutUseCase
 import iti.grad.nutriscan.domain.exercises.model.Exercise
 import iti.grad.nutriscan.domain.exercises.model.ExercisePage
 import iti.grad.nutriscan.domain.exercises.model.ExerciseQuery
@@ -10,10 +14,6 @@ import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.model.ExerciseType
-import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
-import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
-import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -32,6 +32,7 @@ class ExerciseWorkoutViewModelTest {
 
     private lateinit var repository: FakeExercisesRepository
     private lateinit var getExerciseByIdUseCase: GetExerciseByIdUseCase
+    private lateinit var addExerciseWorkout: AddExerciseWorkoutUseCase
     private lateinit var viewModel: ExerciseWorkoutViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -40,7 +41,9 @@ class ExerciseWorkoutViewModelTest {
         Dispatchers.setMain(testDispatcher)
         repository = FakeExercisesRepository()
         getExerciseByIdUseCase = GetExerciseByIdUseCase(repository)
-        viewModel = ExerciseWorkoutViewModel(getExerciseByIdUseCase)
+        addExerciseWorkout = mockk()
+        coEvery { addExerciseWorkout(any(), any()) } returns Result.success(Unit)
+        viewModel = ExerciseWorkoutViewModel(getExerciseByIdUseCase, addExerciseWorkout)
     }
 
     @AfterEach
@@ -207,6 +210,7 @@ class ExerciseWorkoutViewModelTest {
             // 5 * 0.23 = 1.15 -> round to 1
             Assertions.assertEquals(1, viewModel.state.value.caloriesBurned)
             Assertions.assertTrue(viewModel.state.value.showCongratsDialog)
+            coVerify { addExerciseWorkout(1, 5) }
         }
 
         @Test
@@ -221,6 +225,7 @@ class ExerciseWorkoutViewModelTest {
             // 3 * 10 * 0.3 = 9
             Assertions.assertEquals(9, viewModel.state.value.caloriesBurned)
             Assertions.assertTrue(viewModel.state.value.showCongratsDialog)
+            coVerify { addExerciseWorkout(9, 1) }
         }
     }
 
