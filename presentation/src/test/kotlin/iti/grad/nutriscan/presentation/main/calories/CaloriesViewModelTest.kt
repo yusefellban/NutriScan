@@ -6,6 +6,11 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.dailytracking.model.DailyTracking
+import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateStepsCntUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateTargetWaterCntUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateWaterCntUseCase
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
@@ -19,7 +24,9 @@ import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -40,6 +47,11 @@ class CaloriesViewModelTest {
     private lateinit var observeTodaySteps: ObserveTodayStepsUseCase
     private lateinit var observeTodayFoodLog: ObserveTodayFoodLogUseCase
     private lateinit var removeFoodEntry: RemoveFoodEntryUseCase
+    private lateinit var observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase
+    private lateinit var updateWaterCnt: UpdateWaterCntUseCase
+    private lateinit var updateTargetWaterCnt: UpdateTargetWaterCntUseCase
+    private lateinit var updateStepsCnt: UpdateStepsCntUseCase
+    private lateinit var dailyTrackingFlow: MutableStateFlow<DailyTracking>
     private lateinit var viewModel: CaloriesViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -54,6 +66,15 @@ class CaloriesViewModelTest {
         addedAt = Instant.now(),
     )
 
+    private fun defaultDailyTracking(waterCnt: Int = 4, targetWaterCnt: Int = 8) = DailyTracking(
+        date = LocalDate.now(),
+        targetWaterCnt = targetWaterCnt,
+        waterCnt = waterCnt,
+        stepsCnt = 0,
+        caloriesBurnedSteps = 0,
+        syncedToBackend = false,
+    )
+
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
@@ -62,8 +83,26 @@ class CaloriesViewModelTest {
         observeTodaySteps = mockk()
         observeTodayFoodLog = mockk()
         removeFoodEntry = mockk()
+        observeTodayDailyTracking = mockk()
+        updateWaterCnt = mockk()
+        updateTargetWaterCnt = mockk()
+        updateStepsCnt = mockk()
+        dailyTrackingFlow = MutableStateFlow(defaultDailyTracking())
         every { observeTodayFoodLog() } returns flowOf(emptyList())
-        viewModel = CaloriesViewModel(checkStepsPermission, observeTodaySteps, observeTodayFoodLog, removeFoodEntry)
+        every { observeTodayDailyTracking() } returns dailyTrackingFlow
+        coEvery { updateWaterCnt(any()) } returns Result.success(Unit)
+        coEvery { updateTargetWaterCnt(any()) } returns Result.success(Unit)
+        coEvery { updateStepsCnt(any()) } returns Result.success(Unit)
+        viewModel = CaloriesViewModel(
+            checkStepsPermission,
+            observeTodaySteps,
+            observeTodayFoodLog,
+            removeFoodEntry,
+            observeTodayDailyTracking,
+            updateWaterCnt,
+            updateTargetWaterCnt,
+            updateStepsCnt,
+        )
     }
 
     @AfterEach
@@ -76,7 +115,8 @@ class CaloriesViewModelTest {
     inner class InitialState {
 
         @Test
-        fun `initial state matches the mocked dashboard defaults`() {
+        fun `initial state matches the mocked dashboard defaults`() = runTest {
+            testScheduler.runCurrent()
             val state = viewModel.state.value
 
             Assertions.assertEquals(2350, state.tdee)
@@ -127,7 +167,16 @@ class CaloriesViewModelTest {
         private fun createViewModel(entries: Flow<List<FoodLogEntry>>): CaloriesViewModel {
             val foodLogUseCase = mockk<ObserveTodayFoodLogUseCase>()
             every { foodLogUseCase() } returns entries
-            return CaloriesViewModel(checkStepsPermission, observeTodaySteps, foodLogUseCase, removeFoodEntry)
+            return CaloriesViewModel(
+                checkStepsPermission,
+                observeTodaySteps,
+                foodLogUseCase,
+                removeFoodEntry,
+                observeTodayDailyTracking,
+                updateWaterCnt,
+                updateTargetWaterCnt,
+                updateStepsCnt,
+            )
         }
 
         @Test
@@ -198,13 +247,19 @@ class CaloriesViewModelTest {
     @DisplayName("Water Tracking")
     inner class WaterTracking {
 
+        // Default dailyTrackingFlow: waterCnt=4, targetWaterCnt=8. Water state no longer mutates
+        // in memory — the ViewModel calls updateWaterCnt/updateTargetWaterCnt and waits for the
+        // round trip back through observeDailyTracking(). Tests verify the use-case call args;
+        // where a test needs to observe cascading (e.g. filling multiple cups), the shared
+        // dailyTrackingFlow is nudged manually to simulate the persisted value coming back,
+        // mirroring what the real repository would emit after a successful write.
+
         @Test
         fun `AddWaterClicked adds an empty cup without filling it`() = runTest {
             viewModel.onEvent(CaloriesEvent.AddWaterClicked)
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(9, viewModel.state.value.waterGoal)
-            Assertions.assertEquals(4, viewModel.state.value.waterConsumed)
+            coVerify { updateTargetWaterCnt(9) }
         }
 
         @Test
@@ -213,7 +268,7 @@ class CaloriesViewModelTest {
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(4))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(5, viewModel.state.value.waterConsumed)
+            coVerify { updateWaterCnt(5) }
         }
 
         @Test
@@ -222,7 +277,7 @@ class CaloriesViewModelTest {
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(3))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(3, viewModel.state.value.waterConsumed)
+            coVerify { updateWaterCnt(3) }
         }
 
         @Test
@@ -231,23 +286,35 @@ class CaloriesViewModelTest {
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(6))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(4, viewModel.state.value.waterConsumed)
+            coVerify(exactly = 0) { updateWaterCnt(any()) }
         }
 
         @Test
         fun `WaterCupClicked can fill all the way up to the water goal`() = runTest {
-            repeat(10) { index -> viewModel.onEvent(CaloriesEvent.WaterCupClicked(4 + index)) }
-            testScheduler.runCurrent()
+            var current = 4
+            repeat(4) {
+                viewModel.onEvent(CaloriesEvent.WaterCupClicked(current))
+                testScheduler.runCurrent()
+                current++
+                dailyTrackingFlow.update { it.copy(waterCnt = current) }
+                testScheduler.runCurrent()
+            }
 
-            Assertions.assertEquals(8, viewModel.state.value.waterConsumed)
+            coVerify { updateWaterCnt(8) }
         }
 
         @Test
         fun `WaterCupClicked can unfill all the way down to zero`() = runTest {
-            repeat(10) { index -> viewModel.onEvent(CaloriesEvent.WaterCupClicked(3 - index)) }
-            testScheduler.runCurrent()
+            var current = 4
+            repeat(4) {
+                viewModel.onEvent(CaloriesEvent.WaterCupClicked(current - 1))
+                testScheduler.runCurrent()
+                current--
+                dailyTrackingFlow.update { it.copy(waterCnt = current) }
+                testScheduler.runCurrent()
+            }
 
-            Assertions.assertEquals(0, viewModel.state.value.waterConsumed)
+            coVerify { updateWaterCnt(0) }
         }
 
         @Test
@@ -256,18 +323,26 @@ class CaloriesViewModelTest {
             viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(7))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(7, viewModel.state.value.waterGoal)
-            Assertions.assertEquals(4, viewModel.state.value.waterConsumed)
+            coVerify { updateTargetWaterCnt(7) }
+            coVerify { updateWaterCnt(4) }
         }
 
         @Test
         fun `WaterCupLongPressed on a filled last cup deletes it and drops water consumed`() = runTest {
-            repeat(4) { index -> viewModel.onEvent(CaloriesEvent.WaterCupClicked(4 + index)) } // fill up to 8
+            var current = 4
+            repeat(4) {
+                viewModel.onEvent(CaloriesEvent.WaterCupClicked(current)) // fill up to 8
+                testScheduler.runCurrent()
+                current++
+                dailyTrackingFlow.update { it.copy(waterCnt = current) }
+                testScheduler.runCurrent()
+            }
+
             viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(7))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(7, viewModel.state.value.waterGoal)
-            Assertions.assertEquals(7, viewModel.state.value.waterConsumed)
+            coVerify { updateTargetWaterCnt(7) }
+            coVerify { updateWaterCnt(7) }
         }
 
         @Test
@@ -275,8 +350,8 @@ class CaloriesViewModelTest {
             viewModel.onEvent(CaloriesEvent.WaterCupLongPressed(3))
             testScheduler.runCurrent()
 
-            Assertions.assertEquals(8, viewModel.state.value.waterGoal)
-            Assertions.assertEquals(4, viewModel.state.value.waterConsumed)
+            coVerify(exactly = 0) { updateTargetWaterCnt(any()) }
+            coVerify(exactly = 0) { updateWaterCnt(any()) }
         }
 
         @Test
@@ -317,7 +392,16 @@ class CaloriesViewModelTest {
             val stepsUseCase = mockk<ObserveTodayStepsUseCase>()
             coEvery { permissionUseCase() } returns permissionGranted
             every { stepsUseCase() } returns steps
-            val vm = CaloriesViewModel(permissionUseCase, stepsUseCase, observeTodayFoodLog, removeFoodEntry)
+            val vm = CaloriesViewModel(
+                permissionUseCase,
+                stepsUseCase,
+                observeTodayFoodLog,
+                removeFoodEntry,
+                observeTodayDailyTracking,
+                updateWaterCnt,
+                updateTargetWaterCnt,
+                updateStepsCnt,
+            )
             return Triple(vm, permissionUseCase, stepsUseCase)
         }
 
@@ -330,6 +414,7 @@ class CaloriesViewModelTest {
 
             Assertions.assertEquals(4321, vm.state.value.steps)
             Assertions.assertTrue(vm.state.value.stepsPermissionGranted)
+            coVerify { updateStepsCnt(4321) }
         }
 
         @Test
@@ -340,6 +425,7 @@ class CaloriesViewModelTest {
             testScheduler.runCurrent()
 
             Assertions.assertEquals(40, vm.state.value.steps)
+            coVerify { updateStepsCnt(40) }
         }
 
         @Test
