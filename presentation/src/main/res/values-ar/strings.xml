@@ -280,6 +280,13 @@
     <string name="exercise_result_confirm">رائع!</string>
     <string name="exercise_enter_value">أدخل القيمة</string>
     <string name="exercises_load_error">تعذّر تحميل التمارين. يرجى المحاولة مرة أخرى.</string>
+    <string name="exercises_empty_state">لم يتم العثور على تمارين</string>
+    <string name="exercise_restart_confirm_title">إعادة التمرين؟</string>
+    <string name="exercise_restart_confirm_message">هل أنت متأكد من رغبتك في إعادة التمرين؟ سيؤدي هذا إلى إعادة ضبط المؤقت والتقدم.</string>
+    <string name="exercise_restart_confirm_action">نعم، إعادة</string>
+    <string name="exercise_discard_confirm_title">إلغاء التمرين؟</string>
+    <string name="exercise_discard_confirm_message">هل أنت متأكد من رغبتك في الخروج؟ ستفقد تقدم المؤقت الحالي.</string>
+    <string name="exercise_discard_confirm_action">نعم، إلغاء</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">المحفوظات</string>

@@ -277,6 +277,13 @@
     <string name="exercise_result_confirm">Great!</string>
     <string name="exercise_enter_value">Enter value</string>
     <string name="exercises_load_error">Couldn\'t load exercises. Please try again.</string>
+    <string name="exercises_empty_state">No exercises found</string>
+    <string name="exercise_restart_confirm_title">Restart Workout?</string>
+    <string name="exercise_restart_confirm_message">Are you sure you want to restart? This will reset your timer and progress.</string>
+    <string name="exercise_restart_confirm_action">Yes, Restart</string>
+    <string name="exercise_discard_confirm_title">Discard Workout?</string>
+    <string name="exercise_discard_confirm_message">Are you sure you want to exit? You will lose your current timer progress.</string>
+    <string name="exercise_discard_confirm_action">Yes, Discard</string>
 
     <!-- Saved Screen -->
     <string name="saved_screen_title">Saved</string>
