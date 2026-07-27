@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -58,7 +59,7 @@ import androidx.compose.runtime.Composable
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
-import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
+import iti.grad.nutriscan.presentation.common.components.CalorieGoalsPager
 import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
 import androidx.compose.ui.Modifier
 import iti.grad.nutriscan.presentation.common.components.AlertButton
@@ -172,10 +173,13 @@ private fun CaloriesContent(
                                     productName = food.productName,
                                     verdict = null,
                                     calories = food.calories,
+                                    quantity = food.quantity,
                                     onClick = { onEvent(CaloriesEvent.FoodItemClicked(food)) },
                                     swipeAction = ProductCardSwipeAction.Remove(
                                         hintResId = R.string.food_log_swipe_remove_hint,
-                                        onTriggered = { onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.id)) },
+                                        onTriggered = {
+                                            onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.logEntryId ?: food.id))
+                                        },
                                     ),
                                     caloriesOverlayOnImage = true,
                                     modifier = Modifier
@@ -189,9 +193,11 @@ private fun CaloriesContent(
             }
 
             item {
-                CalorieGoalsCard(
+                CalorieGoalsPager(
                     tdee = state.tdee,
                     caloriesGained = (state.caloriesGained - state.exerciseKcal).coerceAtLeast(0),
+                    caloriesBurned = state.caloriesBurned,
+                    bmi = state.bmi,
                 )
             }
 
@@ -229,6 +235,10 @@ private fun CaloriesContent(
                     onCupClicked = { index -> onEvent(CaloriesEvent.WaterCupClicked(index)) },
                     onCupLongPressed = { index -> onEvent(CaloriesEvent.WaterCupLongPressed(index)) },
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
 

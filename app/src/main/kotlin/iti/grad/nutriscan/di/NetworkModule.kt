@@ -126,6 +126,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideDailyTrackingApiService(retrofit: Retrofit): iti.grad.nutriscan.data.remote.api.DailyTrackingApiService {
+        return retrofit.create(iti.grad.nutriscan.data.remote.api.DailyTrackingApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAllergyApiService(retrofit: Retrofit): AllergyApiService {
         return retrofit.create(AllergyApiService::class.java)
     }

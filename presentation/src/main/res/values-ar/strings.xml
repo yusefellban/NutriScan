@@ -145,17 +145,11 @@
     <string name="error_relation_required">يرجى إدخال الصلة</string>
     <string name="add_family_member_generic_error">تعذر حفظ فرد العائلة. يرجى المحاولة مرة أخرى.</string>
 
-    <!-- Health Metrics (BMI / TDEE) — قراءة فقط، محسوبة من الخادم -->
-    <string name="user_profile_health_metrics_title">المقاييس الصحية</string>
-    <string name="user_profile_health_metrics_subtitle">محسوبة من الخادم · للقراءة فقط</string>
-    <string name="user_profile_bmi_label">مؤشر كتلة الجسم</string>
-    <string name="user_profile_tdee_label">إجمالي الحرق اليومي</string>
-    <string name="user_profile_tdee_unit">سعرة/يوم</string>
+    <!-- BMI categories — تُستخدم في بطاقة مؤشر كتلة الجسم بشاشة السعرات (انظر BmiCategory.kt) -->
     <string name="user_profile_bmi_underweight">نقص الوزن</string>
     <string name="user_profile_bmi_normal">طبيعي</string>
     <string name="user_profile_bmi_overweight">زيادة الوزن</string>
     <string name="user_profile_bmi_obese">سمنة</string>
-    <string name="user_profile_metrics_not_available">غير متاح بعد</string>
     <string name="bmi_tdee_not_available">ستظهر المقاييس الصحية بعد أول مزامنة للملف الشخصي.</string>
 
     <!-- App Settings -->
@@ -213,6 +207,8 @@
     <string name="calorie_goals">أهداف السعرات</string>
     <string name="your_tdee">إجمالي الحرق</string>
     <string name="calories_gained">السعرات المكتسبة</string>
+    <string name="calories_burned">السعرات المحروقة</string>
+    <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
     <string name="your_exercise">تمارينك</string>
@@ -294,6 +290,7 @@
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
     <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>

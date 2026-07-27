@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.saved.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 
@@ -79,7 +79,7 @@ class SavedViewModel @Inject constructor(
                 calories = product.calories.toIntOrNull() ?: 0,
                 imageUrl = product.imageUrl,
                 verdict = product.verdict,
-                loggedDate = LocalDate.now(),
+                loggedDate = CairoDateProvider.today(),
                 addedAt = java.time.Instant.now(),
             )
             addFoodEntryUseCase(entry)

@@ -142,17 +142,11 @@
     <string name="error_relation_required">Please enter a relation</string>
     <string name="add_family_member_generic_error">Couldn\'t save this family member. Please try again.</string>
 
-    <!-- Health Metrics (BMI / TDEE) — read-only, server-computed -->
-    <string name="user_profile_health_metrics_title">Health Metrics</string>
-    <string name="user_profile_health_metrics_subtitle">Calculated by server · read-only</string>
-    <string name="user_profile_bmi_label">BMI</string>
-    <string name="user_profile_tdee_label">TDEE</string>
-    <string name="user_profile_tdee_unit">kcal/day</string>
+    <!-- BMI categories — used by the Calories screen's BMI card (see BmiCategory.kt) -->
     <string name="user_profile_bmi_underweight">Underweight</string>
     <string name="user_profile_bmi_normal">Normal</string>
     <string name="user_profile_bmi_overweight">Overweight</string>
     <string name="user_profile_bmi_obese">Obese</string>
-    <string name="user_profile_metrics_not_available">Not yet available</string>
     <string name="bmi_tdee_not_available">Health metrics will appear after your first profile sync.</string>
 
     <!-- App Settings -->
@@ -209,6 +203,8 @@
     <string name="calorie_goals">Calorie Goals</string>
     <string name="your_tdee">Your TDEE</string>
     <string name="calories_gained">Calories Gained</string>
+    <string name="calories_burned">Calories Burned</string>
+    <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
     <string name="your_exercise">Your Exercise</string>
@@ -291,6 +287,7 @@
     <string name="saved_empty_state">No saved products yet</string>
     <string name="product_card_swipe_hint">Swipe right to add</string>
     <string name="product_card_kcal_unit">Kcal</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
     <string name="food_log_swipe_remove_hint">Swipe to remove</string>

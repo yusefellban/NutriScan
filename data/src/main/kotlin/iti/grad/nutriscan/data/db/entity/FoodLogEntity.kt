@@ -14,4 +14,10 @@ data class FoodLogEntity(
     val verdict: String,
     val loggedDate: String,
     val addedAtEpochMillis: Long,
+    /** True while a POST/PUT/DELETE meal sync to the backend is still owed. */
+    val pendingSync: Boolean = false,
+    /** Soft-delete tombstone: true means the user removed this locally but the
+     * backend DELETE hasn't been confirmed yet — kept out of observeByUserAndDate
+     * results, physically removed once the sync succeeds. */
+    val deleted: Boolean = false,
 )

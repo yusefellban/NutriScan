@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.UiText
@@ -34,7 +35,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userRepository: IUserRepository,
-    private val getRecentScansUseCase: GetRecentScansUseCase
+    private val getRecentScansUseCase: GetRecentScansUseCase,
+    private val reconcileTodayUseCase: ReconcileTodayUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -45,10 +47,14 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadRecentScans()
-        
+
         viewModelScope.launch {
             // Trigger fetch from remote on load
             userRepository.fetchAndSyncProfile()
+        }
+
+        viewModelScope.launch {
+            reconcileTodayUseCase()
         }
 
         viewModelScope.launch {

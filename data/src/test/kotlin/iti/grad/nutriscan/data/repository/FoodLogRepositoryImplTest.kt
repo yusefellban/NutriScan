@@ -6,6 +6,7 @@ import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +24,32 @@ private class FakeFoodLogDao : FoodLogDao {
     private val entries = MutableStateFlow<List<FoodLogEntity>>(emptyList())
 
     override fun observeByUserAndDate(userId: String, date: String): Flow<List<FoodLogEntity>> =
-        MutableStateFlow(entries.value.filter { it.userId == userId && it.loggedDate == date })
+        MutableStateFlow(entries.value.filter { it.userId == userId && it.loggedDate == date && !it.deleted })
 
     override suspend fun insert(entity: FoodLogEntity) {
         entries.value = entries.value.filterNot { it.id == entity.id } + entity
     }
 
-    override suspend fun deleteByIdForUser(id: String, userId: String) {
-        entries.value = entries.value.filterNot { it.id == id && it.userId == userId }
+    override suspend fun getByIdForUser(id: String, userId: String): FoodLogEntity? =
+        entries.value.find { it.id == id && it.userId == userId }
+
+    override suspend fun markDeletedForUser(id: String, userId: String) {
+        entries.value = entries.value.map {
+            if (it.id == id && it.userId == userId) it.copy(deleted = true, pendingSync = true) else it
+        }
+    }
+
+    override suspend fun getPendingSyncEntries(userId: String): List<FoodLogEntity> =
+        entries.value.filter { it.pendingSync && it.userId == userId }
+
+    override suspend fun clearPendingSync(id: String) {
+        entries.value = entries.value.map {
+            if (it.id == id) it.copy(pendingSync = false) else it
+        }
+    }
+
+    override suspend fun hardDelete(id: String) {
+        entries.value = entries.value.filterNot { it.id == id }
     }
 }
 
@@ -38,6 +57,7 @@ class FoodLogRepositoryImplTest {
 
     private lateinit var dao: FakeFoodLogDao
     private lateinit var authRepository: IAuthRepository
+    private lateinit var dailyTrackingRepository: IDailyTrackingRepository
     private lateinit var repository: FoodLogRepositoryImpl
 
     private fun entry(id: String = "entry-1") = FoodLogEntry(
@@ -55,7 +75,10 @@ class FoodLogRepositoryImplTest {
     fun setup() {
         dao = FakeFoodLogDao()
         authRepository = mockk()
-        repository = FoodLogRepositoryImpl(dao, authRepository, UnconfinedTestDispatcher())
+        dailyTrackingRepository = mockk()
+        coEvery { dailyTrackingRepository.pushMeal(any(), any(), any()) } returns Result.success(Unit)
+        coEvery { dailyTrackingRepository.deleteMeal(any(), any()) } returns Result.success(Unit)
+        repository = FoodLogRepositoryImpl(dao, authRepository, dailyTrackingRepository, UnconfinedTestDispatcher())
     }
 
     @Test
@@ -102,8 +125,9 @@ class FoodLogRepositoryImplTest {
     }
 
     @Test
-    fun `removeFoodEntry deletes a previously added entry`() = runTest {
+    fun `removeFoodEntry soft-deletes then hard-deletes once the backend confirms`() = runTest {
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        coEvery { dailyTrackingRepository.deleteMeal(any(), "product-1") } returns Result.success(Unit)
         repository.addFoodEntry(entry())
 
         val removeResult = repository.removeFoodEntry("entry-1")
@@ -111,5 +135,15 @@ class FoodLogRepositoryImplTest {
 
         val entries = repository.observeTodayFoodLog().first()
         assertTrue(entries.isEmpty())
+    }
+
+    @Test
+    fun `addFoodEntry sets pendingSync when the backend push fails`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        coEvery { dailyTrackingRepository.pushMeal(any(), "product-1", any()) } returns Result.failure(RuntimeException("offline"))
+
+        repository.addFoodEntry(entry())
+
+        assertEquals(1, dao.getPendingSyncEntries("user-1").size)
     }
 }

@@ -3,27 +3,33 @@ package iti.grad.nutriscan.presentation.main.calories.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateStepsCntUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateTargetWaterCntUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateWaterCntUseCase
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class CaloriesViewModel @Inject constructor(
@@ -31,6 +37,11 @@ class CaloriesViewModel @Inject constructor(
     private val observeTodaySteps: ObserveTodayStepsUseCase,
     private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
     private val removeFoodEntry: RemoveFoodEntryUseCase,
+    private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
+    private val updateWaterCnt: UpdateWaterCntUseCase,
+    private val updateTargetWaterCnt: UpdateTargetWaterCntUseCase,
+    private val updateStepsCnt: UpdateStepsCntUseCase,
+    private val userRepository: IUserRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CaloriesState())
@@ -43,18 +54,41 @@ class CaloriesViewModel @Inject constructor(
 
     init {
         observeFoodLog()
-        observeWorkoutStats()
+        observeDailyTracking()
+        observeUserMetrics()
     }
 
-    private fun observeWorkoutStats() {
+    /** Server-computed TDEE/BMI (see [iti.grad.nutriscan.domain.user.model.User]) — null until
+     * the first profile sync completes. The Calories screen shows a placeholder in that gap
+     * rather than hiding the BMI page. */
+    private fun observeUserMetrics() {
         viewModelScope.launch {
-            ExercisesSharedTracker.exerciseKcal.collect { kcal ->
-                _state.update { it.copy(exerciseKcal = kcal) }
+            userRepository.getUserData().collect { user ->
+                _state.update {
+                    it.copy(
+                        tdee = user?.tdee?.toInt() ?: 0,
+                        bmi = user?.bmi,
+                    )
+                }
             }
         }
+    }
+
+    /** Collects today's Room-backed water/steps/exercise (offline-first, synced nightly for
+     * water/steps only — exercise has no backend field yet) — see DailyTrackingRepositoryImpl. */
+    private fun observeDailyTracking() {
         viewModelScope.launch {
-            ExercisesSharedTracker.exerciseMinutes.collect { mins ->
-                _state.update { it.copy(exerciseMinutes = mins) }
+            observeTodayDailyTracking().collect { tracking ->
+                _state.update {
+                    it.copy(
+                        waterConsumed = tracking.waterCnt,
+                        waterGoal = tracking.targetWaterCnt,
+                        steps = tracking.stepsCnt,
+                        exerciseKcal = tracking.exerciseKcal,
+                        exerciseMinutes = tracking.exerciseMinutes,
+                        caloriesBurned = tracking.caloriesBurnedSteps + tracking.exerciseKcal,
+                    )
+                }
             }
         }
     }
@@ -79,11 +113,17 @@ class CaloriesViewModel @Inject constructor(
         }
     }
 
-    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in sync. */
+    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in
+     * sync. Entries for the same product are grouped into one card with a quantity badge instead
+     * of duplicating the card — see [toGroupedProductUiModel]. */
     private fun observeFoodLog() {
         viewModelScope.launch {
             observeTodayFoodLog().collect { entries ->
-                val products = entries.map { it.toProductUiModel() }.toImmutableList()
+                val products = entries
+                    .groupBy { it.productId ?: it.id }
+                    .values
+                    .map { it.toGroupedProductUiModel() }
+                    .toImmutableList()
                 _state.update {
                     it.copy(
                         addedFoods = products,
@@ -119,16 +159,28 @@ class CaloriesViewModel @Inject constructor(
         if (granted) startObservingSteps()
     }
 
-    /** Collects the live sensor-backed steps flow so the gauge updates as the user walks. */
+    /** Collects the live sensor-backed steps flow and updates local state directly on every
+     * emission so the gauge feels instant. The Room mirror (via [updateStepsCnt]) is only read
+     * once a night by the sync worker, so it's collected separately and debounced by 30s to
+     * avoid a DB read + write per single step (bursts of rapid emissions collapse to one write). */
     private fun startObservingSteps() {
         if (stepsObservationJob?.isActive == true) return
         stepsObservationJob = viewModelScope.launch {
-            observeTodaySteps().collect { steps -> _state.update { it.copy(steps = steps) } }
+            launch {
+                observeTodaySteps().collect { steps ->
+                    _state.update { it.copy(steps = steps) }
+                }
+            }
+            launch {
+                observeTodaySteps().debounce(30.seconds).collect { steps ->
+                    updateStepsCnt(steps)
+                }
+            }
         }
     }
 
     private fun addWaterCup() {
-        _state.update { it.copy(waterGoal = it.waterGoal + 1) }
+        viewModelScope.launch { updateTargetWaterCnt(_state.value.waterGoal + 1) }
     }
 
     /**
@@ -137,23 +189,24 @@ class CaloriesViewModel @Inject constructor(
      * so cups always fill/unfill strictly in order.
      */
     private fun toggleWaterCup(index: Int) {
-        _state.update { state ->
-            when {
-                index == state.waterConsumed && index < state.waterGoal ->
-                    state.copy(waterConsumed = state.waterConsumed + 1)
-                index == state.waterConsumed - 1 && state.waterConsumed > 0 ->
-                    state.copy(waterConsumed = state.waterConsumed - 1)
-                else -> state
-            }
+        val state = _state.value
+        val newWaterCnt = when {
+            index == state.waterConsumed && index < state.waterGoal -> state.waterConsumed + 1
+            index == state.waterConsumed - 1 && state.waterConsumed > 0 -> state.waterConsumed - 1
+            else -> return
         }
+        viewModelScope.launch { updateWaterCnt(newWaterCnt) }
     }
 
     /** Only the last cup can be deleted, same ordering rule as [toggleWaterCup]. */
     private fun removeWaterCup(index: Int) {
-        if (index != _state.value.waterGoal - 1) return
-        _state.update { state ->
-            val newGoal = state.waterGoal - 1
-            state.copy(waterGoal = newGoal, waterConsumed = state.waterConsumed.coerceAtMost(newGoal))
+        val state = _state.value
+        if (index != state.waterGoal - 1) return
+        val newGoal = state.waterGoal - 1
+        val newWaterCnt = state.waterConsumed.coerceAtMost(newGoal)
+        viewModelScope.launch {
+            updateTargetWaterCnt(newGoal)
+            updateWaterCnt(newWaterCnt)
         }
         navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
     }
@@ -163,11 +216,19 @@ class CaloriesViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private fun FoodLogEntry.toProductUiModel() = ProductUiModel(
-        id = productId ?: id,
-        productName = name,
-        imageUrl = imageUrl,
-        verdict = verdict,
-        calories = calories.toString(),
-    )
+    /** One card per distinct product: [quantity] is the group size, and swiping to remove
+     * targets [logEntryId] — the most-recently-added entry — so each swipe removes one instance
+     * and decrements the badge instead of deleting every logged copy at once. */
+    private fun List<FoodLogEntry>.toGroupedProductUiModel(): ProductUiModel {
+        val mostRecent = maxBy { it.addedAt }
+        return ProductUiModel(
+            id = mostRecent.productId ?: mostRecent.id,
+            productName = mostRecent.name,
+            imageUrl = mostRecent.imageUrl,
+            verdict = mostRecent.verdict,
+            calories = mostRecent.calories.toString(),
+            quantity = size,
+            logEntryId = mostRecent.id,
+        )
+    }
 }

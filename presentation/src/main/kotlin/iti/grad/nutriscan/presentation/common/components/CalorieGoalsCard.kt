@@ -39,6 +39,7 @@ import java.util.Locale
 fun CalorieGoalsCard(
     tdee: Int,
     caloriesGained: Int,
+    caloriesBurned: Int,
     modifier: Modifier = Modifier,
 ) {
     val trackColor = AppTheme.colors.Teal300
@@ -93,6 +94,11 @@ fun CalorieGoalsCard(
                     GoalStatRow(
                         label = stringResource(R.string.calories_gained),
                         value = "${formatKcal(caloriesGained)} $kcalUnit",
+                        badgeColor = trackColor,
+                    )
+                    GoalStatRow(
+                        label = stringResource(R.string.calories_burned),
+                        value = "${formatKcal(caloriesBurned)} $kcalUnit",
                         badgeColor = trackColor,
                     )
                 }

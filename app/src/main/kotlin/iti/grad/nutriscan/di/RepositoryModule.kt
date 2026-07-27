@@ -35,6 +35,8 @@ import iti.grad.nutriscan.domain.nutrigpt.repository.INutriGptRepository
 import iti.grad.nutriscan.data.repository.NutriGptRepositoryImpl
 import iti.grad.nutriscan.data.repository.SavedScanRepositoryImpl
 import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
+import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
+import iti.grad.nutriscan.data.repository.DailyTrackingRepositoryImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -127,4 +129,10 @@ abstract class RepositoryModule {
     abstract fun bindSavedScanRepository(
         impl: SavedScanRepositoryImpl
     ): ISavedScanRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDailyTrackingRepository(
+        impl: DailyTrackingRepositoryImpl
+    ): IDailyTrackingRepository
 }

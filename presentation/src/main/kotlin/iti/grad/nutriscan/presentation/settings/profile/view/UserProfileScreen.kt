@@ -33,7 +33,6 @@ import iti.grad.nutriscan.presentation.settings.profile.add_member.viewmodel.Add
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.UserProfileState
-import iti.grad.nutriscan.presentation.settings.profile.view.components.BmiTdeeCard
 import iti.grad.nutriscan.presentation.settings.profile.view.components.AddFamilyMemberBottomSheet
 import iti.grad.nutriscan.presentation.settings.profile.view.components.FamilyMembersSection
 import iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileHeaderSection
@@ -135,11 +134,6 @@ private fun UserProfileContent(
                     .padding(start = 20.dp, top = 24.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
-                BmiTdeeCard(
-                    bmi = state.bmi,
-                    tdee = state.tdee,
-                )
-
                 FamilyMembersSection(
                     familyMembers = state.familyMembers,
                     onAddMemberClick = { onEvent(UserProfileEvent.AddMemberClicked) },

@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.data.repository.mapper
 
 import iti.grad.nutriscan.data.db.entity.FoodLogEntity
+import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import java.time.Instant
@@ -29,4 +30,4 @@ fun FoodLogEntry.toEntity(userId: String): FoodLogEntity = FoodLogEntity(
     addedAtEpochMillis = addedAt.toEpochMilli(),
 )
 
-fun today(): LocalDate = LocalDate.now()
+fun today(): LocalDate = CairoDateProvider.today()

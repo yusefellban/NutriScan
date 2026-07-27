@@ -5,6 +5,16 @@ This repo's actual rules live in `AGENTS.md` (root) plus `data/AGENTS.md`,
 relevant ones before touching code in that area — they are long and
 detailed on purpose; this file is just the pointer and the TL;DR.
 
+## Commands
+
+Multi-module Gradle project: `:app`, `:domain`, `:data`, `:presentation`.
+
+- Build debug APK: `./gradlew assembleDebug`
+- Unit tests (all modules): `./gradlew test`
+- Unit tests, single module: `./gradlew :presentation:test`
+- Single test class: `./gradlew :presentation:test --tests "*.ScanResultViewModelTest"`
+- Lint: `./gradlew lint`
+
 ## Non-negotiables (see root `AGENTS.md` for full detail)
 
 - **Plan first.** Before writing/modifying code for any non-trivial feature,

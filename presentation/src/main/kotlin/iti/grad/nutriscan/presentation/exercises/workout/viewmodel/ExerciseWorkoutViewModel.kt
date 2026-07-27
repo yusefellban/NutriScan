@@ -3,12 +3,12 @@ package iti.grad.nutriscan.presentation.exercises.workout.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.dailytracking.usecase.AddExerciseWorkoutUseCase
 import iti.grad.nutriscan.domain.exercises.model.Exercise
 import iti.grad.nutriscan.domain.exercises.usecase.GetExerciseByIdUseCase
 import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
-import iti.grad.nutriscan.presentation.exercises.tracker.ExercisesSharedTracker
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEffect
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutEvent
 import iti.grad.nutriscan.presentation.exercises.workout.state.ExerciseWorkoutState
@@ -26,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExerciseWorkoutViewModel @Inject constructor(
-    private val getExerciseByIdUseCase: GetExerciseByIdUseCase
+    private val getExerciseByIdUseCase: GetExerciseByIdUseCase,
+    private val addExerciseWorkout: AddExerciseWorkoutUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExerciseWorkoutState())
@@ -187,7 +188,7 @@ class ExerciseWorkoutViewModel @Inject constructor(
         val roundedCalories = Math.round(calories).toInt().coerceAtLeast(1)
         val workoutMinutes = (currentState.secondsElapsed / 60).coerceAtLeast(1)
 
-        ExercisesSharedTracker.addWorkout(roundedCalories, workoutMinutes)
+        viewModelScope.launch { addExerciseWorkout(roundedCalories, workoutMinutes) }
 
         _state.update {
             it.copy(

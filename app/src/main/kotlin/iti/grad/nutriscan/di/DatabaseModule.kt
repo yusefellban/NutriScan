@@ -95,4 +95,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideSavedScanDao(db: NutriScanDatabase): SavedScanDao = db.savedScanDao()
+
+    @Provides
+    @Singleton
+    fun provideDailyTrackingDao(db: NutriScanDatabase): iti.grad.nutriscan.data.db.dao.DailyTrackingDao =
+        db.dailyTrackingDao()
 }
