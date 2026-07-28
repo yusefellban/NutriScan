@@ -1,6 +1,8 @@
 package iti.grad.nutriscan.presentation.settings.notifications.view
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,16 +13,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -42,12 +49,30 @@ fun NotificationSettingsScreen(
     val context = LocalContext.current
     val testNotificationSentMessage = stringResource(R.string.notification_settings_test_sent)
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentViewModel = rememberUpdatedState(viewModel)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) currentViewModel.value.refreshBatteryOptimizationState()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is NotificationSettingsEffect.NavigateBack -> onNavigateBack()
                 is NotificationSettingsEffect.TestNotificationSent ->
                     Toast.makeText(context, testNotificationSentMessage, Toast.LENGTH_SHORT).show()
+                is NotificationSettingsEffect.RequestIgnoreBatteryOptimizations -> {
+                    // Opens the system's battery-optimization list rather than firing
+                    // ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS directly — that action needs the
+                    // REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission, which Google Play restricts
+                    // and requires a Play Console justification declaration for. This action needs
+                    // no special permission; the user just finds NutriScan in the list themselves.
+                    context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                }
             }
         }
     }
@@ -120,6 +145,32 @@ private fun NotificationSettingsContent(
                 isLoading = false,
                 onClick = { onEvent(NotificationSettingsEvent.SendTestNotificationClicked) },
             )
+        }
+
+        if (!state.isIgnoringBatteryOptimizations) {
+            item {
+                Text(
+                    text = stringResource(R.string.notification_settings_battery_header),
+                    style = AppTheme.typography.titleSmall,
+                    color = AppTheme.colors.Gray500,
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.notification_settings_battery_warning),
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.colors.AppSettingsRowLabel,
+                )
+            }
+
+            item {
+                AppButton(
+                    textResId = R.string.notification_settings_battery_button,
+                    isLoading = false,
+                    onClick = { onEvent(NotificationSettingsEvent.AllowBackgroundNotificationsClicked) },
+                )
+            }
         }
     }
 }

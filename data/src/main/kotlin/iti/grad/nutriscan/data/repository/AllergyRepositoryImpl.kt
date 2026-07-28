@@ -2,12 +2,22 @@ package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.AllergyDao
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IAllergyRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.domain.allergy.model.Allergy
 import iti.grad.nutriscan.domain.allergy.repository.IAllergyRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,16 +25,32 @@ import javax.inject.Inject
 class AllergyRepositoryImpl @Inject constructor(
     private val remoteDataSource: IAllergyRemoteDataSource,
     private val allergyDao: AllergyDao,
-    private val json: Json
+    private val json: Json,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IAllergyRepository {
 
-    override fun getAllergiesOffline(): Flow<List<Allergy>> {
-        return allergyDao.getAllergiesFlow().map { entities ->
-            entities.map { entity ->
-                Allergy(id = entity.id, name = entity.name, description = entity.description)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+    /** Polls the backend catalog every [SYNC_INTERVAL_MS] for as long as at least one collector is
+     * subscribed, so an allergy added/edited server-side shows up without an app restart. Catalog
+     * data rarely changes, so the interval is long — this is cheap insurance, not a live feed.
+     * [shareIn] multicasts this single poll loop to every collector — [AllergyRepositoryImpl] is a
+     * singleton, so without it, two screens observing allergies at once would each spin up their
+     * own independent poller. */
+    private val allergiesFlow: Flow<List<Allergy>> = channelFlow {
+        syncAllergies()
+        launch {
+            while (isActive) {
+                delay(SYNC_INTERVAL_MS)
+                syncAllergies()
             }
         }
-    }
+        allergyDao.getAllergiesFlow()
+            .map { entities -> entities.map { entity -> Allergy(id = entity.id, name = entity.name, description = entity.description) } }
+            .collect { send(it) }
+    }.shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getAllergiesOffline(): Flow<List<Allergy>> = allergiesFlow
 
     override suspend fun syncAllergies(): Result<Unit> {
         return try {
@@ -73,5 +99,10 @@ class AllergyRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             "An unexpected error occurred."
         }
+    }
+
+    private companion object {
+        const val SYNC_INTERVAL_MS = 300_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

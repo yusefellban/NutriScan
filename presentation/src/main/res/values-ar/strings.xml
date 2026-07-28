@@ -200,6 +200,9 @@
     <string name="notification_push_test_body">إذا كنت ترى هذا، فالإشعارات تعمل بشكل صحيح.</string>
     <string name="notification_settings_send_test">إرسال إشعار تجريبي</string>
     <string name="notification_settings_test_sent">تم إرسال الإشعار التجريبي</string>
+    <string name="notification_settings_battery_header">التسليم في الخلفية</string>
+    <string name="notification_settings_battery_warning">قد يمنع موفر البطارية في هاتفك هذه الإشعارات عندما يكون تطبيق NutriScan مغلقًا. اضغط أدناه للعثور على NutriScan في إعدادات البطارية والسماح له بالعمل دون قيود، وتحقق أيضًا من إعدادات التشغيل التلقائي إذا استمر عدم وصولها إليك.</string>
+    <string name="notification_settings_battery_button">فتح إعدادات البطارية</string>
 
     <!-- App Settings -->
     <string name="app_settings_title">إعدادات التطبيق</string>

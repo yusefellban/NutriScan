@@ -1,5 +1,7 @@
 package iti.grad.nutriscan.presentation.settings.notifications
 
+import android.content.Context
+import android.os.PowerManager
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,6 +36,8 @@ import org.junit.jupiter.api.Test
 class NotificationSettingsViewModelTest {
 
     private lateinit var viewModel: NotificationSettingsViewModel
+    private val context: Context = mockk()
+    private val powerManager: PowerManager = mockk()
     private val observePrefs: ObserveNotificationPrefsUseCase = mockk()
     private val setPref: SetNotificationPrefUseCase = mockk()
     private val setQuietHoursEnabled: SetQuietHoursEnabledUseCase = mockk()
@@ -41,12 +45,15 @@ class NotificationSettingsViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private fun createViewModel() = NotificationSettingsViewModel(
-        observePrefs, setPref, setQuietHoursEnabled, sendTestNotification,
+        context, observePrefs, setPref, setQuietHoursEnabled, sendTestNotification,
     )
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        every { context.getSystemService(Context.POWER_SERVICE) } returns powerManager
+        every { context.packageName } returns "iti.grad.nutriscan"
+        every { powerManager.isIgnoringBatteryOptimizations("iti.grad.nutriscan") } returns true
         coEvery { observePrefs() } returns flowOf(NotificationPrefs.default())
         coEvery { setPref(any(), any()) } returns Result.success(Unit)
         coEvery { setQuietHoursEnabled(any()) } returns Result.success(Unit)
@@ -156,6 +163,43 @@ class NotificationSettingsViewModelTest {
                 testScheduler.advanceUntilIdle()
 
                 Assertions.assertTrue(awaitItem() is NotificationSettingsEffect.NavigateBack)
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Battery Optimization")
+    inner class BatteryOptimization {
+
+        @Test
+        fun `state reflects isIgnoringBatteryOptimizations on init`() = runTest {
+            every { powerManager.isIgnoringBatteryOptimizations("iti.grad.nutriscan") } returns false
+            viewModel = createViewModel()
+            testScheduler.advanceUntilIdle()
+
+            Assertions.assertFalse(viewModel.state.value.isIgnoringBatteryOptimizations)
+        }
+
+        @Test
+        fun `refreshBatteryOptimizationState re-reads the current exemption state`() = runTest {
+            every { powerManager.isIgnoringBatteryOptimizations("iti.grad.nutriscan") } returns false
+            viewModel = createViewModel()
+            testScheduler.advanceUntilIdle()
+            Assertions.assertFalse(viewModel.state.value.isIgnoringBatteryOptimizations)
+
+            every { powerManager.isIgnoringBatteryOptimizations("iti.grad.nutriscan") } returns true
+            viewModel.refreshBatteryOptimizationState()
+
+            Assertions.assertTrue(viewModel.state.value.isIgnoringBatteryOptimizations)
+        }
+
+        @Test
+        fun `AllowBackgroundNotificationsClicked emits RequestIgnoreBatteryOptimizations`() = runTest {
+            viewModel.effect.test {
+                viewModel.onEvent(NotificationSettingsEvent.AllowBackgroundNotificationsClicked)
+                testScheduler.advanceUntilIdle()
+
+                Assertions.assertTrue(awaitItem() is NotificationSettingsEffect.RequestIgnoreBatteryOptimizations)
             }
         }
     }

@@ -2,6 +2,7 @@ package iti.grad.nutriscan.data.repository
 
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
@@ -9,9 +10,18 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,30 +29,45 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val remoteDataSource: IUserRemoteDataSource,
-    private val json: Json
+    private val json: Json,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IUserRepository {
 
-    override fun getUserData(): Flow<User?> {
-        return userDao.getUserFlow().map { entity ->
-            entity?.let {
-                User(
-                    id = it.id,
-                    firstName = it.firstName,
-                    lastName = it.lastName,
-                    email = it.email,
-                    gender = it.gender,
-                    dateOfBirth = it.dateOfBirth,
-                    heightCm = it.heightCm,
-                    weightKg = it.weightKg,
-                    diseaseIds = it.diseaseIds,
-                    allergyIds = it.allergyIds,
-                    avatarUrl = it.avatarUrl,
-                    bmi = it.bmi,
-                    tdee = it.tdee,
-                )
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+    /** Polls the backend every [SYNC_INTERVAL_MS] for as long as at least one collector is
+     * subscribed, so a profile edit made on another device shows up here without an app restart.
+     * [shareIn] multicasts this single poll loop to every collector — [UserRepositoryImpl] is a
+     * singleton, so without it, two screens observing the profile at once would each spin up their
+     * own independent poller. */
+    private val userDataFlow: Flow<User?> = channelFlow {
+        fetchAndSyncProfile()
+        launch {
+            while (isActive) {
+                delay(SYNC_INTERVAL_MS)
+                fetchAndSyncProfile()
             }
         }
-    }
+        userDao.getUserFlow().map { entity -> entity?.toDomain() }.collect { send(it) }
+    }.shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getUserData(): Flow<User?> = userDataFlow
+
+    private fun UserEntity.toDomain() = User(
+        id = id,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        gender = gender,
+        dateOfBirth = dateOfBirth,
+        heightCm = heightCm,
+        weightKg = weightKg,
+        diseaseIds = diseaseIds,
+        allergyIds = allergyIds,
+        avatarUrl = avatarUrl,
+        bmi = bmi,
+        tdee = tdee,
+    )
 
     override suspend fun fetchAndSyncProfile(): Result<Unit> {
         return try {
@@ -158,5 +183,10 @@ class UserRepositoryImpl @Inject constructor(
         } catch (_: Exception) {
             "An unexpected error occurred."
         }
+    }
+
+    private companion object {
+        const val SYNC_INTERVAL_MS = 15_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }
