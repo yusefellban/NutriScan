@@ -36,13 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +49,7 @@ import coil3.compose.AsyncImage
 import iti.grad.presentation.R
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.isAppRtl
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -268,7 +267,7 @@ private fun QuantityBadge(
 private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val isRtl = isAppRtl()
     val isRemove = swipeAction is ProductCardSwipeAction.Remove
     val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.ProductCardSwipeIconBackground
 

@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 /**
@@ -74,7 +75,7 @@ fun ExploreItemRow(
         )
 
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_right),
+            painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
             contentDescription = null,
             tint = AppTheme.colors.ProfileMenuChevron,
             modifier = Modifier.size(20.dp),

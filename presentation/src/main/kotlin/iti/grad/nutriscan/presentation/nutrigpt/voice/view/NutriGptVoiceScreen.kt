@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -114,7 +115,7 @@ fun NutriGptVoiceScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.KeyboardArrowLeft,
+                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                         contentDescription = "Back",
                         tint = AppTheme.colors.Primary
                     )
@@ -174,7 +175,7 @@ fun NutriGptVoiceScreen(
             val textAlign = if (isHintText) {
                 TextAlign.Center
             } else {
-                if (state.chatLanguage == ChatLanguage.AR) TextAlign.Right else TextAlign.Left
+                TextAlign.Start
             }
 
             Text(
