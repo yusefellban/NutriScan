@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,11 +22,11 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.AvatarCircle
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderSubtitle
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
 
 /**
@@ -74,20 +73,9 @@ fun HomeGreetingHeader(
             Spacer(modifier = Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.home_greeting, firstName),
-                    style = AppTheme.typography.titleLarge.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                    color = AppTheme.colors.OnPrimary,
-                )
+                HeroHeaderTitle(text = stringResource(R.string.home_greeting, firstName))
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_subtitle),
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.Gray100,
-                )
+                HeroHeaderSubtitle(text = stringResource(R.string.home_subtitle))
             }
 
             Box(

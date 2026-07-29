@@ -41,7 +41,7 @@ fun AvatarCircle(
     Box(
         modifier = modifier
             .size(size)
-            .border(width = ringWidth, color = AppTheme.colors.Teal1000, shape = CircleShape)
+            .border(width = ringWidth, color = AppTheme.colors.OnPrimary, shape = CircleShape)
             .padding(ringWidth + 2.dp)
             .clip(CircleShape)
             .background(AppTheme.colors.ProfileHeaderAccent)

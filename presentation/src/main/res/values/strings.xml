@@ -379,7 +379,11 @@
     <string name="exercise_discard_confirm_action">Yes, Discard</string>
 
     <!-- Saved Screen -->
-    <string name="saved_screen_title">Saved</string>
+    <string name="saved_screen_title">Saved Products</string>
+    <string name="saved_screen_subtitle">Your favorite scanned products</string>
+    <string name="saved_count_badge">%1$d saved</string>
+    <string name="calories_tracking_title">Calories Tracking</string>
+    <string name="calories_tracking_subtitle">Track your daily intake</string>
     <string name="saved_search_hint">Search here</string>
     <string name="saved_empty_state">No saved products yet</string>
     <string name="product_card_swipe_hint">Swipe right to add</string>

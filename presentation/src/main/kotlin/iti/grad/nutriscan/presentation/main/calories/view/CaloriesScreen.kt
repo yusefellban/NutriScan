@@ -6,13 +6,11 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
-import androidx.compose.foundation.layout.WindowInsetsSides
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import androidx.compose.runtime.LaunchedEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
@@ -35,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.WindowInsets
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.presentation.R
@@ -48,6 +44,10 @@ import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
 import androidx.activity.result.contract.ActivityResultContracts
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import androidx.compose.ui.platform.LocalContext
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import androidx.compose.foundation.lazy.LazyColumn
@@ -128,13 +128,28 @@ private fun CaloriesContent(
     onEvent: (CaloriesEvent) -> Unit,
     bottomPadding: Dp,
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppTheme.colors.ProfileHeaderBackground),
+    ) {
+        SectionHeroHeader {
+            CaloriesHeroContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 56.dp, bottom = 24.dp),
+            )
+        }
+
         LazyColumn(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(AppTheme.colors.Background)
-                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
                 .padding(horizontal = 22.dp),
-            contentPadding = PaddingValues(bottom = bottomPadding + 24.dp),
+            contentPadding = PaddingValues(top = 20.dp, bottom = bottomPadding + 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {
@@ -241,6 +256,7 @@ private fun CaloriesContent(
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
+    }
 
         if (state.pendingRemoveFoodId != null) {
             CustomAlertDialog(
@@ -269,9 +285,9 @@ private fun CaloriesContent(
 
 @SuppressLint("NonObservableLocale")
 @Composable
-private fun CaloriesHeader(caloriesGained: Int) {
+private fun CaloriesHeader(caloriesGained: Int, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -297,6 +313,33 @@ private fun CaloriesHeader(caloriesGained: Int) {
                 text = stringResource(R.string.calorie_badge),
                 style = CaloriesTypography.badgeText,
                 color = AppTheme.colors.Teal1000,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CaloriesHeroContent(modifier: Modifier = Modifier) {
+    val today = remember {
+        java.time.LocalDate.now().format(
+            java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d"),
+        )
+    }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        HeroHeaderTitle(text = stringResource(R.string.calories_tracking_title))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(AppTheme.colors.ProfileStreakBadgeBackground)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+        ) {
+            Text(
+                text = today,
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.Teal400,
             )
         }
     }

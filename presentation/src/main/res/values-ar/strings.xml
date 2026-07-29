@@ -384,7 +384,11 @@
     <string name="exercise_discard_confirm_action">نعم، إلغاء</string>
 
     <!-- Saved Screen -->
-    <string name="saved_screen_title">المحفوظات</string>
+    <string name="saved_screen_title">المنتجات المحفوظة</string>
+    <string name="saved_screen_subtitle">منتجاتك المفضلة التي تم مسحها</string>
+    <string name="saved_count_badge">%1$d محفوظ</string>
+    <string name="calories_tracking_title">تتبع السعرات</string>
+    <string name="calories_tracking_subtitle">تتبع استهلاكك اليومي</string>
     <string name="saved_search_hint">ابحث هنا</string>
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
