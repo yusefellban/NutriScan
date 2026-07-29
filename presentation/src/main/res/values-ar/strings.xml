@@ -255,6 +255,22 @@
     <string name="help_feedback_cancel">إلغاء</string>
     <string name="help_credits_team">صُنع بعناية بواسطة فريق NutriScan</string>
     <string name="help_credits_version">الإصدار %1$s</string>
+    <string name="terms_section_1_title">قبول الشروط</string>
+    <string name="terms_section_1_body">من خلال إنشاء حساب واستخدام NutriScan، فإنك توافق على هذه الشروط والأحكام. إذا كنت لا توافق، يرجى عدم استخدام التطبيق.</string>
+    <string name="terms_section_2_title">استخدام التطبيق</string>
+    <string name="terms_section_2_body">يتم توفير NutriScan لتتبع التغذية الشخصية. أنت توافق على استخدامه فقط للأغراض القانونية والحفاظ على أمان بيانات حسابك.</string>
+    <string name="terms_section_3_title">ليست نصيحة طبية</string>
+    <string name="terms_section_3_body">معلومات التغذية وتقديرات السعرات الحرارية وردود NutriGPT هي لأغراض إعلامية فقط وليست بديلاً عن الاستشارة الطبية أو الغذائية المتخصصة. استشر مختصًا مؤهلاً للقرارات الطبية.</string>
+    <string name="terms_section_4_title">بيانات المسح والكاميرا</string>
+    <string name="terms_section_4_body">تتم معالجة الصور الملتقطة لمسح الباركود أو الإيصالات لاستخراج بيانات القيمة الغذائية ولا تتم مشاركتها مع أطراف ثالثة إلا بالقدر اللازم لتوفير هذه الميزة.</string>
+    <string name="terms_section_5_title">المساعد الذكي (NutriGPT)</string>
+    <string name="terms_section_5_body">يتم إنشاء ردود NutriGPT تلقائيًا وقد تكون غير دقيقة أحيانًا. استخدم تقديرك الشخصي قبل التصرف بناءً على اقتراحات الذكاء الاصطناعي.</string>
+    <string name="terms_section_6_title">الحساب والملفات العائلية</string>
+    <string name="terms_section_6_body">أنت مسؤول عن دقة المعلومات المُدخلة لنفسك ولأي ملفات عائلية تديرها ضمن حسابك.</string>
+    <string name="terms_section_7_title">التغييرات على هذه الشروط</string>
+    <string name="terms_section_7_body">قد نقوم بتحديث هذه الشروط من وقت لآخر. استمرار استخدامك للتطبيق بعد التغييرات يعني موافقتك على الشروط المحدّثة.</string>
+    <string name="terms_section_8_title">التواصل</string>
+    <string name="terms_section_8_body">لديك أسئلة حول هذه الشروط؟ تواصل معنا من خيار تواصل مع الدعم في شاشة المساعدة.</string>
 
     <!-- Placeholder Screens -->
     <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>

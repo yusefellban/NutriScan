@@ -250,6 +250,22 @@
     <string name="help_feedback_cancel">Cancel</string>
     <string name="help_credits_team">Made with care by the NutriScan Team</string>
     <string name="help_credits_version">v%1$s</string>
+    <string name="terms_section_1_title">Acceptance of Terms</string>
+    <string name="terms_section_1_body">By creating an account and using NutriScan, you agree to these Terms and Conditions. If you don\'t agree, please don\'t use the app.</string>
+    <string name="terms_section_2_title">Use of the App</string>
+    <string name="terms_section_2_body">NutriScan is provided for personal nutrition tracking. You agree to use it only for lawful purposes and to keep your account credentials secure.</string>
+    <string name="terms_section_3_title">Not Medical Advice</string>
+    <string name="terms_section_3_body">Nutrition information, calorie estimates, and NutriGPT responses are for informational purposes only and are not a substitute for professional medical or dietary advice. Consult a qualified professional for medical decisions.</string>
+    <string name="terms_section_4_title">Scanning and Camera Data</string>
+    <string name="terms_section_4_body">Photos taken for barcode or receipt scanning are processed to extract nutrition data and are not shared with third parties beyond what\'s required to provide this feature.</string>
+    <string name="terms_section_5_title">AI Assistant (NutriGPT)</string>
+    <string name="terms_section_5_body">Responses from NutriGPT are generated automatically and may occasionally be inaccurate. Use your judgment before acting on AI-provided suggestions.</string>
+    <string name="terms_section_6_title">Account and Family Profiles</string>
+    <string name="terms_section_6_body">You\'re responsible for the accuracy of information entered for yourself and any family profiles you manage under your account.</string>
+    <string name="terms_section_7_title">Changes to These Terms</string>
+    <string name="terms_section_7_body">We may update these Terms from time to time. Continued use of the app after changes means you accept the updated Terms.</string>
+    <string name="terms_section_8_title">Contact</string>
+    <string name="terms_section_8_body">Questions about these Terms? Reach us from the Help screen\'s Contact Support option.</string>
 
     <!-- Placeholder Screens -->
     <string name="placeholder_edit_profile_title">Edit Profile</string>
