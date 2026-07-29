@@ -54,12 +54,12 @@ fun HelpScreen(
                 is HelpEffect.OpenEmail -> {
                     val subject = if (effect.isFeedback) feedbackSubject else contactSubject
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        data = Uri.parse("mailto:")
+                        data = Uri.parse("mailto:${Uri.encode(effect.recipient)}")
                         putExtra(Intent.EXTRA_EMAIL, arrayOf(effect.recipient))
                         putExtra(Intent.EXTRA_SUBJECT, subject)
                         putExtra(Intent.EXTRA_TEXT, effect.body)
                     }
-                    context.startActivity(Intent.createChooser(intent, null))
+                    runCatching { context.startActivity(Intent.createChooser(intent, null)) }
                 }
             }
         }

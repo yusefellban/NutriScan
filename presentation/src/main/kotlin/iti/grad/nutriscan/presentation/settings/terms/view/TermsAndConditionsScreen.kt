@@ -1,8 +1,10 @@
 package iti.grad.nutriscan.presentation.settings.terms.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -30,10 +32,16 @@ fun TermsAndConditionsScreen(
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding(),
         ) {
-            AppTopHeader(
-                title = stringResource(R.string.app_settings_terms_and_conditions),
-                onBackClick = onNavigateBack,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(AppTheme.colors.Teal1000),
+            ) {
+                AppTopHeader(
+                    title = stringResource(R.string.app_settings_terms_and_conditions),
+                    onBackClick = onNavigateBack,
+                )
+            }
 
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                 TermsSection(stringResource(R.string.terms_section_1_title), stringResource(R.string.terms_section_1_body))
