@@ -184,4 +184,10 @@ abstract class RepositoryModule {
     abstract fun bindDailyTrackingRepository(
         impl: DailyTrackingRepositoryImpl
     ): IDailyTrackingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStepHistoryRepository(
+        impl: iti.grad.nutriscan.data.repository.StepHistoryRepositoryImpl
+    ): iti.grad.nutriscan.domain.steps.history.repository.IStepHistoryRepository
 }
