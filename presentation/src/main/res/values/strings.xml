@@ -112,6 +112,9 @@
     <string name="edit_profile_password_hint">Password</string>
     <string name="edit_profile_confirm_title">Save Changes?</string>
     <string name="edit_profile_confirm_message">Your health profile changes will affect how products are evaluated for you. Continue?</string>
+    <string name="edit_profile_avatar_uploading">Uploading photo…</string>
+    <string name="edit_profile_avatar_upload_error">Couldn\'t upload your photo. Please try again.</string>
+    <string name="edit_profile_avatar_upload_retry">Retry upload</string>
     <string name="action_edit">Edit</string>
     <string name="edit_profile_first_name_hint">First name</string>
     <string name="edit_profile_last_name_hint">Last name</string>
