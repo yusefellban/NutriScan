@@ -30,6 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
+import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
@@ -135,29 +137,23 @@ fun ExercisesScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 state.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = AppTheme.colors.Teal1000
-                    )
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(6) {
+                            ExerciseListItemShimmerCard()
+                        }
+                    }
                 }
                 state.errorMessageRes != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(state.errorMessageRes!!),
-                            style = AppTheme.typography.bodyMedium,
-                            color = AppTheme.colors.TextSecondary,
-                            textAlign = TextAlign.Center
+                        OfflineStateWidget(
+                            onRetry = { viewModel.onEvent(ExercisesEvent.OnRetryClick) }
                         )
-                        Button(
-                            onClick = { viewModel.onEvent(ExercisesEvent.OnRetryClick) },
-                            colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
-                        ) {
-                            Text(text = stringResource(id = R.string.action_retry))
-                        }
                     }
                 }
                 state.visibleExercises.isEmpty() -> {

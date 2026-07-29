@@ -6,4 +6,5 @@ sealed interface SavedEvent {
     data class SearchQueryChanged(val query: String) : SavedEvent
     data class ProductClicked(val product: ProductUiModel) : SavedEvent
     data class SwipeToAddTriggered(val productId: String) : SavedEvent
+    data object RetryLoad : SavedEvent
 }

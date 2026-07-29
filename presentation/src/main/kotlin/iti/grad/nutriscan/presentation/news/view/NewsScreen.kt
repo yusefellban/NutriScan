@@ -33,7 +33,10 @@ import iti.grad.nutriscan.presentation.news.state.NewsEffect
 import iti.grad.nutriscan.presentation.news.state.NewsEvent
 import iti.grad.nutriscan.presentation.news.state.NewsState
 import iti.grad.nutriscan.presentation.news.view.components.NewsArticleCard
+import iti.grad.nutriscan.presentation.news.view.components.NewsArticleShimmerCard
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.news.view.components.NewsTopicChipRow
+import iti.grad.nutriscan.presentation.news.view.components.NewsTopicChipShimmerRow
 import iti.grad.nutriscan.presentation.news.viewmodel.NewsViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -91,26 +94,39 @@ private fun NewsContent(
                 )
             }
 
-            NewsTopicChipRow(
-                chips = state.chips,
-                selectedChipIds = state.selectedChipIds,
-                onChipClicked = { onEvent(NewsEvent.ChipClicked(it)) },
-                modifier = Modifier
-                    .padding(horizontal = 22.dp)
-                    .padding(top = 4.dp, bottom = 16.dp),
-            )
+            if (state.isLoading && state.chips.isEmpty()) {
+                NewsTopicChipShimmerRow(
+                    modifier = Modifier
+                        .padding(horizontal = 22.dp)
+                        .padding(top = 4.dp, bottom = 16.dp)
+                )
+            } else {
+                NewsTopicChipRow(
+                    chips = state.chips,
+                    selectedChipIds = state.selectedChipIds,
+                    onChipClicked = { onEvent(NewsEvent.ChipClicked(it)) },
+                    modifier = Modifier
+                        .padding(horizontal = 22.dp)
+                        .padding(top = 4.dp, bottom = 16.dp),
+                )
+            }
 
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
-                    state.isLoading -> CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = AppTheme.colors.Teal1000,
-                    )
-                    state.errorMessageResId != null -> Text(
-                        text = stringResource(state.errorMessageResId),
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.colors.TextSecondary,
-                        modifier = Modifier.align(Alignment.Center).padding(horizontal = 22.dp),
+                    state.isLoading -> LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 22.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        userScrollEnabled = false,
+                    ) {
+                        items(5) { 
+                            NewsArticleShimmerCard()
+                        }
+                    }
+                    state.errorMessageResId != null -> OfflineStateWidget(
+                        onRetry = { onEvent(NewsEvent.RetryClicked) },
+                        modifier = Modifier.align(Alignment.Center)
                     )
                     state.articles.isEmpty() -> Text(
                         text = stringResource(R.string.news_empty_state),

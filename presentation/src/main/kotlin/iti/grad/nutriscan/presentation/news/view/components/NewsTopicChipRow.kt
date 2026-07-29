@@ -5,8 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -17,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.domain.news.model.NewsTopicChip
+import iti.grad.nutriscan.presentation.common.components.shimmerEffect
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.collections.immutable.ImmutableList
@@ -67,3 +71,22 @@ fun NewsTopicChipRow(
 }
 
 private val chipShape = RoundedCornerShape(32.dp)
+
+@Composable
+fun NewsTopicChipShimmerRow(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        val widths = listOf(60.dp, 80.dp, 100.dp, 70.dp, 90.dp)
+        for (width in widths) {
+            Box(
+                modifier = Modifier
+                    .width(width)
+                    .height(36.dp)
+                    .clip(chipShape)
+                    .shimmerEffect()
+            )
+        }
+    }
+}

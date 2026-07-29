@@ -424,6 +424,9 @@
     <string name="news_screen_title">Health News</string>
     <string name="news_chip_all">All</string>
     <string name="news_load_error">Couldn\'t load news. Please try again.</string>
+    <string name="news_no_internet_title">No Internet Connection</string>
+    <string name="news_no_internet_subtitle">Please check your internet connection and try again.</string>
+    <string name="news_no_internet_retry">Try Again</string>
     <string name="news_empty_state">No articles found for the selected topics.</string>
     <string name="news_card_byline">By %1$s</string>
     <string name="news_time_just_now">Just now</string>
@@ -464,6 +467,9 @@
     <string name="alert_button_retry">Retry</string>
     <string name="alert_test_message">Are you sure you want to delete this profile? This action cannot be undone.</string>
     <string name="alert_internet_message">Please check your internet connection and try again.</string>
+    <string name="offline_state_title">No Internet Connection</string>
+    <string name="offline_state_subtitle">Please check your internet connection and try again.</string>
+    <string name="offline_state_retry">Try Again</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">Login Failed</string>
