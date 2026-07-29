@@ -30,15 +30,7 @@ class HelpViewModel @Inject constructor() : ViewModel() {
         when (event) {
             HelpEvent.BackClicked -> navigate(HelpEffect.NavigateBack)
             is HelpEvent.FaqItemClicked -> toggleFaq(event.id)
-            HelpEvent.ContactSupportClicked -> navigate(
-                HelpEffect.OpenEmail(recipient = SUPPORT_EMAIL, body = "", isFeedback = false)
-            )
-            HelpEvent.SendFeedbackClicked -> _state.update { it.copy(showFeedbackDialog = true) }
-            is HelpEvent.FeedbackTextChanged -> _state.update { it.copy(feedbackText = event.text) }
-            HelpEvent.FeedbackSubmitClicked -> submitFeedback()
-            HelpEvent.FeedbackDismissed -> _state.update {
-                it.copy(showFeedbackDialog = false, feedbackText = "")
-            }
+            HelpEvent.ContactSupportClicked -> navigate(HelpEffect.OpenEmail(recipient = SUPPORT_EMAIL))
         }
     }
 
@@ -46,12 +38,6 @@ class HelpViewModel @Inject constructor() : ViewModel() {
         _state.update {
             it.copy(expandedFaqId = if (it.expandedFaqId == id) null else id)
         }
-    }
-
-    private fun submitFeedback() {
-        val body = _state.value.feedbackText
-        _state.update { it.copy(showFeedbackDialog = false, feedbackText = "") }
-        navigate(HelpEffect.OpenEmail(recipient = SUPPORT_EMAIL, body = body, isFeedback = true))
     }
 
     private fun navigate(effect: HelpEffect) {

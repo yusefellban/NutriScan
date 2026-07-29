@@ -242,12 +242,6 @@
     <string name="help_contact_section_title">Still need help?</string>
     <string name="help_contact_support">Contact Support</string>
     <string name="help_contact_support_subject">NutriScan Support Request</string>
-    <string name="help_send_feedback">Send Feedback</string>
-    <string name="help_feedback_dialog_title">Send Feedback</string>
-    <string name="help_feedback_dialog_hint">Tell us what\'s on your mind</string>
-    <string name="help_feedback_subject">NutriScan App Feedback</string>
-    <string name="help_feedback_submit">Send</string>
-    <string name="help_feedback_cancel">Cancel</string>
     <string name="help_credits_team">Made with care by the NutriScan Team</string>
     <string name="help_credits_version">v%1$s</string>
     <string name="terms_section_1_title">Acceptance of Terms</string>

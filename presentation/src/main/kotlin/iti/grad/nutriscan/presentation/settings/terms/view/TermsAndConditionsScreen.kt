@@ -1,10 +1,9 @@
 package iti.grad.nutriscan.presentation.settings.terms.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
 import iti.grad.nutriscan.presentation.settings.terms.view.components.TermsSection
 import iti.grad.presentation.R
 
@@ -23,7 +22,10 @@ import iti.grad.presentation.R
 fun TermsAndConditionsScreen(
     onNavigateBack: () -> Unit = {},
 ) {
-    Scaffold(containerColor = AppTheme.colors.Background) { innerPadding ->
+    Scaffold(
+        containerColor = AppTheme.colors.Background,
+        contentWindowInsets = WindowInsets(0),
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -32,16 +34,10 @@ fun TermsAndConditionsScreen(
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding(),
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(AppTheme.colors.Teal1000),
-            ) {
-                AppTopHeader(
-                    title = stringResource(R.string.app_settings_terms_and_conditions),
-                    onBackClick = onNavigateBack,
-                )
-            }
+            AppSettingsHeader(
+                title = stringResource(R.string.app_settings_terms_and_conditions),
+                onBackClick = onNavigateBack,
+            )
 
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                 TermsSection(stringResource(R.string.terms_section_1_title), stringResource(R.string.terms_section_1_body))

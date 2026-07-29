@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,12 +20,13 @@ import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
-import iti.grad.presentation.R
 
 @Composable
 fun AppSettingsHeader(
+    title: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -53,7 +53,7 @@ fun AppSettingsHeader(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = stringResource(R.string.app_settings_title),
+                text = title,
                 style = TextStyle(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.ExtraBold,
@@ -62,11 +62,13 @@ fun AppSettingsHeader(
                 ),
                 color = AppTheme.colors.Teal300,
             )
-            Text(
-                text = stringResource(R.string.app_settings_subtitle),
-                style = AppTheme.typography.titleSmall,
-                color = AppTheme.colors.Gray100,
-            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = AppTheme.typography.titleSmall,
+                    color = AppTheme.colors.Gray100,
+                )
+            }
         }
     }
 }

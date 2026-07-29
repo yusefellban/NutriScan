@@ -247,12 +247,6 @@
     <string name="help_contact_section_title">ما زلت بحاجة إلى مساعدة؟</string>
     <string name="help_contact_support">تواصل مع الدعم</string>
     <string name="help_contact_support_subject">طلب دعم NutriScan</string>
-    <string name="help_send_feedback">إرسال ملاحظات</string>
-    <string name="help_feedback_dialog_title">إرسال ملاحظات</string>
-    <string name="help_feedback_dialog_hint">أخبرنا بما يدور في ذهنك</string>
-    <string name="help_feedback_subject">ملاحظات حول تطبيق NutriScan</string>
-    <string name="help_feedback_submit">إرسال</string>
-    <string name="help_feedback_cancel">إلغاء</string>
     <string name="help_credits_team">صُنع بعناية بواسطة فريق NutriScan</string>
     <string name="help_credits_version">الإصدار %1$s</string>
     <string name="terms_section_1_title">قبول الشروط</string>

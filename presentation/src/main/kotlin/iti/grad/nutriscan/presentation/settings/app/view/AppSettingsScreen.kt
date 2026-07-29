@@ -95,7 +95,11 @@ private fun AppSettingsContent(
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding(),
         ) {
-            AppSettingsHeader(onBackClick = { onEvent(AppSettingsEvent.BackClicked) })
+            AppSettingsHeader(
+                title = stringResource(R.string.app_settings_title),
+                subtitle = stringResource(R.string.app_settings_subtitle),
+                onBackClick = { onEvent(AppSettingsEvent.BackClicked) },
+            )
 
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 35.dp),

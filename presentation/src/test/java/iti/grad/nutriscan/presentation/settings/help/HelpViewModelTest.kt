@@ -63,7 +63,7 @@ class HelpViewModelTest {
     }
 
     @Test
-    fun `ContactSupportClicked emits OpenEmail with support address and empty body`() = runTest {
+    fun `ContactSupportClicked emits OpenEmail with support address`() = runTest {
         val viewModel = createViewModel()
         viewModel.effect.test {
             viewModel.onEvent(HelpEvent.ContactSupportClicked)
@@ -71,50 +71,7 @@ class HelpViewModelTest {
             Assertions.assertTrue(effect is HelpEffect.OpenEmail)
             effect as HelpEffect.OpenEmail
             Assertions.assertEquals("ahmedtayseer424@gmail.com", effect.recipient)
-            Assertions.assertEquals("", effect.body)
-            Assertions.assertFalse(effect.isFeedback)
         }
-    }
-
-    @Test
-    fun `SendFeedbackClicked shows feedback dialog`() {
-        val viewModel = createViewModel()
-        viewModel.onEvent(HelpEvent.SendFeedbackClicked)
-        Assertions.assertTrue(viewModel.state.value.showFeedbackDialog)
-    }
-
-    @Test
-    fun `FeedbackTextChanged updates feedback text`() {
-        val viewModel = createViewModel()
-        viewModel.onEvent(HelpEvent.FeedbackTextChanged("great app"))
-        Assertions.assertEquals("great app", viewModel.state.value.feedbackText)
-    }
-
-    @Test
-    fun `FeedbackSubmitClicked emits OpenEmail with feedback text as body and closes dialog`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.onEvent(HelpEvent.SendFeedbackClicked)
-        viewModel.onEvent(HelpEvent.FeedbackTextChanged("great app"))
-        viewModel.effect.test {
-            viewModel.onEvent(HelpEvent.FeedbackSubmitClicked)
-            val effect = awaitItem()
-            Assertions.assertTrue(effect is HelpEffect.OpenEmail)
-            effect as HelpEffect.OpenEmail
-            Assertions.assertEquals("great app", effect.body)
-            Assertions.assertTrue(effect.isFeedback)
-        }
-        Assertions.assertFalse(viewModel.state.value.showFeedbackDialog)
-        Assertions.assertEquals("", viewModel.state.value.feedbackText)
-    }
-
-    @Test
-    fun `FeedbackDismissed hides dialog and clears text`() {
-        val viewModel = createViewModel()
-        viewModel.onEvent(HelpEvent.SendFeedbackClicked)
-        viewModel.onEvent(HelpEvent.FeedbackTextChanged("draft"))
-        viewModel.onEvent(HelpEvent.FeedbackDismissed)
-        Assertions.assertFalse(viewModel.state.value.showFeedbackDialog)
-        Assertions.assertEquals("", viewModel.state.value.feedbackText)
     }
 
     @Test

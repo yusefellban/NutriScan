@@ -4,10 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -24,13 +23,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
 import iti.grad.nutriscan.presentation.settings.help.state.HelpEffect
 import iti.grad.nutriscan.presentation.settings.help.state.HelpEvent
 import iti.grad.nutriscan.presentation.settings.help.state.HelpState
 import iti.grad.nutriscan.presentation.settings.help.view.components.FaqAccordionItem
-import iti.grad.nutriscan.presentation.settings.help.view.components.FeedbackDialog
 import iti.grad.nutriscan.presentation.settings.help.view.components.HelpContactSection
 import iti.grad.nutriscan.presentation.settings.help.viewmodel.HelpViewModel
 import iti.grad.presentation.BuildConfig
@@ -45,19 +43,16 @@ fun HelpScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val contactSubject = stringResource(R.string.help_contact_support_subject)
-    val feedbackSubject = stringResource(R.string.help_feedback_subject)
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is HelpEffect.NavigateBack -> onNavigateBack()
                 is HelpEffect.OpenEmail -> {
-                    val subject = if (effect.isFeedback) feedbackSubject else contactSubject
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                         data = Uri.parse("mailto:${Uri.encode(effect.recipient)}")
                         putExtra(Intent.EXTRA_EMAIL, arrayOf(effect.recipient))
-                        putExtra(Intent.EXTRA_SUBJECT, subject)
-                        putExtra(Intent.EXTRA_TEXT, effect.body)
+                        putExtra(Intent.EXTRA_SUBJECT, contactSubject)
                     }
                     runCatching { context.startActivity(Intent.createChooser(intent, null)) }
                 }
@@ -73,7 +68,10 @@ private fun HelpContent(
     state: HelpState,
     onEvent: (HelpEvent) -> Unit,
 ) {
-    Scaffold(containerColor = AppTheme.colors.Background) { innerPadding ->
+    Scaffold(
+        containerColor = AppTheme.colors.Background,
+        contentWindowInsets = WindowInsets(0),
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -82,18 +80,10 @@ private fun HelpContent(
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding(),
         ) {
-            // Wrapped in a Teal1000 background box: AppTopHeader renders white text,
-            // which needs a dark backdrop for contrast (matches AppSettingsHeader's pattern).
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(AppTheme.colors.Teal1000),
-            ) {
-                AppTopHeader(
-                    title = stringResource(R.string.app_settings_help),
-                    onBackClick = { onEvent(HelpEvent.BackClicked) },
-                )
-            }
+            AppSettingsHeader(
+                title = stringResource(R.string.app_settings_help),
+                onBackClick = { onEvent(HelpEvent.BackClicked) },
+            )
 
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
@@ -116,7 +106,6 @@ private fun HelpContent(
 
                 HelpContactSection(
                     onContactSupportClick = { onEvent(HelpEvent.ContactSupportClicked) },
-                    onSendFeedbackClick = { onEvent(HelpEvent.SendFeedbackClicked) },
                 )
 
                 Column(
@@ -137,14 +126,5 @@ private fun HelpContent(
                 }
             }
         }
-    }
-
-    if (state.showFeedbackDialog) {
-        FeedbackDialog(
-            feedbackText = state.feedbackText,
-            onTextChanged = { onEvent(HelpEvent.FeedbackTextChanged(it)) },
-            onSubmit = { onEvent(HelpEvent.FeedbackSubmitClicked) },
-            onDismiss = { onEvent(HelpEvent.FeedbackDismissed) },
-        )
     }
 }

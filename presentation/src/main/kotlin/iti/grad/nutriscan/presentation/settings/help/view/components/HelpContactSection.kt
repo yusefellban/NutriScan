@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +17,6 @@ import iti.grad.presentation.R
 @Composable
 fun HelpContactSection(
     onContactSupportClick: () -> Unit,
-    onSendFeedbackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -31,11 +29,6 @@ fun HelpContactSection(
             icon = rememberVectorPainter(Icons.Filled.Email),
             label = stringResource(R.string.help_contact_support),
             onClick = onContactSupportClick,
-        )
-        SettingsActionRow(
-            icon = rememberVectorPainter(Icons.Filled.Feedback),
-            label = stringResource(R.string.help_send_feedback),
-            onClick = onSendFeedbackClick,
         )
     }
 }
