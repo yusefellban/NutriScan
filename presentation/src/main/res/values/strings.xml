@@ -424,6 +424,9 @@
     <string name="news_screen_title">Health News</string>
     <string name="news_chip_all">All</string>
     <string name="news_load_error">Couldn\'t load news. Please try again.</string>
+    <string name="news_no_internet_title">No Internet Connection</string>
+    <string name="news_no_internet_subtitle">Please check your internet connection and try again.</string>
+    <string name="news_no_internet_retry">Try Again</string>
     <string name="news_empty_state">No articles found for the selected topics.</string>
     <string name="news_card_byline">By %1$s</string>
     <string name="news_time_just_now">Just now</string>

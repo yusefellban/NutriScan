@@ -4,9 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.components.customShadow
+import iti.grad.nutriscan.presentation.common.components.shimmerEffect
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
 import iti.grad.presentation.R
@@ -149,5 +153,67 @@ private fun formatPublishedAt(iso: String): String {
         minutesAgo < 60 -> stringResource(R.string.news_time_minutes_ago, minutesAgo.toInt())
         minutesAgo < 24 * 60 -> stringResource(R.string.news_time_hours_ago, (minutesAgo / 60).toInt())
         else -> stringResource(R.string.news_time_days_ago, (minutesAgo / (24 * 60)).toInt())
+    }
+}
+
+@Composable
+fun NewsArticleShimmerCard(modifier: Modifier = Modifier) {
+    val cardShape = RoundedCornerShape(16.dp)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .customShadow(shape = cardShape, color = AppTheme.colors.Teal1000.copy(alpha = 0.2f), blurRadius = 30f, offsetY = 15f)
+            .clip(cardShape)
+            .background(AppTheme.colors.Surface)
+            .padding(8.dp),
+    ) {
+        // Image Placeholder
+        Box(
+            modifier = Modifier
+                .size(width = 137.dp, height = 140.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .shimmerEffect()
+        )
+        
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .fillMaxWidth()
+                .heightIn(min = 140.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Title (3 lines)
+                Box(modifier = Modifier.fillMaxWidth().height(14.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+                Box(modifier = Modifier.fillMaxWidth().height(14.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+                Box(modifier = Modifier.fillMaxWidth(0.6f).height(14.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // Source Name
+                Box(modifier = Modifier.fillMaxWidth(0.4f).height(12.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+
+                // Author
+                Box(modifier = Modifier.fillMaxWidth(0.5f).height(12.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Time
+                Box(modifier = Modifier.fillMaxWidth(0.3f).height(12.dp).clip(RoundedCornerShape(4.dp)).shimmerEffect())
+                
+                // Dots icon placeholder
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(50))
+                        .shimmerEffect()
+                )
+            }
+        }
     }
 }

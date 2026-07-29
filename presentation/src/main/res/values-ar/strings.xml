@@ -429,6 +429,9 @@
     <string name="news_screen_title">أخبار صحية</string>
     <string name="news_chip_all">الكل</string>
     <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
+    <string name="news_no_internet_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="news_no_internet_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
+    <string name="news_no_internet_retry">إعادة المحاولة</string>
     <string name="news_empty_state">لا توجد مقالات للمواضيع المحددة.</string>
     <string name="news_card_byline">بقلم %1$s</string>
     <string name="news_time_just_now">الآن</string>
