@@ -32,7 +32,9 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.state.SavedState
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
+import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
@@ -94,41 +96,67 @@ private fun SavedScreenContent(
     bottomPadding: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
-    if (state.filteredProducts.isEmpty()) {
-        Column(modifier = modifier.padding(bottom = bottomPadding)) {
-            SavedSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+    when {
+        state.isLoading -> {
+            SavedProductShimmerGrid(
+                modifier = modifier,
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = bottomPadding + 4.dp),
+                header = {
+                    SavedSearchBar(
+                        query = state.searchQuery,
+                        onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp, vertical = 12.dp)
+                    )
+                }
             )
-            
+        }
+        state.error != null && state.products.isEmpty() -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize().padding(bottom = bottomPadding),
                 contentAlignment = Alignment.Center
             ) {
-                EmptyStateWidget(
-                    message = stringResource(id = R.string.saved_empty_state)
-                )
+                OfflineStateWidget(onRetry = { onEvent(SavedEvent.RetryLoad) })
             }
         }
-    } else {
-        SavedProductGrid(
-            products = state.filteredProducts,
-            onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
-            onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = bottomPadding + 4.dp),
-            header = {
+        state.filteredProducts.isEmpty() -> {
+            Column(modifier = modifier.padding(bottom = bottomPadding)) {
                 SavedSearchBar(
                     query = state.searchQuery,
                     onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 4.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 )
-            },
-            modifier = modifier
-        )
+                
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    EmptyStateWidget(
+                        message = stringResource(id = R.string.saved_empty_state)
+                    )
+                }
+            }
+        }
+        else -> {
+            SavedProductGrid(
+                products = state.filteredProducts,
+                onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
+                onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = bottomPadding + 4.dp),
+                header = {
+                    SavedSearchBar(
+                        query = state.searchQuery,
+                        onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp, vertical = 12.dp)
+                    )
+                },
+                modifier = modifier
+            )
+        }
     }
 }

@@ -67,6 +67,9 @@ class SavedViewModel @Inject constructor(
                     addToFoodLog(product)
                 }
             }
+            is SavedEvent.RetryLoad -> {
+                loadSavedScans()
+            }
         }
     }
 
@@ -95,6 +98,7 @@ class SavedViewModel @Inject constructor(
     }
 
     private fun loadSavedScans() {
+        _state.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
             getSavedScansUseCase().collect { scans ->
                 val uiModels = scans.map { scan ->
@@ -117,7 +121,9 @@ class SavedViewModel @Inject constructor(
                     }
                     currentState.copy(
                         products = uiModels,
-                        filteredProducts = filtered
+                        filteredProducts = filtered,
+                        isLoading = false,
+                        error = null
                     )
                 }
             }
