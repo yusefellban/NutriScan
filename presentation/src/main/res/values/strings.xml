@@ -85,7 +85,7 @@
     <!-- Profile Setup Pager -->
     <string name="profile_setup_gender_title_prefix">"What is Your "</string>
     <string name="profile_setup_gender_title_highlight">Gender</string>
-    <string name="profile_setup_gender_title_suffix">?</string>
+    <string name="profile_setup_gender_title_suffix">\?</string>
     <string name="profile_setup_gender_subtitle">We\'ll use this information to personalize your NutriScan experience.</string>
     <string name="profile_setup_gender_female">Female</string>
     <string name="profile_setup_gender_male">Male</string>

@@ -508,4 +508,10 @@
     <string name="step_history_period_3months">٣ أشهر</string>
     <string name="step_history_period_6months">٦ أشهر</string>
 
+    <string name="cup_removed">تمت إزالة الكوب</string>
+    <string name="alert_verification_failed_title">فشل التحقق</string>
+    <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة.</string>
+    <string name="error_server_down">الخادم غير متاح مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="common_retry">إعادة المحاولة</string>
+
 </resources>
