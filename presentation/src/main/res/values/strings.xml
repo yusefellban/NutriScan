@@ -158,7 +158,9 @@
 
     <!-- Notification Settings -->
     <string name="notification_settings_title">Notification Settings</string>
-    <string name="notification_settings_toggles_header">Notification Types</string>
+    <string name="notification_settings_category_activity">Fitness &amp; Tracking</string>
+    <string name="notification_settings_category_reminders">Reminders</string>
+    <string name="notification_settings_category_content">Content &amp; News</string>
     <string name="notification_type_steps">Steps</string>
     <string name="notification_type_water">Water</string>
     <string name="notification_type_workout">Workout</string>

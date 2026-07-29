@@ -163,7 +163,9 @@
 
     <!-- Notification Settings -->
     <string name="notification_settings_title">إعدادات الإشعارات</string>
-    <string name="notification_settings_toggles_header">أنواع الإشعارات</string>
+    <string name="notification_settings_category_activity">اللياقة والتتبع</string>
+    <string name="notification_settings_category_reminders">التذكيرات</string>
+    <string name="notification_settings_category_content">المحتوى والأخبار</string>
     <string name="notification_type_steps">الخطوات</string>
     <string name="notification_type_water">الماء</string>
     <string name="notification_type_workout">التمرين</string>
