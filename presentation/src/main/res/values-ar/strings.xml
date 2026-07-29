@@ -493,5 +493,14 @@
     <string name="filter_unsafe">غير آمن</string>
     <string name="scan_history_empty">لا يوجد سجل متاح</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
+    <!-- Step History -->
+    <string name="step_history_title">سجل الخطوات</string>
+    <string name="step_history_daily_average">المتوسط اليومي</string>
+    <string name="step_history_total_steps">إجمالي الخطوات</string>
+    <string name="step_history_steps">خطوة</string>
+    <string name="step_history_period_week">أسبوع</string>
+    <string name="step_history_period_month">شهر</string>
+    <string name="step_history_period_3months">٣ أشهر</string>
+    <string name="step_history_period_6months">٦ أشهر</string>
 
 </resources>

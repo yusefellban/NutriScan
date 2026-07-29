@@ -204,6 +204,42 @@ internal data class AppColorsExtension2(
 )
 
 @Immutable
+internal data class AppColorsExtension3(
+    // Top Bar & Header
+    val StepHistoryScreenBg: Color,
+    val StepHistoryTopBarIconBg: Color,
+    val StepHistoryTopBarIconTint: Color,
+    val StepHistoryTitle: Color,
+
+    // Gauge Card
+    val StepHistoryGaugeCardBg: Color,
+    val StepHistoryGaugeTrack: Color,
+    val StepHistoryGaugeFill: Color,
+    val StepHistoryGaugeValueText: Color,
+    val StepHistoryGaugeLabelText: Color,
+    val StepHistoryGaugeIconTint: Color,
+
+    // Period Chips
+    val StepHistoryChipContainerBg: Color,
+    val StepHistoryChipBgSelected: Color,
+    val StepHistoryChipTextSelected: Color,
+    val StepHistoryChipBgUnselected: Color,
+    val StepHistoryChipTextUnselected: Color,
+
+    // Bar Chart
+    val StepHistoryChartLabel: Color,
+    val StepHistoryChartBarBg: Color,
+    val StepHistoryChartBarFill: Color,
+
+    // Summary Cards
+    val StepHistorySummaryCardBg: Color,
+    val StepHistorySummaryTitleText: Color,
+    val StepHistorySummaryValueText: Color,
+    val StepHistorySummaryIconBg: Color,
+    val StepHistorySummaryIconTint: Color,
+)
+
+@Immutable
 @ConsistentCopyVisibility
 data class AppColors internal constructor(
     // --- Teal Palette ---
@@ -359,6 +395,7 @@ data class AppColors internal constructor(
     // a D8 VerifyError crash from having too many constructor parameters.
     private val extension: AppColorsExtension,
     private val extension2: AppColorsExtension2,
+    private val extension3: AppColorsExtension3,
 ) {
     val ProfileHeaderBackground: Color get() = extension.ProfileHeaderBackground
     val ProfileHeaderAccent: Color get() = extension.ProfileHeaderAccent
@@ -485,6 +522,30 @@ data class AppColors internal constructor(
     val ChatDisclaimerBackground: Color get() = extension2.ChatDisclaimerBackground
     val ChatDisclaimerText: Color get() = extension2.ChatDisclaimerText
     val ChatDisclaimerIcon: Color get() = extension2.ChatDisclaimerIcon
+
+    val StepHistoryScreenBg: Color get() = extension3.StepHistoryScreenBg
+    val StepHistoryTopBarIconBg: Color get() = extension3.StepHistoryTopBarIconBg
+    val StepHistoryTopBarIconTint: Color get() = extension3.StepHistoryTopBarIconTint
+    val StepHistoryTitle: Color get() = extension3.StepHistoryTitle
+    val StepHistoryGaugeCardBg: Color get() = extension3.StepHistoryGaugeCardBg
+    val StepHistoryGaugeTrack: Color get() = extension3.StepHistoryGaugeTrack
+    val StepHistoryGaugeFill: Color get() = extension3.StepHistoryGaugeFill
+    val StepHistoryGaugeValueText: Color get() = extension3.StepHistoryGaugeValueText
+    val StepHistoryGaugeLabelText: Color get() = extension3.StepHistoryGaugeLabelText
+    val StepHistoryGaugeIconTint: Color get() = extension3.StepHistoryGaugeIconTint
+    val StepHistoryChipContainerBg: Color get() = extension3.StepHistoryChipContainerBg
+    val StepHistoryChipBgSelected: Color get() = extension3.StepHistoryChipBgSelected
+    val StepHistoryChipTextSelected: Color get() = extension3.StepHistoryChipTextSelected
+    val StepHistoryChipBgUnselected: Color get() = extension3.StepHistoryChipBgUnselected
+    val StepHistoryChipTextUnselected: Color get() = extension3.StepHistoryChipTextUnselected
+    val StepHistoryChartLabel: Color get() = extension3.StepHistoryChartLabel
+    val StepHistoryChartBarBg: Color get() = extension3.StepHistoryChartBarBg
+    val StepHistoryChartBarFill: Color get() = extension3.StepHistoryChartBarFill
+    val StepHistorySummaryCardBg: Color get() = extension3.StepHistorySummaryCardBg
+    val StepHistorySummaryTitleText: Color get() = extension3.StepHistorySummaryTitleText
+    val StepHistorySummaryValueText: Color get() = extension3.StepHistorySummaryValueText
+    val StepHistorySummaryIconBg: Color get() = extension3.StepHistorySummaryIconBg
+    val StepHistorySummaryIconTint: Color get() = extension3.StepHistorySummaryIconTint
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -810,6 +871,35 @@ fun lightColors() = AppColors(
         ChatDisclaimerBackground = Color(0xFFF8F8F9), // Gray100
         ChatDisclaimerText = Color(0xFF777777), // Gray800
         ChatDisclaimerIcon = Color(0xFF13A4AB), // Teal1000
+    ),
+    extension3 = AppColorsExtension3(
+        StepHistoryScreenBg = Color(0xFFF8F8F9),
+        StepHistoryTopBarIconBg = Color(0xFFD4F1F2),
+        StepHistoryTopBarIconTint = Color(0xFF11939A),
+        StepHistoryTitle = Color(0xFF0A545A),
+
+        StepHistoryGaugeCardBg = Color(0xFFFFFFFF),
+        StepHistoryGaugeTrack = Color(0xFFD4F1F2),
+        StepHistoryGaugeFill = Color(0xFF13A4AB),
+        StepHistoryGaugeValueText = Color(0xFF393C3C),
+        StepHistoryGaugeLabelText = Color(0xFF393C3C),
+        StepHistoryGaugeIconTint = Color(0xFF11939A),
+
+        StepHistoryChipContainerBg = Color(0xFFE5E5E4),
+        StepHistoryChipBgSelected = Color(0xFFFFFFFF),
+        StepHistoryChipTextSelected = Color(0xFF393C3C),
+        StepHistoryChipBgUnselected = Color.Transparent,
+        StepHistoryChipTextUnselected = Color(0xFF777777),
+
+        StepHistoryChartLabel = Color(0xFF777777),
+        StepHistoryChartBarBg = Color(0xFFE8FAFA),
+        StepHistoryChartBarFill = Color(0xFF13A4AB),
+
+        StepHistorySummaryCardBg = Color(0xFFFFFFFF),
+        StepHistorySummaryTitleText = Color(0xFF11939A),
+        StepHistorySummaryValueText = Color(0xFF393C3C),
+        StepHistorySummaryIconBg = Color(0xFFE8FAFA),
+        StepHistorySummaryIconTint = Color(0xFF11939A),
     ),
 )
 
@@ -1139,5 +1229,34 @@ fun darkColors() = AppColors(
         ChatDisclaimerBackground = Color(0x4D0F474A), // Teal1600 at 30%
         ChatDisclaimerText = Color(0xFFE8FAFA), // Teal100
         ChatDisclaimerIcon = Color(0xFF75DEE3), // Teal500
+    ),
+    extension3 = AppColorsExtension3(
+        StepHistoryScreenBg = Color(0xFF0F474A),
+        StepHistoryTopBarIconBg = Color(0xFF0B5F65),
+        StepHistoryTopBarIconTint = Color(0xFFA3E9EC),
+        StepHistoryTitle = Color(0xFFE8FAFA),
+
+        StepHistoryGaugeCardBg = Color(0xFF0B5F65),
+        StepHistoryGaugeTrack = Color(0xFF0F474A),
+        StepHistoryGaugeFill = Color(0xFF75DEE3),
+        StepHistoryGaugeValueText = Color(0xFFE8FAFA),
+        StepHistoryGaugeLabelText = Color(0xFFA6A5A5),
+        StepHistoryGaugeIconTint = Color(0xFFA3E9EC),
+
+        StepHistoryChipContainerBg = Color(0xFF0A545A),
+        StepHistoryChipBgSelected = Color(0xFF13A4AB),
+        StepHistoryChipTextSelected = Color(0xFFE8FAFA),
+        StepHistoryChipBgUnselected = Color.Transparent,
+        StepHistoryChipTextUnselected = Color(0xFFA3E9EC),
+
+        StepHistoryChartLabel = Color(0xFFA6A5A5),
+        StepHistoryChartBarBg = Color(0xFF0F474A),
+        StepHistoryChartBarFill = Color(0xFF75DEE3),
+
+        StepHistorySummaryCardBg = Color(0xFF0B5F65),
+        StepHistorySummaryTitleText = Color(0xFFA3E9EC),
+        StepHistorySummaryValueText = Color(0xFFE8FAFA),
+        StepHistorySummaryIconBg = Color(0xFF0F474A),
+        StepHistorySummaryIconTint = Color(0xFFA3E9EC),
     ),
 )

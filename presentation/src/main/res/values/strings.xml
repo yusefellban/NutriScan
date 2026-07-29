@@ -499,5 +499,14 @@
     <string name="filter_unsafe">Unsafe</string>
     <string name="scan_history_empty">No history found</string>
     <string name="scan_history_error_load">Failed to load history</string>
+    <!-- Step History -->
+    <string name="step_history_title">Step history</string>
+    <string name="step_history_daily_average">Daily average</string>
+    <string name="step_history_total_steps">Total steps</string>
+    <string name="step_history_steps">steps</string>
+    <string name="step_history_period_week">Week</string>
+    <string name="step_history_period_month">Month</string>
+    <string name="step_history_period_3months">3 Months</string>
+    <string name="step_history_period_6months">6 Months</string>
 
 </resources>
