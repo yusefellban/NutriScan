@@ -202,6 +202,7 @@ fun AppNavGraph(
                 onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
+                onNavigateToStepHistory = { navController.navigate(StepHistoryRoute) },
             )
         }
 
@@ -398,8 +399,15 @@ fun AppNavGraph(
             )
         }
 
-
-
+        // 33. Step History
+        composable<StepHistoryRoute> {
+            PlaceholderScreen(
+                title = "Step History",
+                buttonText = "Go Back"
+            ) {
+                navController.navigateUp()
+            }
+        }
     }
 }
 
