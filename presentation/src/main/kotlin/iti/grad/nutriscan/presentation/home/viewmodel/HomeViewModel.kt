@@ -64,7 +64,8 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             firstName = user.firstName,
                             userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
-                            avatarUrl = user.avatarUrl
+                            avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt
                         )
                     }
                 }
@@ -77,6 +78,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ScanCardClicked -> emitEffect(HomeEffect.NavigateToScan)
             is HomeEvent.ViewAllHistoryClicked -> emitEffect(HomeEffect.NavigateToHistory)
             is HomeEvent.NotificationClicked -> emitEffect(HomeEffect.NavigateToNotifications)
+            is HomeEvent.AvatarClicked -> emitEffect(HomeEffect.NavigateToEditProfile)
             is HomeEvent.HistoryItemClicked -> emitEffect(
                 HomeEffect.NavigateToScanResult(event.itemId)
             )

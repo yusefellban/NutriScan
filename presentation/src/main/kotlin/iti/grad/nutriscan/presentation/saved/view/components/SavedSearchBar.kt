@@ -23,7 +23,10 @@ fun SavedSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    height: Dp = 48.dp
+    height: Dp = 48.dp,
+    textColor: Color = AppTheme.colors.TextPrimary,
+    placeholderColor: Color = AppTheme.colors.ExerciseSearchPlaceholder,
+    borderColor: Color = AppTheme.colors.SavedSearchBarBorder,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -39,7 +42,7 @@ fun SavedSearchBar(
                 Text(
                     text = stringResource(id = R.string.saved_search_hint),
                     style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.ExerciseSearchPlaceholder
+                    color = placeholderColor
                 )
             },
             shape = RoundedCornerShape(28.dp),
@@ -47,15 +50,16 @@ fun SavedSearchBar(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = AppTheme.colors.SavedSearchBarBorder,
-                unfocusedIndicatorColor = AppTheme.colors.SavedSearchBarBorder,
+                focusedIndicatorColor = borderColor,
+                unfocusedIndicatorColor = borderColor,
+                cursorColor = textColor,
             ),
             singleLine = true,
-            textStyle = AppTheme.typography.bodyMedium.copy(color = AppTheme.colors.TextPrimary)
+            textStyle = AppTheme.typography.bodyMedium.copy(color = textColor)
         )
-        
+
         Spacer(modifier = Modifier.width(12.dp))
-        
+
         IconButton(
             onClick = { /* Search action usually handled by onQueryChange */ },
             modifier = Modifier
