@@ -6,7 +6,9 @@ import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
+import iti.grad.nutriscan.data.remote.dto.UserDto
 import iti.grad.nutriscan.data.remote.dto.toEntity
+import iti.grad.nutriscan.data.util.ImageCompressor
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -22,8 +24,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -67,37 +74,74 @@ class UserRepositoryImpl @Inject constructor(
         avatarUrl = avatarUrl,
         bmi = bmi,
         tdee = tdee,
+        updatedAt = updatedAt,
     )
 
     override suspend fun fetchAndSyncProfile(): Result<Unit> {
         return try {
             val dto = remoteDataSource.getProfile()
-            val localUser = userDao.getUserFlow().firstOrNull()
-            
-            val entity = UserEntity(
-                id = dto.id.takeIf { it.isNotBlank() } ?: localUser?.id ?: "unknown",
-                firstName = dto.firstName ?: dto.name ?: localUser?.firstName ?: "",
-                lastName = dto.lastName ?: localUser?.lastName,
-                email = dto.email.takeIf { it.isNotBlank() } ?: localUser?.email ?: "",
-                gender = dto.gender,
-                dateOfBirth = dto.dateOfBirth,
-                heightCm = dto.heightCm,
-                weightKg = dto.weightKg,
-                diseaseIds = dto.diseases?.map { it.id } ?: localUser?.diseaseIds ?: emptyList(),
-                allergyIds = dto.allergies?.map { it.id } ?: localUser?.allergyIds ?: emptyList(),
-                // If backend returns null, preserve our local offline avatar
-                avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
-                // Server-computed: always take the latest value from the backend;
-                // preserve local if the backend omits them (null-coalescing).
-                bmi = dto.bmi ?: localUser?.bmi,
-                tdee = dto.tdee ?: localUser?.tdee,
-                familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() }
-            )
-            userDao.insertOrUpdateUser(entity)
-
+            persistProfileDto(dto)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Merges a [UserDto] fetched from the backend into the local database.
+     * Shared by [fetchAndSyncProfile] and [uploadAvatar] so both paths persist
+     * the server's response identically — there is exactly one place that
+     * knows how to turn a [UserDto] into a [UserEntity].
+     */
+    private suspend fun persistProfileDto(dto: UserDto) {
+        val localUser = userDao.getUserFlow().firstOrNull()
+
+        val entity = UserEntity(
+            id = dto.id.takeIf { it.isNotBlank() } ?: localUser?.id ?: "unknown",
+            firstName = dto.firstName ?: dto.name ?: localUser?.firstName ?: "",
+            lastName = dto.lastName ?: localUser?.lastName,
+            email = dto.email.takeIf { it.isNotBlank() } ?: localUser?.email ?: "",
+            gender = dto.gender,
+            dateOfBirth = dto.dateOfBirth,
+            heightCm = dto.heightCm,
+            weightKg = dto.weightKg,
+            diseaseIds = dto.diseases?.map { it.id } ?: localUser?.diseaseIds ?: emptyList(),
+            allergyIds = dto.allergies?.map { it.id } ?: localUser?.allergyIds ?: emptyList(),
+            // If backend returns null, preserve our local offline avatar
+            avatarUrl = dto.avatarUrl ?: localUser?.avatarUrl,
+            // Server-computed: always take the latest value from the backend;
+            // preserve local if the backend omits them (null-coalescing).
+            bmi = dto.bmi ?: localUser?.bmi,
+            tdee = dto.tdee ?: localUser?.tdee,
+            familyMembers = dto.familyMembers.orEmpty().map { it.toEntity() },
+            updatedAt = dto.updatedAt ?: localUser?.updatedAt
+        )
+        userDao.insertOrUpdateUser(entity)
+    }
+
+    override suspend fun uploadAvatar(imageFile: File): Result<Unit> {
+        return withContext(ioDispatcher) {
+            try {
+                val compressedFile = ImageCompressor.compress(imageFile)
+                val requestFile = compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val part = MultipartBody.Part.createFormData(
+                    "image",
+                    compressedFile.name,
+                    requestFile
+                )
+
+                val dto = remoteDataSource.uploadProfileImage(part)
+
+                if (compressedFile.absolutePath != imageFile.absolutePath) {
+                    compressedFile.delete()
+                }
+
+                persistProfileDto(dto)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Timber.e(e, "Avatar upload failed")
+                Result.failure(e)
+            }
         }
     }
 
@@ -114,7 +158,6 @@ class UserRepositoryImpl @Inject constructor(
                 weightKg = profileUpdate.weightKg ?: currentUser.weightKg,
                 diseaseIds = profileUpdate.diseaseIds ?: currentUser.diseaseIds,
                 allergyIds = profileUpdate.allergyIds ?: currentUser.allergyIds,
-                avatarUrl = profileUpdate.avatarUrl ?: currentUser.avatarUrl,
                 // bmi and tdee are server-computed — never overwrite with null on optimistic update.
                 bmi = currentUser.bmi,
                 tdee = currentUser.tdee,
@@ -129,7 +172,6 @@ class UserRepositoryImpl @Inject constructor(
                 weightKg = profileUpdate.weightKg,
                 diseaseIds = profileUpdate.diseaseIds ?: emptyList(),
                 allergyIds = profileUpdate.allergyIds ?: emptyList(),
-                avatarUrl = profileUpdate.avatarUrl,
                 // No bmi/tdee yet — will be populated on next fetchAndSyncProfile()
                 bmi = null,
                 tdee = null,
@@ -144,8 +186,7 @@ class UserRepositoryImpl @Inject constructor(
                 heightCm = profileUpdate.heightCm,
                 weightKg = profileUpdate.weightKg,
                 diseaseIds = profileUpdate.diseaseIds,
-                allergyIds = profileUpdate.allergyIds,
-                avatarUrl = profileUpdate.avatarUrl
+                allergyIds = profileUpdate.allergyIds
             )
             val response = remoteDataSource.updateProfile(request)
             
