@@ -30,6 +30,7 @@ import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.settings.help.view.HelpScreen
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
@@ -339,14 +340,11 @@ fun AppNavGraph(
             }
         }
 
-        // 26. Help (Placeholder)
+        // 26. Help
         composable<HelpRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.app_settings_help),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            HelpScreen(
+                onNavigateBack = { navController.navigateUp() },
+            )
         }
 
 
