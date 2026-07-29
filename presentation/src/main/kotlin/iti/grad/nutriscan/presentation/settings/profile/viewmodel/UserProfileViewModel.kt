@@ -55,6 +55,7 @@ class UserProfileViewModel @Inject constructor(
                         it.copy(
                             userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
                             avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt,
                             bmi = user.bmi,
                             tdee = user.tdee,
                         )

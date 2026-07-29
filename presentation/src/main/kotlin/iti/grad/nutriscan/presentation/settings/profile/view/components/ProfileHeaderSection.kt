@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.rememberAvatarImageRequest
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -43,6 +44,7 @@ import iti.grad.presentation.R
 fun ProfileHeaderSection(
     userName: String,
     avatarUrl: String?,
+    avatarUpdatedAt: String?,
     streakDays: Int,
     onEditProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +80,7 @@ fun ProfileHeaderSection(
             ) {
                 if (avatarUrl != null) {
                     AsyncImage(
-                        model = avatarUrl,
+                        model = rememberAvatarImageRequest(avatarUrl, avatarUpdatedAt),
                         contentDescription = stringResource(R.string.user_profile_avatar_description),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.size(56.dp).clip(CircleShape),

@@ -20,7 +20,10 @@ data class UserDto(
     val allergies: List<DiseaseOrAllergyDto>? = null,
     val diseases: List<DiseaseOrAllergyDto>? = null,
     val familyMembers: List<FamilyMemberDto>? = null,
-    val avatarUrl: String? = null
+    /** Backend serializes the avatar picture field as "imageUrl". */
+    @SerialName("imageUrl") val avatarUrl: String? = null,
+    /** Used purely for cache-busting the avatar image locally — see [iti.grad.nutriscan.data.repository.UserRepositoryImpl]. */
+    val updatedAt: String? = null
 )
 
 @Serializable

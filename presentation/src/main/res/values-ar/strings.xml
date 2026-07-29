@@ -119,6 +119,9 @@
     <string name="edit_profile_password_hint">كلمة المرور</string>
     <string name="edit_profile_confirm_title">حفظ تغييرات الملف الشخصي؟</string>
     <string name="edit_profile_confirm_message">هل أنت متأكد من رغبتك في تعديل ملفك الصحي؟ سيؤدي ذلك إلى تحديث قرارات فحص سلامة الغذاء المستقبلية.</string>
+    <string name="edit_profile_avatar_uploading">جارٍ رفع الصورة…</string>
+    <string name="edit_profile_avatar_upload_error">تعذر رفع صورتك. يرجى المحاولة مرة أخرى.</string>
+    <string name="edit_profile_avatar_upload_retry">إعادة محاولة الرفع</string>
     <string name="edit_profile_first_name_hint">الاسم الأول</string>
     <string name="edit_profile_last_name_hint">اسم العائلة</string>
     <string name="edit_profile_dob_hint">تاريخ الميلاد</string>

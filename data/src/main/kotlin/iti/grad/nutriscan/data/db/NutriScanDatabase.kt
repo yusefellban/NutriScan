@@ -49,7 +49,7 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
     // daily_tracking, FoodLogEntity's pendingSync/deleted columns, SavedScanEntity's
     // userId/pendingSync/deleted columns) relies on fallbackToDestructiveMigration()
     // in DatabaseModule — this clears all local tables on upgrade.
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)

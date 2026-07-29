@@ -21,5 +21,7 @@ data class UserEntity(
     val bmi: Double? = null,
     /** Server-computed TDEE (kcal/day) — stored locally, never written by the client. */
     val tdee: Double? = null,
-    val familyMembers: List<FamilyMemberEntity> = emptyList()
+    val familyMembers: List<FamilyMemberEntity> = emptyList(),
+    /** Server-side last-update timestamp. Used to bust the avatar image cache. */
+    val updatedAt: String? = null
 )

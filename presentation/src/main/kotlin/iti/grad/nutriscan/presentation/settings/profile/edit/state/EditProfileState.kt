@@ -19,6 +19,9 @@ data class EditProfileState(
     val weightKg: Double? = null,
     val isSaving: Boolean = false,
     val avatarUrl: String? = null,
+    /** Cache-busting token for the avatar image — see [iti.grad.nutriscan.presentation.common.components.rememberAvatarImageRequest]. */
+    val avatarUpdatedAt: String? = null,
+    val avatarUploadState: AvatarUploadState = AvatarUploadState.Idle,
     val diseases: ImmutableList<Disease> = persistentListOf(),
     val selectedDiseaseIds: ImmutableList<Int> = persistentListOf(),
     val isDiseasesLoading: Boolean = false,
@@ -33,3 +36,12 @@ data class EditProfileState(
     val isLoading: Boolean = false,
     val alertState: ProfileAlertState = None
 )
+
+/** Independent state for the avatar upload flow — decoupled from [EditProfileState.isSaving]
+ * so a slow/failed picture upload never blocks saving the rest of the profile fields. */
+@Immutable
+sealed interface AvatarUploadState {
+    data object Idle : AvatarUploadState
+    data object Uploading : AvatarUploadState
+    data object Error : AvatarUploadState
+}

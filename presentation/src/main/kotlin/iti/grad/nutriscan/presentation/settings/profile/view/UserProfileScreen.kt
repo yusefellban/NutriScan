@@ -117,6 +117,7 @@ private fun UserProfileContent(
             ProfileHeaderSection(
                 userName = state.userName,
                 avatarUrl = state.avatarUrl,
+                avatarUpdatedAt = state.avatarUpdatedAt,
                 streakDays = state.streakDays,
                 onEditProfileClick = { onEvent(UserProfileEvent.EditProfileClicked) },
             )

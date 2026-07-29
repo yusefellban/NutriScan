@@ -1,6 +1,8 @@
 package iti.grad.nutriscan.presentation.settings.profile.edit
 
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,8 +15,11 @@ import iti.grad.nutriscan.domain.disease.model.Disease
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.user.model.User
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
 import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UploadAvatarUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.AvatarUploadState
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
@@ -33,6 +38,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditProfileViewModelTest {
@@ -47,6 +53,7 @@ class EditProfileViewModelTest {
         every { this@mockk() } returns userData
     }
     private val updateUserProfileUseCase: UpdateUserProfileUseCase = mockk()
+    private val uploadAvatarUseCase: UploadAvatarUseCase = mockk()
     private val getDiseasesUseCase: GetDiseasesUseCase = mockk {
         every { this@mockk() } returns flowOf(emptyList())
     }
@@ -55,20 +62,34 @@ class EditProfileViewModelTest {
     }
     private val syncDiseasesUseCase: SyncDiseasesUseCase = mockk()
     private val syncAllergiesUseCase: SyncAllergiesUseCase = mockk()
-    private val context: Context = mockk(relaxed = true)
+    private val userRepository: IUserRepository = mockk()
+
+    // A fake content:// picker Uri whose bytes the ViewModel copies into the app cache dir
+    // before handing the resulting File to uploadAvatarUseCase.
+    private val pickedUri: Uri = mockk()
+    private val contentResolver: ContentResolver = mockk {
+        every { openInputStream(pickedUri) } returns ByteArrayInputStream(byteArrayOf(1, 2, 3))
+    }
+    private val context: Context = mockk(relaxed = true) {
+        every { this@mockk.contentResolver } returns contentResolver
+        every { cacheDir } returns java.io.File(System.getProperty("java.io.tmpdir"), "edit_profile_test_cache").apply { mkdirs() }
+    }
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { syncDiseasesUseCase() } returns Result.success(Unit)
         coEvery { syncAllergiesUseCase() } returns Result.success(Unit)
+        coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
         viewModel = EditProfileViewModel(
             getUserProfileUseCase,
             updateUserProfileUseCase,
+            uploadAvatarUseCase,
             getDiseasesUseCase,
             getAllergiesUseCase,
             syncDiseasesUseCase,
             syncAllergiesUseCase,
+            userRepository,
             context,
         )
     }
@@ -126,10 +147,12 @@ class EditProfileViewModelTest {
         viewModel = EditProfileViewModel(
             getUserProfileUseCase,
             updateUserProfileUseCase,
+            uploadAvatarUseCase,
             getDiseasesUseCase,
             getAllergiesUseCase,
             syncDiseasesUseCase,
             syncAllergiesUseCase,
+            userRepository,
             context,
         )
         testScheduler.advanceUntilIdle()
@@ -171,9 +194,52 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `SelectAvatar updates avatarUrl for a non-content URI`() {
-        viewModel.onEvent(EditProfileEvent.SelectAvatar("file:///tmp/avatar.jpg"))
-        assertEquals("file:///tmp/avatar.jpg", viewModel.state.value.avatarUrl)
+    fun `SelectAvatar uploads immediately and returns to Idle on success`() = runTest(testDispatcher) {
+        coEvery { uploadAvatarUseCase(any()) } returns Result.success(Unit)
+
+        viewModel.onEvent(EditProfileEvent.SelectAvatar(pickedUri))
+        assertEquals(AvatarUploadState.Uploading, viewModel.state.value.avatarUploadState)
+
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(AvatarUploadState.Idle, viewModel.state.value.avatarUploadState)
+        coVerify(exactly = 1) { uploadAvatarUseCase(any()) }
+    }
+
+    @Test
+    fun `SelectAvatar upload failure surfaces an error state`() = runTest(testDispatcher) {
+        coEvery { uploadAvatarUseCase(any()) } returns Result.failure(Exception("Network error"))
+
+        viewModel.onEvent(EditProfileEvent.SelectAvatar(pickedUri))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(AvatarUploadState.Error, viewModel.state.value.avatarUploadState)
+    }
+
+    @Test
+    fun `RetryAvatarUpload re-runs the last picked photo`() = runTest(testDispatcher) {
+        coEvery { uploadAvatarUseCase(any()) } returns Result.failure(Exception("Network error"))
+        viewModel.onEvent(EditProfileEvent.SelectAvatar(pickedUri))
+        testScheduler.advanceUntilIdle()
+
+        coEvery { uploadAvatarUseCase(any()) } returns Result.success(Unit)
+        viewModel.onEvent(EditProfileEvent.RetryAvatarUpload)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(AvatarUploadState.Idle, viewModel.state.value.avatarUploadState)
+        coVerify(exactly = 2) { uploadAvatarUseCase(any()) }
+    }
+
+    @Test
+    fun `DismissAvatarUploadError resets to Idle without retrying`() = runTest(testDispatcher) {
+        coEvery { uploadAvatarUseCase(any()) } returns Result.failure(Exception("Network error"))
+        viewModel.onEvent(EditProfileEvent.SelectAvatar(pickedUri))
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onEvent(EditProfileEvent.DismissAvatarUploadError)
+
+        assertEquals(AvatarUploadState.Idle, viewModel.state.value.avatarUploadState)
+        coVerify(exactly = 1) { uploadAvatarUseCase(any()) }
     }
 
     @Test
@@ -238,7 +304,6 @@ class EditProfileViewModelTest {
                 weightKg = any(),
                 diseaseIds = any(),
                 allergyIds = any(),
-                avatarUrl = any(),
             )
         } returns Result.success(Unit)
 
@@ -250,7 +315,9 @@ class EditProfileViewModelTest {
         assertFalse(state.showSaveConfirmation)
         assertFalse(state.isSaving)
         assertFalse(state.isEditMode)
-        coVerify(exactly = 1) { updateUserProfileUseCase(any(), any(), any(), any(), any(), any(), any(), any(), any()) }
+        coVerify(exactly = 1) { updateUserProfileUseCase(any(), any(), any(), any(), any(), any(), any(), any()) }
+        // Regression guard: the avatar is never part of the text-field save request.
+        coVerify(exactly = 0) { uploadAvatarUseCase(any()) }
     }
 
     @Test
@@ -265,7 +332,6 @@ class EditProfileViewModelTest {
                 weightKg = any(),
                 diseaseIds = any(),
                 allergyIds = any(),
-                avatarUrl = any(),
             )
         } returns Result.failure(Exception("Network error"))
 
