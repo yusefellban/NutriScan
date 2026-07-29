@@ -16,8 +16,7 @@ class UpdateUserProfileUseCase @Inject constructor(
         heightCm: Double? = null,
         weightKg: Double? = null,
         diseaseIds: List<Int>? = null,
-        allergyIds: List<Int>? = null,
-        avatarUrl: String? = null
+        allergyIds: List<Int>? = null
     ): Result<Unit> {
         return userRepository.updateProfile(
             ProfileUpdate(
@@ -28,8 +27,7 @@ class UpdateUserProfileUseCase @Inject constructor(
                 heightCm = heightCm,
                 weightKg = weightKg,
                 diseaseIds = diseaseIds,
-                allergyIds = allergyIds,
-                avatarUrl = avatarUrl
+                allergyIds = allergyIds
             )
         )
     }
