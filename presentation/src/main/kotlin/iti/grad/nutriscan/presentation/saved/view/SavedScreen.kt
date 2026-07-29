@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.saved.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -19,14 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.unit.Dp
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -34,10 +35,10 @@ import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
+import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun SavedScreen(
@@ -124,24 +125,41 @@ private fun SavedScreenContent(
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(AppTheme.colors.Background),
         ) {
-            if (state.filteredProducts.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = bottomPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyStateWidget(
-                        message = stringResource(id = R.string.saved_empty_state)
+            when {
+                state.isLoading -> {
+                    SavedProductShimmerGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
                     )
                 }
-            } else {
-                SavedProductGrid(
-                    products = state.filteredProducts,
-                    onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
-                    onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
-                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
-                )
+                state.error != null && state.products.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        OfflineStateWidget(onRetry = { onEvent(SavedEvent.RetryLoad) })
+                    }
+                }
+                state.filteredProducts.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = bottomPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyStateWidget(
+                            message = stringResource(id = R.string.saved_empty_state)
+                        )
+                    }
+                }
+                else -> {
+                    SavedProductGrid(
+                        products = state.filteredProducts,
+                        onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
+                        onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
+                    )
+                }
             }
         }
     }

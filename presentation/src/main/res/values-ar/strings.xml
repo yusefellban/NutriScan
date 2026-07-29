@@ -435,6 +435,9 @@
     <string name="news_screen_title">أخبار صحية</string>
     <string name="news_chip_all">الكل</string>
     <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
+    <string name="news_no_internet_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="news_no_internet_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
+    <string name="news_no_internet_retry">إعادة المحاولة</string>
     <string name="news_empty_state">لا توجد مقالات للمواضيع المحددة.</string>
     <string name="news_card_byline">بقلم %1$s</string>
     <string name="news_time_just_now">الآن</string>
@@ -475,6 +478,9 @@
     <string name="alert_button_retry">إعادة المحاولة</string>
     <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
     <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    <string name="offline_state_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="offline_state_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
+    <string name="offline_state_retry">إعادة المحاولة</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">فشل تسجيل الدخول</string>

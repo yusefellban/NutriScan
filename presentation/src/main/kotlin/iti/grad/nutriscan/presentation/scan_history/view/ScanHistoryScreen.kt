@@ -25,6 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
@@ -105,28 +107,20 @@ private fun ScanHistoryContent(
                 )
 
                 if (state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = AppTheme.colors.Primary)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(8) {
+                            HistoryItemShimmerCard(modifier = Modifier.padding(vertical = 6.dp))
+                        }
                     }
                 } else if (state.error != null && state.allHistoryItems.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = state.error,
-                                color = AppTheme.colors.TextSecondary,
-                                style = AppTheme.typography.bodyLarge
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = { onEvent(ScanHistoryEvent.RetryLoad) },
-                                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
-                            ) {
-                                Text(stringResource(R.string.action_retry), color = Color.White)
-                            }
-                        }
+                        OfflineStateWidget(onRetry = { onEvent(ScanHistoryEvent.RetryLoad) })
                     }
                 } else if (state.displayedHistoryItems.isEmpty()) {
                     Box(

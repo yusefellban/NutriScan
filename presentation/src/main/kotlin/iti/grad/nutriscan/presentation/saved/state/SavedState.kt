@@ -8,4 +8,6 @@ data class SavedState(
     val searchQuery: String = "",
     val products: ImmutableList<ProductUiModel> = persistentListOf(),
     val filteredProducts: ImmutableList<ProductUiModel> = persistentListOf(),
+    val isLoading: Boolean = true,
+    val error: String? = null
 )
