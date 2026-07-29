@@ -52,7 +52,7 @@ fun HelpScreen(
             when (effect) {
                 is HelpEffect.NavigateBack -> onNavigateBack()
                 is HelpEffect.OpenEmail -> {
-                    val subject = if (effect.body.isEmpty()) contactSubject else feedbackSubject
+                    val subject = if (effect.isFeedback) feedbackSubject else contactSubject
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                         data = Uri.parse("mailto:")
                         putExtra(Intent.EXTRA_EMAIL, arrayOf(effect.recipient))

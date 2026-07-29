@@ -72,6 +72,7 @@ class HelpViewModelTest {
             effect as HelpEffect.OpenEmail
             Assertions.assertEquals("ahmedtayseer424@gmail.com", effect.recipient)
             Assertions.assertEquals("", effect.body)
+            Assertions.assertFalse(effect.isFeedback)
         }
     }
 
@@ -100,6 +101,7 @@ class HelpViewModelTest {
             Assertions.assertTrue(effect is HelpEffect.OpenEmail)
             effect as HelpEffect.OpenEmail
             Assertions.assertEquals("great app", effect.body)
+            Assertions.assertTrue(effect.isFeedback)
         }
         Assertions.assertFalse(viewModel.state.value.showFeedbackDialog)
         Assertions.assertEquals("", viewModel.state.value.feedbackText)
