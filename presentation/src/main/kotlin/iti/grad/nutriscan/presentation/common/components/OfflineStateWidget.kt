@@ -1,10 +1,9 @@
-package iti.grad.nutriscan.presentation.news.view.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,17 +16,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
 @Composable
-fun NewsOfflineState(
+fun OfflineStateWidget(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -41,7 +39,7 @@ fun NewsOfflineState(
         )
         
         Text(
-            text = stringResource(id = R.string.news_no_internet_title),
+            text = stringResource(id = R.string.offline_state_title),
             style = AppTheme.typography.headlineMedium,
             color = AppTheme.colors.TextPrimary,
             textAlign = TextAlign.Center,
@@ -51,7 +49,7 @@ fun NewsOfflineState(
         Spacer(modifier = Modifier.height(12.dp))
         
         Text(
-            text = stringResource(id = R.string.news_no_internet_subtitle),
+            text = stringResource(id = R.string.offline_state_subtitle),
             style = AppTheme.typography.bodyMedium,
             color = AppTheme.colors.TextSecondary,
             textAlign = TextAlign.Center,
@@ -61,7 +59,7 @@ fun NewsOfflineState(
         Spacer(modifier = Modifier.height(32.dp))
         
         AppButton(
-            textResId = R.string.news_no_internet_retry,
+            textResId = R.string.offline_state_retry,
             isLoading = false,
             onClick = onRetry
         )

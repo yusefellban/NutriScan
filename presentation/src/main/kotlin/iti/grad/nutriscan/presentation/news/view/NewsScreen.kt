@@ -34,7 +34,7 @@ import iti.grad.nutriscan.presentation.news.state.NewsEvent
 import iti.grad.nutriscan.presentation.news.state.NewsState
 import iti.grad.nutriscan.presentation.news.view.components.NewsArticleCard
 import iti.grad.nutriscan.presentation.news.view.components.NewsArticleShimmerCard
-import iti.grad.nutriscan.presentation.news.view.components.NewsOfflineState
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.news.view.components.NewsTopicChipRow
 import iti.grad.nutriscan.presentation.news.view.components.NewsTopicChipShimmerRow
 import iti.grad.nutriscan.presentation.news.viewmodel.NewsViewModel
@@ -124,7 +124,7 @@ private fun NewsContent(
                             NewsArticleShimmerCard()
                         }
                     }
-                    state.errorMessageResId != null -> NewsOfflineState(
+                    state.errorMessageResId != null -> OfflineStateWidget(
                         onRetry = { onEvent(NewsEvent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )

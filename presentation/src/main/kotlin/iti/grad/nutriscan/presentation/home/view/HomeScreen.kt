@@ -43,6 +43,8 @@ import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
@@ -201,29 +203,16 @@ private fun HomeFeedContent(
             // ── History Items ──
             when {
                 state.isHistoryLoading -> {
-                    item {
-                        androidx.compose.foundation.layout.Box(
-                            modifier = Modifier.fillMaxWidth().padding(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = AppTheme.colors.Primary)
-                        }
+                    items(3) {
+                        HistoryItemShimmerCard(modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
                 state.historyError != null -> {
                     item {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = state.historyError, color = AppTheme.colors.VerdictRedText)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            AppButton(
-                                textResId = R.string.common_retry,
-                                isLoading = false,
-                                onClick = { onEvent(HomeEvent.RetryLoadHistory) }
-                            )
-                        }
+                        OfflineStateWidget(
+                            onRetry = { onEvent(HomeEvent.RetryLoadHistory) },
+                            modifier = Modifier.padding(vertical = 24.dp)
+                        )
                     }
                 }
                 state.recentHistory.isEmpty() -> {
