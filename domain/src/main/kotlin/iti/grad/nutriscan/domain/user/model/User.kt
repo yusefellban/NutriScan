@@ -16,4 +16,6 @@ data class User(
     val bmi: Double? = null,
     /** Server-computed Total Daily Energy Expenditure in kcal/day. Read-only — never sent to the backend. */
     val tdee: Double? = null,
+    /** Server-side last-update timestamp. Used to bust the avatar image cache — never sent to the backend. */
+    val updatedAt: String? = null,
 )
