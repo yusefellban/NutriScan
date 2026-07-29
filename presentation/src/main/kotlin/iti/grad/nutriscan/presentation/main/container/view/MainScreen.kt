@@ -78,6 +78,7 @@ fun MainScreen(
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToNews = onNavigateToNews,
                         onNavigateToChatWithAi = onNavigateToChatWithAi,
+                        onNavigateToEditProfile = onNavigateToEditProfile,
                     )
                 }
                 BottomNavTab.CALORIES -> {

@@ -12,11 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -67,6 +64,7 @@ fun HomeScreen(
     onNavigateToNews: () -> Unit = {},
     onNavigateToChatWithAi: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -79,6 +77,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToChatWithAi -> onNavigateToChatWithAi()
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
+                is HomeEffect.NavigateToEditProfile -> onNavigateToEditProfile()
             }
         }
     }
@@ -109,26 +108,34 @@ private fun HomeFeedContent(
     onEvent: (HomeEvent) -> Unit,
     bottomPadding: Dp
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            // Must contrast with ProfileSheetBackground, or the sheet's
+            // rounded top corners have nothing to show through and render
+            // as sharp — same reasoning as UserProfileScreen.
+            .background(AppTheme.colors.ProfileHeaderBackground),
+    ) {
+        HomeGreetingHeader(
+            firstName = state.firstName,
+            avatarUrl = state.avatarUrl,
+            avatarUpdatedAt = state.avatarUpdatedAt,
+            onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
+            onAvatarClick = { onEvent(HomeEvent.AvatarClicked) },
+        )
+
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .background(AppTheme.colors.Background)
-                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding()),
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(AppTheme.colors.Background),
             contentPadding = PaddingValues(
+                top = 16.dp,
                 bottom = bottomPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // ── Greeting Header ──
-            item {
-                HomeGreetingHeader(
-                    userName = state.userName,
-                    avatarUrl = state.avatarUrl,
-                    onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-            }
-
             // ── Daily Health Tip ──
             item {
                 DailyHealthTipCard()
@@ -253,3 +260,4 @@ private fun HomeFeedContent(
             }
         }
     }
+}

@@ -14,6 +14,7 @@ data class HomeState(
     val userName: String = "",
     val firstName: String = "",
     val avatarUrl: String? = null,
+    val avatarUpdatedAt: String? = null,
     val isLoading: Boolean = false,
     val isHistoryLoading: Boolean = false,
     val historyError: String? = null,
