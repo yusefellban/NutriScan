@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
+import androidx.compose.ui.res.stringResource
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.main.calories.stephistory.state.StepHistoryEffect
 import iti.grad.nutriscan.presentation.main.calories.stephistory.state.StepHistoryEvent
@@ -30,7 +35,7 @@ import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components
 import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components.StepHistoryGaugeCard
 import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components.StepHistoryPeriodSelector
 import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components.StepHistorySummaryRow
-import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components.StepHistoryTopBar
+import iti.grad.nutriscan.presentation.main.calories.stephistory.view.components.StepHistoryDateRangeRow
 import iti.grad.nutriscan.presentation.main.calories.stephistory.viewmodel.StepHistoryViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -55,7 +60,8 @@ fun StepHistoryScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = AppTheme.colors.StepHistoryScreenBg
+        containerColor = AppTheme.colors.StepHistoryScreenBg,
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -80,32 +86,42 @@ fun StepHistoryScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp)
                 ) {
-                    StepHistoryTopBar(
+                    AppSettingsHeader(
+                        title = stringResource(id = R.string.step_history_title),
                         onBackClick = { viewModel.onEvent(StepHistoryEvent.NavigateBack) }
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    StepHistoryGaugeCard(summary = state.summary)
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    StepHistoryPeriodSelector(
-                        selectedPeriod = state.selectedPeriod,
-                        onPeriodSelected = { viewModel.onEvent(StepHistoryEvent.SelectPeriod(it)) }
-                    )
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    StepHistoryBarChart(summary = state.summary)
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    StepHistorySummaryRow(summary = state.summary)
-                    
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                    ) {
+                        StepHistoryPeriodSelector(
+                            selectedPeriod = state.selectedPeriod,
+                            onPeriodSelected = { viewModel.onEvent(StepHistoryEvent.SelectPeriod(it)) }
+                        )
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        StepHistoryDateRangeRow(summary = state.summary)
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        StepHistoryGaugeCard(summary = state.summary)
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        StepHistoryBarChart(summary = state.summary)
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        StepHistorySummaryRow(summary = state.summary)
+                        
+                        Spacer(modifier = Modifier.height(40.dp))
+                    }
                 }
             }
         }

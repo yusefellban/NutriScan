@@ -293,6 +293,11 @@
     <string name="register_error_generic">Registration failed. Please try again.</string>
 
     <!-- Calories Dashboard -->
+    <string name="step_history_active_mins">Active\nMinutes</string>
+    <string name="step_history_start_date">Start</string>
+    <string name="step_history_end_date">End</string>
+
+    <string name="daily_insight_title">Daily Insight</string>
     <string name="nav_calories">Calories</string>
     <string name="daily_products">Daily Products</string>
     <string name="calorie_badge">Calorie</string>

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.domain.steps.history.model.StepHistorySummary
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.components.stepHistoryCardShadow
 
 @Composable
 fun StepHistorySummaryRow(
@@ -67,6 +68,7 @@ private fun SummaryCard(
 ) {
     Box(
         modifier = modifier
+            .stepHistoryCardShadow(RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(AppTheme.colors.StepHistorySummaryCardBg)
             .padding(16.dp),

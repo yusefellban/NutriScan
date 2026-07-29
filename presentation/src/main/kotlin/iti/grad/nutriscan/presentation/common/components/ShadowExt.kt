@@ -85,3 +85,24 @@ fun Modifier.calorieCardSurface(contentPadding: Dp = 16.dp): Modifier {
         .background(backgroundColor)
         .padding(contentPadding)
 }
+
+/**
+ * Shared shadow modifier for StepHistory screen components to maintain consistency
+ * with the Calories screen shadow styling.
+ */
+@Composable
+fun Modifier.stepHistoryCardShadow(shape: Shape = AppTheme.shapes.Large): Modifier {
+    val isDark = AppTheme.isDark
+    val shadowColor = if (isDark) {
+        AppTheme.colors.Teal700.copy(alpha = 0.35f)
+    } else {
+        AppTheme.colors.Teal1000.copy(alpha = 0.2f)
+    }
+    return this.customShadow(
+        shape = shape,
+        color = shadowColor,
+        blurRadius = 45f,
+        offsetY = 15f,
+        spread = 5.dp
+    )
+}
