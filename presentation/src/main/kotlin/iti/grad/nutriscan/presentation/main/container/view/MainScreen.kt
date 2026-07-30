@@ -37,6 +37,7 @@ fun MainScreen(
     onNavigateToFamilyMemberDetail: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToExercises: () -> Unit,
+    onNavigateToStepHistory: () -> Unit,
     modifier: Modifier = Modifier,
     initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
@@ -87,6 +88,7 @@ fun MainScreen(
                         snackbarHostState = snackbarHostState,
                         onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) },
                         onNavigateToExercises = onNavigateToExercises,
+                        onNavigateToStepHistory = onNavigateToStepHistory,
                         onNavigateToSavedProducts = { selectedTab = BottomNavTab.SAVED }
                     )
                 }

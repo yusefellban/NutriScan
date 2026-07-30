@@ -15,6 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.presentation.main.calories.stephistory.view.StepHistoryScreen
+import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
@@ -202,6 +204,7 @@ fun AppNavGraph(
                 onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
+                onNavigateToStepHistory = { navController.navigate(StepHistoryRoute) },
             )
         }
 
@@ -398,8 +401,12 @@ fun AppNavGraph(
             )
         }
 
-
-
+        // 33. Step History
+        composable<StepHistoryRoute> {
+            StepHistoryScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
+        }
     }
 }
 

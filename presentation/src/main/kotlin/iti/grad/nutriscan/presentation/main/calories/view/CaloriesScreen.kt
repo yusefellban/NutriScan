@@ -81,6 +81,7 @@ fun CaloriesScreen(
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
     onNavigateToSavedProducts: () -> Unit = {},
     onNavigateToExercises: () -> Unit = {},
+    onNavigateToStepHistory: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarScope = rememberCoroutineScope()
@@ -119,6 +120,7 @@ fun CaloriesScreen(
         state = state,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
+        onNavigateToStepHistory = onNavigateToStepHistory,
     )
 }
 
@@ -127,6 +129,7 @@ private fun CaloriesContent(
     state: CaloriesState,
     onEvent: (CaloriesEvent) -> Unit,
     bottomPadding: Dp,
+    onNavigateToStepHistory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -226,7 +229,7 @@ private fun CaloriesContent(
                     StepsGaugeCard(
                         steps = state.steps,
                         stepsGoal = state.stepsGoal,
-                        onClick = { onEvent(CaloriesEvent.StepsCardClicked) },
+                        onClick = onNavigateToStepHistory,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),

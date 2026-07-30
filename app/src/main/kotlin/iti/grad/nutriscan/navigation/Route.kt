@@ -114,3 +114,6 @@ object ChatWithAiRoute
 
 @Serializable
 object NutriGptVoiceRoute
+
+@Serializable
+object StepHistoryRoute
