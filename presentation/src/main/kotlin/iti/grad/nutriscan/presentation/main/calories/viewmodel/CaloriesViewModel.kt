@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateStepsCntUseCase
 import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateTargetWaterCntUseCase
 import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateWaterCntUseCase
@@ -41,6 +42,7 @@ class CaloriesViewModel @Inject constructor(
     private val updateWaterCnt: UpdateWaterCntUseCase,
     private val updateTargetWaterCnt: UpdateTargetWaterCntUseCase,
     private val updateStepsCnt: UpdateStepsCntUseCase,
+    private val reconcileToday: ReconcileTodayUseCase,
     private val userRepository: IUserRepository,
 ) : ViewModel() {
 
@@ -110,24 +112,35 @@ class CaloriesViewModel @Inject constructor(
                 _state.update { it.copy(pendingRemoveFoodId = null) }
             }
             is CaloriesEvent.FoodItemClicked -> navigate(CaloriesEffect.NavigateToProductDetail(event.product))
+            CaloriesEvent.Refreshed -> refresh()
         }
     }
 
-    /** Collects today's food log (Room, offline-first) and keeps addedFoods/caloriesGained in
-     * sync. Entries for the same product are grouped into one card with a quantity badge instead
-     * of duplicating the card — see [toGroupedProductUiModel]. */
+    /** Re-pulls today's backend state on demand. [reconcileToday] seeds water/steps *and* inserts
+     * any backend-known meal missing locally, so this is what makes a reinstall — or a second
+     * device on the same account — catch up without waiting for the next app start. The Room
+     * flows this ViewModel already collects push the new data into state on their own. */
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            reconcileToday()
+                .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.calories_refresh_error)) }
+            _state.update { it.copy(isRefreshing = false) }
+        }
+    }
+
+    /** Collects today's food log (Room, offline-first). One row per product per day — the
+     * repository increments/decrements mealCnt in place (see FoodLogRepositoryImpl) — so no
+     * grouping is needed here, unlike before that guarantee existed. */
     private fun observeFoodLog() {
         viewModelScope.launch {
             observeTodayFoodLog().collect { entries ->
-                val products = entries
-                    .groupBy { it.productId ?: it.id }
-                    .values
-                    .map { it.toGroupedProductUiModel() }
-                    .toImmutableList()
+                val products = entries.map { it.toProductUiModel() }.toImmutableList()
                 _state.update {
                     it.copy(
                         addedFoods = products,
-                        caloriesGained = entries.sumOf { entry -> entry.calories },
+                        caloriesGained = entries.sumOf { entry -> entry.calories * entry.mealCnt },
                     )
                 }
             }
@@ -215,19 +228,13 @@ class CaloriesViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    /** One card per distinct product: [quantity] is the group size, and swiping to remove
-     * targets [logEntryId] — the most-recently-added entry — so each swipe removes one instance
-     * and decrements the badge instead of deleting every logged copy at once. */
-    private fun List<FoodLogEntry>.toGroupedProductUiModel(): ProductUiModel {
-        val mostRecent = maxBy { it.addedAt }
-        return ProductUiModel(
-            id = mostRecent.productId ?: mostRecent.id,
-            productName = mostRecent.name,
-            imageUrl = mostRecent.imageUrl,
-            verdict = mostRecent.verdict,
-            calories = mostRecent.calories.toString(),
-            quantity = size,
-            logEntryId = mostRecent.id,
-        )
-    }
+    private fun FoodLogEntry.toProductUiModel(): ProductUiModel = ProductUiModel(
+        id = productId ?: id,
+        productName = name,
+        imageUrl = imageUrl,
+        verdict = verdict,
+        calories = calories.toString(),
+        quantity = mealCnt,
+        logEntryId = id,
+    )
 }
