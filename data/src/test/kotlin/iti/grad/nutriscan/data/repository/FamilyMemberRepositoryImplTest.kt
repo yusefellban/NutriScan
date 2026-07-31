@@ -212,7 +212,13 @@ class FamilyMemberRepositoryImplTest {
         coEvery { tokenManager.getAccessToken() } returns null
 
         val insertedUser = io.mockk.slot<UserEntity>()
-        coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } returns Unit
+        // The real DAO writes through to the flow the repository re-reads straight afterwards
+        // (getActiveUserId seeds the placeholder, then addFamilyMember reads the user back). A
+        // stub that only captures leaves that second read null, so the repository correctly
+        // reports "no local user" and the test fails for a reason that can't happen against Room.
+        coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } answers {
+            userFlow.value = insertedUser.captured
+        }
         coEvery { remoteDataSource.updateProfile(any()) } returns successResponse()
         coEvery { remoteDataSource.getProfile() } returns userDto(emptyList())
 
