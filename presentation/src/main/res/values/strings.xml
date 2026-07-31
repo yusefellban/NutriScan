@@ -402,6 +402,7 @@
     <string name="food_log_added_snackbar">Added %1$s to today\'s food log</string>
     <string name="food_log_add_error">Couldn\'t add this item. Please try again.</string>
     <string name="food_log_remove_error">Couldn\'t remove this item. Please try again.</string>
+    <string name="calories_refresh_error">Couldn\'t refresh. Check your connection and try again.</string>
 
     <!-- Verdicts -->
     <string name="verdict_safe">Safe</string>
@@ -414,10 +415,14 @@
     <string name="nutrition_serving_size">Serving</string>
     <string name="nutrition_sugar">Sugar</string>
     <string name="nutrition_fat">Fat</string>
-    <string name="nutrition_saturated_fat">Sat. Fat</string>
+    <string name="nutrition_protein">Protein</string>
+    <string name="nutrition_carbs">Carbs</string>
+    <string name="nutrition_fiber">Fiber</string>
+    <string name="nutrition_sodium">Sodium</string>
     <string name="unit_kcal">%s kcal</string>
     <string name="unit_serving">%s serving</string>
     <string name="unit_g">%s g</string>
+    <string name="unit_mg">%s mg</string>
     <string name="no_specific_match_found">No specific match found.</string>
     <string name="product_details_scanned_at">Scanned at</string>
     <string name="product_details_for_you">For you</string>

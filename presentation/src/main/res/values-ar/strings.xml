@@ -402,6 +402,7 @@
     <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
     <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
     <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
+    <string name="calories_refresh_error">تعذّر التحديث. تحقّق من اتصالك وحاول مرة أخرى.</string>
 
     <!-- Verdicts -->
     <string name="verdict_safe">آمن</string>
@@ -414,10 +415,14 @@
     <string name="nutrition_serving_size">حصة</string>
     <string name="nutrition_sugar">سكر</string>
     <string name="nutrition_fat">دهون</string>
-    <string name="nutrition_saturated_fat">دهون مشبعة</string>
+    <string name="nutrition_protein">بروتين</string>
+    <string name="nutrition_carbs">كربوهيدرات</string>
+    <string name="nutrition_fiber">ألياف</string>
+    <string name="nutrition_sodium">صوديوم</string>
     <string name="unit_kcal">%s سعرة</string>
     <string name="unit_serving">%s حصة</string>
     <string name="unit_g">%s جم</string>
+    <string name="unit_mg">%s مجم</string>
     <string name="no_specific_match_found">لم يتم العثور على تطابق محدد.</string>
     <string name="product_details_scanned_at">تم المسح في</string>
     <string name="product_details_for_you">لك</string>
