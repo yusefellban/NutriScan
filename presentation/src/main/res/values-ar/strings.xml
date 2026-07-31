@@ -432,8 +432,15 @@
     <string name="product_details_bookmark_add">حفظ المنتج</string>
     <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
     <!-- News -->
-    <string name="news_screen_title">أخبار صحية</string>
-    <string name="news_chip_all">الكل</string>
+    <string name="news_screen_title">اكتشف</string>
+    <string name="news_screen_subtitle">أخبار من جميع أنحاء العالم</string>
+    <string name="news_search_placeholder">بحث</string>
+    <string name="news_search_filter_content_description">تصفية</string>
+    <string name="news_category_label">أخبار</string>
+    <string name="news_source_time_separator"> · </string>
+    <string name="news_source_avatar_content_description">أيقونة المصدر</string>
+    <string name="news_read_full_article">قراءة المقال كاملاً على الويب</string>
+    <string name="news_chip_all">أهم الأخبار الصحية</string>
     <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
     <string name="news_no_internet_title">لا يوجد اتصال بالإنترنت</string>
     <string name="news_no_internet_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
@@ -446,6 +453,10 @@
     <string name="news_time_days_ago">منذ %1$d ي</string>
     <string name="news_card_menu_content_description">خيارات إضافية</string>
     
+    <!-- News Home Screen -->
+    <string name="news_home_breaking_news">أخبار عاجلة</string>
+    <string name="news_home_recommendation">اقتراحات</string>
+    <string name="news_home_search_content_description">بحث</string>
     <!-- NutriGPT Chat -->
     <string name="nutrigpt_title">المساعد الذكي</string>
     <string name="nutrigpt_empty_title">اسأل أي شيء عن التغذية</string>
