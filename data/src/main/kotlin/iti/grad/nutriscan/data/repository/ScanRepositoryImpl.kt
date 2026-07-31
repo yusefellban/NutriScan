@@ -12,6 +12,7 @@ import iti.grad.nutriscan.data.repository.mapper.toDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import iti.grad.nutriscan.data.di.IoDispatcher
+import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -24,10 +25,17 @@ import iti.grad.nutriscan.domain.scan.model.ScanStatus
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
     private val scanApiService: ScanApiService,
+    private val authRepository: IAuthRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IScanRepository {
 
     private var localRecentScans: MutableList<ScanHistoryEntry>? = null
+
+    /** Account [localRecentScans] was fetched for. This repository is a singleton and the cache is
+     * a plain field, so `database.clearAllTables()` on logout does not touch it: without this the
+     * next account to sign in was served the previous account's scans straight from memory, with
+     * no request made at all, until the process died. */
+    private var cachedScansUserId: String? = null
 
     override suspend fun getProductByBarcode(barcode: String): Result<ProductResult> {
         return withContext(ioDispatcher) {
@@ -116,7 +124,12 @@ class ScanRepositoryImpl @Inject constructor(
                 val response = scanApiService.getScanResult(scanId)
                 val domainResult = response.toDomain()
                 
-                if (domainResult.status == ScanStatus.COMPLETED) {
+                // Only extend the cache when it belongs to the account asking — otherwise a scan
+                // completed right after an account switch would be appended to the previous
+                // account's still-cached list.
+                if (domainResult.status == ScanStatus.COMPLETED &&
+                    authRepository.getCurrentUserId() == cachedScansUserId
+                ) {
                     localRecentScans?.let { cache ->
                         val newEntry = ScanHistoryEntry(
                             scanId = domainResult.scanId,
@@ -142,6 +155,13 @@ class ScanRepositoryImpl @Inject constructor(
 
     override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
+            val userId = authRepository.getCurrentUserId()
+            // Drop another account's cached scans before they can be read or extended.
+            if (userId != cachedScansUserId) {
+                localRecentScans = null
+                cachedScansUserId = userId
+            }
+
             if (page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
@@ -150,6 +170,7 @@ class ScanRepositoryImpl @Inject constructor(
                 val domainScans = response.content.map { it.toDomain() }
                 if (page == 0) {
                     localRecentScans = domainScans.toMutableList()
+                    cachedScansUserId = userId
                 }
                 Result.success(domainScans)
             } catch (e: Exception) {

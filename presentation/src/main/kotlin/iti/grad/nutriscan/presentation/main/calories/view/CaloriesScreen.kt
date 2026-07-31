@@ -51,6 +51,8 @@ import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import androidx.compose.ui.platform.LocalContext
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import androidx.compose.foundation.lazy.LazyColumn
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.CaloriesScreenShimmer
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.SnackbarHostState
@@ -145,12 +147,19 @@ private fun CaloriesContent(
             )
         }
 
-        LazyColumn(
+        PullToRefreshShimmerBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onEvent(CaloriesEvent.Refreshed) },
+            shimmer = { CaloriesScreenShimmer(contentPadding = PaddingValues(top = 20.dp, bottom = bottomPadding + 24.dp)) },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(AppTheme.colors.Background)
+                .background(AppTheme.colors.Background),
+        ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = 22.dp),
             contentPadding = PaddingValues(top = 20.dp, bottom = bottomPadding + 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -258,6 +267,7 @@ private fun CaloriesContent(
             item {
                 Spacer(modifier = Modifier.height(20.dp))
             }
+        }
         }
     }
 

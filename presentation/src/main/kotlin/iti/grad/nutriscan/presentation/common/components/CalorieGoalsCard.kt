@@ -48,8 +48,9 @@ fun CalorieGoalsCard(
     val progress = moodRatio.coerceIn(0f, 1f)
     val moodDrawable = when {
         moodRatio > 1f -> R.drawable.angry
-        moodRatio >= 0.5f -> R.drawable.happy
-        else -> R.drawable.normal
+        moodRatio >= 0.8f -> R.drawable.happy
+        moodRatio >= 0.5f -> R.drawable.normal
+        else -> R.drawable.sad
     }
 
     Column(

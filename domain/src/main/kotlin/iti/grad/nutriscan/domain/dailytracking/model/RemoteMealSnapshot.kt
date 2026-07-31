@@ -7,4 +7,5 @@ data class RemoteMealSnapshot(
     val productName: String?,
     val imageUrl: String?,
     val calories: Int,
+    val mealCnt: Int,
 )

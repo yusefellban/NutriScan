@@ -38,6 +38,12 @@ private class FakeDailyTrackingDao : DailyTrackingDao {
         rows.value = rows.value.filterNot { it.userId == entity.userId && it.date == entity.date } + entity
     }
 
+    override suspend fun getRange(userId: String, startDate: String, endDate: String): List<DailyTrackingEntity> =
+        rows.value.filter { it.userId == userId && it.date >= startDate && it.date <= endDate }.sortedBy { it.date }
+
+    override suspend fun getUnsyncedDays(userId: String): List<DailyTrackingEntity> =
+        rows.value.filter { it.userId == userId && !it.syncedToBackend }.sortedBy { it.date }
+
     override suspend fun markSynced(userId: String, date: String) {
         rows.value = rows.value.map {
             if (it.userId == userId && it.date == date) it.copy(syncedToBackend = true) else it
@@ -79,6 +85,7 @@ class DailyTrackingRepositoryImplTest {
 
     @BeforeEach
     fun setup() {
+        stubAndroidLog()
         dao = FakeDailyTrackingDao()
         api = mockk()
         authRepository = mockk()
@@ -109,6 +116,50 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
+    fun `updateWaterCnt pushes shortly after the write instead of waiting for the periodic worker`() =
+        runTest(testDispatcher.scheduler) {
+            val date = CairoDateProvider.today()
+            coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+
+            repository.updateWaterCnt(4)
+            testScheduler.advanceUntilIdle()
+
+            coVerify(exactly = 1) { api.updateDay(date.toString(), any()) }
+            val today = repository.observeToday().first()
+            assertTrue(today.syncedToBackend)
+        }
+
+    @Test
+    fun `a burst of water writes collapses into a single PATCH`() = runTest(testDispatcher.scheduler) {
+        val date = CairoDateProvider.today()
+        coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+
+        // Filling cups one after another, faster than the debounce window.
+        repository.updateWaterCnt(1)
+        repository.updateWaterCnt(2)
+        repository.updateWaterCnt(3)
+        repository.updateWaterCnt(4)
+        testScheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) { api.updateDay(date.toString(), any()) }
+        assertEquals(4, repository.observeToday().first().waterCnt)
+    }
+
+    @Test
+    fun `updateWaterCnt keeps the row unsynced locally when the immediate push fails`() =
+        runTest(testDispatcher.scheduler) {
+            val date = CairoDateProvider.today()
+            coEvery { api.updateDay(date.toString(), any()) } throws RuntimeException("offline")
+
+            repository.updateWaterCnt(4)
+            testScheduler.runCurrent()
+
+            val today = repository.observeToday().first()
+            assertEquals(4, today.waterCnt)
+            assertFalse(today.syncedToBackend)
+        }
+
+    @Test
     fun `updateWaterCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
         repository.updateWaterCnt(1)
 
@@ -131,6 +182,46 @@ class DailyTrackingRepositoryImplTest {
         // 1000 steps * 70kg * 0.0005 = 35
         assertEquals(35, today.caloriesBurnedSteps)
     }
+
+    @Test
+    fun `updateStepsCnt ignores a lower reading so a second device cannot zero out the day`() =
+        runTest(testDispatcher.scheduler) {
+            val date = CairoDateProvider.today()
+            coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+            repository.updateStepsCnt(39)
+
+            // A fresh device / reinstall / emulator starts its step counter from 0.
+            repository.updateStepsCnt(0)
+
+            assertEquals(39, repository.observeToday().first().stepsCnt)
+        }
+
+    @Test
+    fun `updateStepsCnt still accepts a higher reading`() = runTest(testDispatcher.scheduler) {
+        val date = CairoDateProvider.today()
+        coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+        repository.updateStepsCnt(39)
+
+        repository.updateStepsCnt(120)
+
+        assertEquals(120, repository.observeToday().first().stepsCnt)
+    }
+
+    @Test
+    fun `fetchAndSeedToday keeps a locally-higher step count and leaves the row owing a push`() =
+        runTest(testDispatcher.scheduler) {
+            val date = CairoDateProvider.today()
+            coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
+            repository.updateStepsCnt(120)
+            repository.syncPendingDay(date)
+            coEvery { api.getToday() } returns DailyTrackingResponseDto(date = date.toString(), stepsCnt = 39)
+
+            repository.fetchAndSeedToday()
+
+            val today = repository.observeToday().first()
+            assertEquals(120, today.stepsCnt)
+            assertFalse(today.syncedToBackend)
+        }
 
     @Test
     fun `updateStepsCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
@@ -173,19 +264,68 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
+    fun `syncAllPendingDays flushes an older day the today-only sync would have stranded`() =
+        runTest(testDispatcher.scheduler) {
+            val oldDay = "2026-07-20"
+            dao.upsert(
+                DailyTrackingEntity(
+                    userId = "user-1",
+                    date = oldDay,
+                    targetWaterCnt = 8,
+                    waterCnt = 5,
+                    stepsCnt = 900,
+                    caloriesBurnedSteps = 31,
+                    exerciseKcal = 0,
+                    exerciseMinutes = 0,
+                    syncedToBackend = false,
+                )
+            )
+            coEvery { api.updateDay(oldDay, any()) } returns DailyTrackingResponseDto(date = oldDay)
+
+            val result = repository.syncAllPendingDays()
+
+            assertTrue(result.isSuccess)
+            coVerify(exactly = 1) { api.updateDay(oldDay, any()) }
+            assertTrue(dao.getUnsyncedDays("user-1").none { it.date == oldDay })
+        }
+
+    @Test
+    fun `syncAllPendingDays reports failure so the worker retries`() = runTest(testDispatcher.scheduler) {
+        val oldDay = "2026-07-20"
+        dao.upsert(
+            DailyTrackingEntity(
+                userId = "user-1",
+                date = oldDay,
+                targetWaterCnt = 8,
+                waterCnt = 5,
+                stepsCnt = 900,
+                caloriesBurnedSteps = 31,
+                exerciseKcal = 0,
+                exerciseMinutes = 0,
+                syncedToBackend = false,
+            )
+        )
+        coEvery { api.updateDay(oldDay, any()) } throws RuntimeException("network down")
+
+        assertTrue(repository.syncAllPendingDays().isFailure)
+        assertTrue(dao.getUnsyncedDays("user-1").any { it.date == oldDay })
+    }
+
+    @Test
     fun `fetchAndSeedToday seeds Room only when no row exists yet`() = runTest(testDispatcher.scheduler) {
         coEvery { api.getToday() } returns DailyTrackingResponseDto(
             date = CairoDateProvider.today().toString(),
             targetWaterCnt = 6,
             waterCnt = 2,
             stepsCnt = 500,
-            meals = listOf(DailyTrackingMealResponseDto(scanId = "scan-1", mealCnt = 1)),
+            meals = listOf(DailyTrackingMealResponseDto(scanId = "scan-1", mealCnt = 3)),
         )
 
         val result = repository.fetchAndSeedToday()
 
         assertTrue(result.isSuccess)
         assertEquals(1, result.getOrThrow().meals.size)
+        assertEquals(3, result.getOrThrow().meals.first().mealCnt)
         val today = repository.observeToday().first()
         assertEquals(2, today.waterCnt)
         assertTrue(today.syncedToBackend)
@@ -224,4 +364,47 @@ class DailyTrackingRepositoryImplTest {
         val today = repository.observeToday().first()
         assertTrue(today.syncedToBackend)
     }
+
+    @Test
+    fun `fetchAndSeedToday falls back to today's date when the backend omits it`() =
+        runTest(testDispatcher.scheduler) {
+            coEvery { api.getToday() } returns DailyTrackingResponseDto(date = null, waterCnt = 2)
+
+            val result = repository.fetchAndSeedToday()
+
+            assertTrue(result.isSuccess)
+            assertEquals(CairoDateProvider.today(), result.getOrThrow().date)
+        }
+
+    @Test
+    fun `fetchAndSeedToday drops meals with a null scanId instead of failing to parse`() =
+        runTest(testDispatcher.scheduler) {
+            coEvery { api.getToday() } returns DailyTrackingResponseDto(
+                date = CairoDateProvider.today().toString(),
+                meals = listOf(
+                    DailyTrackingMealResponseDto(scanId = null, mealCnt = 1),
+                    DailyTrackingMealResponseDto(scanId = "scan-1", mealCnt = 2),
+                ),
+            )
+
+            val result = repository.fetchAndSeedToday()
+
+            assertTrue(result.isSuccess)
+            assertEquals(1, result.getOrThrow().meals.size)
+            assertEquals("scan-1", result.getOrThrow().meals.first().scanId)
+        }
+
+    @Test
+    fun `fetchAndSeedToday falls back to mealCnt 1 when the backend sends it as explicit null`() =
+        runTest(testDispatcher.scheduler) {
+            coEvery { api.getToday() } returns DailyTrackingResponseDto(
+                date = CairoDateProvider.today().toString(),
+                meals = listOf(DailyTrackingMealResponseDto(scanId = "scan-1", mealCnt = null)),
+            )
+
+            val result = repository.fetchAndSeedToday()
+
+            assertTrue(result.isSuccess)
+            assertEquals(1, result.getOrThrow().meals.first().mealCnt)
+        }
 }

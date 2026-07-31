@@ -41,6 +41,8 @@ import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.HomeScreenShimmer
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
@@ -126,12 +128,18 @@ private fun HomeFeedContent(
             onAvatarClick = { onEvent(HomeEvent.AvatarClicked) },
         )
 
-        LazyColumn(
+        PullToRefreshShimmerBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onEvent(HomeEvent.Refreshed) },
+            shimmer = { HomeScreenShimmer(contentPadding = PaddingValues(top = 16.dp, bottom = bottomPadding)) },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(AppTheme.colors.Background),
+        ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 top = 16.dp,
                 bottom = bottomPadding,
@@ -247,6 +255,7 @@ private fun HomeFeedContent(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
+        }
         }
     }
 }

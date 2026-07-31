@@ -202,6 +202,18 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUserId(): String? = JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+    /**
+     * The `sub` claim identifies the signed-in account and scopes every per-user Room table.
+     *
+     * Falls back to the access token because the login request sends no `scope=openid`, so
+     * Keycloak never issues an id_token and [TokenManager.getIdToken] is always null. That made
+     * this return null for every signed-in user, and each caller then fell back to a shared
+     * device-local id — so every account on the device read and wrote the *same* rows. Both tokens
+     * are JWTs carrying the same `sub`, so reading it from the access token needs no realm or
+     * client change.
+     */
+    override suspend fun getCurrentUserId(): String? =
+        JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+            ?: JwtDecoder.extractSubjectClaim(tokenManager.getAccessToken())
     override suspend fun getAccessToken(): String? = tokenManager.getAccessToken()
 }

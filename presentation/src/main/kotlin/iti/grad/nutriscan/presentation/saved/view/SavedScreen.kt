@@ -35,6 +35,7 @@ import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
@@ -125,13 +126,21 @@ private fun SavedScreenContent(
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(AppTheme.colors.Background),
         ) {
+            val shimmerGrid: @Composable () -> Unit = {
+                SavedProductShimmerGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
+                )
+            }
+
+            PullToRefreshShimmerBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(SavedEvent.Refreshed) },
+                shimmer = shimmerGrid,
+                modifier = Modifier.fillMaxSize(),
+            ) {
             when {
-                state.isLoading -> {
-                    SavedProductShimmerGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
-                    )
-                }
+                state.isLoading -> shimmerGrid()
                 state.error != null && state.products.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
@@ -160,6 +169,7 @@ private fun SavedScreenContent(
                         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
                     )
                 }
+            }
             }
         }
     }

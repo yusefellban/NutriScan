@@ -19,6 +19,18 @@ interface FoodLogDao {
     @Query("SELECT * FROM food_log WHERE id = :id AND userId = :userId")
     suspend fun getByIdForUser(id: String, userId: String): FoodLogEntity?
 
+    @Query(
+        "SELECT * FROM food_log WHERE userId = :userId AND productId = :productId " +
+            "AND loggedDate = :date AND deleted = 0 LIMIT 1"
+    )
+    suspend fun getByUserProductAndDate(userId: String, productId: String, date: String): FoodLogEntity?
+
+    @Query("UPDATE food_log SET mealCnt = :mealCnt, pendingSync = 1 WHERE id = :id")
+    suspend fun updateMealCnt(id: String, mealCnt: Int)
+
+    @Query("UPDATE food_log SET backendCreated = 1 WHERE id = :id")
+    suspend fun markBackendCreated(id: String)
+
     @Query("UPDATE food_log SET deleted = 1, pendingSync = 1 WHERE id = :id AND userId = :userId")
     suspend fun markDeletedForUser(id: String, userId: String)
 

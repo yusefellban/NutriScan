@@ -17,6 +17,8 @@ data class HomeState(
     val avatarUpdatedAt: String? = null,
     val isLoading: Boolean = false,
     val isHistoryLoading: Boolean = false,
+    /** Drives the pull-to-refresh indicator; [isHistoryLoading] covers the first load only. */
+    val isRefreshing: Boolean = false,
     val historyError: String? = null,
     val recentHistory: ImmutableList<HistoryItemUiModel> = persistentListOf(),
 )

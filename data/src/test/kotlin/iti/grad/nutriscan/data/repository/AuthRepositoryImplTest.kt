@@ -70,7 +70,7 @@ class AuthRepositoryImplTest {
             firstName = "test",
             lastName = "",
             email = email,
-            username = email,
+            username = "test",
             password = password,
             dateOfBirth = "2000-01-01",
             gender = "MALE",
@@ -83,7 +83,7 @@ class AuthRepositoryImplTest {
         
         coEvery { remoteDataSource.register(request) } returns apiResponse
 
-        val result = repository.register(email, password)
+        val result = repository.register("test", "", email, password)
 
         assertTrue(result.isSuccess)
         coVerify(exactly = 1) { remoteDataSource.register(request) }

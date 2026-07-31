@@ -13,7 +13,7 @@ data class DailyTrackingRequestDto(
 @Serializable
 data class DailyTrackingResponseDto(
     val id: Int? = null,
-    val date: String,
+    val date: String? = null,
     val targetWaterCnt: Int? = null,
     val waterCnt: Int? = null,
     val stepsCnt: Int? = null,
@@ -33,21 +33,21 @@ data class UpdateMealRequestDto(
 
 @Serializable
 data class DailyTrackingMealResponseDto(
-    val scanId: String,
+    val scanId: String? = null,
     val productName: String? = null,
     val imageUrl: String? = null,
-    val mealCnt: Int = 1,
+    val mealCnt: Int? = null,
     val nutritionFacts: NutritionFactsDto? = null,
 )
 
 @Serializable
 data class DailyTrackingSummaryResponseDto(
     val id: Int? = null,
-    val date: String,
+    val date: String? = null,
     val targetWaterCnt: Int? = null,
     val waterCnt: Int? = null,
     val stepsCnt: Int? = null,
-    val mealCount: Int = 0,
+    val mealCount: Int? = null,
 )
 
 @Serializable

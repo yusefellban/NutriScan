@@ -111,6 +111,16 @@ class UserProfileViewModel @Inject constructor(
             }
             UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = ProfileAlertState.None) }
             UserProfileEvent.RetryAction -> loadProfileData(isUserInitiated = true)
+            UserProfileEvent.Refreshed -> refresh()
+        }
+    }
+
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            userRepository.fetchAndSyncProfile()
+            _state.update { it.copy(isRefreshing = false) }
         }
     }
 

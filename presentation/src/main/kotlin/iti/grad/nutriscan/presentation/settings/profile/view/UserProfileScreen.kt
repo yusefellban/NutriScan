@@ -25,7 +25,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.layout.PaddingValues
 import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.ProfileScreenShimmer
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
@@ -122,12 +125,19 @@ private fun UserProfileContent(
                 onEditProfileClick = { onEvent(UserProfileEvent.EditProfileClicked) },
             )
 
-            Column(
+            PullToRefreshShimmerBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(UserProfileEvent.Refreshed) },
+                shimmer = { ProfileScreenShimmer(contentPadding = PaddingValues(vertical = 24.dp)) },
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                    .background(AppTheme.colors.ProfileSheetBackground)
+                    .background(AppTheme.colors.ProfileSheetBackground),
+            ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     // No end padding: FamilyMembersSection's dashed box needs
                     // to reach the screen's true trailing edge. Every other
@@ -169,6 +179,7 @@ private fun UserProfileContent(
 
                 // Bottom spacing to account for the bottom nav bar overflow
                 Spacer(modifier = Modifier.height(8.dp))
+            }
             }
         }
 

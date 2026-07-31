@@ -183,9 +183,12 @@ private fun ProductDetailsContent(
                                 NutritionFactsRow(
                                     calories = product.calories,
                                     servingSize = product.servingSize,
-                                    sugar = product.sugar,
+                                    protein = product.protein,
+                                    carbs = product.carbs,
                                     fat = product.fat,
-                                    saturatedFat = product.saturatedFat,
+                                    fiber = product.fiber,
+                                    sugar = product.sugar,
+                                    sodium = product.sodium,
                                 )
                                 Spacer(modifier = Modifier.height(32.dp))
                             }

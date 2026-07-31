@@ -14,4 +14,5 @@ sealed interface HomeEvent {
     data object ChatWithAiClicked : HomeEvent
     data object RetryLoadHistory : HomeEvent
     data object RefreshHistorySilently : HomeEvent
+    data object Refreshed : HomeEvent
 }

@@ -33,9 +33,12 @@ import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
 fun NutritionFactsRow(
     calories: String?,
     servingSize: String?,
-    sugar: String?,
+    protein: String?,
+    carbs: String?,
     fat: String?,
-    saturatedFat: String?,
+    fiber: String?,
+    sugar: String?,
+    sodium: String?,
     modifier: Modifier = Modifier,
 ) {
     data class MacroItem(val label: String, val value: String)
@@ -43,9 +46,12 @@ fun NutritionFactsRow(
     val items = buildList {
         if (!calories.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_calories), stringResource(iti.grad.presentation.R.string.unit_kcal, calories)))
         if (!servingSize.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_serving_size), stringResource(iti.grad.presentation.R.string.unit_serving, servingSize)))
-        if (!sugar.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_sugar), stringResource(iti.grad.presentation.R.string.unit_g, sugar)))
+        if (!protein.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_protein), stringResource(iti.grad.presentation.R.string.unit_g, protein)))
+        if (!carbs.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_carbs), stringResource(iti.grad.presentation.R.string.unit_g, carbs)))
         if (!fat.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_fat), stringResource(iti.grad.presentation.R.string.unit_g, fat)))
-        if (!saturatedFat.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_saturated_fat), stringResource(iti.grad.presentation.R.string.unit_g, saturatedFat)))
+        if (!fiber.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_fiber), stringResource(iti.grad.presentation.R.string.unit_g, fiber)))
+        if (!sugar.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_sugar), stringResource(iti.grad.presentation.R.string.unit_g, sugar)))
+        if (!sodium.isNullOrBlank()) add(MacroItem(stringResource(iti.grad.presentation.R.string.nutrition_sodium), stringResource(iti.grad.presentation.R.string.unit_mg, sodium)))
     }
 
     if (items.isEmpty()) return

@@ -26,19 +26,34 @@ class DailyTrackingSyncEngine(
      * everything succeeded (worker should retry otherwise). */
     suspend fun sync(date: LocalDate): Boolean {
         val daySyncResult = syncPendingDailyTracking(date)
-        val userId = authRepository.getCurrentUserId() ?: LOCAL_USER_ID
+        // Then every *other* day still owing a push. A day that ended unsynced — logged just
+        // before midnight, or pushed while offline — was previously never retried, because this
+        // job only ever asked for the current date. That left a permanent hole in the history the
+        // backend can serve back for past days.
+        val backlogResult = dailyTrackingRepository.syncAllPendingDays()
+        // No signed-in user means there is nothing of anyone's to push. Previously this fell back
+        // to a shared device-local id and synced whatever sat in that bucket, which is exactly how
+        // one account's rows reached another's.
+        val userId = authRepository.getCurrentUserId() ?: return true
 
         var anyMealRetryFailed = false
         for (entry in foodLogDao.getPendingSyncEntries(userId)) {
             val loggedDate = LocalDate.parse(entry.loggedDate)
             val scanId = entry.productId ?: entry.id
-            val syncResult = if (entry.deleted) {
-                dailyTrackingRepository.deleteMeal(loggedDate, scanId)
-            } else {
-                dailyTrackingRepository.pushMeal(loggedDate, scanId, mealCnt = 1)
+            val syncResult = when {
+                entry.deleted -> dailyTrackingRepository.deleteMeal(loggedDate, scanId)
+                entry.backendCreated -> dailyTrackingRepository.updateMeal(loggedDate, scanId, entry.mealCnt)
+                else -> dailyTrackingRepository.pushMeal(loggedDate, scanId, entry.mealCnt)
             }
             if (syncResult.isSuccess) {
-                if (entry.deleted) foodLogDao.hardDelete(entry.id) else foodLogDao.clearPendingSync(entry.id)
+                when {
+                    entry.deleted -> foodLogDao.hardDelete(entry.id)
+                    entry.backendCreated -> foodLogDao.clearPendingSync(entry.id)
+                    else -> {
+                        foodLogDao.markBackendCreated(entry.id)
+                        foodLogDao.clearPendingSync(entry.id)
+                    }
+                }
             } else {
                 anyMealRetryFailed = true
             }
@@ -46,10 +61,10 @@ class DailyTrackingSyncEngine(
 
         val savedScanRetryResult = savedScanRepository.retryPendingSync()
 
-        return daySyncResult.isSuccess && !anyMealRetryFailed && savedScanRetryResult.isSuccess
+        return daySyncResult.isSuccess &&
+            backlogResult.isSuccess &&
+            !anyMealRetryFailed &&
+            savedScanRetryResult.isSuccess
     }
 
-    private companion object {
-        const val LOCAL_USER_ID = "local_device_user"
-    }
 }

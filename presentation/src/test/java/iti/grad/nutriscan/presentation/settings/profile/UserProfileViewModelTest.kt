@@ -254,4 +254,13 @@ class UserProfileViewModelTest {
             assertEquals(UserProfileEffect.NavigateToSettings, awaitItem())
         }
     }
+
+    @Test
+    fun `Refreshed re-syncs the profile and clears isRefreshing when it finishes`() = runTest(testDispatcher) {
+        viewModel.onEvent(UserProfileEvent.Refreshed)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.isRefreshing)
+        coVerify { userRepository.fetchAndSyncProfile() }
+    }
 }

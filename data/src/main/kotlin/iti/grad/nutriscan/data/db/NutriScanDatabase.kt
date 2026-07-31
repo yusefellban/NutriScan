@@ -46,10 +46,12 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
     ],
     // v3 -> v4: MIGRATION_3_4 (water_log/workout_log/streak). v4 -> v5: MIGRATION_4_5
     // (users.bmi/tdee). Everything after (family_members, exercises, saved_scan,
-    // daily_tracking, FoodLogEntity's pendingSync/deleted columns, SavedScanEntity's
-    // userId/pendingSync/deleted columns) relies on fallbackToDestructiveMigration()
-    // in DatabaseModule — this clears all local tables on upgrade.
-    version = 11,
+    // daily_tracking, FoodLogEntity's pendingSync/deleted/mealCnt/backendCreated columns,
+    // StreakEntity's re-key from a single global row to per-userId,
+    // SavedScanEntity's userId/pendingSync/deleted columns) relies on
+    // fallbackToDestructiveMigration() in DatabaseModule — this clears all local tables on
+    // upgrade.
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)
