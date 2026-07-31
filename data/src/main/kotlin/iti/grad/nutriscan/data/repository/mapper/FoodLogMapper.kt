@@ -16,6 +16,7 @@ fun FoodLogEntity.toDomain(): FoodLogEntry = FoodLogEntry(
     verdict = runCatching { ProductVerdict.valueOf(verdict) }.getOrDefault(ProductVerdict.SAFE),
     loggedDate = LocalDate.parse(loggedDate),
     addedAt = Instant.ofEpochMilli(addedAtEpochMillis),
+    mealCnt = mealCnt,
 )
 
 fun FoodLogEntry.toEntity(userId: String): FoodLogEntity = FoodLogEntity(
@@ -28,6 +29,7 @@ fun FoodLogEntry.toEntity(userId: String): FoodLogEntity = FoodLogEntity(
     verdict = verdict.name,
     loggedDate = loggedDate.toString(),
     addedAtEpochMillis = addedAt.toEpochMilli(),
+    mealCnt = mealCnt,
 )
 
 fun today(): LocalDate = CairoDateProvider.today()
