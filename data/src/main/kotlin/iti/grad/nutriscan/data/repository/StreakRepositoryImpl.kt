@@ -30,7 +30,7 @@ class StreakRepositoryImpl @Inject constructor(
 
     override fun observeStreak(): Flow<StreakInfo> = flow {
         emitAll(
-            streakDao.observe().map { entity ->
+            streakDao.observe(resolveUserId()).map { entity ->
                 StreakInfo(
                     currentStreak = entity?.currentStreak ?: 0,
                     longestStreak = entity?.longestStreak ?: 0,
@@ -50,7 +50,7 @@ class StreakRepositoryImpl @Inject constructor(
                 (tracking.waterCnt > 0 || tracking.stepsCnt > 0 || tracking.exerciseMinutes > 0)
             if (!loggedFood && !trackedActivity) return@runCatchingCancellable
 
-            val existing = streakDao.observe().first()
+            val existing = streakDao.get(userId)
             val lastActive = existing?.lastActiveDate?.let(LocalDate::parse)
             val newStreak = when {
                 lastActive == today -> existing?.currentStreak ?: 1
@@ -59,6 +59,7 @@ class StreakRepositoryImpl @Inject constructor(
             }
             streakDao.upsert(
                 StreakEntity(
+                    userId = userId,
                     currentStreak = newStreak,
                     longestStreak = maxOf(newStreak, existing?.longestStreak ?: 0),
                     lastActiveDate = today.toString(),
@@ -67,12 +68,9 @@ class StreakRepositoryImpl @Inject constructor(
         }
     }
 
-    // ponytail: falls back to a shared local-device id when logged out (e.g. testing against
-    // the still-mock Saved catalog) so the food log stays usable before real auth is wired
-    // through end to end. Swap for a hard "not authenticated" failure once that's in place.
-    private suspend fun resolveUserId(): String = authRepository.getCurrentUserId() ?: LOCAL_USER_ID
+    /** Fails rather than using a shared device-local id — that fallback is how one account's
+     * streak became visible to the next. Callers wrap this in runCatchingCancellable. */
+    private suspend fun resolveUserId(): String = authRepository.getCurrentUserId()
+        ?: error("No authenticated user - per-user data is unavailable until sign-in completes")
 
-    private companion object {
-        const val LOCAL_USER_ID = "local_device_user"
-    }
 }
