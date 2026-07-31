@@ -237,6 +237,24 @@ internal data class AppColorsExtension3(
     val StepHistorySummaryValueText: Color,
     val StepHistorySummaryIconBg: Color,
     val StepHistorySummaryIconTint: Color,
+
+    // News Screen Redesign
+    val NewsChipSelectedBg: Color,
+    val NewsChipSelectedText: Color,
+    val NewsChipUnselectedBg: Color,
+    val NewsChipUnselectedBorder: Color,
+    val NewsChipUnselectedText: Color,
+    val NewsCategoryLabel: Color,
+    val NewsCardTitle: Color,
+    val NewsSourceText: Color,
+    val NewsSourceAvatarBg: Color,
+    val NewsSearchBarBg: Color,
+    val NewsSearchBarBorder: Color,
+    val NewsSearchIconTint: Color,
+    val NewsDivider: Color,
+    val NewsScreenTitle: Color,
+    val NewsCardBg: Color,
+    val NewsCardBorder: Color,
 )
 
 @Immutable
@@ -546,6 +564,24 @@ data class AppColors internal constructor(
     val StepHistorySummaryValueText: Color get() = extension3.StepHistorySummaryValueText
     val StepHistorySummaryIconBg: Color get() = extension3.StepHistorySummaryIconBg
     val StepHistorySummaryIconTint: Color get() = extension3.StepHistorySummaryIconTint
+
+    // News Screen Redesign
+    val NewsChipSelectedBg: Color get() = extension3.NewsChipSelectedBg
+    val NewsChipSelectedText: Color get() = extension3.NewsChipSelectedText
+    val NewsChipUnselectedBg: Color get() = extension3.NewsChipUnselectedBg
+    val NewsChipUnselectedBorder: Color get() = extension3.NewsChipUnselectedBorder
+    val NewsChipUnselectedText: Color get() = extension3.NewsChipUnselectedText
+    val NewsCategoryLabel: Color get() = extension3.NewsCategoryLabel
+    val NewsCardTitle: Color get() = extension3.NewsCardTitle
+    val NewsSourceText: Color get() = extension3.NewsSourceText
+    val NewsSourceAvatarBg: Color get() = extension3.NewsSourceAvatarBg
+    val NewsSearchBarBg: Color get() = extension3.NewsSearchBarBg
+    val NewsSearchBarBorder: Color get() = extension3.NewsSearchBarBorder
+    val NewsSearchIconTint: Color get() = extension3.NewsSearchIconTint
+    val NewsDivider: Color get() = extension3.NewsDivider
+    val NewsScreenTitle: Color get() = extension3.NewsScreenTitle
+    val NewsCardBg: Color get() = extension3.NewsCardBg
+    val NewsCardBorder: Color get() = extension3.NewsCardBorder
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -900,6 +936,24 @@ fun lightColors() = AppColors(
         StepHistorySummaryValueText = Color(0xFF393C3C),
         StepHistorySummaryIconBg = Color(0xFFE8FAFA),
         StepHistorySummaryIconTint = Color(0xFF11939A),
+
+        // News Screen Redesign (Light Mode)
+        NewsChipSelectedBg = Color(0xFF17B8BE), // Teal800
+        NewsChipSelectedText = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBg = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBorder = Color(0xFFD6D6D5), // Gray400
+        NewsChipUnselectedText = Color(0xFF898989), // Gray700
+        NewsCategoryLabel = Color(0xFF17B8BE), // Teal800
+        NewsCardTitle = Color(0xFF393C3C), // Gray1600
+        NewsSourceText = Color(0xFF898989), // Gray700
+        NewsSourceAvatarBg = Color(0xFFD4F1F2), // Teal200 (light bg for icon)
+        NewsSearchBarBg = Color(0xFFFFFFFF), // White
+        NewsSearchBarBorder = Color(0xFFD6D6D5), // Gray400
+        NewsSearchIconTint = Color(0xFF898989), // Gray700
+        NewsDivider = Color(0xFFE5E5E4), // Gray300
+        NewsScreenTitle = Color(0xFF393C3C), // Gray1600
+        NewsCardBg = Color(0xFFFFFFFF), // White
+        NewsCardBorder = Color(0xFFE5E5E4), // Gray300
     ),
 )
 
@@ -1258,5 +1312,23 @@ fun darkColors() = AppColors(
         StepHistorySummaryValueText = Color(0xFFE8FAFA),
         StepHistorySummaryIconBg = Color(0xFF0F474A),
         StepHistorySummaryIconTint = Color(0xFFA3E9EC),
+
+        // News Screen Redesign (Dark Mode)
+        NewsChipSelectedBg = Color(0xFF17B8BE), // Teal800
+        NewsChipSelectedText = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBg = Color(0xFF0F474A), // Teal1600
+        NewsChipUnselectedBorder = Color(0xFF0B5F65), // Teal1400
+        NewsChipUnselectedText = Color(0xFFA3E9EC), // Teal400
+        NewsCategoryLabel = Color(0xFF17B8BE), // Teal800
+        NewsCardTitle = Color(0xFFCAF2F4), // Teal300
+        NewsSourceText = Color(0xFF2FC5CC), // Teal700
+        NewsSourceAvatarBg = Color(0xFF0B5F65), // Teal1400
+        NewsSearchBarBg = Color(0xFF0F474A), // Teal1600
+        NewsSearchBarBorder = Color(0xFF0B5F65), // Teal1400
+        NewsSearchIconTint = Color(0xFFA3E9EC), // Teal400
+        NewsDivider = Color(0xFF0B5F65), // Teal1400
+        NewsScreenTitle = Color(0xFFCAF2F4), // Teal300
+        NewsCardBg = Color(0xFF0A545A), // Teal1500
+        NewsCardBorder = Color(0xFF0B5F65), // Teal1400
     ),
 )
