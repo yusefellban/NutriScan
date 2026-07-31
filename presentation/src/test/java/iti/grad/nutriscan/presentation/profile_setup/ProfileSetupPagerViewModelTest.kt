@@ -256,7 +256,6 @@ class ProfileSetupPagerViewModelTest {
                     weightKg = any(),
                     diseaseIds = any(),
                     allergyIds = any(),
-                    avatarUrl = any(),
                 )
             } returns Result.success(Unit)
 
@@ -277,7 +276,6 @@ class ProfileSetupPagerViewModelTest {
                         weightKg = any(),
                         diseaseIds = any(),
                         allergyIds = any(),
-                        avatarUrl = any(),
                     )
                 }
                 coVerify(exactly = 1) { completeOnboardingUseCase() }
@@ -297,7 +295,6 @@ class ProfileSetupPagerViewModelTest {
                     weightKg = any(),
                     diseaseIds = any(),
                     allergyIds = any(),
-                    avatarUrl = any(),
                 )
             } returns Result.failure(Exception(errorMessage))
 

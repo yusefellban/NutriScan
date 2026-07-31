@@ -86,6 +86,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
             is HomeEvent.RetryLoadHistory -> loadRecentScans()
             is HomeEvent.RefreshHistorySilently -> refreshHistorySilently()
+            is HomeEvent.Refreshed -> refresh()
         }
     }
 
@@ -110,6 +111,24 @@ class HomeViewModel @Inject constructor(
                         ) 
                     }
                 }
+        }
+    }
+
+    /** Pull-to-refresh: re-pulls both halves of the feed — the scan list and today's tracking —
+     * since the profile header and greeting come from whatever the reconcile writes back. */
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            reconcileTodayUseCase()
+            getRecentScansUseCase(page = 0, size = 3)
+                .onSuccess { scans ->
+                    _state.update { it.copy(recentHistory = mapScansToUi(scans), historyError = null) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(historyError = error.message ?: "Failed to load recent scans") }
+                }
+            _state.update { it.copy(isRefreshing = false) }
         }
     }
 

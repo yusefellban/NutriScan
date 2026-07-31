@@ -19,4 +19,5 @@ sealed interface UserProfileEvent {
     data class BottomNavTabClicked(val tab: BottomNavTab) : UserProfileEvent
     object DismissAlert : UserProfileEvent
     object RetryAction : UserProfileEvent
+    data object Refreshed : UserProfileEvent
 }

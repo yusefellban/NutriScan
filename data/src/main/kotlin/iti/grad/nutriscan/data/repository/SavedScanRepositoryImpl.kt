@@ -108,6 +108,13 @@ class SavedScanRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun refresh(): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            retryPendingSync()
+            reconcileFromBackend(resolveUserId())
+        }
+    }
+
     /** Seeds Room from the backend's favorites list (needed after reinstall, when Room is empty)
      * and drops local rows the backend no longer lists as favorited — mirrors the un-favorite
      * happening from another device. Best-effort: failures (offline) just fall back to whatever
@@ -123,7 +130,8 @@ class SavedScanRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun resolveUserId(): String = authRepository.getCurrentUserId() ?: LOCAL_USER_ID
+    private suspend fun resolveUserId(): String = authRepository.getCurrentUserId()
+        ?: error("No authenticated user - per-user data is unavailable until sign-in completes")
 
     private fun ScanResult.toEntity(userId: String, pendingSync: Boolean = false) = SavedScanEntity(
         scanId = scanId,
@@ -205,7 +213,6 @@ class SavedScanRepositoryImpl @Inject constructor(
     }
 
     private companion object {
-        const val LOCAL_USER_ID = "local_device_user"
         const val FAVORITES_PAGE_SIZE = 100
         const val RECONCILE_INTERVAL_MS = 15_000L
         const val SHARE_STOP_TIMEOUT_MS = 5_000L

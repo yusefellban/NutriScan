@@ -7,7 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import iti.grad.nutriscan.domain.nutrigpt.manager.IVoiceManager
 import iti.grad.nutriscan.domain.nutrigpt.manager.VoiceState
-import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptMessageResponse
+import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptMessage
 import iti.grad.nutriscan.domain.nutrigpt.usecase.SendNutriGptMessageUseCase
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.voice.state.NutriGptVoiceEffect
@@ -88,7 +88,7 @@ class NutriGptVoiceViewModelTest {
     @Test
     fun `VoiceManager emitting FinalResult triggers SendMessage on success`() = runTest {
         val finalQuery = "Is apple healthy?"
-        val response = NutriGptMessageResponse(text = "Yes, very healthy.", sources = emptyList())
+        val response = NutriGptMessage(id = "1", text = "Yes, very healthy.", isFromUser = false, sources = emptyList())
         coEvery { sendNutriGptMessageUseCase(finalQuery) } returns Result.success(response)
         
         voiceStateFlow.value = VoiceState.FinalResult(finalQuery)

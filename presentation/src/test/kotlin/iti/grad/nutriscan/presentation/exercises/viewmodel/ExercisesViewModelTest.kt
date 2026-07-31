@@ -13,8 +13,6 @@ import iti.grad.nutriscan.domain.exercises.usecase.GetExercisesUseCase
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
-import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -204,8 +202,8 @@ class ExercisesViewModelTest {
                             equipment = "body only",
                             target = "pectorals",
                             secondaryMuscles = emptyList(),
-                            instructions = "Lie face down...",
-                            instructionSteps = emptyList(),
+                            instructions = mapOf("en" to "Lie face down..."),
+                            instructionSteps = emptyMap(),
                             imageUrl = null,
                             gifUrl = null,
                             repKcal = 0.20,
@@ -238,8 +236,8 @@ class ExercisesViewModelTest {
                         equipment = "body only",
                         target = "pectorals",
                         secondaryMuscles = emptyList(),
-                        instructions = "Lie face down...",
-                        instructionSteps = emptyList(),
+                        instructions = mapOf("en" to "Lie face down..."),
+                        instructionSteps = emptyMap(),
                         imageUrl = null,
                         gifUrl = null,
                         repKcal = 0.20,
