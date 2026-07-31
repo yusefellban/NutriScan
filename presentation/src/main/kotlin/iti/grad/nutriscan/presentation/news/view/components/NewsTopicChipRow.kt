@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.news.view.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -33,10 +34,6 @@ fun NewsTopicChipRow(
     onChipClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = AppTheme.isDark
-    val unselectedColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Gray700
-    val unselectedBorderColor = if (isDark) AppTheme.colors.Teal1400 else AppTheme.colors.Gray400
-
     Row(
         modifier = modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -51,13 +48,18 @@ fun NewsTopicChipRow(
             Text(
                 text = label,
                 style = AppTheme.typography.bodyMedium,
-                color = if (isSelected) AppTheme.colors.Teal1000 else unselectedColor,
+                color = if (isSelected) AppTheme.colors.NewsChipSelectedText else AppTheme.colors.NewsChipUnselectedText,
                 modifier = Modifier
                     .clip(chipShape)
-                    .border(
-                        width = 1.dp,
-                        color = if (isSelected) AppTheme.colors.Teal1000 else unselectedBorderColor,
-                        shape = chipShape,
+                    .background(if (isSelected) AppTheme.colors.NewsChipSelectedBg else AppTheme.colors.NewsChipUnselectedBg)
+                    .then(
+                        if (!isSelected) {
+                            Modifier.border(
+                                width = 1.dp,
+                                color = AppTheme.colors.NewsChipUnselectedBorder,
+                                shape = chipShape,
+                            )
+                        } else Modifier
                     )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },

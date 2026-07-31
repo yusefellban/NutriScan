@@ -37,6 +37,9 @@ import iti.grad.nutriscan.presentation.settings.terms.view.TermsAndConditionsScr
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.news.home.view.NewsHomeScreen
+import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
+import iti.grad.nutriscan.presentation.news.detail.view.NewsDetailScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
@@ -196,7 +199,7 @@ fun AppNavGraph(
                 onNavigateToProductDetail = { scanId ->
                     navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
-                onNavigateToNews = { navController.navigate(NewsRoute) },
+                onNavigateToNews = { navController.navigate(NewsHomeRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
@@ -379,10 +382,65 @@ fun AppNavGraph(
             )
         }
         
-         // 30. News
+         // 30a. News Home (Landing)
+        composable<NewsHomeRoute> {
+            NewsHomeScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToDiscover = { navController.navigate(NewsRoute) },
+                onNavigateToDetail = { article ->
+                    navController.navigate(
+                        NewsDetailRoute(
+                            title = article.title,
+                            description = article.description,
+                            url = article.url,
+                            imageUrl = article.imageUrl,
+                            sourceName = article.sourceName,
+                            publishedAtLabel = article.publishedAtLabel,
+                            author = article.author,
+                            category = article.category
+                        )
+                    )
+                }
+            )
+        }
+
+         // 30b. News Discover (Search)
         composable<NewsRoute> {
             NewsScreen(
                 onNavigateBack = { navController.navigateUp() },
+                onNavigateToDetail = { article ->
+                    navController.navigate(
+                        NewsDetailRoute(
+                            title = article.title,
+                            description = article.description,
+                            url = article.url,
+                            imageUrl = article.imageUrl,
+                            sourceName = article.sourceName,
+                            publishedAtLabel = article.publishedAtLabel,
+                            author = article.author,
+                            category = article.category
+                        )
+                    )
+                }
+            )
+        }
+
+        // 30c. News Detail Screen
+        composable<NewsDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<NewsDetailRoute>()
+            val article = NewsUiArticle(
+                title = route.title,
+                description = route.description,
+                url = route.url,
+                imageUrl = route.imageUrl,
+                sourceName = route.sourceName,
+                publishedAtLabel = route.publishedAtLabel,
+                author = route.author,
+                category = route.category
+            )
+            NewsDetailScreen(
+                article = article,
+                onNavigateBack = { navController.navigateUp() }
             )
         }
 
