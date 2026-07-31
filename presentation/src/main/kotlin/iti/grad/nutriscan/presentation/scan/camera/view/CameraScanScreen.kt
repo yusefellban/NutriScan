@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -100,9 +102,15 @@ fun CameraScanScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is CameraScanEffect.ShowSnackBarRes ->
-                    snackbarHostState.showSnackbar(context.getString(effect.messageResId))
+                    snackbarHostState.showAppSnackbar(
+                        message = context.getString(effect.messageResId),
+                        type = SnackbarType.WARNING
+                    )
                 is CameraScanEffect.ShowSnackBar ->
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showAppSnackbar(
+                        message = effect.message,
+                        type = effect.snackbarType
+                    )
                 is CameraScanEffect.RequestCameraPermission -> {
                     val granted = ContextCompat.checkSelfPermission(
                         context,

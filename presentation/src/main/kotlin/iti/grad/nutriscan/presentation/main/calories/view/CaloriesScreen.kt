@@ -56,6 +56,8 @@ import iti.grad.nutriscan.presentation.common.components.CaloriesScreenShimmer
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
@@ -107,7 +109,10 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                        snackbarHostState.showAppSnackbar(
+                            message = context.getString(effect.messageResId),
+                            type = SnackbarType.ERROR
+                        )
                     }
                 }
 

@@ -31,13 +31,18 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
@@ -58,6 +63,7 @@ fun NutriGptScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -123,7 +129,10 @@ fun NutriGptScreen(
             when (effect) {
                 is NutriGptEffect.NavigateBack -> onNavigateBack()
                 is NutriGptEffect.ShowError -> {
-                    // Show error somehow, maybe toast or snackbar
+                    snackbarHostState.showAppSnackbar(
+                        message = effect.message,
+                        type = SnackbarType.ERROR
+                    )
                 }
             }
         }
@@ -221,6 +230,14 @@ fun NutriGptScreen(
                     viewModel.onEvent(NutriGptEvent.SetListeningState(false))
                 }
             )
+        }
+
+        // Snackbar overlay — positioned at bottom above the input bar
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) { data ->
+            AppSnackbar(snackbarData = data)
         }
     }
 }

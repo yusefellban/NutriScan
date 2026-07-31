@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPage
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.ui.platform.LocalContext
 import iti.grad.nutriscan.presentation.profile_setup.view.components.HeightSelectionPage
 import androidx.compose.foundation.pager.HorizontalPager
@@ -76,7 +78,10 @@ fun ProfileSetupPagerScreen(
                     val message = effect.messageStr
                         ?: effect.messageResId?.let { context.getString(it) }
                         ?: ""
-                    snackbarHostState.showSnackbar(message = message)
+                    snackbarHostState.showAppSnackbar(
+                        message = message,
+                        type = SnackbarType.ERROR
+                    )
                 }
             }
         }
@@ -85,7 +90,7 @@ fun ProfileSetupPagerScreen(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
+                AppSnackbar(snackbarData = data)
             }
         },
         containerColor = AppTheme.colors.Background,

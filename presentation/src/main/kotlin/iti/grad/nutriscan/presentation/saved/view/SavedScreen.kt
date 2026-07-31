@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,16 +64,18 @@ fun SavedScreen(
                     // dismissed) never stalls this loop from handling the next effect — e.g. a
                     // bottom-nav tap right after a swipe must navigate immediately, not wait.
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(
+                        snackbarHostState.showAppSnackbar(
                             message = String.format(addedTemplate, effect.productName),
+                            type = SnackbarType.SUCCESS,
                             duration = SnackbarDuration.Short
                         )
                     }
                 }
                 is SavedEffect.ShowAddErrorSnackbar -> {
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(
+                        snackbarHostState.showAppSnackbar(
                             message = addErrorMessage,
+                            type = SnackbarType.ERROR,
                             duration = SnackbarDuration.Short
                         )
                     }

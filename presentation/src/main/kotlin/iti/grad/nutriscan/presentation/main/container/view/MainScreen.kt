@@ -62,7 +62,7 @@ fun MainScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
+                AppSnackbar(snackbarData = data)
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)

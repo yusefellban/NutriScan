@@ -10,6 +10,7 @@ import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
@@ -142,7 +143,12 @@ class CameraScanViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            _effect.send(CameraScanEffect.ShowSnackBar("Image capture failed: ${error.message}"))
+            _effect.send(
+                CameraScanEffect.ShowSnackBar(
+                    message = "Image capture failed: ${error.message}",
+                    snackbarType = SnackbarType.ERROR
+                )
+            )
         }
     }
 
@@ -205,9 +211,14 @@ class CameraScanViewModel @Inject constructor(
                             activeScan = state.activeScan?.copy(isSaved = true)
                         )
                     }
-                    _effect.send(CameraScanEffect.ShowSnackBar("Scan saved to Bookmarks"))
+                    _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_saved_to_bookmarks))
                 } else {
-                    _effect.send(CameraScanEffect.ShowSnackBar("Failed to save scan"))
+                    _effect.send(
+                        CameraScanEffect.ShowSnackBar(
+                            message = "Failed to save scan",
+                            snackbarType = SnackbarType.ERROR
+                        )
+                    )
                 }
             }
         }
