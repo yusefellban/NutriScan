@@ -104,7 +104,8 @@ fun MainScreen(
                     SavedScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) },
+                        onNavigateToScan = { selectedTab = BottomNavTab.SCAN }
                     )
                 }
                 BottomNavTab.PROFILE -> {

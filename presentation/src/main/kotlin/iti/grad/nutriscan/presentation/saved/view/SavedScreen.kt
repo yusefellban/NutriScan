@@ -48,7 +48,8 @@ fun SavedScreen(
     viewModel: SavedViewModel = hiltViewModel(),
     bottomPadding: Dp = 0.dp,
     snackbarHostState: SnackbarHostState,
-    onNavigateToProductDetail: (ProductUiModel) -> Unit = {}
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
+    onNavigateToScan: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val addedTemplate = stringResource(id = R.string.food_log_added_snackbar)
@@ -88,6 +89,7 @@ fun SavedScreen(
         state = state,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
+        onNavigateToScan = onNavigateToScan,
         modifier = Modifier.fillMaxSize(),
     )
 }
@@ -97,6 +99,7 @@ private fun SavedScreenContent(
     state: SavedState,
     onEvent: (SavedEvent) -> Unit,
     bottomPadding: Dp = 0.dp,
+    onNavigateToScan: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -160,9 +163,16 @@ private fun SavedScreenContent(
                             .padding(bottom = bottomPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        EmptyStateWidget(
-                            message = stringResource(id = R.string.saved_empty_state)
-                        )
+                        if (state.searchQuery.isNotEmpty()) {
+                            iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget(
+                                showButton = true,
+                                onScanNowClick = onNavigateToScan
+                            )
+                        } else {
+                            iti.grad.nutriscan.presentation.saved.view.components.SavedEmptyStateWidget(
+                                onScanNowClick = onNavigateToScan
+                            )
+                        }
                     }
                 }
                 else -> {

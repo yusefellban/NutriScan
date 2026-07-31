@@ -391,6 +391,12 @@
     <string name="calories_tracking_subtitle">تتبع استهلاكك اليومي</string>
     <string name="saved_search_hint">ابحث هنا</string>
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
+    <string name="saved_empty_title">لا توجد محفوظات</string>
+    <string name="saved_empty_subtitle">ليس لديك أي منتجات محفوظة في القائمة بعد.\nلم يفت الأوان لتغيير ذلك :)</string>
+    <string name="saved_empty_button">افحص الآن</string>
+    <string name="search_not_found_title">لم يتم العثور على نتائج</string>
+    <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
+    <string name="search_not_found_button">الذهاب للفحص</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
