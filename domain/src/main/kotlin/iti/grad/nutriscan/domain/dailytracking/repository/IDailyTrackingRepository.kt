@@ -38,6 +38,12 @@ interface IDailyTrackingRepository {
     /** Nightly job entry point: PATCHes [date]'s water/steps if unsynced. No-op if already synced. */
     suspend fun syncPendingDay(date: LocalDate): Result<Unit>
 
+    /** Flushes every day still owing a push, not just today — a day that ended unsynced (logged
+     * late at night, or pushed while offline) is otherwise never retried and never reaches the
+     * backend, leaving a permanent hole in the history the backend can serve back. Returns failure
+     * if any day failed, so the worker retries. */
+    suspend fun syncAllPendingDays(): Result<Unit>
+
     /** Login/app-start entry point: fetches GET /daily-tracking/today, seeds local Room water/steps
      * only if no row exists yet for today. Always returns the fetched snapshot on success so the
      * caller (ReconcileTodayUseCase, Task 4) can separately reconcile meals against FoodLogEntity. */
