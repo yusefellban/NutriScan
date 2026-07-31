@@ -1,10 +1,6 @@
 package iti.grad.nutriscan.presentation.news.view
 
-import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -163,12 +160,24 @@ private fun NewsContent(
                         onRetry = { onEvent(NewsEvent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center),
                     )
-                    state.articles.isEmpty() -> Text(
-                        text = stringResource(R.string.news_empty_state),
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.colors.TextSecondary,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
+                    state.articles.isEmpty() -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (state.searchQuery.isNotEmpty()) {
+                                SearchNotFoundEmptyStateWidget(
+                                    showButton = false
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.news_empty_state),
+                                    style = AppTheme.typography.bodyMedium,
+                                    color = AppTheme.colors.TextSecondary,
+                                )
+                            }
+                        }
+                    }
                     else -> LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
