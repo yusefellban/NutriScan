@@ -127,10 +127,8 @@ private fun ScanHistoryContent(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(R.string.scan_history_empty),
-                            color = AppTheme.colors.TextSecondary,
-                            style = AppTheme.typography.bodyLarge
+                        iti.grad.nutriscan.presentation.scan_history.view.components.ScanHistoryEmptyStateWidget(
+                            onScanNowClick = { onEvent(ScanHistoryEvent.BackClicked) }
                         )
                     }
                 } else {

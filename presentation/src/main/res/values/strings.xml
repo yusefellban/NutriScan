@@ -528,7 +528,9 @@
     <string name="filter_safe">Safe</string>
     <string name="filter_caution">Caution</string>
     <string name="filter_unsafe">Unsafe</string>
-    <string name="scan_history_empty">No history found</string>
+    <string name="scan_history_empty_title">No scans yet</string>
+    <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
+    <string name="scan_history_empty_button">Start Scanning</string>
     <string name="scan_history_error_load">Failed to load history</string>
     <!-- Step History -->
     <string name="step_history_title">Step history</string>

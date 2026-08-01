@@ -513,7 +513,9 @@
     <string name="filter_safe">آمن</string>
     <string name="filter_caution">حذر</string>
     <string name="filter_unsafe">غير آمن</string>
-    <string name="scan_history_empty">لا يوجد سجل متاح</string>
+    <string name="scan_history_empty_title">لا توجد عمليات مسح حتى الآن</string>
+    <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
+    <string name="scan_history_empty_button">ابدأ المسح</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
     <!-- Step History -->
     <string name="step_history_title">سجل الخطوات</string>
