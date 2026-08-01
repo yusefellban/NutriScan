@@ -41,6 +41,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableC
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.graphics.Color
@@ -157,13 +158,22 @@ fun ExercisesScreen(
                     }
                 }
                 state.visibleExercises.isEmpty() -> {
-                    EmptyStateWidget(
-                        message = stringResource(id = R.string.exercises_empty_state),
-                        iconResId = R.drawable.dumbell,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth()
-                    )
+                    Box(
+                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (state.searchQuery.isNotEmpty()) {
+                            SearchNotFoundEmptyStateWidget(
+                                showButton = false
+                            )
+                        } else {
+                            EmptyStateWidget(
+                                message = stringResource(id = R.string.exercises_empty_state),
+                                iconResId = R.drawable.dumbell,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
                 }
                 else -> {
                     LazyColumn(

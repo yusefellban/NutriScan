@@ -62,7 +62,7 @@ fun MainScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
+                AppSnackbar(snackbarData = data)
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -104,7 +104,8 @@ fun MainScreen(
                     SavedScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
-                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
+                        onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) },
+                        onNavigateToScan = { selectedTab = BottomNavTab.SCAN }
                     )
                 }
                 BottomNavTab.PROFILE -> {

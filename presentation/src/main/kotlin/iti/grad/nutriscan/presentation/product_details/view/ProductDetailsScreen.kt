@@ -35,6 +35,8 @@ import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
+import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
@@ -134,17 +136,28 @@ private fun ProductDetailsContent(
                             }
                         }
 
-                        state.error != null -> {
+                        state.isNotFound -> {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(400.dp),
+                                    .padding(vertical = 48.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = state.error,
-                                    color = AppTheme.colors.Error,
-                                    modifier = Modifier.padding(16.dp),
+                               NotFoundStateWidget(
+                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
+                                )
+                            }
+                        }
+
+                        state.errorMessageResId != null -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                OfflineStateWidget(
+                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
                                 )
                             }
                         }

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">نيوتري سكان</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">عذراً! الصفحة التي تبحث\nعنها غير موجودة.</string>
     <string name="signup_title">سجل مجاناً!</string>
     <string name="first_name_label">الاسم الأول</string>
     <string name="first_name_hint">أدخل اسمك الأول…</string>
@@ -47,6 +49,7 @@
     <!-- Bottom Navigation -->
     <string name="nav_home">الرئيسية</string>
     <string name="nav_history">السجل</string>
+    <string name="try_again">حاول مرة أخرى</string>
     <string name="nav_scan">مسح</string>
     <string name="nav_saved">المحفوظات</string>
     <string name="nav_profile">الملف الشخصي</string>
@@ -391,6 +394,12 @@
     <string name="calories_tracking_subtitle">تتبع استهلاكك اليومي</string>
     <string name="saved_search_hint">ابحث هنا</string>
     <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
+    <string name="saved_empty_title">لا توجد محفوظات</string>
+    <string name="saved_empty_subtitle">ليس لديك أي منتجات محفوظة في القائمة بعد.\nلم يفت الأوان لتغيير ذلك :)</string>
+    <string name="saved_empty_button">افحص الآن</string>
+    <string name="search_not_found_title">لم يتم العثور على نتائج</string>
+    <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
+    <string name="search_not_found_button">الذهاب للفحص</string>
     <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
@@ -494,8 +503,8 @@
     <string name="alert_button_retry">إعادة المحاولة</string>
     <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
     <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
-    <string name="offline_state_title">لا يوجد اتصال بالإنترنت</string>
-    <string name="offline_state_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
+    <string name="offline_state_title">لا يوجد اتصال</string>
+    <string name="offline_state_subtitle">عذراً! يبدو أنك غير متصل بالإنترنت حالياً.</string>
     <string name="offline_state_retry">إعادة المحاولة</string>
     
     <!-- Auth Alerts -->
@@ -507,7 +516,9 @@
     <string name="filter_safe">آمن</string>
     <string name="filter_caution">حذر</string>
     <string name="filter_unsafe">غير آمن</string>
-    <string name="scan_history_empty">لا يوجد سجل متاح</string>
+    <string name="scan_history_empty_title">لا توجد عمليات مسح حتى الآن</string>
+    <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
+    <string name="scan_history_empty_button">ابدأ المسح</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
     <!-- Step History -->
     <string name="step_history_title">سجل الخطوات</string>
@@ -530,4 +541,8 @@
     <string name="error_server_down">الخادم غير متاح مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
     <string name="common_retry">إعادة المحاولة</string>
 
+    <string name="action_dismiss">إغلاق</string>
+    <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
+    <string name="scan_save_failed">فشل في حفظ الفحص</string>
+    <string name="scan_capture_failed">فشل التقاط الصورة: %1$s</string>
 </resources>

@@ -4,71 +4,67 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
 @Composable
-fun OfflineStateWidget(
+fun NotFoundStateWidget(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         val imageRes = if (AppTheme.isDark) {
-            R.drawable.no_network_connection_dark
+            R.drawable.not_found_dark
         } else {
-            R.drawable.no_network_connection_light
+            R.drawable.not_found_light
         }
-
+        
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
-            contentScale = ContentScale.Fit
         )
         
+        Spacer(modifier = Modifier.height(24.dp))
+        
         Text(
-            text = stringResource(id = R.string.offline_state_title),
-            style = AppTheme.typography.titleLarge,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            text = stringResource(id = R.string.not_found_title),
+            style = AppTheme.typography.titleLarge.copy(fontSize = 32.sp),
+            fontWeight = FontWeight.Bold,
             color = AppTheme.colors.TextPrimary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            textAlign = TextAlign.Center
         )
         
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = stringResource(id = R.string.offline_state_subtitle),
+            text = stringResource(id = R.string.not_found_subtitle),
             style = AppTheme.typography.bodyLarge,
             color = AppTheme.colors.TextPrimary.copy(alpha = 0.5f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 40.dp)
+            textAlign = TextAlign.Center
         )
         
         Spacer(modifier = Modifier.height(32.dp))
         
         AppButton(
-            textResId = R.string.offline_state_retry,
+            textResId = R.string.try_again,
             isLoading = false,
-            onClick = onRetry
+            onClick = onRetry,
         )
     }
 }

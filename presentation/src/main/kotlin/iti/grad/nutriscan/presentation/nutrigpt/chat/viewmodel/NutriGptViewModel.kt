@@ -10,6 +10,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptState
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
+import iti.grad.presentation.R
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +47,7 @@ class NutriGptViewModel @Inject constructor(
         when (event) {
             is NutriGptEvent.SendMessage -> sendMessage(event.query)
             is NutriGptEvent.UpdateQuery -> {
-                _state.update { it.copy(currentQuery = event.text) }
+                _state.update { it.copy(currentQuery = event.text, errorMessageResId = null) }
             }
             is NutriGptEvent.SetListeningState -> {
                 _state.update { it.copy(isListening = event.isListening) }
@@ -58,6 +59,13 @@ class NutriGptViewModel @Inject constructor(
                 _state.update {
                     val newLang = if (it.chatLanguage == ChatLanguage.EN) ChatLanguage.AR else ChatLanguage.EN
                     it.copy(chatLanguage = newLang)
+                }
+            }
+            NutriGptEvent.RetryLastMessage -> {
+                _state.update { it.copy(errorMessageResId = null) }
+                val lastUserMessage = _state.value.messages.lastOrNull { it.isFromUser }
+                if (lastUserMessage != null) {
+                    retryMessage(lastUserMessage.text)
                 }
             }
         }
@@ -84,10 +92,20 @@ class NutriGptViewModel @Inject constructor(
         _state.update {
             it.copy(
                 currentQuery = "",
-                isLoading = true
+                isLoading = true,
+                errorMessageResId = null
             )
         }
 
+        performMessageRequest(query)
+    }
+
+    private fun retryMessage(query: String) {
+        _state.update { it.copy(isLoading = true, errorMessageResId = null) }
+        performMessageRequest(query)
+    }
+
+    private fun performMessageRequest(query: String) {
         viewModelScope.launch {
             val result = sendNutriGptMessageUseCase(query)
             _state.update { it.copy(isLoading = false) }
@@ -95,7 +113,8 @@ class NutriGptViewModel @Inject constructor(
             result.onSuccess { botMessage ->
                 nutriGptRepository.addMessage(botMessage)
             }.onFailure { error ->
-                _effect.send(NutriGptEffect.ShowError(error.message ?: "Unknown Error"))
+                _state.update { it.copy(errorMessageResId = R.string.offline_state_title) }
+                _effect.send(NutriGptEffect.ShowError(iti.grad.nutriscan.presentation.common.model.UiText.StringResource(R.string.offline_state_subtitle)))
             }
         }
     }

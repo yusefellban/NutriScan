@@ -14,6 +14,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,14 +55,21 @@ fun StepHistoryScreen(
             when (effect) {
                 is StepHistoryEffect.NavigateBack -> onNavigateBack()
                 is StepHistoryEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showAppSnackbar(
+                        message = effect.message,
+                        type = SnackbarType.ERROR
+                    )
                 }
             }
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                AppSnackbar(snackbarData = data)
+            }
+        },
         containerColor = AppTheme.colors.StepHistoryScreenBg,
         contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->

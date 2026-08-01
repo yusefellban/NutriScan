@@ -75,14 +75,12 @@ private fun NewsHomeContent(
     onEvent: (NewsHomeEvent) -> Unit,
 ) {
     Scaffold(containerColor = AppTheme.colors.Background) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
-            // ── Header row: Back button (left) + Search icon (right) ──
-            item(key = "header") {
+        if (state.errorMessageResId != null && state.breakingArticles.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier
@@ -106,71 +104,101 @@ private fun NewsHomeContent(
                             .clickable { onEvent(NewsHomeEvent.SearchClicked) },
                     )
                 }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    OfflineStateWidget(onRetry = { onEvent(NewsHomeEvent.RetryClicked) })
+                }
             }
-
-            // ── Breaking News section ──
-            item(key = "breaking_title") {
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = stringResource(id = R.string.news_home_breaking_news),
-                    style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = AppTheme.colors.NewsScreenTitle,
-                    modifier = Modifier.padding(horizontal = 22.dp),
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            item(key = "breaking_pager") {
-                when {
-                    state.isLoading -> BreakingNewsPagerShimmer(
-                        modifier = Modifier.padding(start = 22.dp),
-                    )
-                    state.errorMessageResId != null -> Box(
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
+                // ── Header row: Back button (left) + Search icon (right) ──
+                item(key = "header") {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(260.dp),
-                        contentAlignment = Alignment.Center,
+                            .padding(horizontal = 22.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        OfflineStateWidget(
-                            onRetry = { onEvent(NewsHomeEvent.RetryClicked) },
+                        AppBackButton(
+                            onClick = { onEvent(NewsHomeEvent.BackClicked) },
+                            iconTint = AppTheme.colors.NewsCategoryLabel,
+                            borderColor = AppTheme.colors.NewsCategoryLabel,
+                        )
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_search),
+                            contentDescription = stringResource(id = R.string.news_home_search_content_description),
+                            tint = AppTheme.colors.NewsScreenTitle,
+                            modifier = Modifier
+                                .size(26.dp)
+                                .clickable { onEvent(NewsHomeEvent.SearchClicked) },
                         )
                     }
-                    else -> BreakingNewsPager(
-                        articles = state.breakingArticles,
-                        onArticleClicked = { onEvent(NewsHomeEvent.BreakingArticleClicked(it)) },
-                        modifier = Modifier.padding(start = 22.dp),
-                    )
                 }
-            }
 
-            // ── Recommendation section ──
-            item(key = "recommendation_title") {
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = stringResource(id = R.string.news_home_recommendation),
-                    style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = AppTheme.colors.NewsScreenTitle,
-                    modifier = Modifier.padding(horizontal = 22.dp),
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            if (state.isLoading) {
-                items(4) {
-                    NewsArticleShimmerCard(
-                        modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp),
+                // ── Breaking News section ──
+                item(key = "breaking_title") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = stringResource(id = R.string.news_home_breaking_news),
+                        style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = AppTheme.colors.NewsScreenTitle,
+                        modifier = Modifier.padding(horizontal = 22.dp),
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            } else if (state.errorMessageResId == null) {
-                items(
-                    items = state.recommendationArticles,
-                    key = { it.url },
-                ) { article ->
-                    NewsArticleCard(
-                        article = article,
-                        onClick = { onEvent(NewsHomeEvent.RecommendationArticleClicked(article)) },
-                        modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp),
+
+                item(key = "breaking_pager") {
+                    when {
+                        state.isLoading -> BreakingNewsPagerShimmer(
+                            modifier = Modifier.padding(start = 22.dp),
+                        )
+                        else -> BreakingNewsPager(
+                            articles = state.breakingArticles,
+                            onArticleClicked = { onEvent(NewsHomeEvent.BreakingArticleClicked(it)) },
+                            modifier = Modifier.padding(start = 22.dp),
+                        )
+                    }
+                }
+
+                // ── Recommendation section ──
+                item(key = "recommendation_title") {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(id = R.string.news_home_recommendation),
+                        style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = AppTheme.colors.NewsScreenTitle,
+                        modifier = Modifier.padding(horizontal = 22.dp),
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                if (state.isLoading) {
+                    items(4) {
+                        NewsArticleShimmerCard(
+                            modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp),
+                        )
+                    }
+                } else if (state.errorMessageResId == null) {
+                    items(
+                        items = state.recommendationArticles,
+                        key = { it.url },
+                    ) { article ->
+                        NewsArticleCard(
+                            article = article,
+                            onClick = { onEvent(NewsHomeEvent.RecommendationArticleClicked(article)) },
+                            modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp),
+                        )
+                    }
                 }
             }
         }

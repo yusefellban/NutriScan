@@ -40,6 +40,9 @@
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_history">History</string>
+    <string name="try_again">Try again</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">Oops! The page you\'re\nlooking for can\'t be found.</string>
     <string name="nav_scan">Scan</string>
     <string name="nav_saved">Saved</string>
     <string name="nav_profile">Profile</string>
@@ -125,6 +128,7 @@
     <!-- Permissions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_remove">Remove</string>
+    <string name="action_dismiss">Dismiss</string>
 
     <!-- User Profile Screen -->
     <string name="user_profile_day_streak">%1$d Day streak</string>
@@ -279,6 +283,9 @@
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
     <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
+    <string name="scan_saved_to_bookmarks">Scan saved to Bookmarks</string>
+    <string name="scan_save_failed">Failed to save scan</string>
+    <string name="scan_capture_failed">Image capture failed: %1$s</string>
     <!-- Email Verification -->
     <string name="email_verification_title">Verify Your Email</string>
     <string name="email_verification_subtitle">Confirm it\'s you to start scanning.</string>
@@ -391,6 +398,12 @@
     <string name="calories_tracking_subtitle">Track your daily intake</string>
     <string name="saved_search_hint">Search here</string>
     <string name="saved_empty_state">No saved products yet</string>
+    <string name="saved_empty_title">No Saved scans</string>
+    <string name="saved_empty_subtitle">You have nothing on your list yet.\nIt\'s never too late to change it :)</string>
+    <string name="saved_empty_button">Scan Now</string>
+    <string name="search_not_found_title">No results found</string>
+    <string name="search_not_found_subtitle">No results found. Please try again.</string>
+    <string name="search_not_found_button">Go to Scan</string>
     <string name="product_card_swipe_hint">Swipe right to add</string>
     <string name="product_card_kcal_unit">Kcal</string>
     <string name="product_card_quantity_badge">x%1$d</string>
@@ -494,9 +507,9 @@
     <string name="alert_button_retry">Retry</string>
     <string name="alert_test_message">Are you sure you want to delete this profile? This action cannot be undone.</string>
     <string name="alert_internet_message">Please check your internet connection and try again.</string>
-    <string name="offline_state_title">No Internet Connection</string>
-    <string name="offline_state_subtitle">Please check your internet connection and try again.</string>
-    <string name="offline_state_retry">Try Again</string>
+    <string name="offline_state_title">No connection</string>
+    <string name="offline_state_subtitle">Oops! It seems you\'re currently offline.</string>
+    <string name="offline_state_retry">Try again</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">Login Failed</string>
@@ -518,7 +531,9 @@
     <string name="filter_safe">Safe</string>
     <string name="filter_caution">Caution</string>
     <string name="filter_unsafe">Unsafe</string>
-    <string name="scan_history_empty">No history found</string>
+    <string name="scan_history_empty_title">No scans yet</string>
+    <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
+    <string name="scan_history_empty_button">Start Scanning</string>
     <string name="scan_history_error_load">Failed to load history</string>
     <!-- Step History -->
     <string name="step_history_title">Step history</string>

@@ -1,10 +1,6 @@
 package iti.grad.nutriscan.presentation.news.view
 
-import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -95,80 +92,118 @@ private fun NewsContent(
     onEvent: (NewsEvent) -> Unit,
 ) {
     Scaffold(containerColor = AppTheme.colors.Background) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(horizontal = 22.dp)
-        ) {
-            // Header: Back button + Title in same row
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+        if (state.errorMessageResId != null && state.articles.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             ) {
-                AppBackButton(
-                    onClick = { onEvent(NewsEvent.BackClicked) },
-                    iconTint = AppTheme.colors.NewsCategoryLabel,
-                    borderColor = AppTheme.colors.NewsCategoryLabel,
-                )
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Text(
-                        text = stringResource(id = R.string.news_screen_title),
-                        style = AppTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                        color = AppTheme.colors.NewsScreenTitle,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.news_screen_subtitle),
-                        style = AppTheme.typography.bodySmall,
-                        color = AppTheme.colors.NewsSourceText,
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 22.dp)
+                ) {
+                    AppBackButton(
+                        onClick = { onEvent(NewsEvent.BackClicked) },
+                        iconTint = AppTheme.colors.NewsCategoryLabel,
+                        borderColor = AppTheme.colors.NewsCategoryLabel,
                     )
                 }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    OfflineStateWidget(onRetry = { onEvent(NewsEvent.RetryClicked) })
+                }
             }
-            
-            // Search Bar
-            Spacer(modifier = Modifier.height(20.dp))
-            NewsSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { onEvent(NewsEvent.SearchQueryChanged(it)) },
-                onFilterClick = { onEvent(NewsEvent.FilterClicked) },
-            )
-            
-            // Chips Row
-            Spacer(modifier = Modifier.height(16.dp))
-            if (state.isLoading && state.chips.isEmpty()) {
-                NewsTopicChipShimmerRow()
-            } else {
-                NewsTopicChipRow(
-                    chips = state.chips,
-                    selectedChipIds = state.selectedChipIds,
-                    onChipClicked = { onEvent(NewsEvent.ChipClicked(it)) },
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(horizontal = 22.dp)
+            ) {
+                // Header: Back button + Title in same row
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    AppBackButton(
+                        onClick = { onEvent(NewsEvent.BackClicked) },
+                        iconTint = AppTheme.colors.NewsCategoryLabel,
+                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                    )
+                    Column(modifier = Modifier.padding(top = 16.dp)) {
+                        Text(
+                            text = stringResource(id = R.string.news_screen_title),
+                            style = AppTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                            color = AppTheme.colors.NewsScreenTitle,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.news_screen_subtitle),
+                            style = AppTheme.typography.bodySmall,
+                            color = AppTheme.colors.NewsSourceText,
+                        )
+                    }
+                }
+                
+                // Search Bar
+                Spacer(modifier = Modifier.height(20.dp))
+                NewsSearchBar(
+                    query = state.searchQuery,
+                    onQueryChange = { onEvent(NewsEvent.SearchQueryChanged(it)) },
+                    onFilterClick = { onEvent(NewsEvent.FilterClicked) },
                 )
-            }
-            
-            // Articles List
-            Spacer(modifier = Modifier.height(12.dp))
-            Box(modifier = Modifier.fillMaxSize()) {
-                when {
-                    state.isLoading -> LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        userScrollEnabled = false,
-                    ) {
-                        items(5) { 
-                            NewsArticleShimmerCard()
+                
+                // Chips Row
+                Spacer(modifier = Modifier.height(16.dp))
+                if (state.isLoading && state.chips.isEmpty()) {
+                    NewsTopicChipShimmerRow()
+                } else {
+                    NewsTopicChipRow(
+                        chips = state.chips,
+                        selectedChipIds = state.selectedChipIds,
+                        onChipClicked = { onEvent(NewsEvent.ChipClicked(it)) },
+                    )
+                }
+                
+                // Articles List
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        state.isLoading -> LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            userScrollEnabled = false,
+                        ) {
+                            items(5) { 
+                                NewsArticleShimmerCard()
+                            }
+                        }
+                        state.errorMessageResId != null -> OfflineStateWidget(
+                            onRetry = { onEvent(NewsEvent.RetryClicked) },
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    state.articles.isEmpty() -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (state.searchQuery.isNotEmpty()) {
+                                SearchNotFoundEmptyStateWidget(
+                                    showButton = false
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.news_empty_state),
+                                    style = AppTheme.typography.bodyMedium,
+                                    color = AppTheme.colors.TextSecondary,
+                                )
+                            }
                         }
                     }
-                    state.errorMessageResId != null -> OfflineStateWidget(
-                        onRetry = { onEvent(NewsEvent.RetryClicked) },
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                    state.articles.isEmpty() -> Text(
-                        text = stringResource(R.string.news_empty_state),
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.colors.TextSecondary,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
                     else -> LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -182,6 +217,7 @@ private fun NewsContent(
                     }
                 }
             }
+        }
         }
     }
 }
