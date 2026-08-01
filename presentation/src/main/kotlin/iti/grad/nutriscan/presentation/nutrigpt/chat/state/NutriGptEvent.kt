@@ -6,4 +6,5 @@ sealed interface NutriGptEvent {
     data class SetListeningState(val isListening: Boolean) : NutriGptEvent
     data object ToggleSources : NutriGptEvent
     data object ToggleLanguage : NutriGptEvent
+    data object RetryLastMessage : NutriGptEvent
 }

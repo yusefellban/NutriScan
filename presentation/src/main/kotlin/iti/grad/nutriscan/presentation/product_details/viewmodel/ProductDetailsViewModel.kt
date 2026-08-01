@@ -90,12 +90,15 @@ class ProductDetailsViewModel @Inject constructor(
             is ProductDetailsEvent.DismissDeleteBookmark -> {
                 _state.update { it.copy(showDeleteDialog = false) }
             }
+            is ProductDetailsEvent.RetryLoad -> {
+                loadProductDetail()
+            }
         }
     }
 
     private fun loadProductDetail() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, errorMessageResId = null) }
             val savedScan = getSavedScanByIdUseCase(scanId).getOrNull()
             // The backend's favorites list only returns a summary, so a reconciled Room row carries
             // calories and zeroes every other macro. Reading it here showed "0 g" across the board
@@ -108,7 +111,7 @@ class ProductDetailsViewModel @Inject constructor(
                 val detail = mapToProductDetail(source).copy(isBookmarked = savedScan != null)
                 _state.update { it.copy(isLoading = false, productDetail = detail) }
             } else {
-                _state.update { it.copy(isLoading = false, error = "Failed to load product details") }
+                _state.update { it.copy(isLoading = false, errorMessageResId = iti.grad.presentation.R.string.offline_state_title) }
             }
         }
     }

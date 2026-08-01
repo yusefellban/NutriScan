@@ -43,6 +43,7 @@ import androidx.compose.material3.SnackbarHostState
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
@@ -130,7 +131,7 @@ fun NutriGptScreen(
                 is NutriGptEffect.NavigateBack -> onNavigateBack()
                 is NutriGptEffect.ShowError -> {
                     snackbarHostState.showAppSnackbar(
-                        message = effect.message,
+                        message = effect.message.asString(context),
                         type = SnackbarType.ERROR
                     )
                 }
@@ -190,6 +191,15 @@ fun NutriGptScreen(
                     if (state.isLoading) {
                         item(key = "loading_bubble") {
                             ChatTypingBubble()
+                        }
+                    }
+                    
+                    if (state.errorMessageResId != null) {
+                        item(key = "error_widget") {
+                            OfflineStateWidget(
+                                modifier = Modifier.padding(top = 16.dp),
+                                onRetry = { viewModel.onEvent(NutriGptEvent.RetryLastMessage) }
+                            )
                         }
                     }
                 }

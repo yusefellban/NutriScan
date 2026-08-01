@@ -134,17 +134,15 @@ private fun ProductDetailsContent(
                             }
                         }
 
-                        state.error != null -> {
+                        state.errorMessageResId != null -> {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(400.dp),
+                                    .padding(vertical = 48.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = state.error,
-                                    color = AppTheme.colors.Error,
-                                    modifier = Modifier.padding(16.dp),
+                                iti.grad.nutriscan.presentation.common.components.OfflineStateWidget(
+                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
                                 )
                             }
                         }

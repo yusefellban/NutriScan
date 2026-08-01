@@ -29,8 +29,14 @@ fun OfflineStateWidget(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val imageRes = if (AppTheme.isDark) {
+            R.drawable.no_network_connection_dark
+        } else {
+            R.drawable.no_network_connection_light
+        }
+
         Image(
-            painter = painterResource(id = R.drawable.no_internet_img),
+            painter = painterResource(id = imageRes),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,7 +46,8 @@ fun OfflineStateWidget(
         
         Text(
             text = stringResource(id = R.string.offline_state_title),
-            style = AppTheme.typography.headlineMedium,
+            style = AppTheme.typography.titleLarge,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             color = AppTheme.colors.TextPrimary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp)
@@ -50,8 +57,8 @@ fun OfflineStateWidget(
         
         Text(
             text = stringResource(id = R.string.offline_state_subtitle),
-            style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.TextSecondary,
+            style = AppTheme.typography.bodyLarge,
+            color = AppTheme.colors.TextPrimary.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 40.dp)
         )
