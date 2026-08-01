@@ -32,6 +32,7 @@ import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
+import iti.grad.nutriscan.presentation.scan_history.view.components.ScanHistoryEmptyStateWidget
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -127,7 +128,7 @@ private fun ScanHistoryContent(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        iti.grad.nutriscan.presentation.scan_history.view.components.ScanHistoryEmptyStateWidget(
+                        ScanHistoryEmptyStateWidget(
                             onScanNowClick = { onEvent(ScanHistoryEvent.BackClicked) }
                         )
                     }
