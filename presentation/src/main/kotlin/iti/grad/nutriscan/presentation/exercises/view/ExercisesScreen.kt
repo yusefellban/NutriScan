@@ -41,6 +41,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableC
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.graphics.Color
@@ -162,7 +163,7 @@ fun ExercisesScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         if (state.searchQuery.isNotEmpty()) {
-                            iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget(
+                            SearchNotFoundEmptyStateWidget(
                                 showButton = false
                             )
                         } else {
