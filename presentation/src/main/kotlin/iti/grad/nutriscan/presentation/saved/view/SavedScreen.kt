@@ -39,6 +39,8 @@ import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
 import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
+import iti.grad.nutriscan.presentation.saved.view.components.SavedEmptyStateWidget
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
@@ -164,12 +166,12 @@ private fun SavedScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         if (state.searchQuery.isNotEmpty()) {
-                            iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget(
+                            SearchNotFoundEmptyStateWidget(
                                 showButton = true,
                                 onScanNowClick = onNavigateToScan
                             )
                         } else {
-                            iti.grad.nutriscan.presentation.saved.view.components.SavedEmptyStateWidget(
+                            SavedEmptyStateWidget(
                                 onScanNowClick = onNavigateToScan
                             )
                         }
