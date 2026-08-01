@@ -35,6 +35,8 @@ import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
+import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
@@ -141,7 +143,7 @@ private fun ProductDetailsContent(
                                     .padding(vertical = 48.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget(
+                               NotFoundStateWidget(
                                     onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
                                 )
                             }
@@ -154,7 +156,7 @@ private fun ProductDetailsContent(
                                     .padding(vertical = 48.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                iti.grad.nutriscan.presentation.common.components.OfflineStateWidget(
+                                OfflineStateWidget(
                                     onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
                                 )
                             }
