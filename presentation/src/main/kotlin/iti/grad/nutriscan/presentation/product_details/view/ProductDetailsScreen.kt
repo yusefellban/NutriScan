@@ -134,6 +134,19 @@ private fun ProductDetailsContent(
                             }
                         }
 
+                        state.isNotFound -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget(
+                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
+                                )
+                            }
+                        }
+
                         state.errorMessageResId != null -> {
                             Box(
                                 modifier = Modifier

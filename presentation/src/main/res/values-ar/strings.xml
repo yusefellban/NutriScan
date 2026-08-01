@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">نيوتري سكان</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">عذراً! الصفحة التي تبحث\nعنها غير موجودة.</string>
     <string name="signup_title">سجل مجاناً!</string>
     <string name="first_name_label">الاسم الأول</string>
     <string name="first_name_hint">أدخل اسمك الأول…</string>
@@ -47,6 +49,7 @@
     <!-- Bottom Navigation -->
     <string name="nav_home">الرئيسية</string>
     <string name="nav_history">السجل</string>
+    <string name="try_again">حاول مرة أخرى</string>
     <string name="nav_scan">مسح</string>
     <string name="nav_saved">المحفوظات</string>
     <string name="nav_profile">الملف الشخصي</string>

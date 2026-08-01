@@ -98,18 +98,20 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun loadProductDetail() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessageResId = null) }
+            _state.update { it.copy(isLoading = true, errorMessageResId = null, isNotFound = false) }
             val savedScan = getSavedScanByIdUseCase(scanId).getOrNull()
-            // The backend's favorites list only returns a summary, so a reconciled Room row carries
-            // calories and zeroes every other macro. Reading it here showed "0 g" across the board
-            // for any bookmarked product; the full breakdown only exists on GET /scans/{id}. Room
-            // stays as the offline fallback, and still decides the bookmark flag either way.
-            val apiResult = getScanResultUseCase(scanId).getOrNull()
-            val source = apiResult ?: savedScan
+            
+            val apiResult = getScanResultUseCase(scanId)
+            val source = apiResult.getOrNull() ?: savedScan
+            
+            val exception = apiResult.exceptionOrNull()
+            val isNotFoundException = exception?.message?.contains("404") == true || exception?.javaClass?.simpleName == "NotFoundException"
 
             if (source != null) {
                 val detail = mapToProductDetail(source).copy(isBookmarked = savedScan != null)
                 _state.update { it.copy(isLoading = false, productDetail = detail) }
+            } else if (isNotFoundException) {
+                _state.update { it.copy(isLoading = false, isNotFound = true) }
             } else {
                 _state.update { it.copy(isLoading = false, errorMessageResId = iti.grad.presentation.R.string.offline_state_title) }
             }

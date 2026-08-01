@@ -40,6 +40,9 @@
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_history">History</string>
+    <string name="try_again">Try again</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">Oops! The page you\'re\nlooking for can\'t be found.</string>
     <string name="nav_scan">Scan</string>
     <string name="nav_saved">Saved</string>
     <string name="nav_profile">Profile</string>
