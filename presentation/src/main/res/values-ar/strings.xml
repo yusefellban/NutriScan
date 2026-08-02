@@ -549,8 +549,9 @@
     <string name="notification_history_title">الإشعارات</string>
     <string name="notification_history_clear_all">مسح الكل</string>
     <string name="notification_history_settings">الإعدادات</string>
-    <string name="notification_history_empty_title">لا توجد إشعارات بعد</string>
-    <string name="notification_history_empty_subtitle">أنت على اطلاع بكل جديد! سنخبرك عندما يكون هناك شيء جديد.</string>
+    <string name="notification_history_empty_title">لا توجد إشعارات</string>
+    <string name="notification_history_empty_subtitle">لا توجد إشعارات جديدة حالياً.\nسنخبرك عندما يحتاج أمر مهم إلى انتباهك.</string>
+    <string name="notification_history_go_back">رجوع</string>
     <string name="notification_history_time_just_now">الآن</string>
     <string name="notification_history_time_minutes_ago">منذ %1$d دقيقة</string>
     <string name="notification_history_time_hours_ago">منذ %1$d ساعة</string>

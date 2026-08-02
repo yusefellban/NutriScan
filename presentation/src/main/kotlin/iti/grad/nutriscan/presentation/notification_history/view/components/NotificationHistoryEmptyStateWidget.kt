@@ -19,16 +19,18 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
 @Composable
-fun NotificationHistoryEmptyStateWidget(modifier: Modifier = Modifier) {
+fun NotificationHistoryEmptyStateWidget(
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         val imageRes = if (AppTheme.isDark) {
-            R.drawable.not_found_dark
+            R.drawable.no_notifications_dark
         } else {
-            R.drawable.not_found_light
+            R.drawable.no_notifications_light
         }
         
         Image(

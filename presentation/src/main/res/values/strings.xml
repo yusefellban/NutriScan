@@ -548,8 +548,9 @@
     <string name="notification_history_title">Notifications</string>
     <string name="notification_history_clear_all">Clear All</string>
     <string name="notification_history_settings">Settings</string>
-    <string name="notification_history_empty_title">No Notifications Yet</string>
-    <string name="notification_history_empty_subtitle">You\'re all caught up! We\'ll let you know when there\'s something new.</string>
+    <string name="notification_history_empty_title">No notifications</string>
+    <string name="notification_history_empty_subtitle">No new notifications right now.\nWe\'ll let you know when something\nimportant needs your attention.</string>
+    <string name="notification_history_go_back">Go back</string>
     <string name="notification_history_time_just_now">Just now</string>
     <string name="notification_history_time_minutes_ago">%1$d min ago</string>
     <string name="notification_history_time_hours_ago">%1$d hr ago</string>
