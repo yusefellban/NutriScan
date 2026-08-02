@@ -62,21 +62,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         setContent {
-            val notificationPermissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission(),
-            ) { /* no-op: workers simply won't be able to post if denied */ }
 
-            LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    val granted = ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS,
-                    ) == PackageManager.PERMISSION_GRANTED
-                    if (!granted) {
-                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-            }
 
             val themeMode by mainActivityViewModel.themeMode.collectAsStateWithLifecycle()
             val darkTheme = when (themeMode) {

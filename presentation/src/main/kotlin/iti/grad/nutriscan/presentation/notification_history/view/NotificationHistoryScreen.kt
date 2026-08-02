@@ -1,5 +1,12 @@
 package iti.grad.nutriscan.presentation.notification_history.view
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
@@ -50,6 +59,7 @@ import iti.grad.nutriscan.presentation.notification_history.state.NotificationHi
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryEvent
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryItemUi
 import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationHistoryEmptyStateWidget
+import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationPermissionDeniedWidget
 import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationHistoryItemCard
 import iti.grad.nutriscan.presentation.notification_history.viewmodel.NotificationHistoryViewModel
 import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
@@ -69,7 +79,34 @@ fun NotificationHistoryScreen(
     val context = LocalContext.current
     var showClearConfirmDialog by remember { mutableStateOf(false) }
 
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasNotificationPermission = isGranted
+        }
+    )
+
+    LifecycleResumeEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            hasNotificationPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        }
+        onPauseOrDispose { }
+    }
+
     LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is NotificationHistoryEffect.NavigateBack -> onNavigateBack()
@@ -149,7 +186,18 @@ fun NotificationHistoryScreen(
                     }
                 }
 
-                if (state.isEmpty && !state.isLoading) {
+                if (!hasNotificationPermission) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        NotificationPermissionDeniedWidget(
+                            onGoToSettingsClick = {
+                                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                                context.startActivity(intent)
+                            }
+                        )
+                    }
+                } else if (state.isEmpty && !state.isLoading) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         NotificationHistoryEmptyStateWidget()
                     }

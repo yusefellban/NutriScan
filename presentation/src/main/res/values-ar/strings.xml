@@ -550,8 +550,12 @@
     <string name="notification_history_clear_all">مسح الكل</string>
     <string name="notification_history_settings">الإعدادات</string>
     <string name="notification_history_empty_title">لا توجد إشعارات</string>
-    <string name="notification_history_empty_subtitle">لا توجد إشعارات جديدة حالياً.\nسنخبرك عندما يحتاج أمر مهم إلى انتباهك.</string>
-    <string name="notification_history_go_back">رجوع</string>
+    <string name="notification_history_empty_subtitle">لا توجد إشعارات جديدة حالياً.\nسنخبرك عندما يحتاج أمر مهم لاهتمامك.</string>
+    <string name="notification_history_empty_go_back">العودة للخلف</string>
+    
+    <string name="notification_permission_title">تفعيل الإشعارات</string>
+    <string name="notification_permission_subtitle">قم بتفعيل الإشعارات لتلقي تحديثات المسح، والتذكيرات، وتنبيهات صحية هامة.</string>
+    <string name="notification_permission_button">الانتقال إلى الإعدادات</string>
     <string name="notification_history_time_just_now">الآن</string>
     <string name="notification_history_time_minutes_ago">منذ %1$d دقيقة</string>
     <string name="notification_history_time_hours_ago">منذ %1$d ساعة</string>
