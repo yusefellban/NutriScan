@@ -3,29 +3,45 @@ package iti.grad.nutriscan.notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.domain.notification.model.NotificationType
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.repository.ITestNotificationSender
 import iti.grad.presentation.R
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TestNotificationSenderImpl @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val historyRecorder: INotificationHistoryRecorder,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ITestNotificationSender {
 
+    /** Fire-and-forget scope for recording — test notifications are user-triggered
+     *  one-shots so a leaked job on app kill is acceptable here. */
+    private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
     override fun sendNow() {
+        val title = context.getString(R.string.notification_push_test_title)
+        val body = context.getString(R.string.notification_push_test_body)
         val notification = NutriScanNotificationBuilder.build(
             context = context,
             type = NotificationType.QUOTE,
-            title = context.getString(R.string.notification_push_test_title),
-            body = context.getString(R.string.notification_push_test_body),
+            title = title,
+            body = body,
         )
         NotificationManagerCompat.from(context).notify(TEST_NOTIFICATION_ID, notification)
+        scope.launch { historyRecorder.record(NotificationType.QUOTE, title, body) }
     }
 
     override fun sendAllTypesNow() {
         val manager = NotificationManagerCompat.from(context)
         contentFor(NotificationType.entries).forEach { (type, title, body) ->
             manager.notify(TEST_NOTIFICATION_ID + type.ordinal, NutriScanNotificationBuilder.build(context, type, title, body))
+            scope.launch { historyRecorder.record(type, title, body) }
         }
     }
 

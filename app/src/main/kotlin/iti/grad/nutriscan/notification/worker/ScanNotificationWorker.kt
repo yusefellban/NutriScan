@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import iti.grad.nutriscan.domain.notification.model.NotificationType
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.IsWithinQuietHoursUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
@@ -26,6 +27,7 @@ class ScanNotificationWorker @AssistedInject constructor(
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val scanRepository: IScanRepository,
     private val isWithinQuietHours: IsWithinQuietHoursUseCase,
+    private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -42,15 +44,18 @@ class ScanNotificationWorker @AssistedInject constructor(
         return postReminder()
     }
 
-    private fun postReminder(): Result {
+    private suspend fun postReminder(): Result {
+        val title = applicationContext.getString(R.string.notification_push_scan_title)
+        val body = applicationContext.getString(R.string.notification_push_scan_body)
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
             type = NotificationType.SCAN,
-            title = applicationContext.getString(R.string.notification_push_scan_title),
-            body = applicationContext.getString(R.string.notification_push_scan_body),
+            title = title,
+            body = body,
         )
         NotificationManagerCompat.from(applicationContext)
             .notify(NotificationChannels.channelId(NotificationType.SCAN).hashCode(), notification)
+        historyRecorder.record(NotificationType.SCAN, title, body)
         return Result.success()
     }
 

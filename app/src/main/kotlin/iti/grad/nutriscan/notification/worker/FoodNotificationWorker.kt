@@ -9,6 +9,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
 import iti.grad.nutriscan.domain.notification.model.NotificationType
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.IsWithinQuietHoursUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
@@ -24,6 +25,7 @@ class FoodNotificationWorker @AssistedInject constructor(
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
     private val isWithinQuietHours: IsWithinQuietHoursUseCase,
+    private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -35,14 +37,17 @@ class FoodNotificationWorker @AssistedInject constructor(
         val loggedToday = observeTodayFoodLog().first().isNotEmpty()
         if (loggedToday) return Result.success()
 
+        val title = applicationContext.getString(R.string.notification_push_food_title)
+        val body = applicationContext.getString(R.string.notification_push_food_body)
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
             type = NotificationType.FOOD,
-            title = applicationContext.getString(R.string.notification_push_food_title),
-            body = applicationContext.getString(R.string.notification_push_food_body),
+            title = title,
+            body = body,
         )
         NotificationManagerCompat.from(applicationContext)
             .notify(NotificationChannels.channelId(NotificationType.FOOD).hashCode(), notification)
+        historyRecorder.record(NotificationType.FOOD, title, body)
         return Result.success()
     }
 

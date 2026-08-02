@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import iti.grad.nutriscan.domain.notification.model.NotificationType
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.IsWithinQuietHoursUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
@@ -24,6 +25,7 @@ class BreakNotificationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val isWithinQuietHours: IsWithinQuietHoursUseCase,
+    private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -31,14 +33,17 @@ class BreakNotificationWorker @AssistedInject constructor(
         if (!prefs.isEnabled(NotificationType.BREAK)) return Result.success()
         if (isWithinQuietHours(prefs, LocalTime.now())) return Result.success()
 
+        val title = applicationContext.getString(R.string.notification_push_break_title)
+        val body = applicationContext.getString(R.string.notification_push_break_body)
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
             type = NotificationType.BREAK,
-            title = applicationContext.getString(R.string.notification_push_break_title),
-            body = applicationContext.getString(R.string.notification_push_break_body),
+            title = title,
+            body = body,
         )
         NotificationManagerCompat.from(applicationContext)
             .notify(NotificationChannels.channelId(NotificationType.BREAK).hashCode(), notification)
+        historyRecorder.record(NotificationType.BREAK, title, body)
         return Result.success()
     }
 

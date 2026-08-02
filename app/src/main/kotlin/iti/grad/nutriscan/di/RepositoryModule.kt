@@ -49,6 +49,10 @@ import iti.grad.nutriscan.data.repository.SavedScanRepositoryImpl
 import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.data.repository.DailyTrackingRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRepository
+import iti.grad.nutriscan.data.repository.NotificationHistoryRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
+import iti.grad.nutriscan.data.repository.NotificationHistoryRecorderImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -190,4 +194,16 @@ abstract class RepositoryModule {
     abstract fun bindStepHistoryRepository(
         impl: iti.grad.nutriscan.data.repository.StepHistoryRepositoryImpl
     ): iti.grad.nutriscan.domain.steps.history.repository.IStepHistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationHistoryRepository(
+        impl: NotificationHistoryRepositoryImpl
+    ): INotificationHistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationHistoryRecorder(
+        impl: NotificationHistoryRecorderImpl
+    ): INotificationHistoryRecorder
 }
