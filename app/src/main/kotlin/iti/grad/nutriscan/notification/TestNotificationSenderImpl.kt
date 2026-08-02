@@ -14,6 +14,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import android.annotation.SuppressLint
+
+@SuppressLint("MissingPermission")
 class TestNotificationSenderImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val historyRecorder: INotificationHistoryRecorder,

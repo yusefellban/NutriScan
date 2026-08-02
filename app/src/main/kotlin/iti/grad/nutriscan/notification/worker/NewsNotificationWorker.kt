@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -26,6 +27,7 @@ class NewsNotificationWorker @AssistedInject constructor(
     private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val prefs = observePrefs().first()
         if (!prefs.isEnabled(NotificationType.NEWS)) return Result.success()

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -30,6 +31,7 @@ class StreakNotificationWorker @AssistedInject constructor(
     private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val prefs = observePrefs().first()
         val loggedToday = observeTodayFoodLog().first().isNotEmpty()

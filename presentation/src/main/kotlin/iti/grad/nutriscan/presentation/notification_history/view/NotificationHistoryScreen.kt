@@ -75,9 +75,10 @@ fun NotificationHistoryScreen(
                 is NotificationHistoryEffect.NavigateBack -> onNavigateBack()
                 is NotificationHistoryEffect.NavigateToSettings -> onNavigateToSettings()
                 is NotificationHistoryEffect.ShowUndoSnackbar -> {
+                    val message = context.applicationContext.getString(effect.messageResId)
                     scope.launch {
                         snackbarHostState.showAppSnackbar(
-                            message = context.getString(effect.messageResId),
+                            message = message,
                         )
                     }
                 }
