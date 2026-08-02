@@ -46,6 +46,7 @@ class ScanNotificationWorker @AssistedInject constructor(
         return postReminder()
     }
 
+    @SuppressLint("MissingPermission")
     private suspend fun postReminder(): Result {
         val title = applicationContext.getString(R.string.notification_push_scan_title)
         val body = applicationContext.getString(R.string.notification_push_scan_body)
