@@ -14,6 +14,7 @@ import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.runCatchingCancellable
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTracking
+import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingHistoryPage
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
@@ -112,9 +113,16 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getHistoryPage(page: Int, size: Int): Result<List<DailyTrackingSummary>> =
+    override suspend fun getHistoryPage(page: Int, size: Int): Result<DailyTrackingHistoryPage> =
         withContext(ioDispatcher) {
-            runCatchingCancellable { api.getHistoryPage(page, size).content.map { it.toDomain() } }
+            runCatchingCancellable {
+                val response = api.getHistoryPage(page, size)
+                DailyTrackingHistoryPage(
+                    entries = response.content.map { it.toDomain() },
+                    isLastPage = response.last,
+                    currentPage = response.number,
+                )
+            }
         }
 
     /** Fires [syncPendingDay] in the background right after a local water/steps/target write,

@@ -84,7 +84,7 @@ class StepHistoryRepositoryImpl @Inject constructor(
     ): Map<LocalDate, Int> {
         val remote = dailyTrackingRepository.getHistoryPage(0, HISTORY_PAGE_SIZE)
             .getOrNull()
-            .orEmpty()
+            ?.entries.orEmpty()
             .filter { it.date >= startDate && it.date <= endDate }
             .associate { it.date to it.stepsCnt }
 

@@ -556,5 +556,7 @@
     <string name="calories_history_target">target</string>
     <string name="calories_history_step_unit">step</string>
     <string name="calories_history_min">min</string>
+    <string name="calories_history_error">Something went wrong. Please try again.</string>
+    <string name="calories_history_retry">Retry</string>
 
 </resources>

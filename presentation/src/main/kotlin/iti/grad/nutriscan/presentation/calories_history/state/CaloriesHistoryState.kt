@@ -8,4 +8,8 @@ import kotlinx.collections.immutable.persistentListOf
 data class CaloriesHistoryState(
     val isLoading: Boolean = false,
     val entries: ImmutableList<CaloriesHistoryDayUiModel> = persistentListOf(),
+    val currentPage: Int = 0,
+    val isLastPage: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val errorMessage: String? = null,
 )

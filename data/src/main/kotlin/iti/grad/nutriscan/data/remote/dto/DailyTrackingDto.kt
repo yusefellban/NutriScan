@@ -47,6 +47,10 @@ data class DailyTrackingSummaryResponseDto(
     val targetWaterCnt: Int? = null,
     val waterCnt: Int? = null,
     val stepsCnt: Int? = null,
+    val stepsKcal: Double? = null,
+    val exerciseKcal: Double? = null,
+    val exerciseMin: Double? = null,
+    val totalMealKcal: Long? = null,
     val mealCount: Int? = null,
 )
 
@@ -56,4 +60,5 @@ data class PageDailyTrackingSummaryResponseDto(
     val totalElements: Long = 0,
     val totalPages: Int = 0,
     val number: Int = 0,
+    val last: Boolean = true,
 )

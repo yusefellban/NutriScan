@@ -2,22 +2,36 @@ package iti.grad.nutriscan.presentation.calories_history.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,9 +40,13 @@ import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEve
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryDayCard
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryTopBar
 import iti.grad.nutriscan.presentation.calories_history.viewmodel.CaloriesHistoryViewModel
+import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+
+private const val LOAD_MORE_THRESHOLD = 3
 
 @Composable
 fun CaloriesHistoryScreen(
@@ -37,6 +55,23 @@ fun CaloriesHistoryScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
+
+    // Trigger LoadMore when user scrolls close to the end
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisibleIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0)
+            totalItems > 0 && lastVisibleIndex >= totalItems - LOAD_MORE_THRESHOLD
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            viewModel.onEvent(CaloriesHistoryEvent.LoadMore)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -67,21 +102,80 @@ fun CaloriesHistoryScreen(
                 onCalendarClick = { viewModel.onEvent(CaloriesHistoryEvent.CalendarClicked) },
             )
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 20.dp,
-                    vertical = 8.dp,
-                ),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                items(
-                    items = state.entries,
-                    key = { it.dateLabel },
-                ) { entry ->
-                    CaloriesHistoryDayCard(entry = entry)
+            Box(modifier = Modifier.fillMaxSize()) {
+                when {
+                    // Full-screen loading on first page
+                    state.isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = AppTheme.colors.CaloriesHistoryStatIconTint)
+                        }
+                    }
+
+                    // Full-screen error with retry (only when list is empty)
+                    state.errorMessage != null && state.entries.isEmpty() -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.calories_history_error),
+                                style = AppTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                                color = AppTheme.colors.CaloriesHistoryStatLabel,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            AppButton(
+                                textResId = R.string.calories_history_retry,
+                                isLoading = false,
+                                onClick = { viewModel.onEvent(CaloriesHistoryEvent.Retry) },
+                            )
+                        }
+                    }
+
+                    else -> {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .navigationBarsPadding(),
+                            contentPadding = PaddingValues(
+                                horizontal = 20.dp,
+                                vertical = 8.dp,
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(20.dp),
+                        ) {
+                            items(
+                                items = state.entries,
+                                key = { it.dateLabel },
+                            ) { entry ->
+                                CaloriesHistoryDayCard(entry = entry)
+                            }
+
+                            // Loading indicator at bottom while loading next page
+                            if (state.isLoadingMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 16.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(28.dp),
+                                            color = AppTheme.colors.CaloriesHistoryStatIconTint,
+                                            strokeWidth = 2.dp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
