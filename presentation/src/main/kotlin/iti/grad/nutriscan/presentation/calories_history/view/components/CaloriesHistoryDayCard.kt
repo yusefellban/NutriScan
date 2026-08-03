@@ -70,7 +70,7 @@ fun CaloriesHistoryDayCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            val itemModifier = Modifier.height(115.dp)
+            val itemModifier = Modifier.height(105.dp)
 
             // 1. Total Meals
 
