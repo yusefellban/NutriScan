@@ -34,7 +34,7 @@ fun CaloriesHistoryTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(start = 20.dp, end = 20.dp, bottom = 16.dp, top = 32.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AppBackButton(
@@ -57,7 +57,7 @@ fun CaloriesHistoryTopBar(
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(AppTheme.colors.CaloriesHistoryCalendarIconBg)
+                .background(AppTheme.colors.Teal300)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -66,9 +66,9 @@ fun CaloriesHistoryTopBar(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_calendar_small),
+                painter = painterResource(R.drawable.ic_date),
                 contentDescription = null,
-                tint = AppTheme.colors.CaloriesHistoryCalendarIconTint,
+                tint = AppTheme.colors.Teal500,
                 modifier = Modifier.size(24.dp),
             )
         }
