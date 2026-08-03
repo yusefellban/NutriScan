@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEffect
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEvent
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryDayCard
+import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryEmptyState
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryTopBar
 import iti.grad.nutriscan.presentation.calories_history.viewmodel.CaloriesHistoryViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
@@ -61,6 +62,7 @@ private const val LOAD_MORE_THRESHOLD = 3
 @Composable
 fun CaloriesHistoryScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToAddMeals: () -> Unit,
     viewModel: CaloriesHistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -87,6 +89,7 @@ fun CaloriesHistoryScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is CaloriesHistoryEffect.NavigateBack -> onNavigateBack()
+                is CaloriesHistoryEffect.NavigateToAddMeals -> onNavigateToAddMeals()
             }
         }
     }
@@ -167,6 +170,13 @@ fun CaloriesHistoryScreen(
                         ) {
                             CircularProgressIndicator(color = AppTheme.colors.CaloriesHistoryStatIconTint)
                         }
+                    }
+
+                    // Empty state (no errors, no entries, not loading)
+                    !state.isLoading && state.errorMessage == null && state.entries.isEmpty() -> {
+                        CaloriesHistoryEmptyState(
+                            onAddMealsClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateToAddMeals) },
+                        )
                     }
 
                     // Full-screen error with retry (only when list is empty)

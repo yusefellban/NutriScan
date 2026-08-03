@@ -471,7 +471,12 @@ fun AppNavGraph(
         // 34. Calories History
         composable<CaloriesHistoryRoute> {
             CaloriesHistoryScreen(
-                onNavigateBack = { navController.navigateUp() }
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToAddMeals = {
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.SCAN)) {
+                        popUpTo(MainRoute()) { inclusive = true }
+                    }
+                }
             )
         }
     }

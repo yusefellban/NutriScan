@@ -560,5 +560,8 @@
     <string name="calories_history_retry">إعادة المحاولة</string>
     <string name="calories_history_date_confirm">تأكيد</string>
     <string name="calories_history_date_cancel">إلغاء</string>
+    <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
+    <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
+    <string name="calories_history_empty_button">إضافة وجبات</string>
 
 </resources>

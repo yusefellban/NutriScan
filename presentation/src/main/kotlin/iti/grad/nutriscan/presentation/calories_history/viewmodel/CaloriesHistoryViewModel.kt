@@ -67,6 +67,9 @@ class CaloriesHistoryViewModel @Inject constructor(
                 val selected = _state.value.selectedDate
                 if (selected != null) loadSingleDay(selected) else loadFirstPage()
             }
+            is CaloriesHistoryEvent.NavigateToAddMeals -> viewModelScope.launch {
+                _effect.send(CaloriesHistoryEffect.NavigateToAddMeals)
+            }
         }
     }
 

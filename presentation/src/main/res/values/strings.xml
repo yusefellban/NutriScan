@@ -560,5 +560,8 @@
     <string name="calories_history_retry">Retry</string>
     <string name="calories_history_date_confirm">Confirm</string>
     <string name="calories_history_date_cancel">Cancel</string>
+    <string name="calories_history_empty_title">No Calories History</string>
+    <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
+    <string name="calories_history_empty_button">Add meals</string>
 
 </resources>

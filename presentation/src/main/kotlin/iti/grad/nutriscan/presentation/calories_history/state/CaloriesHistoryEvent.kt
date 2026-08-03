@@ -16,4 +16,6 @@ sealed interface CaloriesHistoryEvent {
     data object LoadMore : CaloriesHistoryEvent
     /** Fired when the user taps retry after a failed first-page load. */
     data object Retry : CaloriesHistoryEvent
+    /** Fired when the user taps the "Add meals" button in the empty state. */
+    data object NavigateToAddMeals : CaloriesHistoryEvent
 }
