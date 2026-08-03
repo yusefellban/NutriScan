@@ -50,7 +50,7 @@ fun CaloriesHistoryStatItem(
         modifier = modifier
             .customShadow(
                 shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF13A4AB).copy(alpha = 0.2f),
+                color = Color(AppTheme.colors.CaloriesHistoryStatIconTint.value).copy(alpha = 0.2f),
                 blurRadius = 20f,
                 offsetY = 10f,
                 spread = (-5).dp,
