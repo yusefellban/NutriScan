@@ -57,7 +57,7 @@ fun CaloriesHistoryTopBar(
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(AppTheme.colors.Teal300)
+                .background(AppTheme.colors.CaloriesHistoryCalendarIconBg)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -68,7 +68,7 @@ fun CaloriesHistoryTopBar(
             Icon(
                 painter = painterResource(R.drawable.ic_date),
                 contentDescription = null,
-                tint = AppTheme.colors.Teal500,
+                tint = AppTheme.colors.CaloriesHistoryCalendarIconTint,
                 modifier = Modifier.size(24.dp),
             )
         }

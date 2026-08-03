@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,7 +50,7 @@ fun CaloriesHistoryStatItem(
         modifier = modifier
             .customShadow(
                 shape = RoundedCornerShape(14.dp),
-                color = AppTheme.colors.Primary.copy(alpha = 0.2f),
+                color = Color(0xFF13A4AB).copy(alpha = 0.2f),
                 blurRadius = 20f,
                 offsetY = 10f,
                 spread = (-5).dp,
