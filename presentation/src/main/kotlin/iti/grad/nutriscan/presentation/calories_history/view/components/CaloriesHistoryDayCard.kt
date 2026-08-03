@@ -1,0 +1,133 @@
+package iti.grad.nutriscan.presentation.calories_history.view.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryDayUiModel
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.theme.LexendDeca
+import iti.grad.presentation.R
+
+/**
+ * Full-width card for one day's calorie summary.
+ *
+ * Visual structure (matches screenshot):
+ *
+ *         ╭──────────────────╮
+ *         │   23-7-2026      │   ← white date chip, centered
+ *         ╰──────────────────╯
+ *  ╭─────────────────────────────────────────────╮
+ *  │  [TotalMeals] [Water]  [Steps]  [Exercise]  │  ← outer card (light teal bg)
+ *  ╰─────────────────────────────────────────────╯
+ */
+@Composable
+fun CaloriesHistoryDayCard(
+    entry: CaloriesHistoryDayUiModel,
+    modifier: Modifier = Modifier,
+) {
+    val kcalUnit = stringResource(R.string.calories_history_kcal)
+    val cupsUnit = stringResource(R.string.calories_history_cups)
+    val targetUnit = stringResource(R.string.calories_history_target)
+    val stepUnit = stringResource(R.string.calories_history_step_unit)
+    val minUnit = stringResource(R.string.calories_history_min)
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(0.dp),
+    ) {
+        // Date chip — white pill overlapping the top edge of the card
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .background(AppTheme.colors.CaloriesHistoryDateChipBg)
+                .padding(horizontal = 28.dp, vertical = 8.dp),
+        ) {
+            Text(
+                text = entry.dateLabel,
+                style = AppTheme.typography.bodyMedium.copy(
+                    fontFamily = LexendDeca,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                ),
+                color = AppTheme.colors.CaloriesHistoryStatSecondary,
+            )
+        }
+
+        // Outer card (light teal-gray background)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(AppTheme.colors.CaloriesHistoryOuterCardBg)
+                .padding(12.dp)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            val itemModifier = Modifier.size(115.dp)
+
+            // 1. Total Meals
+            CaloriesHistoryStatItem(
+                modifier = itemModifier,
+                icon = painterResource(R.drawable.ic_flame),
+                label = stringResource(R.string.calories_history_total_meals),
+                primaryValue = "${entry.totalMealsKcal}",
+                primaryUnit = kcalUnit,
+            )
+
+            // 2. Water
+            CaloriesHistoryStatItem(
+                modifier = itemModifier,
+                icon = painterResource(R.drawable.ic_water_dot),
+                label = stringResource(R.string.calories_history_water),
+                primaryValue = "${entry.waterCups}",
+                primaryUnit = cupsUnit,
+                secondaryValue = "${entry.waterTarget}",
+                secondaryUnit = targetUnit,
+            )
+
+            // 3. Steps
+            CaloriesHistoryStatItem(
+                modifier = itemModifier,
+                icon = painterResource(R.drawable.steps),
+                label = stringResource(R.string.calories_history_steps),
+                primaryValue = "${entry.steps}",
+                primaryUnit = stepUnit,
+                secondaryValue = "${entry.stepsKcal}",
+                secondaryUnit = kcalUnit,
+            )
+
+            // 4. Exercise
+            CaloriesHistoryStatItem(
+                modifier = itemModifier,
+                icon = painterResource(R.drawable.ic_fire_outline),
+                label = stringResource(R.string.calories_history_exercise),
+                primaryValue = "${entry.exerciseMinutes}",
+                primaryUnit = minUnit,
+                secondaryValue = "${entry.exerciseKcal}",
+                secondaryUnit = kcalUnit,
+            )
+        }
+    }
+}

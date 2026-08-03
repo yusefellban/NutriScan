@@ -545,4 +545,16 @@
     <string name="step_history_period_3months">3 Months</string>
     <string name="step_history_period_6months">6 Months</string>
 
+    <!-- Calories History -->
+    <string name="calories_history_title">Calories History</string>
+    <string name="calories_history_total_meals">Total\nMeals</string>
+    <string name="calories_history_water">Water</string>
+    <string name="calories_history_steps">Steps</string>
+    <string name="calories_history_exercise">Exercise</string>
+    <string name="calories_history_kcal">Kcal</string>
+    <string name="calories_history_cups">Cups</string>
+    <string name="calories_history_target">target</string>
+    <string name="calories_history_step_unit">step</string>
+    <string name="calories_history_min">min</string>
+
 </resources>

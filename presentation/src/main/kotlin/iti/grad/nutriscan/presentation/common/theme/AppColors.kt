@@ -255,6 +255,23 @@ internal data class AppColorsExtension3(
     val NewsScreenTitle: Color,
     val NewsCardBg: Color,
     val NewsCardBorder: Color,
+
+    // --- Calories History ---
+    val CaloriesHistoryScreenBg: Color,
+    val CaloriesHistoryTopBarIconBg: Color,
+    val CaloriesHistoryTopBarIconTint: Color,
+    val CaloriesHistoryTitle: Color,
+    val CaloriesHistoryDateText: Color,
+    val CaloriesHistoryCardBg: Color,
+    val CaloriesHistoryCardBorder: Color,
+    val CaloriesHistoryStatLabel: Color,
+    val CaloriesHistoryStatValue: Color,
+    val CaloriesHistoryStatSecondary: Color,
+    val CaloriesHistoryStatIconTint: Color,
+    val CaloriesHistoryCalendarIconBg: Color,
+    val CaloriesHistoryCalendarIconTint: Color,
+    val CaloriesHistoryOuterCardBg: Color,
+    val CaloriesHistoryDateChipBg: Color,
 )
 
 @Immutable
@@ -582,6 +599,23 @@ data class AppColors internal constructor(
     val NewsScreenTitle: Color get() = extension3.NewsScreenTitle
     val NewsCardBg: Color get() = extension3.NewsCardBg
     val NewsCardBorder: Color get() = extension3.NewsCardBorder
+
+    // Calories History
+    val CaloriesHistoryScreenBg: Color get() = extension3.CaloriesHistoryScreenBg
+    val CaloriesHistoryTopBarIconBg: Color get() = extension3.CaloriesHistoryTopBarIconBg
+    val CaloriesHistoryTopBarIconTint: Color get() = extension3.CaloriesHistoryTopBarIconTint
+    val CaloriesHistoryTitle: Color get() = extension3.CaloriesHistoryTitle
+    val CaloriesHistoryDateText: Color get() = extension3.CaloriesHistoryDateText
+    val CaloriesHistoryCardBg: Color get() = extension3.CaloriesHistoryCardBg
+    val CaloriesHistoryCardBorder: Color get() = extension3.CaloriesHistoryCardBorder
+    val CaloriesHistoryStatLabel: Color get() = extension3.CaloriesHistoryStatLabel
+    val CaloriesHistoryStatValue: Color get() = extension3.CaloriesHistoryStatValue
+    val CaloriesHistoryStatSecondary: Color get() = extension3.CaloriesHistoryStatSecondary
+    val CaloriesHistoryStatIconTint: Color get() = extension3.CaloriesHistoryStatIconTint
+    val CaloriesHistoryCalendarIconBg: Color get() = extension3.CaloriesHistoryCalendarIconBg
+    val CaloriesHistoryCalendarIconTint: Color get() = extension3.CaloriesHistoryCalendarIconTint
+    val CaloriesHistoryOuterCardBg: Color get() = extension3.CaloriesHistoryOuterCardBg
+    val CaloriesHistoryDateChipBg: Color get() = extension3.CaloriesHistoryDateChipBg
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -954,6 +988,23 @@ fun lightColors() = AppColors(
         NewsScreenTitle = Color(0xFF393C3C), // Gray1600
         NewsCardBg = Color(0xFFFFFFFF), // White
         NewsCardBorder = Color(0xFFE5E5E4), // Gray300
+
+        // Calories History (Light Mode)
+        CaloriesHistoryScreenBg = Color(0xFFF8F8F9),        // Gray100
+        CaloriesHistoryTopBarIconBg = Color(0xFFD4F1F2),    // Teal200
+        CaloriesHistoryTopBarIconTint = Color(0xFF11939A),  // Teal1200
+        CaloriesHistoryTitle = Color(0xFF0A545A),           // Teal1500
+        CaloriesHistoryDateText = Color(0xFF11939A),        // Teal1200
+        CaloriesHistoryCardBg = Color(0xFFFFFFFF),          // White
+        CaloriesHistoryCardBorder = Color(0xFFE5E5E4),      // Gray300
+        CaloriesHistoryStatLabel = Color(0xFF11939A),       // Teal1200
+        CaloriesHistoryStatValue = Color(0xFF0A545A),       // Teal1500
+        CaloriesHistoryStatSecondary = Color(0xFF898989),   // Gray700
+        CaloriesHistoryStatIconTint = Color(0xFF13A4AB),    // Teal1000
+        CaloriesHistoryCalendarIconBg = Color(0xFFD4F1F2),  // Teal200
+        CaloriesHistoryCalendarIconTint = Color(0xFF11939A),// Teal1200
+        CaloriesHistoryOuterCardBg = Color(0xFFE0EFEF),     // Light teal-gray outer card
+        CaloriesHistoryDateChipBg = Color(0xFFFFFFFF),      // White date chip
     ),
 )
 
@@ -1330,5 +1381,22 @@ fun darkColors() = AppColors(
         NewsScreenTitle = Color(0xFFCAF2F4), // Teal300
         NewsCardBg = Color(0xFF0A545A), // Teal1500
         NewsCardBorder = Color(0xFF0B5F65), // Teal1400
+
+        // Calories History (Dark Mode)
+        CaloriesHistoryScreenBg = Color(0xFF0F474A),         // Teal1600
+        CaloriesHistoryTopBarIconBg = Color(0xFF0B5F65),     // Teal1400
+        CaloriesHistoryTopBarIconTint = Color(0xFFA3E9EC),   // Teal400
+        CaloriesHistoryTitle = Color(0xFFE8FAFA),            // Teal100
+        CaloriesHistoryDateText = Color(0xFF47D3D9),         // Teal600
+        CaloriesHistoryCardBg = Color(0xFF0B5F65),           // Teal1400
+        CaloriesHistoryCardBorder = Color(0xFF11939A),       // Teal1200
+        CaloriesHistoryStatLabel = Color(0xFF47D3D9),        // Teal600
+        CaloriesHistoryStatValue = Color(0xFFE8FAFA),        // Teal100
+        CaloriesHistoryStatSecondary = Color(0xFFA3E9EC),    // Teal400
+        CaloriesHistoryStatIconTint = Color(0xFF47D3D9),     // Teal600
+        CaloriesHistoryCalendarIconBg = Color(0xFF0A545A),   // Teal1500
+        CaloriesHistoryCalendarIconTint = Color(0xFF47D3D9), // Teal600
+        CaloriesHistoryOuterCardBg = Color(0xFF0A545A),      // Teal1500 outer card
+        CaloriesHistoryDateChipBg = Color(0xFF0F474A),       // Teal1600 date chip
     ),
 )
