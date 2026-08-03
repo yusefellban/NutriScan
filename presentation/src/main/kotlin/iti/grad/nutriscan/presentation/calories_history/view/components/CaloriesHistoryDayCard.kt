@@ -90,7 +90,7 @@ fun CaloriesHistoryDayCard(
             // 1. Total Meals
             CaloriesHistoryStatItem(
                 modifier = itemModifier,
-                icon = painterResource(R.drawable.ic_flame),
+                icon = painterResource(R.drawable.ic_calorie_outlined),
                 label = stringResource(R.string.calories_history_total_meals),
                 primaryValue = "${entry.totalMealsKcal}",
                 primaryUnit = kcalUnit,
@@ -99,7 +99,7 @@ fun CaloriesHistoryDayCard(
             // 2. Water
             CaloriesHistoryStatItem(
                 modifier = itemModifier,
-                icon = painterResource(R.drawable.ic_water_dot),
+                icon = painterResource(R.drawable.ic_water_outlined),
                 label = stringResource(R.string.calories_history_water),
                 primaryValue = "${entry.waterCups}",
                 primaryUnit = cupsUnit,
@@ -121,7 +121,7 @@ fun CaloriesHistoryDayCard(
             // 4. Exercise
             CaloriesHistoryStatItem(
                 modifier = itemModifier,
-                icon = painterResource(R.drawable.ic_fire_outline),
+                icon = painterResource(R.drawable.ic_dumbell),
                 label = stringResource(R.string.calories_history_exercise),
                 primaryValue = "${entry.exerciseMinutes}",
                 primaryUnit = minUnit,
