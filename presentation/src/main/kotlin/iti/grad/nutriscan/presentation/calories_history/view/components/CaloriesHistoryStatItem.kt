@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
@@ -46,6 +47,13 @@ fun CaloriesHistoryStatItem(
 ) {
     Column(
         modifier = modifier
+            .customShadow(
+                shape = RoundedCornerShape(14.dp),
+                color = AppTheme.colors.Primary.copy(alpha = 0.2f),
+                blurRadius = 20f,
+                offsetY = 10f,
+                spread = (-5).dp,
+            )
             .clip(RoundedCornerShape(14.dp))
             .background(AppTheme.colors.CaloriesHistoryCardBg)
             .padding(horizontal = 10.dp, vertical = 10.dp),

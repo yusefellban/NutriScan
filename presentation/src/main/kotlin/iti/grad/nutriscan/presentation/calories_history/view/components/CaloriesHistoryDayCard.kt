@@ -23,10 +23,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryDayUiModel
+import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
-import iti.grad.presentation.R
 
 /**
  * Full-width card for one day's calorie summary.
@@ -51,43 +53,26 @@ fun CaloriesHistoryDayCard(
     val stepUnit = stringResource(R.string.calories_history_step_unit)
     val minUnit = stringResource(R.string.calories_history_min)
 
-    Column(
+    Box(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(0.dp),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        // Date chip — white pill overlapping the top edge of the card
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(AppTheme.colors.CaloriesHistoryDateChipBg)
-                .padding(horizontal = 28.dp, vertical = 8.dp),
-        ) {
-            Text(
-                text = entry.dateLabel,
-                style = AppTheme.typography.bodyMedium.copy(
-                    fontFamily = LexendDeca,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                ),
-                color = AppTheme.colors.CaloriesHistoryStatSecondary,
-            )
-        }
-
         // Outer card (light teal-gray background)
         Row(
             modifier = Modifier
+                .padding(top = 18.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
                 .background(AppTheme.colors.CaloriesHistoryOuterCardBg)
-                .padding(12.dp)
-                .horizontalScroll(rememberScrollState()),
+                .horizontalScroll(rememberScrollState())
+                .padding(top = 28.dp, start = 12.dp, end = 12.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.Top,
         ) {
             val itemModifier = Modifier.size(115.dp)
 
             // 1. Total Meals
+
             CaloriesHistoryStatItem(
                 modifier = itemModifier,
                 icon = painterResource(R.drawable.ic_calorie_outlined),
@@ -127,6 +112,32 @@ fun CaloriesHistoryDayCard(
                 primaryUnit = minUnit,
                 secondaryValue = "${entry.exerciseKcal}",
                 secondaryUnit = kcalUnit,
+            )
+        }
+
+        // Date chip — white pill overlapping the top edge of the card
+        Box(
+            modifier = Modifier
+                .zIndex(1f)
+                .customShadow(
+                    shape = RoundedCornerShape(50.dp),
+                    color = AppTheme.colors.Primary.copy(alpha = 0.2f),
+                    blurRadius = 20f,
+                    offsetY = 10f,
+                    spread = (-5).dp,
+                )
+                .clip(RoundedCornerShape(50.dp))
+                .background(AppTheme.colors.CaloriesHistoryDateChipBg)
+                .padding(horizontal = 28.dp, vertical = 8.dp),
+        ) {
+            Text(
+                text = entry.dateLabel,
+                style = AppTheme.typography.bodyMedium.copy(
+                    fontFamily = LexendDeca,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                ),
+                color = AppTheme.colors.CaloriesHistoryStatSecondary,
             )
         }
     }
