@@ -83,9 +83,9 @@ fun CaloriesHistoryStatItem(
                 text = label,
                 style = AppTheme.typography.labelSmall.copy(
                     fontFamily = LexendDeca,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 12.sp,
+                    lineHeight = 12.sp,
                 ),
                 color = AppTheme.colors.CaloriesHistoryStatLabel,
             )
@@ -101,8 +101,8 @@ fun CaloriesHistoryStatItem(
             Text(
                 text = primaryValue,
                 style = AppTheme.typography.bodyLarge.copy(
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = LexendDeca,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
                 ),
@@ -128,11 +128,11 @@ fun CaloriesHistoryStatItem(
             ) {
                 Text(
                     text = secondaryValue,
-                    style = AppTheme.typography.bodyMedium.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
+                    style = AppTheme.typography.bodyLarge.copy(
+                        fontFamily = LexendDeca,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        lineHeight = 20.sp,
                     ),
                     color = AppTheme.colors.CaloriesHistoryStatValue,
                 )
