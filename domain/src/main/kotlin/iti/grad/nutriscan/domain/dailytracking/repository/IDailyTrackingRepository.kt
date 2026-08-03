@@ -15,6 +15,9 @@ interface IDailyTrackingRepository {
 
     suspend fun getHistoryPage(page: Int, size: Int): Result<DailyTrackingHistoryPage>
 
+    /** Fetches a single day's summary from the backend — used by the date picker in CaloriesHistory. */
+    suspend fun getRemoteDaySummary(date: LocalDate): Result<DailyTrackingSummary>
+
     /** Updates local Room only (`syncedToBackend = false`) — no live network call. */
     suspend fun updateWaterCnt(waterCnt: Int): Result<Unit>
 

@@ -17,6 +17,10 @@ data class DailyTrackingResponseDto(
     val targetWaterCnt: Int? = null,
     val waterCnt: Int? = null,
     val stepsCnt: Int? = null,
+    val stepsKcal: Double? = null,
+    val exerciseKcal: Double? = null,
+    val exerciseMin: Double? = null,
+    val totalMealKcal: Long? = null,
     val meals: List<DailyTrackingMealResponseDto> = emptyList(),
 )
 

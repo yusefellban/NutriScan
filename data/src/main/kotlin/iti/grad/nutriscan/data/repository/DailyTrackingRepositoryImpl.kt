@@ -9,6 +9,7 @@ import iti.grad.nutriscan.data.remote.dto.DailyTrackingRequestDto
 import iti.grad.nutriscan.data.remote.dto.UpdateMealRequestDto
 import iti.grad.nutriscan.data.repository.mapper.toDomain
 import iti.grad.nutriscan.data.repository.mapper.toEntity
+import iti.grad.nutriscan.data.repository.mapper.toDaySummary
 import iti.grad.nutriscan.data.repository.mapper.toRemoteSnapshot
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.CairoDateProvider
@@ -123,6 +124,11 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     currentPage = response.number,
                 )
             }
+        }
+
+    override suspend fun getRemoteDaySummary(date: LocalDate): Result<DailyTrackingSummary> =
+        withContext(ioDispatcher) {
+            runCatchingCancellable { api.getByDate(date.toString()).toDaySummary() }
         }
 
     /** Fires [syncPendingDay] in the background right after a local water/steps/target write,

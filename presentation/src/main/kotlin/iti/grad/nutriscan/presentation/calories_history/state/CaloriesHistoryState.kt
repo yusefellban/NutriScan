@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.calories_history.state
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import java.time.LocalDate
 
 @Immutable
 data class CaloriesHistoryState(
@@ -12,4 +13,6 @@ data class CaloriesHistoryState(
     val isLastPage: Boolean = false,
     val isLoadingMore: Boolean = false,
     val errorMessage: String? = null,
+    val showDatePicker: Boolean = false,
+    val selectedDate: LocalDate? = null,
 )

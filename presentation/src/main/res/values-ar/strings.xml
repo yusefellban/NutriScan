@@ -558,5 +558,7 @@
     <string name="calories_history_min">د</string>
     <string name="calories_history_error">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
     <string name="calories_history_retry">إعادة المحاولة</string>
+    <string name="calories_history_date_confirm">تأكيد</string>
+    <string name="calories_history_date_cancel">إلغاء</string>
 
 </resources>

@@ -558,5 +558,7 @@
     <string name="calories_history_min">min</string>
     <string name="calories_history_error">Something went wrong. Please try again.</string>
     <string name="calories_history_retry">Retry</string>
+    <string name="calories_history_date_confirm">Confirm</string>
+    <string name="calories_history_date_cancel">Cancel</string>
 
 </resources>

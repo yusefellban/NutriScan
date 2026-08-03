@@ -18,10 +18,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -45,9 +51,13 @@ import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 private const val LOAD_MORE_THRESHOLD = 3
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaloriesHistoryScreen(
     onNavigateBack: () -> Unit,
@@ -81,6 +91,51 @@ fun CaloriesHistoryScreen(
         }
     }
 
+    // ── Date Picker Dialog ──
+    if (state.showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = state.selectedDate
+                ?.atStartOfDay()
+                ?.toInstant(ZoneOffset.UTC)
+                ?.toEpochMilli(),
+            selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return utcTimeMillis <= System.currentTimeMillis()
+                }
+            }
+        )
+        DatePickerDialog(
+            onDismissRequest = {
+                viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val picked = Instant.ofEpochMilli(millis)
+                                .atZone(ZoneOffset.UTC)
+                                .toLocalDate()
+                            viewModel.onEvent(CaloriesHistoryEvent.DateSelected(picked))
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.calories_history_date_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker)
+                    },
+                ) {
+                    Text(stringResource(R.string.calories_history_date_cancel))
+                }
+            },
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     Scaffold(
         containerColor = AppTheme.colors.CaloriesHistoryScreenBg,
         contentWindowInsets = WindowInsets(0),
@@ -108,7 +163,7 @@ fun CaloriesHistoryScreen(
                     state.isLoading -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(color = AppTheme.colors.CaloriesHistoryStatIconTint)
                         }
