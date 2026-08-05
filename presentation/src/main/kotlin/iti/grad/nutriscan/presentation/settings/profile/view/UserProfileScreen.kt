@@ -60,6 +60,7 @@ fun UserProfileScreen(
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToCaloriesHistory: () -> Unit = {},
     onNavigateToTab: (iti.grad.nutriscan.presentation.common.model.BottomNavTab) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
@@ -72,6 +73,7 @@ fun UserProfileScreen(
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
                 is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
+                is UserProfileEffect.NavigateToCaloriesHistory -> onNavigateToCaloriesHistory()
                 is UserProfileEffect.ShowError -> errorMessage = effect.message
                 is UserProfileEffect.NavigateToTab -> onNavigateToTab(effect.tab)
             }
@@ -164,6 +166,11 @@ private fun UserProfileContent(
                         iconResId = R.drawable.hour,
                         label = stringResource(R.string.user_profile_scan_history),
                         onClick = { onEvent(UserProfileEvent.ScanHistoryClicked) },
+                    )
+                    ProfileMenuRow(
+                        iconResId = R.drawable.ic_history,
+                        label = stringResource(R.string.calories_history_title),
+                        onClick = { onEvent(UserProfileEvent.CaloriesHistoryClicked) },
                     )
                     ProfileMenuRow(
                         iconResId = R.drawable.bell,

@@ -545,4 +545,23 @@
     <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
     <string name="scan_save_failed">فشل في حفظ الفحص</string>
     <string name="scan_capture_failed">فشل التقاط الصورة: %1$s</string>
+    <!-- Calories History -->
+    <string name="calories_history_title">سجل السعرات</string>
+    <string name="calories_history_total_meals">إجمالي\nالوجبات</string>
+    <string name="calories_history_water">ماء</string>
+    <string name="calories_history_steps">خطوات</string>
+    <string name="calories_history_exercise">تمرين</string>
+    <string name="calories_history_kcal">كيلو سعر</string>
+    <string name="calories_history_cups">أكواب</string>
+    <string name="calories_history_target">الهدف</string>
+    <string name="calories_history_step_unit">خطوة</string>
+    <string name="calories_history_min">د</string>
+    <string name="calories_history_error">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
+    <string name="calories_history_retry">إعادة المحاولة</string>
+    <string name="calories_history_date_confirm">تأكيد</string>
+    <string name="calories_history_date_cancel">إلغاء</string>
+    <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
+    <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
+    <string name="calories_history_empty_button">إضافة وجبات</string>
+
 </resources>

@@ -7,5 +7,9 @@ data class DailyTrackingSummary(
     val targetWaterCnt: Int,
     val waterCnt: Int,
     val stepsCnt: Int,
+    val stepsKcal: Int,
+    val exerciseKcal: Int,
+    val exerciseMinutes: Int,
+    val totalMealKcal: Int,
     val mealCount: Int,
 )

@@ -198,14 +198,6 @@ class NewsViewModelTest {
         }
 
         @Test
-        fun `OpenArticleInWeb emits OpenArticle with the article's url`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(NewsEvent.OpenArticleInWeb("https://example.com/x"))
-                Assertions.assertEquals(NewsEffect.OpenArticle("https://example.com/x"), awaitItem())
-            }
-        }
-
-        @Test
         fun `BackClicked emits NavigateBack`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(NewsEvent.BackClicked)

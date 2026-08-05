@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.main.calories.stephistory.view.StepHistoryScreen
+import iti.grad.nutriscan.presentation.calories_history.view.CaloriesHistoryScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
@@ -208,6 +209,7 @@ fun AppNavGraph(
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
                 onNavigateToStepHistory = { navController.navigate(StepHistoryRoute) },
+                onNavigateToCaloriesHistory = { navController.navigate(CaloriesHistoryRoute) },
             )
         }
 
@@ -463,6 +465,18 @@ fun AppNavGraph(
         composable<StepHistoryRoute> {
             StepHistoryScreen(
                 onNavigateBack = { navController.navigateUp() }
+            )
+        }
+
+        // 34. Calories History
+        composable<CaloriesHistoryRoute> {
+            CaloriesHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToAddMeals = {
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.SCAN)) {
+                        popUpTo(MainRoute()) { inclusive = true }
+                    }
+                }
             )
         }
     }

@@ -545,4 +545,23 @@
     <string name="step_history_period_3months">3 Months</string>
     <string name="step_history_period_6months">6 Months</string>
 
+    <!-- Calories History -->
+    <string name="calories_history_title">Calories History</string>
+    <string name="calories_history_total_meals">Total\nMeals</string>
+    <string name="calories_history_water">Water</string>
+    <string name="calories_history_steps">Steps</string>
+    <string name="calories_history_exercise">Exercise</string>
+    <string name="calories_history_kcal">Kcal</string>
+    <string name="calories_history_cups">Cups</string>
+    <string name="calories_history_target">target</string>
+    <string name="calories_history_step_unit">step</string>
+    <string name="calories_history_min">min</string>
+    <string name="calories_history_error">Something went wrong. Please try again.</string>
+    <string name="calories_history_retry">Retry</string>
+    <string name="calories_history_date_confirm">Confirm</string>
+    <string name="calories_history_date_cancel">Cancel</string>
+    <string name="calories_history_empty_title">No Calories History</string>
+    <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
+    <string name="calories_history_empty_button">Add meals</string>
+
 </resources>

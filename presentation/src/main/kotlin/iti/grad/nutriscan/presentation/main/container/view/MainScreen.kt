@@ -38,6 +38,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToExercises: () -> Unit,
     onNavigateToStepHistory: () -> Unit,
+    onNavigateToCaloriesHistory: () -> Unit,
     modifier: Modifier = Modifier,
     initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
@@ -115,6 +116,7 @@ fun MainScreen(
                         onNavigateToNotifications = onNavigateToNotifications,
                         onNavigateToSettings = onNavigateToSettings,
                         onNavigateToEditProfile = onNavigateToEditProfile,
+                        onNavigateToCaloriesHistory = onNavigateToCaloriesHistory,
                     )
                 }
             }
