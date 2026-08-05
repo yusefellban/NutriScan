@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
-import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
 import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -37,10 +37,7 @@ import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
-import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
-import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
-import iti.grad.nutriscan.presentation.saved.view.components.SavedEmptyStateWidget
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
@@ -151,30 +148,37 @@ private fun SavedScreenContent(
             when {
                 state.isLoading -> shimmerGrid()
                 state.error != null && state.products.isEmpty() -> {
-                    Box(
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_network_connection_light,
+                        darkImageRes = R.drawable.no_network_connection_dark,
+                        title = stringResource(R.string.offline_state_title),
+                        subtitle = stringResource(R.string.offline_state_subtitle),
+                        buttonText = stringResource(R.string.offline_state_retry),
+                        onButtonClick = { onEvent(SavedEvent.RetryLoad) },
                         modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        OfflineStateWidget(onRetry = { onEvent(SavedEvent.RetryLoad) })
-                    }
+                    )
                 }
                 state.filteredProducts.isEmpty() -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = bottomPadding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (state.searchQuery.isNotEmpty()) {
-                            SearchNotFoundEmptyStateWidget(
-                                showButton = true,
-                                onScanNowClick = onNavigateToScan
-                            )
-                        } else {
-                            SavedEmptyStateWidget(
-                                onScanNowClick = onNavigateToScan
-                            )
-                        }
+                    if (state.searchQuery.isNotEmpty()) {
+                        AppEmptyStateWidget(
+                            lightImageRes = R.drawable.search_reasult_not_found_light,
+                            darkImageRes = R.drawable.search_reasult_not_found_dark,
+                            title = stringResource(R.string.search_not_found_title),
+                            subtitle = stringResource(R.string.search_not_found_subtitle),
+                            buttonText = stringResource(R.string.search_not_found_button),
+                            onButtonClick = onNavigateToScan,
+                            modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                        )
+                    } else {
+                        AppEmptyStateWidget(
+                            lightImageRes = R.drawable.saved_not_found_light,
+                            darkImageRes = R.drawable.saved_not_found_dark,
+                            title = stringResource(R.string.saved_empty_title),
+                            subtitle = stringResource(R.string.saved_empty_subtitle),
+                            buttonText = stringResource(R.string.saved_empty_button),
+                            onButtonClick = onNavigateToScan,
+                            modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                        )
                     }
                 }
                 else -> {

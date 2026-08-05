@@ -137,29 +137,17 @@ private fun ProductDetailsContent(
                         }
 
                         state.isNotFound -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 48.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                               NotFoundStateWidget(
-                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
-                                )
-                            }
+                            NotFoundStateWidget(
+                                onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
+                                modifier = Modifier.padding(vertical = 48.dp),
+                            )
                         }
 
                         state.errorMessageResId != null -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 48.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                OfflineStateWidget(
-                                    onRetry = { onEvent(ProductDetailsEvent.RetryLoad) }
-                                )
-                            }
+                            OfflineStateWidget(
+                                onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
+                                modifier = Modifier.padding(vertical = 48.dp),
+                            )
                         }
 
                         state.productDetail != null -> {
