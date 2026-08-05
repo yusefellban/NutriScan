@@ -55,5 +55,21 @@ fun DailyTrackingSummaryResponseDto.toDomain(): DailyTrackingSummary = DailyTrac
     targetWaterCnt = targetWaterCnt ?: 0,
     waterCnt = waterCnt ?: 0,
     stepsCnt = stepsCnt ?: 0,
+    stepsKcal = stepsKcal?.toInt() ?: 0,
+    exerciseKcal = exerciseKcal?.toInt() ?: 0,
+    exerciseMinutes = exerciseMin?.toInt() ?: 0,
+    totalMealKcal = totalMealKcal?.toInt() ?: 0,
     mealCount = mealCount ?: 0,
+)
+
+fun DailyTrackingResponseDto.toDaySummary(): DailyTrackingSummary = DailyTrackingSummary(
+    date = date?.let { LocalDate.parse(it) } ?: CairoDateProvider.today(),
+    targetWaterCnt = targetWaterCnt ?: 0,
+    waterCnt = waterCnt ?: 0,
+    stepsCnt = stepsCnt ?: 0,
+    stepsKcal = stepsKcal?.toInt() ?: 0,
+    exerciseKcal = exerciseKcal?.toInt() ?: 0,
+    exerciseMinutes = exerciseMin?.toInt() ?: 0,
+    totalMealKcal = totalMealKcal?.toInt() ?: 0,
+    mealCount = meals.size,
 )

@@ -9,11 +9,13 @@ import iti.grad.nutriscan.data.remote.dto.DailyTrackingRequestDto
 import iti.grad.nutriscan.data.remote.dto.UpdateMealRequestDto
 import iti.grad.nutriscan.data.repository.mapper.toDomain
 import iti.grad.nutriscan.data.repository.mapper.toEntity
+import iti.grad.nutriscan.data.repository.mapper.toDaySummary
 import iti.grad.nutriscan.data.repository.mapper.toRemoteSnapshot
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.runCatchingCancellable
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTracking
+import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingHistoryPage
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
@@ -112,9 +114,21 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getHistoryPage(page: Int, size: Int): Result<List<DailyTrackingSummary>> =
+    override suspend fun getHistoryPage(page: Int, size: Int): Result<DailyTrackingHistoryPage> =
         withContext(ioDispatcher) {
-            runCatchingCancellable { api.getHistoryPage(page, size).content.map { it.toDomain() } }
+            runCatchingCancellable {
+                val response = api.getHistoryPage(page, size)
+                DailyTrackingHistoryPage(
+                    entries = response.content.map { it.toDomain() },
+                    isLastPage = response.last,
+                    currentPage = response.number,
+                )
+            }
+        }
+
+    override suspend fun getRemoteDaySummary(date: LocalDate): Result<DailyTrackingSummary> =
+        withContext(ioDispatcher) {
+            runCatchingCancellable { api.getByDate(date.toString()).toDaySummary() }
         }
 
     /** Fires [syncPendingDay] in the background right after a local water/steps/target write,

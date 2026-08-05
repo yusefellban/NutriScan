@@ -197,7 +197,6 @@ class NewsViewModelTest {
             Assertions.assertNull(viewModel.state.value.selectedArticle)
         }
 
-
         @Test
         fun `BackClicked emits NavigateBack`() = runTest {
             viewModel.effect.test {

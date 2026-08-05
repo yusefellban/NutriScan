@@ -99,6 +99,7 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileEvent.ScanHistoryClicked -> emitEffect(UserProfileEffect.NavigateToScanHistory)
             is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotifications)
             is UserProfileEvent.SettingsClicked -> emitEffect(UserProfileEffect.NavigateToSettings)
+            is UserProfileEvent.CaloriesHistoryClicked -> emitEffect(UserProfileEffect.NavigateToCaloriesHistory)
             is UserProfileEvent.BottomNavTabClicked -> {
                 // Profile is the only tab rendered by this screen; every other
                 // tab is a separate destination pushed on top, so this retained
