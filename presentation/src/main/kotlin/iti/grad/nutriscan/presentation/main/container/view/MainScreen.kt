@@ -7,6 +7,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -14,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import iti.grad.nutriscan.presentation.common.components.AppBottomNavBar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
@@ -24,6 +30,8 @@ import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.saved.view.SavedScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
+import iti.grad.nutriscan.presentation.common.components.ActionConfirmAlert
+import iti.grad.presentation.R
 
 @Composable
 fun MainScreen(
@@ -45,6 +53,31 @@ fun MainScreen(
     var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     var captureTrigger by remember { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val context = LocalContext.current
+    var showExitDialog by rememberSaveable { mutableStateOf(false) }
+
+    if (showExitDialog) {
+        ActionConfirmAlert(
+            title = stringResource(R.string.exit_dialog_title),
+            message = stringResource(R.string.exit_dialog_message),
+            confirmText = stringResource(R.string.exit_dialog_confirm),
+            cancelText = stringResource(R.string.action_cancel),
+            onConfirm = {
+                showExitDialog = false
+                context.findActivity()?.moveTaskToBack(true)
+            },
+            onDismiss = { showExitDialog = false }
+        )
+    }
+
+    BackHandler {
+        if (selectedTab != BottomNavTab.HOME) {
+            selectedTab = BottomNavTab.HOME
+        } else {
+            showExitDialog = true
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -81,6 +114,7 @@ fun MainScreen(
                         onNavigateToNews = onNavigateToNews,
                         onNavigateToChatWithAi = onNavigateToChatWithAi,
                         onNavigateToEditProfile = onNavigateToEditProfile,
+                        onNavigateToScan = { selectedTab = BottomNavTab.SCAN },
                     )
                 }
                 BottomNavTab.CALORIES -> {
@@ -122,4 +156,10 @@ fun MainScreen(
             }
         }
     }
+}
+
+private fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

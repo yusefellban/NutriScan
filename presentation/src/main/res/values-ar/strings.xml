@@ -30,6 +30,11 @@
     <string name="action_sign_in">تسجيل الدخول</string>
     <string name="prompt_no_account">ليس لديك حساب؟ سجل الآن.</string>
 
+    <!-- Exit Dialog -->
+    <string name="exit_dialog_title">الخروج من التطبيق</string>
+    <string name="exit_dialog_message">هل أنت متأكد من رغبتك في الخروج من نيوتري سكان؟</string>
+    <string name="exit_dialog_confirm">خروج</string>
+
     <!-- Home Screen -->
     <string name="home_greeting">مرحباً، %1$s!</string>
     <string name="home_subtitle">صحتك تأتي أولاً</string>

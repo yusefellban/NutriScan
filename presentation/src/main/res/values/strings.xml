@@ -21,6 +21,11 @@
     <string name="action_sign_in">Sign In</string>
     <string name="prompt_no_account">Don\'t have an account? Sign Up.</string>
 
+    <!-- Exit Dialog -->
+    <string name="exit_dialog_title">Exit App</string>
+    <string name="exit_dialog_message">Are you sure you want to exit NutriScan?</string>
+    <string name="exit_dialog_confirm">Exit</string>
+
     <!-- Home Screen -->
     <string name="home_greeting">Hello, %1$s!</string>
     <string name="home_subtitle">Your Health Comes First</string>
