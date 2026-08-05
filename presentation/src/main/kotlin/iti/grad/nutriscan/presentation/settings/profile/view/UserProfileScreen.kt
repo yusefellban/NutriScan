@@ -58,7 +58,7 @@ fun UserProfileScreen(
     bottomPadding: Dp = 0.dp,
     onNavigateToScanHistory: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
-    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToNotificationSettings: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToCaloriesHistory: () -> Unit = {},
     onNavigateToTab: (iti.grad.nutriscan.presentation.common.model.BottomNavTab) -> Unit = {},
@@ -71,7 +71,7 @@ fun UserProfileScreen(
             when (effect) {
                 is UserProfileEffect.NavigateToEditProfile -> onNavigateToEditProfile()
                 is UserProfileEffect.NavigateToScanHistory -> onNavigateToScanHistory()
-                is UserProfileEffect.NavigateToNotifications -> onNavigateToNotifications()
+                is UserProfileEffect.NavigateToNotificationSettings -> onNavigateToNotificationSettings()
                 is UserProfileEffect.NavigateToSettings -> onNavigateToSettings()
                 is UserProfileEffect.NavigateToCaloriesHistory -> onNavigateToCaloriesHistory()
                 is UserProfileEffect.ShowError -> errorMessage = effect.message

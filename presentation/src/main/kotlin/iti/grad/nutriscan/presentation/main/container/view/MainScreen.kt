@@ -33,6 +33,7 @@ fun MainScreen(
     onNavigateToChatWithAi: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToNotifications: () -> Unit,
+    onNavigateToNotificationSettings: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToFamilyMemberDetail: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -113,7 +114,7 @@ fun MainScreen(
                     UserProfileScreen(
                         bottomPadding = bottomPadding,
                         onNavigateToScanHistory = onNavigateToHistory,
-                        onNavigateToNotifications = onNavigateToNotifications,
+                        onNavigateToNotificationSettings = onNavigateToNotificationSettings,
                         onNavigateToSettings = onNavigateToSettings,
                         onNavigateToEditProfile = onNavigateToEditProfile,
                         onNavigateToCaloriesHistory = onNavigateToCaloriesHistory,

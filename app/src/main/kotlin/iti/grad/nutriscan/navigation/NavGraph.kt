@@ -205,6 +205,7 @@ fun AppNavGraph(
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationHistoryRoute) },
+                onNavigateToNotificationSettings = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
