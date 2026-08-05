@@ -26,16 +26,12 @@ import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
-import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
-import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
-import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
-import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
-import iti.grad.nutriscan.presentation.scan_history.view.components.ScanHistoryEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.scan_history.state.*
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 @Composable
 fun ScanHistoryScreen(
@@ -117,21 +113,23 @@ private fun ScanHistoryContent(
                         }
                     }
                 } else if (state.error != null && state.allHistoryItems.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        OfflineStateWidget(onRetry = { onEvent(ScanHistoryEvent.RetryLoad) })
-                    }
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_network_connection_light,
+                        darkImageRes = R.drawable.no_network_connection_dark,
+                        title = stringResource(R.string.offline_state_title),
+                        subtitle = stringResource(R.string.offline_state_subtitle),
+                        buttonText = stringResource(R.string.offline_state_retry),
+                        onButtonClick = { onEvent(ScanHistoryEvent.RetryLoad) },
+                    )
                 } else if (state.displayedHistoryItems.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ScanHistoryEmptyStateWidget(
-                            onScanNowClick = { onEvent(ScanHistoryEvent.BackClicked) }
-                        )
-                    }
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_scans_yet_light,
+                        darkImageRes = R.drawable.no_scans_yet_dark,
+                        title = stringResource(R.string.scan_history_empty_title),
+                        subtitle = stringResource(R.string.scan_history_empty_subtitle),
+                        buttonText = stringResource(R.string.scan_history_empty_button),
+                        onButtonClick = { onEvent(ScanHistoryEvent.BackClicked) },
+                    )
                 } else {
                     LazyColumn(
                         state = listState,
