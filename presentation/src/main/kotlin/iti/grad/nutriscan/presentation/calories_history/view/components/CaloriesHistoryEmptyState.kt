@@ -20,8 +20,7 @@ import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
-import coil3.compose.AsyncImage
-
+import androidx.compose.foundation.Image
 @Composable
 fun CaloriesHistoryEmptyState(
     onAddMealsClick: () -> Unit,
@@ -34,14 +33,14 @@ fun CaloriesHistoryEmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        val assetName = if (AppTheme.isDark) {
-            "ic_no_calories_history_dark.svg"
+        val iconRes = if (AppTheme.isDark) {
+            R.drawable.ic_no_calories_history_dark
         } else {
-            "ic_no_calories_history_light.svg"
+            R.drawable.ic_no_calories_history_light
         }
         
-        AsyncImage(
-            model = "file:///android_asset/$assetName",
+        Image(
+            painter = painterResource(id = iconRes),
             contentDescription = null,
             modifier = Modifier.size(306.dp)
         )
