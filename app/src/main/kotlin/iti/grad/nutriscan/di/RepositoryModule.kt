@@ -27,8 +27,6 @@ import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 import iti.grad.nutriscan.domain.news.repository.INewsRepository
 import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
-import iti.grad.nutriscan.domain.water.repository.IWaterRepository
-import iti.grad.nutriscan.data.repository.WaterRepositoryImpl
 import iti.grad.nutriscan.domain.workout.repository.IWorkoutRepository
 import iti.grad.nutriscan.data.repository.WorkoutRepositoryImpl
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
@@ -123,11 +121,6 @@ abstract class RepositoryModule {
         impl: NewsRepositoryImpl
     ): INewsRepository
 
-    @Binds
-    @Singleton
-    abstract fun bindWaterRepository(
-        impl: WaterRepositoryImpl
-    ): IWaterRepository
 
     @Binds
     @Singleton

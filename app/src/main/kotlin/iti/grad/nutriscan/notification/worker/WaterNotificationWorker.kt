@@ -12,7 +12,7 @@ import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ShouldNotifyWaterUseCase
-import iti.grad.nutriscan.domain.water.usecase.ObserveTodayWaterUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
 import iti.grad.nutriscan.notification.NutriScanNotificationBuilder
 import iti.grad.presentation.R
@@ -24,7 +24,7 @@ class WaterNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val observePrefs: ObserveNotificationPrefsUseCase,
-    private val observeTodayWater: ObserveTodayWaterUseCase,
+    private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
     private val shouldNotifyWater: ShouldNotifyWaterUseCase,
     private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
@@ -32,14 +32,18 @@ class WaterNotificationWorker @AssistedInject constructor(
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val prefs = observePrefs().first()
-        val water = observeTodayWater().first()
-        if (!shouldNotifyWater(prefs, water, LocalTime.now())) return Result.success()
+        // daily_tracking is what the Calories screen shows. The old water_log table this used
+        // to read was orphaned and always reported 0/8.
+        val tracking = observeTodayDailyTracking().first()
+        if (!shouldNotifyWater(prefs, tracking.waterCnt, tracking.targetWaterCnt, LocalTime.now())) {
+            return Result.success()
+        }
 
         val title = applicationContext.getString(R.string.notification_push_water_title)
         val body = applicationContext.getString(
             R.string.notification_push_water_body,
-            water.glassCount,
-            water.goalGlasses,
+            tracking.waterCnt,
+            tracking.targetWaterCnt,
         )
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
