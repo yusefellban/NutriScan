@@ -65,7 +65,7 @@ class UserProfileViewModel @Inject constructor(
         }
         viewModelScope.launch {
             observeStreak().collectLatest { streak ->
-                _state.update { it.copy(streakDays = streak.currentStreak) }
+                _state.update { it.copy(streakDays = streak) }
             }
         }
         viewModelScope.launch {

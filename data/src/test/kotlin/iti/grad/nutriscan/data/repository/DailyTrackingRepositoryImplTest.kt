@@ -159,19 +159,6 @@ class DailyTrackingRepositoryImplTest {
             assertFalse(today.syncedToBackend)
         }
 
-    @Test
-    fun `updateWaterCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateWaterCnt(1)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
-
-    @Test
-    fun `updateWaterCnt back to zero does not recompute the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateWaterCnt(0)
-
-        coVerify(exactly = 0) { streakRepository.recomputeStreak() }
-    }
 
     @Test
     fun `updateStepsCnt derives caloriesBurnedSteps from the user's weight`() = runTest(testDispatcher.scheduler) {
@@ -223,19 +210,6 @@ class DailyTrackingRepositoryImplTest {
             assertFalse(today.syncedToBackend)
         }
 
-    @Test
-    fun `updateStepsCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateStepsCnt(500)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
-
-    @Test
-    fun `addExerciseWorkout recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.addExerciseWorkout(kcalBurned = 200, minutes = 20)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
 
     @Test
     fun `syncPendingDay calls PATCH and marks synced on success`() = runTest(testDispatcher.scheduler) {

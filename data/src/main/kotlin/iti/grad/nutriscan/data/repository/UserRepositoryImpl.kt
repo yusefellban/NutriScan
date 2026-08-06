@@ -1,6 +1,8 @@
 package iti.grad.nutriscan.data.repository
 
+import iti.grad.nutriscan.data.db.dao.StreakDao
 import iti.grad.nutriscan.data.db.dao.UserDao
+import iti.grad.nutriscan.data.db.entity.StreakEntity
 import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
@@ -35,6 +37,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
+    private val streakDao: StreakDao,
     private val remoteDataSource: IUserRemoteDataSource,
     private val json: Json,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -117,6 +120,15 @@ class UserRepositoryImpl @Inject constructor(
             updatedAt = dto.updatedAt ?: localUser?.updatedAt
         )
         userDao.insertOrUpdateUser(entity)
+        
+        dto.dailyStreak?.let {
+            streakDao.upsert(
+                StreakEntity(
+                    userId = entity.id,
+                    currentStreak = it,
+                )
+            )
+        }
     }
 
     override suspend fun uploadAvatar(imageFile: File): Result<Unit> {

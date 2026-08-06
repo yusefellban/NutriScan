@@ -7,6 +7,7 @@ import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
@@ -36,7 +37,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val userRepository: IUserRepository,
     private val getRecentScansUseCase: GetRecentScansUseCase,
-    private val reconcileTodayUseCase: ReconcileTodayUseCase
+    private val reconcileTodayUseCase: ReconcileTodayUseCase,
+    private val syncDailyStreakUseCase: SyncDailyStreakUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -49,12 +51,11 @@ class HomeViewModel @Inject constructor(
         loadRecentScans()
 
         viewModelScope.launch {
-            // Trigger fetch from remote on load
-            userRepository.fetchAndSyncProfile()
+            reconcileTodayUseCase()
         }
 
         viewModelScope.launch {
-            reconcileTodayUseCase()
+            syncDailyStreakUseCase()
         }
 
         viewModelScope.launch {

@@ -11,4 +11,5 @@ interface IUserRemoteDataSource {
     suspend fun getProfile(): UserDto
     suspend fun updateProfile(request: UpdateUserProfileRequestDto): Response<ResponseBody>
     suspend fun uploadProfileImage(image: MultipartBody.Part): UserDto
+    suspend fun updateDailyStreak(): Response<Unit>
 }

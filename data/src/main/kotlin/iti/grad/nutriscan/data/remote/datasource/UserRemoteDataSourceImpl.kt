@@ -24,4 +24,8 @@ class UserRemoteDataSourceImpl @Inject constructor(
     override suspend fun uploadProfileImage(image: MultipartBody.Part): UserDto {
         return userApiService.uploadProfileImage(image)
     }
+
+    override suspend fun updateDailyStreak(): Response<Unit> {
+        return userApiService.updateDailyStreak()
+    }
 }

@@ -75,8 +75,6 @@ class FoodLogRepositoryImpl @Inject constructor(
     override suspend fun addFoodEntryLocalOnly(entry: FoodLogEntry): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             dao.insert(entry.toEntity(resolveUserId()))
-        }.also {
-            if (it.isSuccess) streakRepository.recomputeStreak()
         }
     }
 
