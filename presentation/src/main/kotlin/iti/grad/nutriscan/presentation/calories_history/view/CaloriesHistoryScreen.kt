@@ -158,6 +158,8 @@ fun CaloriesHistoryScreen(
             CaloriesHistoryTopBar(
                 onBackClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateBack) },
                 onCalendarClick = { viewModel.onEvent(CaloriesHistoryEvent.CalendarClicked) },
+                isFilterActive = state.selectedDate != null,
+                onClearFilterClick = { viewModel.onEvent(CaloriesHistoryEvent.ClearDateFilter) },
             )
 
             Box(modifier = Modifier.fillMaxSize()) {
