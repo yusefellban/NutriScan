@@ -12,6 +12,4 @@ import androidx.room.PrimaryKey
 data class StreakEntity(
     @PrimaryKey val userId: String,
     val currentStreak: Int,
-    val longestStreak: Int,
-    val lastActiveDate: String?,
 )

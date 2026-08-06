@@ -8,8 +8,9 @@ import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.runCatchingCancellable
 import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
-import iti.grad.nutriscan.domain.streak.model.StreakInfo
+
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -24,20 +25,16 @@ import timber.log.Timber
 
 class StreakRepositoryImpl @Inject constructor(
     private val streakDao: StreakDao,
-    private val foodLogDao: FoodLogDao,
-    private val dailyTrackingDao: DailyTrackingDao,
     private val authRepository: IAuthRepository,
     private val userRemoteDataSource: IUserRemoteDataSource,
+    private val userRepository: IUserRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IStreakRepository {
 
-    override fun observeStreak(): Flow<StreakInfo> = flow {
+    override fun observeStreak(): Flow<Int> = flow {
         emitAll(
             streakDao.observe(resolveUserId()).map { entity ->
-                StreakInfo(
-                    currentStreak = entity?.currentStreak ?: 0,
-                    longestStreak = entity?.longestStreak ?: 0,
-                )
+                entity?.currentStreak ?: 0
             }
         )
     }.flowOn(ioDispatcher)
@@ -45,6 +42,7 @@ class StreakRepositoryImpl @Inject constructor(
     override suspend fun syncDailyStreak(): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
             userRemoteDataSource.updateDailyStreak()
+            userRepository.fetchAndSyncProfile().getOrThrow()
         }
     }
 

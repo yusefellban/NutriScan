@@ -22,6 +22,7 @@ data class UserDto(
     val familyMembers: List<FamilyMemberDto>? = null,
     /** Backend serializes the avatar picture field as "imageUrl". */
     @SerialName("imageUrl") val avatarUrl: String? = null,
+    val dailyStreak: Int? = null,
     /** Used purely for cache-busting the avatar image locally — see [iti.grad.nutriscan.data.repository.UserRepositoryImpl]. */
     val updatedAt: String? = null
 )

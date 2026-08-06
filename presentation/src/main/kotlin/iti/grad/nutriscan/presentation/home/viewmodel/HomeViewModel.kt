@@ -51,11 +51,6 @@ class HomeViewModel @Inject constructor(
         loadRecentScans()
 
         viewModelScope.launch {
-            // Trigger fetch from remote on load
-            userRepository.fetchAndSyncProfile()
-        }
-
-        viewModelScope.launch {
             reconcileTodayUseCase()
         }
 
