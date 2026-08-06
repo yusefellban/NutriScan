@@ -9,8 +9,10 @@ interface IStepsPreferencesDataSource {
 
     suspend fun saveBaseline(date: String, steps: Float)
 
-    /** Last known today-steps total, persisted so the UI has a value to show before the first sensor event. */
-    suspend fun getDailySteps(): Int
+    /** Last known step total for [date] (ISO-8601). Returns 0 when the persisted total belongs
+     * to a different day — a stale total is worse than no total, since it is shown to the user
+     * before the first sensor event of the day arrives. */
+    suspend fun getDailySteps(date: String): Int
 
-    suspend fun saveDailySteps(steps: Int)
+    suspend fun saveDailySteps(date: String, steps: Int)
 }
