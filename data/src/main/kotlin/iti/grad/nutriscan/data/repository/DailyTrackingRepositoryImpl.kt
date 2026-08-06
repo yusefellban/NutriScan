@@ -193,8 +193,11 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                 current.copy(
                     exerciseKcal = current.exerciseKcal + kcalBurned,
                     exerciseMinutes = current.exerciseMinutes + minutes,
+                    syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
+            streakRepository.recomputeStreak()
+            pushDayInBackground(CairoDateProvider.today())
             Unit
         }
     }
@@ -241,6 +244,9 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     targetWaterCnt = entity.targetWaterCnt,
                     waterCnt = entity.waterCnt,
                     stepsCnt = entity.stepsCnt,
+                    stepsKcal = entity.caloriesBurnedSteps.toDouble(),
+                    exerciseKcal = entity.exerciseKcal.toDouble(),
+                    exerciseMin = entity.exerciseMinutes.toDouble(),
                 ),
             )
             dao.markSynced(userId, date.toString())
@@ -288,8 +294,8 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                         waterCnt = snapshot.waterCnt,
                         stepsCnt = stepsCnt,
                         caloriesBurnedSteps = caloriesBurnedSteps,
-                        exerciseKcal = existing?.exerciseKcal ?: 0,
-                        exerciseMinutes = existing?.exerciseMinutes ?: 0,
+                        exerciseKcal = maxOf(snapshot.exerciseKcal, existing?.exerciseKcal ?: 0),
+                        exerciseMinutes = maxOf(snapshot.exerciseMinutes, existing?.exerciseMinutes ?: 0),
                         // Keeping a locally-higher step count means the backend is now behind, so
                         // the row still owes a push — marking it synced here would strand the
                         // higher value on this device forever.

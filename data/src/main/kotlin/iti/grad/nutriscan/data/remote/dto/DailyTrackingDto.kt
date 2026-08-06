@@ -8,6 +8,9 @@ data class DailyTrackingRequestDto(
     val targetWaterCnt: Int? = null,
     val waterCnt: Int? = null,
     val stepsCnt: Int? = null,
+    val stepsKcal: Double? = null,
+    val exerciseKcal: Double? = null,
+    val exerciseMin: Double? = null,
 )
 
 @Serializable
