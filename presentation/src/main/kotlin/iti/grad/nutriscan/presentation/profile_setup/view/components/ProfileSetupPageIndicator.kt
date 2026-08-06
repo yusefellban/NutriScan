@@ -22,7 +22,7 @@ fun ProfileSetupPageIndicator(
             withStyle(SpanStyle(color = AppTheme.colors.Teal1000)) {
                 append("${currentPage + 1}")
             }
-            withStyle(SpanStyle(color = AppTheme.colors.PageIndicatorTotal)) {
+            withStyle(SpanStyle(color = AppTheme.colors.TextSecondary.copy(alpha = 0.5f))) {
                 append("/$pageCount")
             }
         },

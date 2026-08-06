@@ -34,7 +34,7 @@ fun OnboardingPageIndicator(
             val color = if (isSelected) {
                 colors.Primary
             } else {
-                colors.Divider
+                colors.TextSecondary.copy(alpha = 0.5f)
             }
             Box(
                 modifier = Modifier
