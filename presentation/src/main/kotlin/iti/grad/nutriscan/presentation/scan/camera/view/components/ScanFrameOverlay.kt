@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.presentation.R
 import androidx.compose.ui.graphics.drawscope.Stroke
 
@@ -35,11 +36,27 @@ private val CornerStroke = 4.dp
 
 @Composable
 fun ScanFrameOverlay(
+    selectedMode: ScanInputMode,
     modifier: Modifier = Modifier,
 ) {
     val frameDescription = stringResource(R.string.scan_frame_content_description)
-    val cornerColor = AppTheme.colors.OnPrimary
-    val scanLineColor = AppTheme.colors.OnPrimary.copy(alpha = 0.45f)
+    val cornerAlpha = when (selectedMode) {
+        ScanInputMode.QR -> 1f
+        ScanInputMode.PHOTO -> 0.9f
+        ScanInputMode.GALLERY -> 0.6f
+    }
+    val lineAlpha = when (selectedMode) {
+        ScanInputMode.QR -> 0.66f
+        ScanInputMode.PHOTO -> 0.5f
+        ScanInputMode.GALLERY -> 0.24f
+    }
+    val durationMillis = when (selectedMode) {
+        ScanInputMode.QR -> 1200
+        ScanInputMode.PHOTO -> 2100
+        ScanInputMode.GALLERY -> 2800
+    }
+    val cornerColor = AppTheme.colors.OnPrimary.copy(alpha = cornerAlpha)
+    val scanLineColor = AppTheme.colors.OnPrimary.copy(alpha = lineAlpha)
     val density = LocalDensity.current
 
     val infiniteTransition = rememberInfiniteTransition(label = "scanLine")
@@ -47,7 +64,7 @@ fun ScanFrameOverlay(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            animation = tween(durationMillis = durationMillis, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "scanLineProgress",

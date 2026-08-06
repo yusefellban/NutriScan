@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 fun CameraPreview(
     isScanning: Boolean,
     imageCapture: ImageCapture,
+    isPreviewActive: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -38,9 +39,9 @@ fun CameraPreview(
         update = { view -> previewView = view },
     )
 
-    DisposableEffect(lifecycleOwner, previewView, isScanning) {
+    DisposableEffect(lifecycleOwner, previewView, isScanning, isPreviewActive) {
         val view = previewView
-        if (view == null || !isScanning) {
+        if (view == null || !isScanning || !isPreviewActive) {
             onDispose { }
         } else {
             val cameraProviderFuture = ProcessCameraProvider.getInstance(context)

@@ -31,6 +31,7 @@ import iti.grad.nutriscan.presentation.home.view.HomeScreen
 import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.saved.view.SavedScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
+import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.nutriscan.presentation.settings.profile.view.UserProfileScreen
 import iti.grad.nutriscan.presentation.common.components.ActionConfirmAlert
 import iti.grad.presentation.R
@@ -55,6 +56,7 @@ fun MainScreen(
 ) {
     var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     var captureTrigger by remember { mutableIntStateOf(0) }
+    var isScanUploadMode by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
@@ -88,10 +90,14 @@ fun MainScreen(
         bottomBar = {
             AppBottomNavBar(
                 selectedTab = selectedTab,
+                isScanUploadMode = isScanUploadMode,
                 onTabClick = { tab -> 
                     if (tab == BottomNavTab.SCAN && selectedTab == BottomNavTab.SCAN) {
                         captureTrigger++
                     } else {
+                        if (tab != BottomNavTab.SCAN) {
+                            isScanUploadMode = false
+                        }
                         selectedTab = tab 
                     }
                 }
@@ -138,6 +144,9 @@ fun MainScreen(
                         bottomPadding = bottomPadding,
                         snackbarHostState = snackbarHostState,
                         captureTrigger = captureTrigger,
+                        onCenterActionUploadModeChanged = { isUpload ->
+                            isScanUploadMode = isUpload
+                        },
                         onNavigateToProductDetail = { uiModel -> onNavigateToProductDetail(uiModel.id) }
                     )
                 }
