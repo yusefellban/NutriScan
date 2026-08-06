@@ -10,6 +10,7 @@ import iti.grad.nutriscan.domain.settings.usecase.GetThemeModeUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetLanguageUseCase
 import iti.grad.nutriscan.domain.settings.usecase.SetThemeModeUseCase
 import iti.grad.nutriscan.domain.auth.usecase.LogoutUseCase
+import iti.grad.nutriscan.domain.user.usecase.DeleteAccountUseCase
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -32,6 +34,7 @@ class AppSettingsViewModel @Inject constructor(
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val userRepository: IUserRepository
 ) : ViewModel() {
 
@@ -68,6 +71,9 @@ class AppSettingsViewModel @Inject constructor(
             AppSettingsEvent.LogoutClicked -> _state.update { it.copy(showLogoutConfirmDialog = true) }
             AppSettingsEvent.LogoutDismissed -> _state.update { it.copy(showLogoutConfirmDialog = false) }
             AppSettingsEvent.LogoutConfirmed -> confirmLogout()
+            AppSettingsEvent.DeleteAccountClicked -> _state.update { it.copy(showDeleteAccountConfirmDialog = true) }
+            AppSettingsEvent.DeleteAccountDismissed -> _state.update { it.copy(showDeleteAccountConfirmDialog = false, deleteAccountError = null) }
+            AppSettingsEvent.DeleteAccountConfirmed -> confirmDeleteAccount()
         }
     }
 
@@ -94,6 +100,30 @@ class AppSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
             navigate(AppSettingsEffect.NavigateToLogin)
+        }
+    }
+
+    private fun confirmDeleteAccount() {
+        _state.update { it.copy(
+            showDeleteAccountConfirmDialog = false,
+            isDeletingAccount = true,
+            deleteAccountError = null,
+        ) }
+        viewModelScope.launch {
+            deleteAccountUseCase()
+                .onSuccess {
+                    // Account scheduled for deletion — log out immediately so the user
+                    // re-authenticates and hits the AccountPendingDeletion screen on next login.
+                    logoutUseCase()
+                    navigate(AppSettingsEffect.AccountDeleted)
+                }
+                .onFailure { error ->
+                    Timber.e(error, "deleteAccount failed")
+                    _state.update { it.copy(
+                        isDeletingAccount = false,
+                        deleteAccountError = error.message ?: "Failed to delete account.",
+                    ) }
+                }
         }
     }
 

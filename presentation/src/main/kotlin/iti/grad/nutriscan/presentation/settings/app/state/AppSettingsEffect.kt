@@ -6,4 +6,6 @@ sealed interface AppSettingsEffect {
     data object NavigateToTermsAndConditions : AppSettingsEffect
     data object NavigateToHelp : AppSettingsEffect
     data object NavigateToLogin : AppSettingsEffect
+    /** Emitted after a successful deleteAccount() + logout sequence. Clears the back stack to Login. */
+    data object AccountDeleted : AppSettingsEffect
 }

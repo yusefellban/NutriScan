@@ -13,4 +13,7 @@ sealed interface AppSettingsEvent {
     data object LogoutClicked : AppSettingsEvent
     data object LogoutConfirmed : AppSettingsEvent
     data object LogoutDismissed : AppSettingsEvent
+    data object DeleteAccountClicked : AppSettingsEvent
+    data object DeleteAccountConfirmed : AppSettingsEvent
+    data object DeleteAccountDismissed : AppSettingsEvent
 }
