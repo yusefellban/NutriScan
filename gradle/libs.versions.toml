@@ -38,6 +38,8 @@ androidxBrowser = "1.9.0"
 work = "2.10.0"
 hiltWork = "1.2.0"
 composeMarkdown = "0.5.4"
+googleServices = "4.5.0"
+firebaseBom = "33.7.0"
 
 [libraries]
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
@@ -95,6 +97,8 @@ mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning"
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
 compose-markdown = { group = "com.github.jeziellago", name = "compose-markdown", version.ref = "composeMarkdown" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -104,3 +108,4 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
