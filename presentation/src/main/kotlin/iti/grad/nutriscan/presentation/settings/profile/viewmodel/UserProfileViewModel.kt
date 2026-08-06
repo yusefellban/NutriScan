@@ -20,6 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -49,7 +50,9 @@ class UserProfileViewModel @Inject constructor(
     init {
         loadProfileData()
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            userRepository.getUserData()
+                .catch { /* Ignored */ }
+                .collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(

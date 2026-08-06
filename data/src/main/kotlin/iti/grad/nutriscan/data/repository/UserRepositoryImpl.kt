@@ -17,11 +17,14 @@ import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -46,7 +49,18 @@ class UserRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IUserRepository {
 
-    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        if (throwable is AccountPendingDeletionException) {
+            Timber.w("Caught AccountPendingDeletionException in repositoryScope")
+        } else {
+            Timber.e(throwable, "Uncaught exception in repositoryScope")
+        }
+    }
+
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher + exceptionHandler)
+
+    private val _accountPendingDeletionEvent = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    override val accountPendingDeletionEvent: Flow<String> = _accountPendingDeletionEvent.asSharedFlow()
 
     /** Polls the backend every [SYNC_INTERVAL_MS] for as long as at least one collector is
      * subscribed, so a profile edit made on another device shows up here without an app restart.
@@ -103,14 +117,12 @@ class UserRepositoryImpl @Inject constructor(
                         .trim()
                         .ifBlank { "unknown" }
                     Timber.w("Account is pending deletion — scheduled: $scheduledDate")
-                    throw AccountPendingDeletionException(scheduledDate)
+                    _accountPendingDeletionEvent.tryEmit(scheduledDate)
+                    return Result.failure(AccountPendingDeletionException(scheduledDate))
                 }
             }
             Timber.e(e, "fetchAndSyncProfile HTTP error: ${e.code()}")
             Result.failure(e)
-        } catch (e: AccountPendingDeletionException) {
-            // Re-throw so the channelFlow propagates it to every collector.
-            throw e
         } catch (e: Exception) {
             Timber.e(e, "fetchAndSyncProfile failed")
             Result.failure(e)

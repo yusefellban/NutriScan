@@ -14,6 +14,11 @@ interface IUserRepository {
     fun getUserData(): Flow<User?>
 
     /**
+     * Emits the scheduled deletion date when a 409 ACCOUNT_PENDING_DELETION is encountered.
+     */
+    val accountPendingDeletionEvent: Flow<String>
+
+    /**
      * Fetches the latest profile from the backend and syncs it with the local database.
      */
     suspend fun fetchAndSyncProfile(): Result<Unit>

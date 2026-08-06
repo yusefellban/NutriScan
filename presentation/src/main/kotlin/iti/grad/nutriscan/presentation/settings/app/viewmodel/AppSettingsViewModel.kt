@@ -25,6 +25,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 
 @HiltViewModel
@@ -47,7 +48,9 @@ class AppSettingsViewModel @Inject constructor(
     init {
         loadSettings()
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            userRepository.getUserData()
+                .catch { /* Ignored, HomeViewModel handles navigation for AccountPendingDeletionException */ }
+                .collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(

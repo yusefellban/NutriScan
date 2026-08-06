@@ -61,12 +61,13 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            userRepository.accountPendingDeletionEvent.collectLatest { scheduledDeletionAt ->
+                emitEffect(HomeEffect.NavigateToAccountPendingDeletion(scheduledDeletionAt))
+            }
+        }
+
+        viewModelScope.launch {
             userRepository.getUserData()
-                .catch { e ->
-                    if (e is AccountPendingDeletionException) {
-                        emitEffect(HomeEffect.NavigateToAccountPendingDeletion(e.scheduledDeletionAt))
-                    }
-                }
                 .collectLatest { user ->
                 if (user != null) {
                     _state.update {

@@ -25,6 +25,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -65,7 +66,9 @@ class CaloriesViewModel @Inject constructor(
      * rather than hiding the BMI page. */
     private fun observeUserMetrics() {
         viewModelScope.launch {
-            userRepository.getUserData().collect { user ->
+            userRepository.getUserData()
+                .catch { /* Ignored */ }
+                .collect { user ->
                 _state.update {
                     it.copy(
                         tdee = user?.tdee?.toInt() ?: 0,
