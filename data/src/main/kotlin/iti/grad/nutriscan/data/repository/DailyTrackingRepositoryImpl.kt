@@ -19,7 +19,6 @@ import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingHistoryPage
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
-import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +58,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     private val api: DailyTrackingApiService,
     private val authRepository: IAuthRepository,
     private val userRepository: IUserRepository,
-    private val streakRepository: IStreakRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IDailyTrackingRepository {
 
@@ -196,7 +194,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
-            streakRepository.recomputeStreak()
             pushDayInBackground(CairoDateProvider.today())
             Unit
         }
