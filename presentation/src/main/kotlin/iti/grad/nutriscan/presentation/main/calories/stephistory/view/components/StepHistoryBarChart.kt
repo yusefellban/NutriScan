@@ -40,7 +40,7 @@ fun StepHistoryBarChart(
             .fillMaxWidth()
             .stepHistoryCardShadow(RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
-            .background(AppTheme.colors.StepHistoryGaugeCardBg)
+            .background(AppTheme.colors.Surface)
             .padding(24.dp)
     ) {
         Text(
@@ -49,7 +49,7 @@ fun StepHistoryBarChart(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             ),
-            color = AppTheme.colors.StepHistoryGaugeValueText
+            color = AppTheme.colors.TextPrimary
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -78,7 +78,7 @@ fun StepHistoryBarChart(
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Medium
                             ),
-                            color = AppTheme.colors.StepHistoryGaugeValueText,
+                            color = AppTheme.colors.TextPrimary,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     } else {
@@ -107,7 +107,7 @@ fun StepHistoryBarChart(
                     Text(
                         text = data.monthLabel,
                         style = AppTheme.typography.labelSmall.copy(
-                            color = AppTheme.colors.StepHistoryChartLabel
+                            color = AppTheme.colors.TextSecondary
                         )
                     )
                 }
@@ -115,3 +115,4 @@ fun StepHistoryBarChart(
         }
     }
 }
+

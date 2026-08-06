@@ -70,7 +70,7 @@ fun StepHistoryScreen(
                 AppSnackbar(snackbarData = data)
             }
         },
-        containerColor = AppTheme.colors.StepHistoryScreenBg,
+        containerColor = AppTheme.colors.ScreenSurfaceBackground,
         contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         Box(
@@ -137,3 +137,4 @@ fun StepHistoryScreen(
         }
     }
 }
+

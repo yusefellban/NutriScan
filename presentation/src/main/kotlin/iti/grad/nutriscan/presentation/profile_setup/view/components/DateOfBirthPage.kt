@@ -105,7 +105,7 @@ fun DateOfBirthPage(
                     offsetY = 0f
                 )
                 .clip(RoundedCornerShape(20.dp))
-                .background(AppTheme.colors.DobCardBackground)
+                .background(AppTheme.colors.Teal500)
                 .clickable { isDatePickerVisible = true },
             contentAlignment = Alignment.Center
         ) {
@@ -222,3 +222,4 @@ fun DateOfBirthPage(
         }
     }
 }
+

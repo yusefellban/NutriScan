@@ -64,9 +64,8 @@ import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsPager
-import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import androidx.compose.ui.Modifier
-import iti.grad.nutriscan.presentation.common.components.AlertButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.Text
 
@@ -277,27 +276,14 @@ private fun CaloriesContent(
     }
 
         if (state.pendingRemoveFoodId != null) {
-            CustomAlertDialog(
+            DeleteWarningAlert(
                 title = stringResource(R.string.food_log_remove_confirm_title),
                 message = stringResource(R.string.food_log_remove_confirm_message),
-                icon = androidx.compose.ui.res.painterResource(id = R.drawable.ic_trash),
-                iconBackgroundColor = AppTheme.colors.ErrorBackground,
-                iconContentColor = AppTheme.colors.Error,
+                confirmText = stringResource(R.string.action_remove),
+                cancelText = stringResource(R.string.action_cancel),
+                onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
                 onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
-            ) {
-                AlertButton(
-                    text = stringResource(R.string.action_cancel),
-                    backgroundColor = AppTheme.colors.SurfaceVariant,
-                    textColor = AppTheme.colors.TextPrimary,
-                    onClick = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
-                )
-                AlertButton(
-                    text = stringResource(R.string.action_remove),
-                    backgroundColor = AppTheme.colors.Error,
-                    textColor = Color.White,
-                    onClick = { onEvent(CaloriesEvent.RemoveFoodConfirmed) }
-                )
-            }
+            )
         }
 }
 

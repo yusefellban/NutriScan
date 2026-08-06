@@ -45,7 +45,7 @@ fun StepHistoryTopBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
-                tint = AppTheme.colors.StepHistoryTopBarIconTint,
+                tint = AppTheme.colors.Teal1200,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -65,3 +65,4 @@ fun StepHistoryTopBar(
         Spacer(modifier = Modifier.size(40.dp))
     }
 }
+

@@ -70,7 +70,7 @@ private fun SummaryCard(
         modifier = modifier
             .stepHistoryCardShadow(RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.StepHistorySummaryCardBg)
+            .background(AppTheme.colors.Surface)
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -88,7 +88,7 @@ private fun SummaryCard(
                 Icon(
                     painter = painterResource(id = iconRes),
                     contentDescription = null,
-                    tint = AppTheme.colors.StepHistorySummaryIconTint,
+                    tint = AppTheme.colors.Teal1200,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -96,7 +96,7 @@ private fun SummaryCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = AppTheme.colors.StepHistorySummaryTitleText
+                    color = AppTheme.colors.Teal1200
                 )
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -104,9 +104,10 @@ private fun SummaryCard(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.StepHistorySummaryValueText
+                    color = AppTheme.colors.TextPrimary
                 )
             )
         }
     }
 }
+

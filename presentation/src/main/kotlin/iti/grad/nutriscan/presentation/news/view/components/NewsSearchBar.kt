@@ -59,9 +59,9 @@ fun NewsSearchBar(
         },
         shape = RoundedCornerShape(16.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = AppTheme.colors.NewsSearchBarBg,
-            unfocusedContainerColor = AppTheme.colors.NewsSearchBarBg,
-            disabledContainerColor = AppTheme.colors.NewsSearchBarBg,
+            focusedContainerColor = AppTheme.colors.Background,
+            unfocusedContainerColor = AppTheme.colors.Background,
+            disabledContainerColor = AppTheme.colors.Background,
             focusedBorderColor = AppTheme.colors.NewsSearchBarBorder,
             unfocusedBorderColor = AppTheme.colors.NewsSearchBarBorder,
             cursorColor = AppTheme.colors.TextPrimary,
@@ -70,3 +70,4 @@ fun NewsSearchBar(
         textStyle = AppTheme.typography.bodyMedium.copy(color = AppTheme.colors.TextPrimary),
     )
 }
+

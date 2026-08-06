@@ -510,7 +510,7 @@ fun WorkoutControlCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_minus),
                     contentDescription = "Decrement",
-                    tint = AppTheme.colors.ExerciseSetsRepsIconTint,
+                    tint = AppTheme.colors.Teal1000,
                     modifier = Modifier.size(12.dp)
                 )
             }
@@ -534,7 +534,7 @@ fun WorkoutControlCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus),
                     contentDescription = "Increment",
-                    tint = AppTheme.colors.ExerciseSetsRepsIconTint,
+                    tint = AppTheme.colors.Teal1000,
                     modifier = Modifier.size(12.dp)
                 )
             }
@@ -551,9 +551,9 @@ fun WorkoutPrimaryButton(
 ) {
     val isDark = AppTheme.isDark
     val disabledContainerColor = if (isDark) {
-        AppTheme.colors.ExerciseWorkoutPrimaryButtonBg.copy(alpha = 0.15f)
+        AppTheme.colors.Teal1000.copy(alpha = 0.15f)
     } else {
-        AppTheme.colors.ExerciseWorkoutPrimaryButtonBg.copy(alpha = 0.4f)
+        AppTheme.colors.Teal1000.copy(alpha = 0.4f)
     }
     val disabledContentColor = if (isDark) {
         AppTheme.colors.ExerciseWorkoutPrimaryButtonText.copy(alpha = 0.3f)
@@ -565,7 +565,7 @@ fun WorkoutPrimaryButton(
         onClick = onClick,
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            containerColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonBg,
+            containerColor = AppTheme.colors.Teal1000,
             contentColor = AppTheme.colors.ExerciseWorkoutPrimaryButtonText,
             disabledContainerColor = disabledContainerColor,
             disabledContentColor = disabledContentColor
@@ -592,12 +592,12 @@ fun WorkoutSecondaryButton(
         enabled = enabled,
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = Color.Transparent,
-            contentColor = AppTheme.colors.ExerciseWorkoutSecondaryButton,
-            disabledContentColor = AppTheme.colors.ExerciseWorkoutSecondaryButton.copy(alpha = 0.4f)
+            contentColor = AppTheme.colors.Teal1000,
+            disabledContentColor = AppTheme.colors.Teal1000.copy(alpha = 0.4f)
         ),
         border = BorderStroke(
             width = 1.dp, 
-            color = if (enabled) AppTheme.colors.ExerciseWorkoutSecondaryButton else AppTheme.colors.ExerciseWorkoutSecondaryButton.copy(alpha = 0.4f)
+            color = if (enabled) AppTheme.colors.Teal1000 else AppTheme.colors.Teal1000.copy(alpha = 0.4f)
         ),
         shape = RoundedCornerShape(14.dp),
         modifier = modifier.height(56.dp)
@@ -634,7 +634,7 @@ fun CongratsDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(24.dp))
-                        .background(AppTheme.colors.AuthDialogBackground)
+                        .background(AppTheme.colors.Background)
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -724,7 +724,9 @@ fun InputDialog(
                 )
             }
         },
-        containerColor = AppTheme.colors.AuthDialogBackground
+        containerColor = AppTheme.colors.Background
     )
 }
+
+
 

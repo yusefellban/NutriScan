@@ -93,7 +93,7 @@ private fun HelpContent(
                     Text(
                         text = stringResource(R.string.help_faq_section_title),
                         style = AppTheme.typography.titleMedium,
-                        color = AppTheme.colors.AppSettingsRowLabel,
+                        color = AppTheme.colors.MenuSectionLabel,
                     )
                     state.faqItems.forEach { item ->
                         FaqAccordionItem(
@@ -128,3 +128,4 @@ private fun HelpContent(
         }
     }
 }
+

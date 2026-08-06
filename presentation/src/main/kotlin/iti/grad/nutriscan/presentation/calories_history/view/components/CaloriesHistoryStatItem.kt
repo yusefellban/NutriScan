@@ -50,13 +50,13 @@ fun CaloriesHistoryStatItem(
         modifier = modifier
             .customShadow(
                 shape = RoundedCornerShape(14.dp),
-                color = Color(AppTheme.colors.CaloriesHistoryStatIconTint.value).copy(alpha = 0.2f),
+                color = Color(AppTheme.colors.Teal1000.value).copy(alpha = 0.2f),
                 blurRadius = 20f,
                 offsetY = 10f,
                 spread = (-5).dp,
             )
             .clip(RoundedCornerShape(14.dp))
-            .background(AppTheme.colors.CaloriesHistoryCardBg)
+            .background(AppTheme.colors.Background)
             .padding(horizontal = 10.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
@@ -76,7 +76,7 @@ fun CaloriesHistoryStatItem(
                 Icon(
                     painter = icon,
                     contentDescription = null,
-                    tint = AppTheme.colors.CaloriesHistoryStatIconTint,
+                    tint = AppTheme.colors.Teal1000,
                     modifier = Modifier.size(15.dp),
                 )
             }
@@ -151,3 +151,5 @@ fun CaloriesHistoryStatItem(
         }
     }
 }
+
+

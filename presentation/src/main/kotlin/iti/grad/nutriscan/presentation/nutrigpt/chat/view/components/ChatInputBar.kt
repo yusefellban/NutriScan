@@ -83,9 +83,9 @@ fun ChatInputBar(
                     modifier = Modifier.weight(1f),
                     enabled = !isLoading,
                     textStyle = AppTheme.typography.bodyLarge.copy(
-                        color = AppTheme.colors.ChatInputText
+                        color = AppTheme.colors.TextPrimary
                     ),
-                    cursorBrush = SolidColor(AppTheme.colors.ChatInputText),
+                    cursorBrush = SolidColor(AppTheme.colors.TextPrimary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = { onSend() }),
@@ -160,3 +160,4 @@ fun ChatInputBar(
         }
     }
 }
+

@@ -71,7 +71,7 @@ fun PasswordSentDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(24.dp))
-                        .background(AppTheme.colors.AuthDialogBackground)
+                        .background(AppTheme.colors.Background)
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -148,3 +148,4 @@ fun PasswordSentDialog(
         }
     }
 }
+

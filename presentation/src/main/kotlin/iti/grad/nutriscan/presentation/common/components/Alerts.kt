@@ -41,7 +41,7 @@ fun ActionConfirmAlert(
         )
         AlertButton(
             text = confirmText,
-            backgroundColor = AppTheme.colors.SaveAlertButtonBackground,
+            backgroundColor = AppTheme.colors.Teal1000,
             textColor = AppTheme.colors.OnPrimary,
             onClick = onConfirm
         )
@@ -307,3 +307,4 @@ private fun InternetAlertPreview() {
 private fun InternetAlertDarkPreview() {
     AppTheme(darkTheme = true) { InternetAlert({}, {}) }
 }
+

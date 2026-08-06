@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +30,8 @@ import iti.grad.presentation.R
 fun CaloriesHistoryTopBar(
     onBackClick: () -> Unit,
     onCalendarClick: () -> Unit,
+    isFilterActive: Boolean,
+    onClearFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -39,7 +42,7 @@ fun CaloriesHistoryTopBar(
     ) {
         AppBackButton(
             onClick = onBackClick,
-            iconTint = AppTheme.colors.CaloriesHistoryTopBarIconTint,
+            iconTint = AppTheme.colors.Teal1200,
             borderColor = AppTheme.colors.CaloriesHistoryTopBarIconBg,
         )
 
@@ -52,6 +55,29 @@ fun CaloriesHistoryTopBar(
         )
 
         Spacer(modifier = Modifier.weight(1f))
+
+        if (isFilterActive) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(AppTheme.colors.ErrorBackground)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClearFilterClick,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = null,
+                    tint = AppTheme.colors.Error,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+        }
 
         Box(
             modifier = Modifier
@@ -74,3 +100,4 @@ fun CaloriesHistoryTopBar(
         }
     }
 }
+

@@ -31,7 +31,7 @@ fun WeightCard(
     val alpha = 1f - (pageOffset * 0.6f).coerceIn(0f, 0.6f)
 
     val cardBg = if (isSelected) {
-        AppTheme.colors.HeightSelectedCardBackground
+        AppTheme.colors.Teal500
     } else {
         AppTheme.colors.HeightUnselectedCardBackground
     }
@@ -77,3 +77,4 @@ fun WeightCard(
         )
     }
 }
+

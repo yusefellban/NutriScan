@@ -39,7 +39,7 @@ fun FaqAccordionItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.AppSettingsCardBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -54,7 +54,7 @@ fun FaqAccordionItem(
             Text(
                 text = stringResource(item.questionRes),
                 style = AppTheme.typography.titleSmall,
-                color = AppTheme.colors.AppSettingsRowLabel,
+                color = AppTheme.colors.MenuSectionLabel,
                 modifier = Modifier.weight(1f),
             )
             Icon(
@@ -77,3 +77,4 @@ fun FaqAccordionItem(
         }
     }
 }
+

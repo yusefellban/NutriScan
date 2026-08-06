@@ -68,15 +68,17 @@ fun SavedSearchBar(
         IconButton(
             onClick = { /* Search action usually handled by onQueryChange */ },
             modifier = Modifier
-                .background(AppTheme.colors.SavedSearchIconBackground, CircleShape)
+                .background(AppTheme.colors.Teal1000, CircleShape)
                 .size(height)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = stringResource(id = R.string.saved_search_hint),
-                tint = AppTheme.colors.SavedSearchIconTint,
+                tint = AppTheme.colors.Teal100,
                 modifier = Modifier.size(20.dp)
             )
         }
     }
 }
+
+

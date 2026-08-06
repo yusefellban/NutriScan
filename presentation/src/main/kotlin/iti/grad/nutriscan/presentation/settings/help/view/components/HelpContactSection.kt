@@ -23,7 +23,7 @@ fun HelpContactSection(
         Text(
             text = stringResource(R.string.help_contact_section_title),
             style = AppTheme.typography.titleMedium,
-            color = AppTheme.colors.AppSettingsRowLabel,
+            color = AppTheme.colors.MenuSectionLabel,
         )
         SettingsActionRow(
             icon = rememberVectorPainter(Icons.Filled.Email),
@@ -32,3 +32,4 @@ fun HelpContactSection(
         )
     }
 }
+
