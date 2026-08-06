@@ -12,7 +12,7 @@ import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ShouldNotifyStepsUseCase
-import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
 import iti.grad.nutriscan.notification.NutriScanNotificationBuilder
 import iti.grad.presentation.R
@@ -24,7 +24,7 @@ class StepsNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val observePrefs: ObserveNotificationPrefsUseCase,
-    private val observeTodaySteps: ObserveTodayStepsUseCase,
+    private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
     private val shouldNotifySteps: ShouldNotifyStepsUseCase,
     private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
@@ -32,7 +32,9 @@ class StepsNotificationWorker @AssistedInject constructor(
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val prefs = observePrefs().first()
-        val steps = observeTodaySteps().first()
+        // daily_tracking is the shared source of truth — the Calories screen shows this exact
+        // number, and StepsSyncWorker keeps it fresh every 15 minutes.
+        val steps = observeTodayDailyTracking().first().stepsCnt
         if (!shouldNotifySteps(prefs, steps, DAILY_GOAL, LocalTime.now())) return Result.success()
 
         val title = applicationContext.getString(R.string.notification_push_steps_title)
