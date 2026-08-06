@@ -45,6 +45,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.scan_history.view.ScanHistoryScreen
+import iti.grad.nutriscan.presentation.notification_history.view.NotificationHistoryScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
@@ -203,7 +204,8 @@ fun AppNavGraph(
                 onNavigateToNews = { navController.navigate(NewsHomeRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
+                onNavigateToNotifications = { navController.navigate(NotificationHistoryRoute) },
+                onNavigateToNotificationSettings = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
@@ -319,6 +321,13 @@ fun AppNavGraph(
         composable<NotificationSettingsRoute> {
             NotificationSettingsScreen(
                 onNavigateBack = { navController.navigateUp() },
+            )
+        }
+
+        composable<NotificationHistoryRoute> {
+            NotificationHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToSettings = { navController.navigate(NotificationSettingsRoute) }
             )
         }
 

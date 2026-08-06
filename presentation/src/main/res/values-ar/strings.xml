@@ -568,5 +568,26 @@
     <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
     <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
     <string name="calories_history_empty_button">إضافة وجبات</string>
+    <!-- Notification History -->
+    <string name="notification_history_title">الإشعارات</string>
+    <string name="notification_history_clear_all">مسح الكل</string>
+    <string name="notification_history_settings">الإعدادات</string>
+    <string name="notification_history_empty_title">لا توجد إشعارات</string>
+    <string name="notification_history_empty_subtitle">لا توجد إشعارات جديدة حالياً.\nسنخبرك عندما يحتاج أمر مهم لاهتمامك.</string>
+    <string name="notification_history_empty_go_back">العودة للخلف</string>
+
+    <string name="notification_permission_title">تفعيل الإشعارات</string>
+    <string name="notification_permission_subtitle">قم بتفعيل الإشعارات لتلقي تحديثات المسح، والتذكيرات، وتنبيهات صحية هامة.</string>
+    <string name="notification_permission_button">الانتقال إلى الإعدادات</string>
+    <string name="notification_history_time_just_now">الآن</string>
+    <string name="notification_history_time_minutes_ago">منذ %1$d دقيقة</string>
+    <string name="notification_history_time_hours_ago">منذ %1$d ساعة</string>
+    <string name="notification_history_time_days_ago">منذ %1$d أيام</string>
+    <string name="notification_history_confirm_clear_title">مسح جميع الإشعارات؟</string>
+    <string name="notification_history_confirm_clear_message">هل أنت متأكد أنك تريد حذف جميع الإشعارات؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="notification_history_confirm_clear_yes">مسح</string>
+    <string name="notification_history_confirm_clear_no">إلغاء</string>
+    <string name="notification_history_deleted">تم حذف الإشعار</string>
+    <string name="notification_history_all_cleared">تم مسح جميع الإشعارات</string>
 
 </resources>

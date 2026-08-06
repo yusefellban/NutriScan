@@ -97,7 +97,7 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileEvent.ConfirmRemoveMemberClicked -> confirmMemberRemoval()
             is UserProfileEvent.CancelRemoveMemberClicked -> _state.update { it.copy(memberPendingDeletion = null) }
             is UserProfileEvent.ScanHistoryClicked -> emitEffect(UserProfileEffect.NavigateToScanHistory)
-            is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotifications)
+            is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotificationSettings)
             is UserProfileEvent.SettingsClicked -> emitEffect(UserProfileEffect.NavigateToSettings)
             is UserProfileEvent.CaloriesHistoryClicked -> emitEffect(UserProfileEffect.NavigateToCaloriesHistory)
             is UserProfileEvent.BottomNavTabClicked -> {

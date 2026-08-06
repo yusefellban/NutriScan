@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import iti.grad.nutriscan.domain.notification.model.NotificationType
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.GetRandomQuoteUseCase
 import iti.grad.nutriscan.domain.notification.usecase.IsWithinQuietHoursUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
@@ -24,22 +26,27 @@ class QuoteNotificationWorker @AssistedInject constructor(
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val getRandomQuote: GetRandomQuoteUseCase,
     private val isWithinQuietHours: IsWithinQuietHoursUseCase,
+    private val historyRecorder: INotificationHistoryRecorder,
 ) : CoroutineWorker(context, params) {
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val prefs = observePrefs().first()
         if (!prefs.isEnabled(NotificationType.QUOTE)) return Result.success()
         if (isWithinQuietHours(prefs, LocalTime.now())) return Result.success()
 
         val quote = getRandomQuote()
+        val title = applicationContext.getString(R.string.notification_push_quote_title)
+        val body = quote.text
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
             type = NotificationType.QUOTE,
-            title = applicationContext.getString(R.string.notification_push_quote_title),
-            body = quote.text,
+            title = title,
+            body = body,
         )
         NotificationManagerCompat.from(applicationContext)
             .notify(NotificationChannels.channelId(NotificationType.QUOTE).hashCode(), notification)
+        historyRecorder.record(NotificationType.QUOTE, title, body)
         return Result.success()
     }
 

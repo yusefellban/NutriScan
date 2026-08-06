@@ -132,6 +132,7 @@ object NutriGptVoiceRoute
 
 @Serializable
 object StepHistoryRoute
-
+@Serializable
+object NotificationHistoryRoute
 @Serializable
 object CaloriesHistoryRoute
