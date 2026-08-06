@@ -10,7 +10,9 @@ import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.data.remote.dto.UserDto
 import iti.grad.nutriscan.data.remote.dto.toEntity
+import iti.grad.nutriscan.data.remote.interceptor.AccountPendingDeletionException
 import iti.grad.nutriscan.data.util.ImageCompressor
+import iti.grad.nutriscan.domain.user.model.AccountDeletionInfo
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -31,6 +33,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -85,7 +88,31 @@ class UserRepositoryImpl @Inject constructor(
             val dto = remoteDataSource.getProfile()
             persistProfileDto(dto)
             Result.success(Unit)
+        } catch (e: HttpException) {
+            // 409 ACCOUNT_PENDING_DELETION is a domain-level signal — do NOT swallow it.
+            // Throwing here terminates the channelFlow so HomeViewModel's catch { } fires.
+            if (e.code() == 409) {
+                val rawBody = e.response()?.errorBody()?.string()
+                val parsed = runCatching {
+                    json.decodeFromString<ApiErrorDto>(rawBody ?: "{}")
+                }.getOrNull()
+                if (parsed?.error == "ACCOUNT_PENDING_DELETION") {
+                    // Extract the date: "Account is already scheduled for deletion on 2026-08-22"
+                    val scheduledDate = parsed.message
+                        .substringAfterLast(" on ", missingDelimiterValue = "")
+                        .trim()
+                        .ifBlank { "unknown" }
+                    Timber.w("Account is pending deletion — scheduled: $scheduledDate")
+                    throw AccountPendingDeletionException(scheduledDate)
+                }
+            }
+            Timber.e(e, "fetchAndSyncProfile HTTP error: ${e.code()}")
+            Result.failure(e)
+        } catch (e: AccountPendingDeletionException) {
+            // Re-throw so the channelFlow propagates it to every collector.
+            throw e
         } catch (e: Exception) {
+            Timber.e(e, "fetchAndSyncProfile failed")
             Result.failure(e)
         }
     }
@@ -235,6 +262,38 @@ class UserRepositoryImpl @Inject constructor(
             apiError.message
         } catch (_: Exception) {
             "An unexpected error occurred."
+        }
+    }
+
+    override suspend fun deleteAccount(): Result<AccountDeletionInfo> {
+        return try {
+            val dto = remoteDataSource.deleteAccount()
+            Result.success(
+                AccountDeletionInfo(
+                    scheduledDeletionAt = dto.scheduledDeletionAt,
+                    gracePeriodDays = dto.gracePeriodDays,
+                )
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "deleteAccount failed")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun restoreAccount(): Result<Unit> {
+        return try {
+            val response = remoteDataSource.restoreAccount()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val rawError = response.errorBody()?.string()
+                val message = parseErrorMessage(rawError)
+                Timber.e("restoreAccount failed with code: ${response.code()}, body: $rawError")
+                Result.failure(Exception(message))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "restoreAccount failed")
+            Result.failure(e)
         }
     }
 

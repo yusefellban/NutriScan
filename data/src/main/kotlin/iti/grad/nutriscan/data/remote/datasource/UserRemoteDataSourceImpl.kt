@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.data.remote.datasource
 
 import iti.grad.nutriscan.data.remote.api.UserApiService
+import iti.grad.nutriscan.data.remote.dto.AccountDeletionResponseDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
@@ -27,5 +28,13 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun updateDailyStreak(): Response<Unit> {
         return userApiService.updateDailyStreak()
+    }
+
+    override suspend fun deleteAccount(): AccountDeletionResponseDto {
+        return userApiService.deleteAccount()
+    }
+
+    override suspend fun restoreAccount(): Response<Unit> {
+        return userApiService.restoreAccount()
     }
 }
