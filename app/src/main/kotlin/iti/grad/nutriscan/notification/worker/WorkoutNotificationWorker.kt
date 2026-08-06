@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import iti.grad.nutriscan.domain.auth.usecase.CheckIfUserIsLoggedInUseCase
 import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
@@ -27,10 +28,14 @@ class WorkoutNotificationWorker @AssistedInject constructor(
     private val observeWorkoutStatus: ObserveWorkoutStatusUseCase,
     private val shouldNotifyWorkout: ShouldNotifyWorkoutUseCase,
     private val historyRecorder: INotificationHistoryRecorder,
+    private val checkIfUserIsLoggedIn: CheckIfUserIsLoggedInUseCase,
 ) : CoroutineWorker(context, params) {
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
+        // Belt and braces: the scheduler cancels on logout, but work enqueued by an older
+        // build — or a session ended by a failed token refresh — can still fire.
+        if (!checkIfUserIsLoggedIn()) return Result.success()
         val prefs = observePrefs().first()
         val done = observeWorkoutStatus().first()
         if (!shouldNotifyWorkout(prefs, done, LocalTime.now())) return Result.success()

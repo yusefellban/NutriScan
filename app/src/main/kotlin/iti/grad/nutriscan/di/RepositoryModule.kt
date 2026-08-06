@@ -51,6 +51,8 @@ import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRep
 import iti.grad.nutriscan.data.repository.NotificationHistoryRepositoryImpl
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.data.repository.NotificationHistoryRecorderImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationScheduler
+import iti.grad.nutriscan.notification.NotificationSchedulerImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -199,4 +201,10 @@ abstract class RepositoryModule {
     abstract fun bindNotificationHistoryRecorder(
         impl: NotificationHistoryRecorderImpl
     ): INotificationHistoryRecorder
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationScheduler(
+        impl: NotificationSchedulerImpl
+    ): INotificationScheduler
 }

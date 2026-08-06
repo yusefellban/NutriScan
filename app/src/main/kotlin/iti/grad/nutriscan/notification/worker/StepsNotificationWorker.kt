@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import iti.grad.nutriscan.domain.auth.usecase.CheckIfUserIsLoggedInUseCase
 import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
@@ -27,10 +28,14 @@ class StepsNotificationWorker @AssistedInject constructor(
     private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
     private val shouldNotifySteps: ShouldNotifyStepsUseCase,
     private val historyRecorder: INotificationHistoryRecorder,
+    private val checkIfUserIsLoggedIn: CheckIfUserIsLoggedInUseCase,
 ) : CoroutineWorker(context, params) {
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
+        // Belt and braces: the scheduler cancels on logout, but work enqueued by an older
+        // build — or a session ended by a failed token refresh — can still fire.
+        if (!checkIfUserIsLoggedIn()) return Result.success()
         val prefs = observePrefs().first()
         // daily_tracking is the shared source of truth — the Calories screen shows this exact
         // number, and StepsSyncWorker keeps it fresh every 15 minutes.
