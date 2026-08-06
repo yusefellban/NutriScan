@@ -149,7 +149,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         runCatchingCancellable {
             val current = currentOrDefault()
             dao.upsert(current.copy(waterCnt = waterCnt, syncedToBackend = false).toEntity(resolveUserId()))
-            if (waterCnt > 0) streakRepository.recomputeStreak()
             pushDayInBackground(CairoDateProvider.today())
         }
     }
@@ -183,7 +182,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
-            if (stepsCnt > 0) streakRepository.recomputeStreak()
             pushDayInBackground(CairoDateProvider.today())
         }
     }
@@ -197,7 +195,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     exerciseMinutes = current.exerciseMinutes + minutes,
                 ).toEntity(resolveUserId())
             )
-            streakRepository.recomputeStreak()
             Unit
         }
     }

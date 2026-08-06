@@ -28,4 +28,7 @@ interface UserApiService {
     suspend fun uploadProfileImage(
         @Part image: MultipartBody.Part
     ): UserDto
+
+    @POST("v1/users/me/daily-streak")
+    suspend fun updateDailyStreak(): Response<Unit>
 }

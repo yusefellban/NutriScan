@@ -10,5 +10,5 @@ interface IStreakRepository {
      * Recomputes streak from food-log activity. On failure the last known
      * streak value must be left untouched (fail closed, never reset to 0).
      */
-    suspend fun recomputeStreak(): Result<Unit>
+    suspend fun syncDailyStreak(): Result<Unit>
 }

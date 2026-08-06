@@ -7,6 +7,7 @@ import iti.grad.nutriscan.data.db.entity.StreakEntity
 import iti.grad.nutriscan.data.di.IoDispatcher
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.common.runCatchingCancellable
+import iti.grad.nutriscan.data.remote.datasource.IUserRemoteDataSource
 import iti.grad.nutriscan.domain.streak.model.StreakInfo
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,12 +20,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
+import timber.log.Timber
 
 class StreakRepositoryImpl @Inject constructor(
     private val streakDao: StreakDao,
     private val foodLogDao: FoodLogDao,
     private val dailyTrackingDao: DailyTrackingDao,
     private val authRepository: IAuthRepository,
+    private val userRemoteDataSource: IUserRemoteDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IStreakRepository {
 
@@ -39,32 +42,9 @@ class StreakRepositoryImpl @Inject constructor(
         )
     }.flowOn(ioDispatcher)
 
-    override suspend fun recomputeStreak(): Result<Unit> = withContext(ioDispatcher) {
+    override suspend fun syncDailyStreak(): Result<Unit> = withContext(ioDispatcher) {
         runCatchingCancellable {
-            val today = LocalDate.now()
-            val userId = resolveUserId()
-            val loggedFood = foodLogDao.observeByUserAndDate(userId, today.toString())
-                .first().isNotEmpty()
-            val tracking = dailyTrackingDao.getByUserAndDate(userId, today.toString())
-            val trackedActivity = tracking != null &&
-                (tracking.waterCnt > 0 || tracking.stepsCnt > 0 || tracking.exerciseMinutes > 0)
-            if (!loggedFood && !trackedActivity) return@runCatchingCancellable
-
-            val existing = streakDao.get(userId)
-            val lastActive = existing?.lastActiveDate?.let(LocalDate::parse)
-            val newStreak = when {
-                lastActive == today -> existing?.currentStreak ?: 1
-                lastActive == today.minusDays(1) -> (existing?.currentStreak ?: 0) + 1
-                else -> 1
-            }
-            streakDao.upsert(
-                StreakEntity(
-                    userId = userId,
-                    currentStreak = newStreak,
-                    longestStreak = maxOf(newStreak, existing?.longestStreak ?: 0),
-                    lastActiveDate = today.toString(),
-                )
-            )
+            userRemoteDataSource.updateDailyStreak()
         }
     }
 
