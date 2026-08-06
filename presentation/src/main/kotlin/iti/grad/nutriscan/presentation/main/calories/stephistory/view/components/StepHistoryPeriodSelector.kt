@@ -62,7 +62,7 @@ fun StepHistoryPeriodSelector(
                     text = stringResource(id = stringRes),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) AppTheme.colors.StepHistoryChipTextSelected
+                        color = if (isSelected) AppTheme.colors.TextPrimary
                         else AppTheme.colors.StepHistoryChipTextUnselected
                     ),
                     textAlign = TextAlign.Center
@@ -71,3 +71,4 @@ fun StepHistoryPeriodSelector(
         }
     }
 }
+

@@ -45,7 +45,7 @@ fun ProgressNextButton(
     )
 
     val trackColor = AppTheme.colors.ProgressTrackColor
-    val progressColor = AppTheme.colors.ProgressFillColor
+    val progressColor = AppTheme.colors.Teal1000
 
     Box(
         modifier = modifier.size(80.dp),
@@ -101,3 +101,4 @@ fun ProgressNextButton(
         }
     }
 }
+

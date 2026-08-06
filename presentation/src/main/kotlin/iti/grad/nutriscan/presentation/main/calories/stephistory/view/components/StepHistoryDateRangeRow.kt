@@ -67,7 +67,7 @@ private fun DateCard(
         modifier = modifier
             .stepHistoryCardShadow(RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.StepHistoryGaugeCardBg)
+            .background(AppTheme.colors.Surface)
             .padding(16.dp)
     ) {
         Row(
@@ -76,7 +76,7 @@ private fun DateCard(
             Icon(
                 painter = painterResource(id = R.drawable.ic_calendar_small),
                 contentDescription = null,
-                tint = AppTheme.colors.StepHistoryTopBarIconTint,
+                tint = AppTheme.colors.Teal1200,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -86,7 +86,7 @@ private fun DateCard(
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp
                 ),
-                color = AppTheme.colors.StepHistoryTopBarIconTint
+                color = AppTheme.colors.Teal1200
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -96,7 +96,8 @@ private fun DateCard(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             ),
-            color = AppTheme.colors.StepHistoryGaugeValueText
+            color = AppTheme.colors.TextPrimary
         )
     }
 }
+

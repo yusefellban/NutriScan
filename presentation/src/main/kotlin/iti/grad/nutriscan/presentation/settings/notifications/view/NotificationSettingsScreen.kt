@@ -210,7 +210,7 @@ private fun NotificationSettingsContent(
                         Text(
                             text = stringResource(R.string.notification_settings_battery_warning),
                             style = AppTheme.typography.bodyMedium,
-                            color = AppTheme.colors.AppSettingsRowLabel,
+                            color = AppTheme.colors.MenuSectionLabel,
                         )
                         AppButton(
                             textResId = R.string.notification_settings_battery_button,
@@ -287,3 +287,4 @@ private fun NotificationSettingsScreenPreview() {
         )
     }
 }
+

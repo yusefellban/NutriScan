@@ -102,10 +102,11 @@ private fun NutritionPill(
                 .fillMaxWidth()
                 .padding(top = 4.dp)
                 .background(
-                    color = AppTheme.colors.ProductDetailNutritionPill,
+                    color = AppTheme.colors.Teal1000,
                     shape = RoundedCornerShape(8.dp),
                 )
                 .padding(horizontal = 10.dp, vertical = 5.dp),
         )
     }
 }
+

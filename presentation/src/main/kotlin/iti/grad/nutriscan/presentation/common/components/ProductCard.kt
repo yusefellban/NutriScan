@@ -269,7 +269,7 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val density = LocalDensity.current
     val isRtl = isAppRtl()
     val isRemove = swipeAction is ProductCardSwipeAction.Remove
-    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.ProductCardSwipeIconBackground
+    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.Teal1000
 
     // Track the drag offset
     val offsetX = remember { Animatable(0f) }
@@ -354,3 +354,4 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
 }
 
 // VerdictBadge is now a shared component — see VerdictBadge.kt
+

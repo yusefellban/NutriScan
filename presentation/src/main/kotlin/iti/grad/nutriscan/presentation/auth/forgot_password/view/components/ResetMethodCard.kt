@@ -47,7 +47,7 @@ fun ResetMethodCard(
     modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(16.dp)
-    val cardBg = AppTheme.colors.MethodCardBackground
+    val cardBg = AppTheme.colors.Surface
     val borderColor = if (isSelected) {
         MaterialTheme.colorScheme.primary
     } else {
@@ -129,3 +129,4 @@ fun ResetMethodCard(
         )
     }
 }
+

@@ -43,7 +43,7 @@ fun SettingsActionRow(
             .fillMaxWidth()
             .height(61.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.AppSettingsCardBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .then(
                 if (onClick != null) {
                     Modifier.clickable(
@@ -62,7 +62,7 @@ fun SettingsActionRow(
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.AppSettingsIconContainerBackground.copy(alpha = 0.55f)),
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -76,7 +76,7 @@ fun SettingsActionRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.AppSettingsRowLabel,
+            color = AppTheme.colors.MenuSectionLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
@@ -97,3 +97,4 @@ private fun DefaultChevron() {
         modifier = Modifier.size(24.dp),
     )
 }
+

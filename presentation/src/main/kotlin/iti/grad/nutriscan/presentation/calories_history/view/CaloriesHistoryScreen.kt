@@ -140,7 +140,7 @@ fun CaloriesHistoryScreen(
     }
 
     Scaffold(
-        containerColor = AppTheme.colors.CaloriesHistoryScreenBg,
+        containerColor = AppTheme.colors.ScreenSurfaceBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(snackbarHostState) { data ->
@@ -151,7 +151,7 @@ fun CaloriesHistoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AppTheme.colors.CaloriesHistoryScreenBg)
+                .background(AppTheme.colors.ScreenSurfaceBackground)
                 .padding(paddingValues)
                 .statusBarsPadding(),
         ) {
@@ -168,7 +168,7 @@ fun CaloriesHistoryScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center,
                         ) {
-                            CircularProgressIndicator(color = AppTheme.colors.CaloriesHistoryStatIconTint)
+                            CircularProgressIndicator(color = AppTheme.colors.Teal1000)
                         }
                     }
 
@@ -233,7 +233,7 @@ fun CaloriesHistoryScreen(
                                     ) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(28.dp),
-                                            color = AppTheme.colors.CaloriesHistoryStatIconTint,
+                                            color = AppTheme.colors.Teal1000,
                                             strokeWidth = 2.dp,
                                         )
                                     }
@@ -246,3 +246,5 @@ fun CaloriesHistoryScreen(
         }
     }
 }
+
+

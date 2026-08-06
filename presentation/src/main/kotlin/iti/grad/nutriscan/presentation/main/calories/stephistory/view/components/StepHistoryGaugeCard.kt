@@ -50,7 +50,7 @@ fun StepHistoryGaugeCard(
             .fillMaxWidth()
             .stepHistoryCardShadow(RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
-            .background(AppTheme.colors.StepHistoryGaugeCardBg)
+            .background(AppTheme.colors.Surface)
             .padding(horizontal = 16.dp, vertical = 20.dp)
     ) {
         Text(
@@ -59,7 +59,7 @@ fun StepHistoryGaugeCard(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             ),
-            color = AppTheme.colors.StepHistoryGaugeValueText
+            color = AppTheme.colors.TextPrimary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -95,7 +95,7 @@ fun StepHistoryGaugeCard(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_walking_person),
                         contentDescription = null,
-                        tint = AppTheme.colors.StepHistoryGaugeIconTint,
+                        tint = AppTheme.colors.Teal1200,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -110,7 +110,7 @@ fun StepHistoryGaugeCard(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             ),
-                            color = AppTheme.colors.StepHistoryGaugeIconTint
+                            color = AppTheme.colors.Teal1200
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -155,7 +155,7 @@ fun StepHistoryGaugeCard(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         ),
-                        color = AppTheme.colors.StepHistoryGaugeValueText
+                        color = AppTheme.colors.TextPrimary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -172,3 +172,4 @@ fun StepHistoryGaugeCard(
         }
     }
 }
+

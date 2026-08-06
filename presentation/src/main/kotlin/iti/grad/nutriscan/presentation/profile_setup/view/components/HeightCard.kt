@@ -31,7 +31,7 @@ fun HeightCard(
     val scale = 1f - (pageOffset * 0.25f).coerceIn(0f, 0.25f)
     val alpha = 1f - (pageOffset * 0.6f).coerceIn(0f, 0.6f)
 
-    val cardBg = if (isSelected) AppTheme.colors.HeightSelectedCardBackground else AppTheme.colors.HeightUnselectedCardBackground
+    val cardBg = if (isSelected) AppTheme.colors.Teal500 else AppTheme.colors.HeightUnselectedCardBackground
     val textCol = if (isSelected) AppTheme.colors.HeightSelectedCardText else AppTheme.colors.HeightUnselectedCardText
 
     val shadowColor = if (isSelected) AppTheme.colors.ShadowSelected else AppTheme.colors.ShadowUnselected
@@ -70,3 +70,4 @@ fun HeightCard(
         )
     }
 }
+

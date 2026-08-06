@@ -19,7 +19,7 @@ fun ProfileSetupPageIndicator(
 ) {
     Text(
         text = buildAnnotatedString {
-            withStyle(SpanStyle(color = AppTheme.colors.PageIndicatorCurrent)) {
+            withStyle(SpanStyle(color = AppTheme.colors.Teal1000)) {
                 append("${currentPage + 1}")
             }
             withStyle(SpanStyle(color = AppTheme.colors.PageIndicatorTotal)) {
@@ -32,3 +32,4 @@ fun ProfileSetupPageIndicator(
         modifier = modifier
     )
 }
+

@@ -39,7 +39,7 @@ fun ProfileMenuRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.ProfileMenuRowBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -52,7 +52,7 @@ fun ProfileMenuRow(
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.ProfileMenuIconBackground.copy(alpha = 0.55f)),
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -66,7 +66,7 @@ fun ProfileMenuRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.ProfileMenuLabel,
+            color = AppTheme.colors.MenuSectionLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
@@ -80,3 +80,4 @@ fun ProfileMenuRow(
         )
     }
 }
+

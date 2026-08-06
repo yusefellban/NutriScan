@@ -39,7 +39,7 @@ fun CaloriesHistoryTopBar(
     ) {
         AppBackButton(
             onClick = onBackClick,
-            iconTint = AppTheme.colors.CaloriesHistoryTopBarIconTint,
+            iconTint = AppTheme.colors.Teal1200,
             borderColor = AppTheme.colors.CaloriesHistoryTopBarIconBg,
         )
 
@@ -74,3 +74,4 @@ fun CaloriesHistoryTopBar(
         }
     }
 }
+

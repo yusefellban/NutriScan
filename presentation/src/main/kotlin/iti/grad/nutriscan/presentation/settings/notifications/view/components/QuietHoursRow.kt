@@ -58,7 +58,7 @@ fun QuietHoursRow(
             modifier = Modifier
                 .padding(top = 8.dp, start = 8.dp)
                 .clip(RoundedCornerShape(50))
-                .background(AppTheme.colors.AppSettingsIconContainerBackground.copy(alpha = 0.55f))
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -81,3 +81,4 @@ fun QuietHoursRow(
         }
     }
 }
+
