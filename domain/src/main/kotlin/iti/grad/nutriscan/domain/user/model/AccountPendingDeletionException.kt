@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.data.remote.interceptor
+package iti.grad.nutriscan.domain.user.model
 
 /**
  * Thrown when GET /v1/users/profile returns HTTP 409 with error code
@@ -18,4 +18,4 @@ package iti.grad.nutriscan.data.remote.interceptor
 class AccountPendingDeletionException(
     /** ISO-8601 date string extracted from the backend error message, e.g. "2026-08-22". */
     val scheduledDeletionAt: String,
-) : NutriScanHttpException("409 — account is pending deletion on $scheduledDeletionAt")
+) : Exception("409 — account is pending deletion on $scheduledDeletionAt")

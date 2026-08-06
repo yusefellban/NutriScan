@@ -69,6 +69,7 @@ fun HomeScreen(
     onNavigateToChatWithAi: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToAccountPendingDeletion: (String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -82,6 +83,7 @@ fun HomeScreen(
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
                 is HomeEffect.NavigateToEditProfile -> onNavigateToEditProfile()
+                is HomeEffect.NavigateToAccountPendingDeletion -> onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
             }
         }
     }

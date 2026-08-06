@@ -10,7 +10,7 @@ import iti.grad.nutriscan.data.remote.dto.ApiErrorDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.data.remote.dto.UserDto
 import iti.grad.nutriscan.data.remote.dto.toEntity
-import iti.grad.nutriscan.data.remote.interceptor.AccountPendingDeletionException
+import iti.grad.nutriscan.domain.user.model.AccountPendingDeletionException
 import iti.grad.nutriscan.data.util.ImageCompressor
 import iti.grad.nutriscan.domain.user.model.AccountDeletionInfo
 import iti.grad.nutriscan.domain.user.model.ProfileUpdate

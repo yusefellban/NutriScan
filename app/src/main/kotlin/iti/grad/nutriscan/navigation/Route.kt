@@ -136,3 +136,6 @@ object StepHistoryRoute
 object NotificationHistoryRoute
 @Serializable
 object CaloriesHistoryRoute
+
+@Serializable
+data class AccountPendingDeletionRoute(val scheduledDeletionAt: String)
