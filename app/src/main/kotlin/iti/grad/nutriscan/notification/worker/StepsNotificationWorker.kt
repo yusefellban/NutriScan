@@ -15,6 +15,7 @@ import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUs
 import iti.grad.nutriscan.domain.notification.usecase.ShouldNotifyStepsUseCase
 import iti.grad.nutriscan.domain.dailytracking.usecase.ObserveTodayDailyTrackingUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
+import iti.grad.nutriscan.notification.NotificationSlots
 import iti.grad.nutriscan.notification.NutriScanNotificationBuilder
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.first
@@ -36,6 +37,15 @@ class StepsNotificationWorker @AssistedInject constructor(
         // Belt and braces: the scheduler cancels on logout, but work enqueued by an older
         // build — or a session ended by a failed token refresh — can still fire.
         if (!checkIfUserIsLoggedIn()) return Result.success()
+        // WorkManager is best-effort — Doze can defer a slot for hours, and a reminder for a
+        // moment that has passed is just noise.
+        if (NotificationSlots.isTooLate(
+                inputData.getInt(NotificationSlots.KEY_SLOT_MINUTE_OF_DAY, -1),
+                LocalTime.now(),
+            )
+        ) {
+            return Result.success()
+        }
         val prefs = observePrefs().first()
         // daily_tracking is the shared source of truth — the Calories screen shows this exact
         // number, and StepsSyncWorker keeps it fresh every 15 minutes.
