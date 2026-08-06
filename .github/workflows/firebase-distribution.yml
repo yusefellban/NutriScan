@@ -62,6 +62,15 @@ jobs:
           EOF
 
       # ----------------------------
+      # Create google-services.json
+      # ----------------------------
+      - name: Create google-services.json
+        run: |
+          cat > app/google-services.json <<EOF
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+
+      # ----------------------------
       # Build Release APK
       # ----------------------------
       - name: Build Release APK
