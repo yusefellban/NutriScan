@@ -55,6 +55,7 @@ import net.openid.appauth.TokenResponse
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
+    onNavigateToProfileSetup: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit
 ) {
@@ -95,6 +96,7 @@ fun LoginScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
+                is LoginEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
                 is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
                 is LoginEffect.LaunchGoogleLogin -> {

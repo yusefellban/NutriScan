@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.onboarding.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.grad.nutriscan.domain.user.usecase.CheckIfProfileSetupUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.IsOnboardingCompletedUseCase
 import iti.grad.nutriscan.domain.auth.usecase.CheckIfUserIsLoggedInUseCase
 import kotlinx.coroutines.channels.Channel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val isOnboardingCompletedUseCase: IsOnboardingCompletedUseCase,
-    private val checkIfUserIsLoggedInUseCase: CheckIfUserIsLoggedInUseCase
+    private val checkIfUserIsLoggedInUseCase: CheckIfUserIsLoggedInUseCase,
+    private val checkIfProfileSetupUseCase: CheckIfProfileSetupUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SplashState)
@@ -35,7 +37,11 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             if (isOnboardingCompletedUseCase()) {
                 if (checkIfUserIsLoggedInUseCase()) {
-                    _effect.send(SplashEffect.NavigateToHome)
+                    if (checkIfProfileSetupUseCase()) {
+                        _effect.send(SplashEffect.NavigateToHome)
+                    } else {
+                        _effect.send(SplashEffect.NavigateToProfileSetup)
+                    }
                 } else {
                     _effect.send(SplashEffect.NavigateToLogin)
                 }
