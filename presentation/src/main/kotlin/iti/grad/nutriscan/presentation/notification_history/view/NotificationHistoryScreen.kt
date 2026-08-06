@@ -53,7 +53,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryEffect
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryEvent
@@ -124,11 +124,11 @@ fun NotificationHistoryScreen(
     }
 
     if (showClearConfirmDialog) {
-        ConfirmationDialog(
+        DeleteWarningAlert(
             title = stringResource(id = R.string.notification_history_confirm_clear_title),
             message = stringResource(id = R.string.notification_history_confirm_clear_message),
-            confirmLabel = stringResource(id = R.string.notification_history_confirm_clear_yes),
-            cancelLabel = stringResource(id = R.string.notification_history_confirm_clear_no),
+            confirmText = stringResource(id = R.string.notification_history_confirm_clear_yes),
+            cancelText = stringResource(id = R.string.notification_history_confirm_clear_no),
             onConfirm = {
                 viewModel.onEvent(NotificationHistoryEvent.ClearAll)
                 showClearConfirmDialog = false
