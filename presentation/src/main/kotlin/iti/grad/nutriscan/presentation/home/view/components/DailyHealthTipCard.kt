@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,9 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.HomeTypography
 import iti.grad.presentation.R
 
+import androidx.compose.ui.res.stringArrayResource
+import java.util.Calendar
+
 /**
  * Daily Health Tip card displayed below the greeting header.
  */
@@ -40,6 +44,11 @@ import iti.grad.presentation.R
 fun DailyHealthTipCard(
     modifier: Modifier = Modifier,
 ) {
+    val dailyTips = stringArrayResource(id = R.array.daily_tips_array)
+    val dayOfMonth = remember { Calendar.getInstance().get(Calendar.DAY_OF_MONTH) }
+    val tipIndex = (dayOfMonth - 1) % dailyTips.size
+    val currentTip = dailyTips.getOrElse(tipIndex) { dailyTips.firstOrNull() ?: "" }
+
     val foregroundShadowColor = AppTheme.colors.Teal200.copy(alpha = 0.5f)
     Row(
         modifier = modifier
@@ -101,7 +110,7 @@ fun DailyHealthTipCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = stringResource(R.string.home_daily_tip_body),
+                text = currentTip,
                 style = AppTheme.typography.bodyLarge,
                 color = AppTheme.colors.PrimaryVariant,
                 maxLines = 2,

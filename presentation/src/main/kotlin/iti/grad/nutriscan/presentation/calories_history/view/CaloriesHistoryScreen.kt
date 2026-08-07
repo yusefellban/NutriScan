@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEffect
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEvent
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryDayCard
-import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryEmptyState
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryTopBar
 import iti.grad.nutriscan.presentation.calories_history.viewmodel.CaloriesHistoryViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
@@ -143,7 +143,12 @@ fun CaloriesHistoryScreen(
         containerColor = AppTheme.colors.ScreenSurfaceBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
-            SnackbarHost(snackbarHostState) { data ->
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp)
+            ) { data ->
                 AppSnackbar(snackbarData = data)
             }
         },
@@ -176,8 +181,13 @@ fun CaloriesHistoryScreen(
 
                     // Empty state (no errors, no entries, not loading)
                     !state.isLoading && state.errorMessage == null && state.entries.isEmpty() -> {
-                        CaloriesHistoryEmptyState(
-                            onAddMealsClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateToAddMeals) },
+                        AppEmptyStateWidget(
+                            lightImageRes = R.drawable.ic_no_calories_history_light,
+                            darkImageRes = R.drawable.ic_no_calories_history_dark,
+                            title = stringResource(R.string.calories_history_empty_title),
+                            subtitle = stringResource(R.string.calories_history_empty_subtitle),
+                            buttonText = stringResource(R.string.calories_history_empty_button),
+                            onButtonClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateToAddMeals) },
                         )
                     }
 
