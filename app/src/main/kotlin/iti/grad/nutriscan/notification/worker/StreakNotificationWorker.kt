@@ -56,7 +56,7 @@ class StreakNotificationWorker @AssistedInject constructor(
         }
 
         val title = applicationContext.getString(R.string.notification_push_streak_title)
-        val body = applicationContext.getString(R.string.notification_push_streak_body, streak.currentStreak)
+        val body = applicationContext.getString(R.string.notification_push_streak_body, streak)
         val notification = NutriScanNotificationBuilder.build(
             context = applicationContext,
             type = NotificationType.STREAK,

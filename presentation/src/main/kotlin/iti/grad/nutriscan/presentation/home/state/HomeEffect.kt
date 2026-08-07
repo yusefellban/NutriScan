@@ -14,4 +14,5 @@ sealed interface HomeEffect {
     data class NavigateToScanResult(val scanId: String) : HomeEffect
     data object NavigateToNews : HomeEffect
     data object NavigateToChatWithAi : HomeEffect
+    data class NavigateToAccountPendingDeletion(val scheduledDeletionAt: String) : HomeEffect
 }

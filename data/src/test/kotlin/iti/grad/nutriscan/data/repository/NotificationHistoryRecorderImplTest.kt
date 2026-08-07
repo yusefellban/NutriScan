@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotificationHistoryRecorderImplTest {

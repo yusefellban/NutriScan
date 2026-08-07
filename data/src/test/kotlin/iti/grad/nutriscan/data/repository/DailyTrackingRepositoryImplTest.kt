@@ -93,7 +93,7 @@ class DailyTrackingRepositoryImplTest {
         streakRepository = mockk(relaxed = true)
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
         coEvery { userRepository.getUserData() } returns MutableStateFlow(user())
-        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, streakRepository, testDispatcher)
+        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, testDispatcher)
     }
 
     @Test
@@ -159,19 +159,6 @@ class DailyTrackingRepositoryImplTest {
             assertFalse(today.syncedToBackend)
         }
 
-    @Test
-    fun `updateWaterCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateWaterCnt(1)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
-
-    @Test
-    fun `updateWaterCnt back to zero does not recompute the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateWaterCnt(0)
-
-        coVerify(exactly = 0) { streakRepository.recomputeStreak() }
-    }
 
     @Test
     fun `updateStepsCnt derives caloriesBurnedSteps from the user's weight`() = runTest(testDispatcher.scheduler) {
@@ -223,19 +210,6 @@ class DailyTrackingRepositoryImplTest {
             assertFalse(today.syncedToBackend)
         }
 
-    @Test
-    fun `updateStepsCnt above zero recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.updateStepsCnt(500)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
-
-    @Test
-    fun `addExerciseWorkout recomputes the streak`() = runTest(testDispatcher.scheduler) {
-        repository.addExerciseWorkout(kcalBurned = 200, minutes = 20)
-
-        coVerify(exactly = 1) { streakRepository.recomputeStreak() }
-    }
 
     @Test
     fun `syncPendingDay calls PATCH and marks synced on success`() = runTest(testDispatcher.scheduler) {
@@ -353,7 +327,7 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `addExerciseWorkout does not mark the row unsynced`() = runTest(testDispatcher.scheduler) {
+    fun `addExerciseWorkout marks the row unsynced`() = runTest(testDispatcher.scheduler) {
         val date = CairoDateProvider.today()
         repository.updateWaterCnt(4)
         coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
@@ -362,7 +336,7 @@ class DailyTrackingRepositoryImplTest {
         repository.addExerciseWorkout(kcalBurned = 100, minutes = 10)
 
         val today = repository.observeToday().first()
-        assertTrue(today.syncedToBackend)
+        assertFalse(today.syncedToBackend)
     }
 
     @Test

@@ -44,6 +44,7 @@ class UserRepositoryImplTest {
 
         repository = UserRepositoryImpl(
             userDao = userDao,
+            streakDao = mockk(relaxed = true),
             remoteDataSource = remoteDataSource,
             json = Json { ignoreUnknownKeys = true },
             ioDispatcher = UnconfinedTestDispatcher(),

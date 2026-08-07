@@ -7,5 +7,8 @@ data class DailyTrackingRemoteSnapshot(
     val targetWaterCnt: Int,
     val waterCnt: Int,
     val stepsCnt: Int,
+    val stepsKcal: Int,
+    val exerciseKcal: Int,
+    val exerciseMinutes: Int,
     val meals: List<RemoteMealSnapshot>,
 )

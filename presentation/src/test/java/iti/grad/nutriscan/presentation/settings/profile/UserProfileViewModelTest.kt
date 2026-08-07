@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.mockk
 import iti.grad.nutriscan.domain.family.model.FamilyMember
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
-import iti.grad.nutriscan.domain.streak.model.StreakInfo
 import iti.grad.nutriscan.domain.streak.usecase.ObserveStreakUseCase
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -41,7 +40,7 @@ class UserProfileViewModelTest {
     private lateinit var viewModel: UserProfileViewModel
     private val userData = MutableStateFlow<User?>(null)
     private val familyMembersFlow = MutableStateFlow<List<FamilyMember>>(emptyList())
-    private val streakFlow = MutableStateFlow(StreakInfo(currentStreak = 0, longestStreak = 0))
+    private val streakFlow = MutableStateFlow(0)
 
     private val userRepository: IUserRepository = mockk {
         coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
@@ -80,7 +79,7 @@ class UserProfileViewModelTest {
 
     @Test
     fun `when the streak use case emits, streakDays updates`() = runTest(testDispatcher) {
-        streakFlow.value = StreakInfo(currentStreak = 7, longestStreak = 12)
+        streakFlow.value = 7
         testScheduler.advanceUntilIdle()
 
         assertEquals(7, viewModel.state.value.streakDays)

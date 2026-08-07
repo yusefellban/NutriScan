@@ -19,7 +19,6 @@ import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingHistoryPage
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
-import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +58,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
     private val api: DailyTrackingApiService,
     private val authRepository: IAuthRepository,
     private val userRepository: IUserRepository,
-    private val streakRepository: IStreakRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : IDailyTrackingRepository {
 
@@ -149,7 +147,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
         runCatchingCancellable {
             val current = currentOrDefault()
             dao.upsert(current.copy(waterCnt = waterCnt, syncedToBackend = false).toEntity(resolveUserId()))
-            if (waterCnt > 0) streakRepository.recomputeStreak()
             pushDayInBackground(CairoDateProvider.today())
         }
     }
@@ -183,7 +180,6 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
-            if (stepsCnt > 0) streakRepository.recomputeStreak()
             pushDayInBackground(CairoDateProvider.today())
         }
     }
@@ -195,9 +191,10 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                 current.copy(
                     exerciseKcal = current.exerciseKcal + kcalBurned,
                     exerciseMinutes = current.exerciseMinutes + minutes,
+                    syncedToBackend = false,
                 ).toEntity(resolveUserId())
             )
-            streakRepository.recomputeStreak()
+            pushDayInBackground(CairoDateProvider.today())
             Unit
         }
     }
@@ -244,6 +241,9 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                     targetWaterCnt = entity.targetWaterCnt,
                     waterCnt = entity.waterCnt,
                     stepsCnt = entity.stepsCnt,
+                    stepsKcal = entity.caloriesBurnedSteps.toDouble(),
+                    exerciseKcal = entity.exerciseKcal.toDouble(),
+                    exerciseMin = entity.exerciseMinutes.toDouble(),
                 ),
             )
             dao.markSynced(userId, date.toString())
@@ -291,8 +291,8 @@ class DailyTrackingRepositoryImpl @Inject constructor(
                         waterCnt = snapshot.waterCnt,
                         stepsCnt = stepsCnt,
                         caloriesBurnedSteps = caloriesBurnedSteps,
-                        exerciseKcal = existing?.exerciseKcal ?: 0,
-                        exerciseMinutes = existing?.exerciseMinutes ?: 0,
+                        exerciseKcal = maxOf(snapshot.exerciseKcal, existing?.exerciseKcal ?: 0),
+                        exerciseMinutes = maxOf(snapshot.exerciseMinutes, existing?.exerciseMinutes ?: 0),
                         // Keeping a locally-higher step count means the backend is now behind, so
                         // the row still owes a push — marking it synced here would strand the
                         // higher value on this device forever.

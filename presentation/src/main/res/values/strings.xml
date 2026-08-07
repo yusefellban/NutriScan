@@ -590,4 +590,23 @@
     <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
     <string name="calories_history_empty_button">Add meals</string>
 
+    <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
+    <string name="delete_account_button_label">Delete Account</string>
+    <string name="delete_account_confirm_title">Delete Account?</string>
+    <string name="delete_account_confirm_message">This will schedule your account for permanent deletion. You have a 15-day grace period to restore it before all your data is lost forever.</string>
+    <string name="delete_account_confirm_action">Delete</string>
+
+    <!-- ── Account Pending Deletion Screen ───────────────────────────────────── -->
+    <string name="account_pending_deletion_header_title">Restore Account</string>
+    <string name="account_pending_deletion_header_subtitle">Your account is scheduled for deletion.</string>
+    <string name="account_pending_deletion_heading">Account Deletion Pending</string>
+    <string name="account_pending_deletion_description">You can restore your account within the grace period to retain all your data and settings.</string>
+    <string name="account_pending_deletion_days_remaining_label">Days remaining to restore:</string>
+    <string name="account_pending_deletion_days_remaining_value">%d days</string>
+    <string name="account_pending_deletion_scheduled_date_label">Scheduled Deletion Date:</string>
+    <string name="account_pending_deletion_restore_btn">Restore My Account</string>
+    <string name="account_pending_deletion_restoring">Restoring…</string>
+    <string name="account_pending_deletion_logout_prompt">Want to exit?</string>
+    <string name="account_pending_deletion_logout_link">Log Out</string>
+
 </resources>

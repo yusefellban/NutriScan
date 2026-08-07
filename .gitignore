@@ -50,3 +50,9 @@ skills-lock.json
 
 #IDE Java/Kotlin build output
 bin/
+
+# Signing
+keystore.properties
+keystore1
+*.jks
+*.keystore

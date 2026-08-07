@@ -7,7 +7,9 @@ import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.user.model.AccountPendingDeletionException
 import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
@@ -22,6 +24,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -36,7 +39,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val userRepository: IUserRepository,
     private val getRecentScansUseCase: GetRecentScansUseCase,
-    private val reconcileTodayUseCase: ReconcileTodayUseCase
+    private val reconcileTodayUseCase: ReconcileTodayUseCase,
+    private val syncDailyStreakUseCase: SyncDailyStreakUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -49,16 +53,22 @@ class HomeViewModel @Inject constructor(
         loadRecentScans()
 
         viewModelScope.launch {
-            // Trigger fetch from remote on load
-            userRepository.fetchAndSyncProfile()
-        }
-
-        viewModelScope.launch {
             reconcileTodayUseCase()
         }
 
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            syncDailyStreakUseCase()
+        }
+
+        viewModelScope.launch {
+            userRepository.accountPendingDeletionEvent.collectLatest { scheduledDeletionAt ->
+                emitEffect(HomeEffect.NavigateToAccountPendingDeletion(scheduledDeletionAt))
+            }
+        }
+
+        viewModelScope.launch {
+            userRepository.getUserData()
+                .collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(
