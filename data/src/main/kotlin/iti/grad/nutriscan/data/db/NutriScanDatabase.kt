@@ -18,14 +18,12 @@ import iti.grad.nutriscan.data.db.converter.JsonTypeConverters
 import iti.grad.nutriscan.data.db.dao.UserDao
 import iti.grad.nutriscan.data.db.dao.DiseaseDao
 import iti.grad.nutriscan.data.db.dao.AllergyDao
-import iti.grad.nutriscan.data.db.dao.WaterLogDao
 import iti.grad.nutriscan.data.db.dao.WorkoutLogDao
 import iti.grad.nutriscan.data.db.dao.StreakDao
 import iti.grad.nutriscan.data.db.dao.ExercisesDao
 import iti.grad.nutriscan.data.db.entity.UserEntity
 import iti.grad.nutriscan.data.db.entity.DiseaseEntity
 import iti.grad.nutriscan.data.db.entity.AllergyEntity
-import iti.grad.nutriscan.data.db.entity.WaterLogEntity
 import iti.grad.nutriscan.data.db.entity.WorkoutLogEntity
 import iti.grad.nutriscan.data.db.entity.StreakEntity
 import iti.grad.nutriscan.data.db.entity.ExerciseEntity
@@ -38,7 +36,6 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
         UserEntity::class,
         DiseaseEntity::class,
         AllergyEntity::class,
-        WaterLogEntity::class,
         WorkoutLogEntity::class,
         StreakEntity::class,
         ExerciseEntity::class,
@@ -51,7 +48,8 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
     // (users.bmi/tdee). Everything after (family_members, exercises, saved_scan,
     // daily_tracking, FoodLogEntity's pendingSync/deleted/mealCnt/backendCreated columns,
     // StreakEntity's re-key from a single global row to per-userId,
-    // SavedScanEntity's userId/pendingSync/deleted columns) relies on
+    // SavedScanEntity's userId/pendingSync/deleted columns, and the v14 -> v15 removal of
+    // water_log now that water lives in daily_tracking) relies on
     // fallbackToDestructiveMigration() in DatabaseModule — this clears all local tables on
     // upgrade. Bump the version when schema changes without a matching migration path.
     version = 16,
@@ -63,7 +61,6 @@ abstract class NutriScanDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun diseaseDao(): DiseaseDao
     abstract fun allergyDao(): AllergyDao
-    abstract fun waterLogDao(): WaterLogDao
     abstract fun workoutLogDao(): WorkoutLogDao
     abstract fun streakDao(): StreakDao
     abstract fun exercisesDao(): ExercisesDao

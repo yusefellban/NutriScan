@@ -51,10 +51,6 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideWaterLogDao(db: NutriScanDatabase) = db.waterLogDao()
-
-    @Provides
-    @Singleton
     fun provideWorkoutLogDao(db: NutriScanDatabase) = db.workoutLogDao()
 
     @Provides

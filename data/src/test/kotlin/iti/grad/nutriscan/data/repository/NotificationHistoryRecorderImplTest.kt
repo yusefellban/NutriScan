@@ -8,6 +8,7 @@ import iti.grad.nutriscan.data.db.dao.NotificationHistoryDao
 import iti.grad.nutriscan.data.db.entity.NotificationHistoryEntity
 import iti.grad.nutriscan.domain.notification.model.NotificationType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

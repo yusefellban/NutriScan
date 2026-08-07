@@ -18,6 +18,7 @@ class StepsPreferencesDataSourceImpl @Inject constructor(
         val BASELINE_DATE = stringPreferencesKey("steps_baseline_date")
         val BASELINE_STEPS = floatPreferencesKey("steps_baseline_steps")
         val DAILY_STEPS = intPreferencesKey("steps_daily_total")
+        val DAILY_DATE = stringPreferencesKey("steps_daily_date")
     }
 
     override suspend fun getBaselineDate(): String? {
@@ -35,11 +36,20 @@ class StepsPreferencesDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDailySteps(): Int {
-        return dataStore.data.map { it[PreferencesKeys.DAILY_STEPS] ?: 0 }.first()
+    override suspend fun getDailySteps(date: String): Int {
+        return dataStore.data.map { preferences ->
+            if (preferences[PreferencesKeys.DAILY_DATE] == date) {
+                preferences[PreferencesKeys.DAILY_STEPS] ?: 0
+            } else {
+                0
+            }
+        }.first()
     }
 
-    override suspend fun saveDailySteps(steps: Int) {
-        dataStore.edit { preferences -> preferences[PreferencesKeys.DAILY_STEPS] = steps }
+    override suspend fun saveDailySteps(date: String, steps: Int) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.DAILY_DATE] = date
+            preferences[PreferencesKeys.DAILY_STEPS] = steps
+        }
     }
 }

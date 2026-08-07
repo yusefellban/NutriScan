@@ -8,14 +8,18 @@ import android.annotation.SuppressLint
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import iti.grad.nutriscan.domain.auth.usecase.CheckIfUserIsLoggedInUseCase
 import iti.grad.nutriscan.domain.notification.model.NotificationType
 import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
 import iti.grad.nutriscan.domain.notification.usecase.IsWithinQuietHoursUseCase
 import iti.grad.nutriscan.domain.notification.usecase.ObserveNotificationPrefsUseCase
 import iti.grad.nutriscan.notification.NotificationChannels
+import iti.grad.nutriscan.notification.NotificationSlots
 import iti.grad.nutriscan.notification.NutriScanNotificationBuilder
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.first
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 
 @HiltWorker
@@ -25,13 +29,28 @@ class NewsNotificationWorker @AssistedInject constructor(
     private val observePrefs: ObserveNotificationPrefsUseCase,
     private val isWithinQuietHours: IsWithinQuietHoursUseCase,
     private val historyRecorder: INotificationHistoryRecorder,
+    private val checkIfUserIsLoggedIn: CheckIfUserIsLoggedInUseCase,
 ) : CoroutineWorker(context, params) {
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
+        // Belt and braces: the scheduler cancels on logout, but work enqueued by an older
+        // build — or a session ended by a failed token refresh — can still fire.
+        if (!checkIfUserIsLoggedIn()) return Result.success()
+        // WorkManager is best-effort — Doze can defer a slot for hours, and a reminder for a
+        // moment that has passed is just noise.
+        if (NotificationSlots.isTooLate(
+                inputData.getInt(NotificationSlots.KEY_SLOT_MINUTE_OF_DAY, -1),
+                LocalTime.now(),
+            )
+        ) {
+            return Result.success()
+        }
         val prefs = observePrefs().first()
         if (!prefs.isEnabled(NotificationType.NEWS)) return Result.success()
         if (isWithinQuietHours(prefs, LocalTime.now())) return Result.success()
+        // WorkManager has no weekday scheduling, so the work is enqueued daily and filtered here.
+        if (LocalDate.now().dayOfWeek !in NEWS_DAYS) return Result.success()
 
         val title = applicationContext.getString(R.string.notification_push_news_title)
         val body = applicationContext.getString(R.string.notification_push_news_body)
@@ -49,5 +68,6 @@ class NewsNotificationWorker @AssistedInject constructor(
 
     companion object {
         const val WORK_NAME = "news_notification_worker"
+        private val NEWS_DAYS = setOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)
     }
 }
