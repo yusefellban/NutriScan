@@ -145,7 +145,9 @@ fun CaloriesHistoryScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.navigationBarsPadding()
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp)
             ) { data ->
                 AppSnackbar(snackbarData = data)
             }
