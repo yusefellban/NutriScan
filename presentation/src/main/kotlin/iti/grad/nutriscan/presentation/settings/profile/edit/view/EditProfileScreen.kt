@@ -363,7 +363,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_chronic_conditions),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -420,7 +420,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_allergies),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

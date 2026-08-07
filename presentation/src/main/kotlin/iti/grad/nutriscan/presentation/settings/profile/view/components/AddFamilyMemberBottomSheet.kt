@@ -131,7 +131,7 @@ fun AddFamilyMemberBottomSheet(
                     else R.string.add_family_member_title
                 ),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.Teal1000,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(20.dp))
 
@@ -263,7 +263,7 @@ fun AddFamilyMemberBottomSheet(
             Text(
                 text = stringResource(R.string.profile_setup_chronic_conditions),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.ProfileSetupSectionTitle,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(12.dp))
             ChipSelectionFlowRow(
@@ -281,7 +281,7 @@ fun AddFamilyMemberBottomSheet(
             Text(
                 text = stringResource(R.string.profile_setup_allergies),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.ProfileSetupSectionTitle,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(12.dp))
             ChipSelectionFlowRow(
