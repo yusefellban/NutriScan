@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.data.remote.api
 
 import iti.grad.nutriscan.data.remote.dto.AccountDeletionResponseDto
+import iti.grad.nutriscan.data.remote.dto.FamilyMemberDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.data.remote.dto.UserDto
 import okhttp3.MultipartBody
@@ -13,6 +14,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface UserApiService {
 
@@ -30,6 +32,13 @@ interface UserApiService {
     suspend fun uploadProfileImage(
         @Part image: MultipartBody.Part
     ): UserDto
+
+    @Multipart
+    @PATCH("v1/users/family-member/{familyMemberId}/image")
+    suspend fun uploadFamilyMemberImage(
+        @Path("familyMemberId") familyMemberId: String,
+        @Part image: MultipartBody.Part
+    ): FamilyMemberDto
 
     @POST("v1/users/me/daily-streak")
     suspend fun updateDailyStreak(): Response<Unit>
