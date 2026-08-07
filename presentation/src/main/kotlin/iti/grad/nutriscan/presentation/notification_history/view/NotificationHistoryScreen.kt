@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.hilt.navigation.compose.hiltViewModel
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
@@ -58,7 +59,7 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryEffect
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryEvent
 import iti.grad.nutriscan.presentation.notification_history.state.NotificationHistoryItemUi
-import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationHistoryEmptyStateWidget
+
 import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationPermissionDeniedWidget
 import iti.grad.nutriscan.presentation.notification_history.view.components.NotificationHistoryItemCard
 import iti.grad.nutriscan.presentation.notification_history.viewmodel.NotificationHistoryViewModel
@@ -201,9 +202,12 @@ fun NotificationHistoryScreen(
                         )
                     }
                 } else if (state.isEmpty && !state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        NotificationHistoryEmptyStateWidget()
-                    }
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_notifications_light,
+                        darkImageRes = R.drawable.no_notifications_dark,
+                        title = stringResource(id = R.string.notification_history_empty_title),
+                        subtitle = stringResource(id = R.string.notification_history_empty_subtitle)
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
