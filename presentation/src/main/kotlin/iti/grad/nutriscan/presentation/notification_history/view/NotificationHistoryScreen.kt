@@ -141,7 +141,10 @@ fun NotificationHistoryScreen(
         containerColor = AppTheme.colors.Background,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.navigationBarsPadding()
+            ) { data ->
                 AppSnackbar(snackbarData = data)
             }
         }

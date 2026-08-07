@@ -143,7 +143,10 @@ fun CaloriesHistoryScreen(
         containerColor = AppTheme.colors.ScreenSurfaceBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
-            SnackbarHost(snackbarHostState) { data ->
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.navigationBarsPadding()
+            ) { data ->
                 AppSnackbar(snackbarData = data)
             }
         },
