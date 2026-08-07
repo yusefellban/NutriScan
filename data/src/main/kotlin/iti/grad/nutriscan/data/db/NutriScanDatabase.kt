@@ -53,8 +53,8 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
     // StreakEntity's re-key from a single global row to per-userId,
     // SavedScanEntity's userId/pendingSync/deleted columns) relies on
     // fallbackToDestructiveMigration() in DatabaseModule — this clears all local tables on
-    // upgrade.
-    version = 15,
+    // upgrade. Bump the version when schema changes without a matching migration path.
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)

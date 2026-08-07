@@ -291,7 +291,25 @@
     <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
     <string name="scan_frame_content_description">إطار ماسح الباركود</string>
     <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>
+    <string name="scan_mode_qr">كيو آر</string>
+    <string name="scan_mode_photo">صورة</string>
+    <string name="scan_mode_gallery">صورة من المعرض</string>
+    <string name="scan_mode_gallery_change">اختر صورة أخرى</string>
+    <string name="scan_center_action_capture">التقاط</string>
+    <string name="scan_center_action_upload">رفع</string>
+    <string name="scan_gallery_selected_image_content_description">معاينة الصورة المختارة</string>
+    <string name="scan_mode_qr_hint">ضع رمز QR داخل الإطار</string>
+    <string name="scan_mode_photo_hint">ضع المنتج داخل الإطار والتقط بوضوح</string>
+    <string name="scan_mode_gallery_hint">ارفع صورة منتج من المعرض</string>
+    <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
+    <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
+    <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
+    <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
+    <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
+    <string name="scan_saved_content_description">حفظ الفحص</string>
     <string name="scan_processing_placeholder_title">جاري المسح\nالباركود: %1$s</string>
+    <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
+    <string name="scan_save_failed">فشل حفظ الفحص</string>
 
     <!-- Email Verification -->
     <string name="email_verification_title">تحقق من بريدك الإلكتروني</string>
@@ -547,8 +565,6 @@
     <string name="common_retry">إعادة المحاولة</string>
 
     <string name="action_dismiss">إغلاق</string>
-    <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
-    <string name="scan_save_failed">فشل في حفظ الفحص</string>
     <string name="scan_capture_failed">فشل التقاط الصورة: %1$s</string>
     <!-- Calories History -->
     <string name="calories_history_title">سجل السعرات</string>

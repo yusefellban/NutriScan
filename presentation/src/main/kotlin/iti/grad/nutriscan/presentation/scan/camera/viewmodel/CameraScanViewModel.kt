@@ -6,15 +6,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
+import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
+import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.presentation.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +37,7 @@ class CameraScanViewModel @Inject constructor(
     private val getScanResultUseCase: GetScanResultUseCase,
     private val saveScanUseCase: SaveScanUseCase,
     private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
-    private val getSavedScansUseCase: iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
+    private val getSavedScansUseCase: GetSavedScansUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CameraScanState())
@@ -67,17 +69,51 @@ class CameraScanViewModel @Inject constructor(
 
     fun onEvent(event: CameraScanEvent) {
         when (event) {
+            is CameraScanEvent.ModeSelected -> handleModeSelected(event.mode)
             is CameraScanEvent.PermissionResult -> handlePermissionResult(event.granted)
             is CameraScanEvent.RequestPermissionClicked -> requestPermission()
-            is CameraScanEvent.CaptureClicked -> handleCaptureClicked()
+            is CameraScanEvent.CenterActionClicked -> handleCenterActionClicked()
+            is CameraScanEvent.GalleryImageSelected -> handleGalleryImageSelected(event.file)
             is CameraScanEvent.ImageCaptured -> handleImageCaptured(event.file)
             is CameraScanEvent.ImageCaptureFailed -> handleImageCaptureFailed(event.error)
+            is CameraScanEvent.GalleryPickCancelled -> handleGalleryPickCancelled()
+            is CameraScanEvent.GalleryPickFailed -> handleGalleryPickFailed()
             is CameraScanEvent.BookmarkClicked -> handleBookmarkClicked()
             is CameraScanEvent.RetryClicked -> handleRetryClicked()
             is CameraScanEvent.DismissScanClicked -> handleDismissScanClicked()
             is CameraScanEvent.CardClicked -> handleCardClicked()
             is CameraScanEvent.ConfirmDeleteBookmark -> handleConfirmDeleteBookmark()
             is CameraScanEvent.DismissDeleteBookmark -> handleDismissDeleteBookmark()
+        }
+    }
+
+    private fun handleModeSelected(mode: ScanInputMode) {
+        if (mode == ScanInputMode.QR) {
+            return
+        }
+
+        val currentMode = _state.value.selectedMode
+        if (currentMode == mode) {
+            if (mode == ScanInputMode.GALLERY) {
+                openGalleryPicker()
+            }
+            return
+        }
+
+        if (mode == ScanInputMode.GALLERY) {
+            currentScanJob?.cancel()
+        }
+
+        _state.update {
+            it.copy(
+                selectedMode = mode,
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = if (mode == ScanInputMode.GALLERY) it.pendingGalleryImagePath else null,
+            )
+        }
+
+        if (mode == ScanInputMode.GALLERY && _state.value.pendingGalleryImagePath == null) {
+            openGalleryPicker()
         }
     }
 
@@ -96,10 +132,29 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
+    private fun handleCenterActionClicked() {
+        val selectedMode = _state.value.selectedMode
+        when (selectedMode) {
+            ScanInputMode.QR,
+            ScanInputMode.PHOTO,
+            -> handleCaptureClicked()
+
+            ScanInputMode.GALLERY -> {
+                val pendingPath = _state.value.pendingGalleryImagePath
+                if (pendingPath.isNullOrBlank()) {
+                    openGalleryPicker()
+                } else {
+                    submitImageFile(File(pendingPath))
+                }
+            }
+        }
+    }
+
     private fun handleCaptureClicked() {
         _state.update {
             it.copy(
                 isScanning = true,
+                isProcessingCenterAction = true,
                 activeScan = ActiveScanUiModel(
                     scanId = "",
                     thumbnailUrl = null,
@@ -112,23 +167,69 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
+    private fun openGalleryPicker() {
+        _state.update { it.copy(isProcessingCenterAction = true) }
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.OpenGalleryPicker)
+        }
+    }
+
     private fun handleImageCaptured(file: File) {
+        submitImageFile(file)
+    }
+
+    private fun handleGalleryImageSelected(file: File) {
         currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isScanning = true,
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = file.absolutePath,
+                // Keep only gallery preview state; do not show scan card until upload is pressed.
+                activeScan = null,
+            )
+        }
+    }
+
+    private fun submitImageFile(file: File) {
+        currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isScanning = true,
+                isProcessingCenterAction = true,
+                activeScan = (state.activeScan ?: ActiveScanUiModel(
+                    scanId = "",
+                    thumbnailUrl = file.absolutePath,
+                    isProcessing = true,
+                )).copy(
+                    thumbnailUrl = file.absolutePath,
+                    isProcessing = true,
+                    isFailed = false,
+                    fullResult = null,
+                ),
+            )
+        }
         currentScanJob = viewModelScope.launch {
             val submitResult = submitScanImageUseCase(file)
             submitResult.onSuccess { scanResult ->
                 val scanId = scanResult.scanId
                 _state.update { state ->
-                    state.copy(activeScan = state.activeScan?.copy(scanId = scanId))
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        // Keep the local gallery path so user can re-upload the same image.
+                        pendingGalleryImagePath = state.pendingGalleryImagePath,
+                        activeScan = state.activeScan?.copy(scanId = scanId),
+                    )
                 }
                 pollScanResult(scanId)
-            }.onFailure { error ->
+            }.onFailure {
                 _state.update { state ->
                     state.copy(
+                        isProcessingCenterAction = false,
                         activeScan = state.activeScan?.copy(
                             isProcessing = false,
-                            isFailed = true
-                        )
+                            isFailed = true,
+                        ),
                     )
                 }
             }
@@ -139,16 +240,55 @@ class CameraScanViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isScanning = false,
-                activeScan = null
+                isProcessingCenterAction = false,
+                activeScan = null,
             )
         }
         viewModelScope.launch {
             _effect.send(
-                CameraScanEffect.ShowSnackBar(
-                    message = "Image capture failed: ${error.message}",
-                    snackbarType = SnackbarType.ERROR
-                )
+                CameraScanEffect.ShowSnackBarRes(
+                    messageResId = R.string.scan_capture_failed_generic,
+                ),
             )
+        }
+    }
+
+    private fun handleGalleryPickCancelled() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
+        _state.update {
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
+        }
+    }
+
+    private fun handleGalleryPickFailed() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
+        _state.update {
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
+        }
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_gallery_pick_failed))
         }
     }
 
@@ -211,13 +351,11 @@ class CameraScanViewModel @Inject constructor(
                             activeScan = state.activeScan?.copy(isSaved = true)
                         )
                     }
-                    _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_saved_to_bookmarks))
                 } else {
                     _effect.send(
-                        CameraScanEffect.ShowSnackBar(
-                            message = "Failed to save scan",
-                            snackbarType = SnackbarType.ERROR
-                        )
+                        CameraScanEffect.ShowSnackBarRes(
+                            messageResId = R.string.scan_save_failed,
+                        ),
                     )
                 }
             }
@@ -262,7 +400,8 @@ class CameraScanViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isScanning = true,
-                activeScan = null
+                isProcessingCenterAction = false,
+                activeScan = null,
             )
         }
     }
@@ -270,9 +409,18 @@ class CameraScanViewModel @Inject constructor(
     private fun handleDismissScanClicked() {
         currentScanJob?.cancel()
         _state.update {
+            val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
+            val previewToKeep = if (shouldKeepGalleryPreview) {
+                // Keep only local file path; remote thumbnail URL cannot be uploaded as File.
+                it.pendingGalleryImagePath
+            } else {
+                null
+            }
             it.copy(
                 isScanning = true,
-                activeScan = null
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = previewToKeep,
+                activeScan = null,
             )
         }
     }

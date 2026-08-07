@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,6 +53,7 @@ private val CornerRadius = 12.dp
 @Composable
 fun FloatingScanButton(
     isSelected: Boolean,
+    isUploadMode: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -115,8 +114,20 @@ fun FloatingScanButton(
 
         if (isSelected) {
             Icon(
-                painter = painterResource(R.drawable.ic_camera_solid),
-                contentDescription = stringResource(R.string.nav_scan),
+                painter = painterResource(
+                    if (isUploadMode) {
+                        R.drawable.ic_plus
+                    } else {
+                        R.drawable.ic_camera_solid
+                    },
+                ),
+                contentDescription = stringResource(
+                    if (isUploadMode) {
+                        R.string.scan_center_action_upload
+                    } else {
+                        R.string.scan_center_action_capture
+                    },
+                ),
                 tint = iconColor,
                 modifier = Modifier.size(28.dp),
             )

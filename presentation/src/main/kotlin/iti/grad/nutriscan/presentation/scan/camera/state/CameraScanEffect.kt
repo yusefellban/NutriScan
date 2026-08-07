@@ -12,5 +12,6 @@ sealed interface CameraScanEffect {
     ) : CameraScanEffect
     data object RequestCameraPermission : CameraScanEffect
     data object TakePicture : CameraScanEffect
+    data object OpenGalleryPicker : CameraScanEffect
     data class NavigateToProductDetail(val product: ProductUiModel) : CameraScanEffect
 }

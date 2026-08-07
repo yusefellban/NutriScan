@@ -112,7 +112,7 @@ fun ActiveScanCard(
             ) {
                 Icon(
                     painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
-                    contentDescription = "Save scan",
+                    contentDescription = stringResource(R.string.scan_saved_content_description),
                     tint = AppTheme.colors.PrimaryVariant,
                     modifier = Modifier.size(22.dp),
                 )
