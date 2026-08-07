@@ -18,7 +18,7 @@ fun TermsSection(
         Text(
             text = title,
             style = AppTheme.typography.titleMedium,
-            color = AppTheme.colors.MenuSectionLabel,
+            color = AppTheme.colors.SectionSubtitle,
         )
         Text(
             text = body,
