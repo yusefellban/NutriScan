@@ -625,4 +625,36 @@
     <string name="account_pending_deletion_logout_prompt">Want to exit?</string>
     <string name="account_pending_deletion_logout_link">Log Out</string>
 
+    <string-array name="daily_tips_array">
+        <item>Health is a state of complete harmony of the body, mind and spirit.</item>
+        <item>Eat food as your medicine, otherwise you will eat medicine as your food.</item>
+        <item>Hydration is the key to energy. Drink a fresh glass of water to kickstart your day!</item>
+        <item>Small healthy choices every day add up to massive lifetime transformations.</item>
+        <item>Nourish your body with real food; it\'s the only place you have to live.</item>
+        <item>A 30-minute brisk walk can boost your heart health and elevate your mood.</item>
+        <item>Consistency over perfection. Keep tracking your meals and stay mindful.</item>
+        <item>Track today, thank yourself tomorrow.</item>
+        <item>Proper sleep and adequate hydration build the foundation for vibrant energy.</item>
+        <item>Progress isn\'t always on the scale — energy and mood count too.</item>
+        <item>Colors on your plate mean vitamins in your body. Aim for a colorful meal!</item>
+        <item>Movement is medicine for your joints and clarity for your mind.</item>
+        <item>Drink water before you feel thirsty; stay proactive with your hydration.</item>
+        <item>Listen to your body\'s hunger cues and savor every single bite.</item>
+        <item>Your health is an investment, not an expense. Prioritize yourself today.</item>
+        <item>Fresh fruits and vegetables are natural boosters for your immune system.</item>
+        <item>Taking steps toward your goal counts, no matter how small they seem.</item>
+        <item>Skipping a log doesn\'t erase your progress. Just log the next one.</item>
+        <item>Consistency beats intensity — small wins, every single day.</item>
+        <item>Stretching for five minutes in the morning awakens your muscles and mind.</item>
+        <item>Mindful eating transforms food into genuine energy and vital vitality.</item>
+        <item>You don\'t have to be extreme, just consistent. Keep going strong!</item>
+        <item>Fueling your muscles with protein helps repair and build daily strength.</item>
+        <item>Replace sugary beverages with water or herbal tea for instant clarity.</item>
+        <item>A peaceful mind leads to a healthier body. Take time to relax today.</item>
+        <item>Strength doesn\'t come from what you can do occasionally, but from what you do consistently.</item>
+        <item>Fiber-rich meals keep your gut happy and your energy steady all day.</item>
+        <item>Celebrate every day you choose health. You are building a brighter future.</item>
+        <item>Good nutrition is a form of self-respect. Treat yourself right today!</item>
+        <item>Success is the sum of small habits repeated day in and day out.</item>
+    </string-array>
 </resources>
