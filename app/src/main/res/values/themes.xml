@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base application theme. Used after the splash finishes. -->
+    <style name="Theme.NutriScan" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Compose handles all UI — only app launch scaffolding here. -->
+    </style>
 
-    <style name="Theme.NutriScan" parent="android:Theme.Material.Light.NoActionBar" />
+    <!--
+        Starting Window theme for the Splash Screen (Android 12+ SplashScreen API).
+
+        windowSplashScreenBackground     — teal color shown instantly on cold launch
+        windowSplashScreenAnimatedIcon   — transparent drawable hides default app icon
+        windowSplashScreenIconBackgroundColor — must also be transparent / match bg
+        postSplashScreenTheme            — theme applied after splashscreen exits
+
+        The teal color here MUST match AppColors.Teal1000 (#13A4AB) exactly so the
+        transition from Starting Window → Compose Splash is completely seamless.
+    -->
+    <style name="Theme.NutriScan.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_transparent</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.NutriScan</item>
+
+        <!-- Force complete fullscreen with no action bar, title, or status bar window scaffolding -->
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
 </resources>
+

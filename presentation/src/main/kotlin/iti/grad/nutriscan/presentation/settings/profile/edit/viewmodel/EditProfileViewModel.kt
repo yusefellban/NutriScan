@@ -1,0 +1,300 @@
+package iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel
+
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+import kotlinx.coroutines.flow.collectLatest
+
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+
+import kotlinx.collections.immutable.toImmutableList
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error
+import androidx.lifecycle.ViewModel
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
+import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
+import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.AvatarUploadState
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
+import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UploadAvatarUseCase
+import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
+import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
+import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
+import timber.log.Timber
+
+/**
+ * ViewModel for the Edit Profile screen.
+ *
+ * Implements MVI patterns and stores editable profile states in-memory with safety confirmation flows.
+ */
+@HiltViewModel
+class EditProfileViewModel @Inject constructor(
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private val uploadAvatarUseCase: UploadAvatarUseCase,
+    private val getDiseasesUseCase: GetDiseasesUseCase,
+    private val getAllergiesUseCase: GetAllergiesUseCase,
+    private val syncDiseasesUseCase: SyncDiseasesUseCase,
+    private val syncAllergiesUseCase: SyncAllergiesUseCase,
+    /** Used to re-fetch server-computed BMI and TDEE after a successful profile update. */
+    private val userRepository: IUserRepository,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(EditProfileState())
+    val state: StateFlow<EditProfileState> = _state.asStateFlow()
+
+    private val _effect = Channel<EditProfileEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
+
+    /** Remembers the last picked photo Uri purely so [EditProfileEvent.RetryAvatarUpload] can re-run it. */
+    private var lastPickedAvatarUri: Uri? = null
+
+    init {
+        loadDiseasesOffline()
+        loadAllergiesOffline()
+        viewModelScope.launch {
+            getUserProfileUseCase().collectLatest { user ->
+                if (user != null) {
+                    _state.update {
+                        it.copy(
+                            firstName = user.firstName,
+                            lastName = user.lastName ?: "",
+                            dateOfBirth = user.dateOfBirth ?: "",
+                            email = user.email ?: "",
+                            heightCm = user.heightCm,
+                            weightKg = user.weightKg,
+                            avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt,
+                            selectedDiseaseIds = user.diseaseIds.toPersistentList(),
+                            selectedAllergyIds = user.allergyIds.toPersistentList()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onEvent(event: EditProfileEvent) {
+        when (event) {
+            EditProfileEvent.EditClicked -> {
+                _state.update { it.copy(isEditMode = true) }
+                syncData()
+            }
+            is EditProfileEvent.UpdateFirstName -> _state.update { it.copy(firstName = event.firstName) }
+            is EditProfileEvent.UpdateLastName -> _state.update { it.copy(lastName = event.lastName) }
+            is EditProfileEvent.UpdateDateOfBirth -> _state.update { it.copy(dateOfBirth = event.dateOfBirth) }
+            is EditProfileEvent.ToggleDisease -> toggleDisease(event.diseaseId)
+            is EditProfileEvent.ToggleAllergy -> toggleAllergy(event.allergyId)
+            EditProfileEvent.RetryLoadDiseases -> syncData() // now retry syncs data
+            EditProfileEvent.RetryLoadAllergies -> syncData()
+            EditProfileEvent.SaveClicked -> _state.update { it.copy(showSaveConfirmation = true) }
+            EditProfileEvent.ConfirmSave -> saveProfileData()
+            EditProfileEvent.DismissSaveConfirmation -> _state.update { it.copy(showSaveConfirmation = false) }
+            EditProfileEvent.BackClicked -> emitEffect(EditProfileEffect.NavigateBack)
+            is EditProfileEvent.SelectAvatar -> {
+                lastPickedAvatarUri = event.uri
+                uploadAvatar(event.uri)
+            }
+            EditProfileEvent.RetryAvatarUpload -> lastPickedAvatarUri?.let { uploadAvatar(it) }
+            EditProfileEvent.DismissAvatarUploadError ->
+                _state.update { it.copy(avatarUploadState = AvatarUploadState.Idle) }
+            is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
+            is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
+            EditProfileEvent.DismissAlert -> {
+                val wasSuccess = _state.value.alertState is Success
+                _state.update { it.copy(alertState = None) }
+                if (wasSuccess) {
+                    emitEffect(EditProfileEffect.NavigateBack)
+                }
+            }
+            EditProfileEvent.RetryAction -> saveProfileData()
+        }
+    }
+
+    private fun loadDiseasesOffline() {
+        viewModelScope.launch {
+            getDiseasesUseCase().collectLatest { diseases ->
+                _state.update {
+                    it.copy(
+                        diseases = diseases.toImmutableList(),
+                        isDiseasesLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    private fun loadAllergiesOffline() {
+        viewModelScope.launch {
+            getAllergiesUseCase().collectLatest { allergies ->
+                _state.update {
+                    it.copy(
+                        allergies = allergies.toImmutableList(),
+                        isAllergiesLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    private fun syncData() {
+        viewModelScope.launch {
+            _state.update { it.copy(isDiseasesLoading = true, isAllergiesLoading = true, diseasesErrorMessage = null, allergiesErrorMessage = null) }
+            
+            val diseasesResult = syncDiseasesUseCase()
+            val allergiesResult = syncAllergiesUseCase()
+            
+            _state.update { state ->
+                val diseasesError = if (state.diseases.isEmpty()) {
+                    diseasesResult.exceptionOrNull()?.message
+                } else null
+
+                val allergiesError = if (state.allergies.isEmpty()) {
+                    allergiesResult.exceptionOrNull()?.message
+                } else null
+
+                state.copy(
+                    isDiseasesLoading = false,
+                    isAllergiesLoading = false,
+                    diseasesErrorMessage = if (diseasesResult.isFailure) diseasesError else null,
+                    allergiesErrorMessage = if (allergiesResult.isFailure) allergiesError else null
+                )
+            }
+        }
+    }
+
+    private fun toggleDisease(diseaseId: Int) {
+        _state.update { state ->
+            val updatedSelected = if (state.selectedDiseaseIds.contains(diseaseId)) {
+                state.selectedDiseaseIds.filter { it != diseaseId }
+            } else {
+                state.selectedDiseaseIds + diseaseId
+            }
+            state.copy(selectedDiseaseIds = updatedSelected.toImmutableList())
+        }
+    }
+
+    private fun toggleAllergy(allergyId: Int) {
+        _state.update { state ->
+            val updatedSelected = if (state.selectedAllergyIds.contains(allergyId)) {
+                state.selectedAllergyIds.filter { it != allergyId }
+            } else {
+                state.selectedAllergyIds + allergyId
+            }
+            state.copy(selectedAllergyIds = updatedSelected.toImmutableList())
+        }
+    }
+
+    /**
+     * Uploads a freshly picked photo immediately (independent of the rest of the
+     * profile form / the Save button). The picked [uri] is first copied into
+     * [Context.getCacheDir] because content:// picker Uris are only guaranteed to be
+     * readable for the lifetime of this call, not for the duration of a background
+     * upload. The new avatar URL is not written into state directly — it arrives
+     * through the existing [getUserProfileUseCase] Flow once [uploadAvatarUseCase]
+     * persists the backend's response, exactly like every other profile field.
+     */
+    private fun uploadAvatar(uri: Uri) {
+        _state.update { it.copy(avatarUploadState = AvatarUploadState.Uploading) }
+        viewModelScope.launch {
+            val tempFile = try {
+                copyToCacheFile(uri)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to read picked avatar image")
+                _state.update { it.copy(avatarUploadState = AvatarUploadState.Error) }
+                return@launch
+            }
+
+            uploadAvatarUseCase(tempFile)
+                .onSuccess {
+                    tempFile.delete()
+                    _state.update { it.copy(avatarUploadState = AvatarUploadState.Idle) }
+                }
+                .onFailure { error ->
+                    tempFile.delete()
+                    Timber.w(error, "Avatar upload failed")
+                    _state.update { it.copy(avatarUploadState = AvatarUploadState.Error) }
+                }
+        }
+    }
+
+    private fun copyToCacheFile(uri: Uri): File {
+        val file = File(context.cacheDir, "avatar_upload_${System.currentTimeMillis()}.jpg")
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output -> input.copyTo(output) }
+        } ?: throw java.io.IOException("Unable to open picked image")
+        return file
+    }
+
+    private fun saveProfileData() {
+        _state.update { it.copy(isSaving = true, showSaveConfirmation = false) }
+        viewModelScope.launch {
+            val currentState = _state.value
+
+            // The avatar picture is uploaded separately via uploadAvatar() as soon as it's
+            // picked — it is never part of this text-field PATCH request.
+            updateUserProfileUseCase(
+                firstName = currentState.firstName,
+                lastName = currentState.lastName.takeIf { it.isNotBlank() },
+                gender = null, // Or handle if gender exists
+                dateOfBirth = currentState.dateOfBirth.takeIf { it.isNotBlank() },
+                heightCm = currentState.heightCm,
+                weightKg = currentState.weightKg,
+                diseaseIds = currentState.selectedDiseaseIds,
+                allergyIds = currentState.selectedAllergyIds
+            ).onSuccess {
+                // Re-fetch the profile so the backend can return the newly
+                // re-computed BMI and TDEE (which depend on heightCm / weightKg).
+                // This is fire-and-forget: a sync failure is non-fatal here
+                // because the save itself already succeeded.
+                launch {
+                    userRepository.fetchAndSyncProfile()
+                        .onFailure { error ->
+                            Timber.w(error, "BMI/TDEE sync failed after profile save — stale metrics may be shown")
+                        }
+                }
+
+                _state.update {
+                    it.copy(
+                        isSaving = false,
+                        isEditMode = false,
+                        alertState = Success(
+                            messageResId = R.string.alert_success_title
+                        )
+                    )
+                }
+            }.onFailure { error ->
+                val newAlertState = when {
+                    error is java.io.IOException -> InternetError
+                    else -> Error(messageStr = "Failed to update profile. Please try again.")
+                }
+                _state.update { it.copy(isSaving = false, alertState = newAlertState) }
+            }
+        }
+    }
+
+    private fun emitEffect(effect: EditProfileEffect) {
+        viewModelScope.launch { _effect.send(effect) }
+    }
+
+
+}

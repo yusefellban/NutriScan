@@ -19,8 +19,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://jitpack.io")
     }
 }
 
 rootProject.name = "NutriScan"
 include(":app")
+include(":domain")
+include(":data")
+include(":presentation")

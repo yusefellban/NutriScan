@@ -1,0 +1,81 @@
+package iti.grad.nutriscan.presentation.auth.email_verification.viewmodel
+
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEvent
+import androidx.lifecycle.ViewModel
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationState
+import iti.grad.nutriscan.presentation.common.model.UiText.StringResource
+import iti.grad.presentation.R
+import androidx.lifecycle.SavedStateHandle
+import iti.grad.nutriscan.presentation.auth.email_verification.state.EmailVerificationEffect
+import iti.grad.nutriscan.presentation.common.model.UiText.DynamicString
+import iti.grad.nutriscan.domain.auth.usecase.ResendVerificationEmailUseCase
+import iti.grad.nutriscan.presentation.common.state.AuthAlertState
+
+@HiltViewModel
+class EmailVerificationViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(
+        EmailVerificationState(
+            email = savedStateHandle.get<String>("email").orEmpty()
+        )
+    )
+    val state: StateFlow<EmailVerificationState> = _state.asStateFlow()
+
+    private val _effect = Channel<EmailVerificationEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
+
+    fun onEvent(event: EmailVerificationEvent) {
+        when (event) {
+            is EmailVerificationEvent.GoToSignInClicked -> handleGoToSignIn()
+            is EmailVerificationEvent.ResendEmailClicked -> handleResendEmail()
+            is EmailVerificationEvent.DismissAlert -> {
+                _state.update { it.copy(alertState = AuthAlertState.None) }
+            }
+        }
+    }
+
+    private fun handleGoToSignIn() {
+        viewModelScope.launch {
+            _effect.send(EmailVerificationEffect.NavigateToSignIn)
+        }
+    }
+
+    private fun handleResendEmail() {
+        val email = _state.value.email
+        if (email.isBlank()) return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isResending = true) }
+            resendVerificationEmailUseCase(email)
+                .onSuccess {
+                    _state.update { 
+                        it.copy(
+                            isResending = false,
+                            alertState = AuthAlertState.Success(message = StringResource(R.string.email_verification_resend_success))
+                        ) 
+                    }
+                }
+                .onFailure { throwable ->
+                    _state.update { 
+                        it.copy(
+                            isResending = false,
+                            alertState = AuthAlertState.Error(message = DynamicString(throwable.message ?: "Failed to resend verification email."))
+                        ) 
+                    }
+                }
+        }
+    }
+}

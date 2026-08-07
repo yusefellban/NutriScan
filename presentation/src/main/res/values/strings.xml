@@ -1,0 +1,664 @@
+<resources>
+    <string name="app_name">NutriScan</string>
+    <string name="signup_title">Sign Up For Free!</string>
+    <string name="first_name_label">First Name</string>
+    <string name="first_name_hint">Enter your first name…</string>
+    <string name="last_name_label">Last Name</string>
+    <string name="last_name_hint">Enter your last name…</string>
+    <string name="email_label">Email Address</string>
+    <string name="email_hint">Enter your email address...</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">****************</string>
+    <string name="confirm_password_label">Password Confirmation</string>
+    <string name="error_password_mismatch">ERROR: Passwords do not match!</string>
+    <string name="error_invalid_email">ERROR: Invalid email format.</string>
+    <string name="error_empty_field">ERROR: Field cannot be empty.</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="prompt_have_account">Already have an account? Sign In.</string>
+    <string name="name_label">Name</string>
+    <string name="name_hint">Enter your name...</string>
+    <string name="login_title">Welcome Back!</string>
+    <string name="action_sign_in">Sign In</string>
+    <string name="prompt_no_account">Don\'t have an account? Sign Up.</string>
+
+    <!-- Exit Dialog -->
+    <string name="exit_dialog_title">Exit App</string>
+    <string name="exit_dialog_message">Are you sure you want to exit NutriScan?</string>
+    <string name="exit_dialog_confirm">Exit</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">Hello, %1$s!</string>
+    <string name="home_subtitle">Your Health Comes First</string>
+    <string name="home_daily_tip_title">Daily Health Tip</string>
+    <string name="home_daily_tip_body">Stay hydrated! Drink at least\n8 glasses of water today.</string>
+    <string name="home_ready_to_scan">Ready to scan?</string>
+    <string name="home_scan_subtitle">Check nutritional facts instantly</string>
+    <string name="home_explore">Explore</string>
+    <string name="home_health_news">Health News</string>
+    <string name="home_chat_with_ai">Chat with AI</string>
+    <string name="home_recent_history">Recent History</string>
+    <string name="home_view_all">View All</string>
+    <string name="verdict_healthy">HEALTHY</string>
+    <string name="verdict_probiotic">PROBIOTIC</string>
+    <string name="verdict_high_sugar">HIGH\nSUGAR</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="try_again">Try again</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">Oops! The page you\'re\nlooking for can\'t be found.</string>
+    <string name="nav_scan">Scan</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_profile">Profile</string>
+    <string name="forgot_password_title">Forgot Password?</string>
+    <string name="forgot_password_subtitle">Then let\'s submit password reset.</string>
+    <string name="reset_method_email">Send via Email</string>
+    <string name="reset_method_email_desc">Reset password via email.</string>
+    <string name="reset_method_2fa">Send via 2FA</string>
+    <string name="reset_method_2fa_desc">Reset password via 2FA.</string>
+    <string name="reset_method_gauth">Send via Google Auth</string>
+    <string name="reset_method_gauth_desc">Reset password via G-Auth.</string>
+    <string name="reset_method_sms">Send via SMS</string>
+    <string name="reset_method_sms_desc">Reset password via SMS.</string>
+    <string name="action_reset_password">Reset Password</string>
+    <string name="password_sent_title">Password Sent!</string>
+    <string name="password_sent_subtitle">We\'ve sent the password to %1$s</string>
+    <string name="action_resend_code">Resend code</string>
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Scan Food Labels Instantly</string>
+    <string name="onboarding_desc_1">Point your camera at any food label and let AI read even the smallest Arabic and English ingredients in seconds.</string>
+    <string name="onboarding_title_2">Know What\'s Safe for You</string>
+    <string name="onboarding_desc_2">Get a personalized safety rating based on your allergies and health conditions, with simple explanations you can trust.</string>
+    <string name="onboarding_title_3">Shop with Confidence</string>
+    <string name="onboarding_desc_3">Discover healthier alternatives, avoid hidden risks, and make smarter food choices every time you shop.</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_lets_start">Let\'s Start</string>
+    <string name="onboarding_skip">SKIP</string>
+    <string name="onboarding_back">BACK</string>
+    <!-- Health Profile Setup -->
+    <string name="profile_setup_title">Setup Your Health Profile</string>
+    <string name="profile_setup_subtitle">Help us tailor NutriScan to your specific dietary needs and health conditions.</string>
+    <string name="profile_setup_chronic_conditions">Chronic Conditions</string>
+    <string name="profile_setup_diabetes">Diabetes</string>
+    <string name="profile_setup_hypertension">Hypertension</string>
+    <string name="profile_setup_celiac">Celiac Disease</string>
+    <string name="profile_setup_allergies">Allergies</string>
+    <string name="profile_setup_peanuts">Peanuts</string>
+    <string name="profile_setup_gluten">Gluten</string>
+    <string name="profile_setup_dairy">Dairy</string>
+    <string name="profile_setup_other">+ Other</string>
+    <string name="profile_setup_custom_input_hint">Type custom option...</string>
+    <string name="action_save">Save</string>
+    <!-- Profile Setup Pager -->
+    <string name="profile_setup_gender_title_prefix">"What is Your "</string>
+    <string name="profile_setup_gender_title_highlight">Gender</string>
+    <string name="profile_setup_gender_title_suffix">\?</string>
+    <string name="profile_setup_gender_subtitle">We\'ll use this information to personalize your NutriScan experience.</string>
+    <string name="profile_setup_gender_female">Female</string>
+    <string name="profile_setup_gender_male">Male</string>
+    <string name="profile_setup_dob_title_prefix">"Your "</string>
+    <string name="profile_setup_dob_title_highlight">Date of birth</string>
+    <string name="profile_setup_dob_subtitle">Your age helps us provide more accurate nutrition and health guidance.</string>
+    <string name="profile_setup_dob_years">Years</string>
+    <string name="profile_setup_dob_date_hint">DD/MM/YYYY</string>
+    <string name="profile_setup_height_title_prefix">"How "</string>
+    <string name="profile_setup_height_title_highlight">tall</string>
+    <string name="profile_setup_height_title_suffix">" are you?"</string>
+    <string name="profile_setup_height_subtitle">We\'ll use your height to personalize your nutrition insights and calorie calculations.</string>
+    <string name="profile_setup_weight_title_prefix">"Your current "</string>
+    <string name="profile_setup_weight_title_highlight">weight</string>
+    <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
+    <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
+    <string name="profile_setup_load_error">Something went wrong while loading. Please try again.</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_name_hint">Name</string>
+    <string name="edit_profile_username_hint">Username</string>
+    <string name="edit_profile_email_hint">Email</string>
+    <string name="edit_profile_password_hint">Password</string>
+    <string name="edit_profile_confirm_title">Save Changes?</string>
+    <string name="edit_profile_confirm_message">Your health profile changes will affect how products are evaluated for you. Continue?</string>
+    <string name="edit_profile_avatar_uploading">Uploading photo…</string>
+    <string name="edit_profile_avatar_upload_error">Couldn\'t upload your photo. Please try again.</string>
+    <string name="edit_profile_avatar_upload_retry">Retry upload</string>
+    <string name="action_edit">Edit</string>
+    <string name="edit_profile_first_name_hint">First name</string>
+    <string name="edit_profile_last_name_hint">Last name</string>
+    <string name="edit_profile_dob_hint">Date of birth</string>
+    <string name="edit_profile_height_label">Hight</string> <!-- Intentional typo to match image -->
+    <string name="edit_profile_weight_label">Weight</string>
+
+    <!-- Permissions -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_dismiss">Dismiss</string>
+
+    <!-- User Profile Screen -->
+    <string name="user_profile_day_streak">%1$d Day streak</string>
+    <string name="user_profile_edit_description">Edit profile</string>
+    <string name="user_profile_avatar_description">Profile picture</string>
+    <string name="user_profile_family_members">Family Members</string>
+    <string name="user_profile_add_member">ADD MEMBER</string>
+    <string name="user_profile_show_details">Show Details</string>
+    <string name="user_profile_member_avatar_description">%1$s\'s picture</string>
+    <string name="user_profile_scan_history">Scan History</string>
+    <string name="user_profile_notifications">Notifications</string>
+    <string name="user_profile_settings">Settings</string>
+    <string name="user_profile_remove_member_title">Remove Family Member?</string>
+    <string name="user_profile_remove_member_message">Remove %1$s from your family? Their health profile and scan history will no longer be tracked here.</string>
+    <string name="add_family_member_title">Add Family Member</string>
+    <string name="edit_family_member_title">Edit Family Member</string>
+    <string name="add_family_member_name_label">Full Name</string>
+    <string name="add_family_member_name_placeholder">e.g. Ahmed Mostafa</string>
+    <string name="add_family_member_relation_label">Relation</string>
+    <string name="add_family_member_relation_placeholder">e.g. Mother, Son</string>
+    <string name="error_name_required">Please enter a name</string>
+    <string name="error_relation_required">Please enter a relation</string>
+    <string name="add_family_member_generic_error">Couldn\'t save this family member. Please try again.</string>
+    <string name="family_member_image_add_action">Add photo</string>
+    <string name="family_member_image_change_action">Change photo</string>
+    <string name="family_member_image_remove_action">Remove photo</string>
+    <string name="family_member_image_upload_in_progress">Uploading photo…</string>
+
+    <!-- BMI categories — used by the Calories screen's BMI card (see BmiCategory.kt) -->
+    <string name="user_profile_bmi_underweight">Underweight</string>
+    <string name="user_profile_bmi_normal">Normal</string>
+    <string name="user_profile_bmi_overweight">Overweight</string>
+    <string name="user_profile_bmi_obese">Obese</string>
+    <string name="bmi_tdee_not_available">Health metrics will appear after your first profile sync.</string>
+
+    <!-- Notification Settings -->
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_category_activity">Fitness &amp; Tracking</string>
+    <string name="notification_settings_category_reminders">Reminders</string>
+    <string name="notification_settings_category_content">Content &amp; News</string>
+    <string name="notification_type_steps">Steps</string>
+    <string name="notification_type_water">Water</string>
+    <string name="notification_type_workout">Workout</string>
+    <string name="notification_type_food">Food Log</string>
+    <string name="notification_type_news">Health News</string>
+    <string name="notification_type_quote">Health Quotes</string>
+    <string name="notification_type_scan">Scan Reminders</string>
+    <string name="notification_type_streak">Streak</string>
+    <string name="notification_type_break">Break Reminders</string>
+    <string name="notification_settings_quiet_hours_header">Quiet Hours</string>
+    <string name="notification_settings_quiet_hours_label">Do not disturb</string>
+    <string name="notification_settings_progress_header">Today\'s Progress</string>
+    <string name="notification_settings_water_progress">%1$d / %2$d glasses</string>
+    <string name="notification_settings_log_water_glass">+1 glass</string>
+    <string name="notification_settings_workout_done">Workout done</string>
+    <string name="notification_settings_mark_workout_done">Mark done</string>
+    <string name="notification_settings_streak_days">%1$d day streak</string>
+    <string name="notification_settings_steps_progress">%1$d / %2$d steps</string>
+    <string name="notification_push_water_title">Stay hydrated</string>
+    <string name="notification_push_water_body">You\'re at %1$d/%2$d glasses today.</string>
+    <string name="notification_push_workout_title">Time to move</string>
+    <string name="notification_push_workout_body">You haven\'t logged a workout today — even a short walk counts.</string>
+    <string name="notification_push_steps_title">Keep going</string>
+    <string name="notification_push_steps_body">You\'re at %1$d/%2$d steps today.</string>
+    <string name="notification_push_streak_title">Don\'t lose your streak</string>
+    <string name="notification_push_streak_body">You\'re on a %1$d-day streak — log a meal before midnight to keep it alive.</string>
+    <string name="notification_push_food_title">Log today\'s meals</string>
+    <string name="notification_push_food_body">You haven\'t logged any food today — a quick scan or entry keeps your record accurate.</string>
+    <string name="notification_push_news_title">Today\'s health news</string>
+    <string name="notification_push_news_body">New nutrition and safety articles are waiting for you.</string>
+    <string name="notification_push_quote_title">Health tip</string>
+    <string name="notification_push_scan_title">Scan before you buy</string>
+    <string name="notification_push_scan_body">It\'s been a few days since your last scan — check your next purchase for safety.</string>
+    <string name="notification_push_break_title">Time for a break</string>
+    <string name="notification_push_break_body">Stand up, stretch, drink some water, and rest your eyes for a minute.</string>
+    <string name="notification_push_test_title">Test notification</string>
+    <string name="notification_push_test_body">If you can see this, notifications are working correctly.</string>
+    <string name="notification_settings_send_test">Send test notification</string>
+    <string name="notification_settings_test_sent">Test notification sent</string>
+    <string name="notification_settings_battery_header">Background delivery</string>
+    <string name="notification_settings_battery_warning">Your phone\'s battery saver may be blocking these notifications when NutriScan isn\'t open. Tap below to find NutriScan in your battery settings and allow it to run unrestricted, and also check your phone\'s auto-launch settings if you still don\'t get them.</string>
+    <string name="notification_settings_battery_button">Open battery settings</string>
+
+    <!-- App Settings -->
+    <string name="app_settings_title">App Settings</string>
+    <string name="app_settings_subtitle">Change application settings here</string>
+    <string name="app_settings_profile_settings">Profile Settings</string>
+    <string name="app_settings_appearance">Appearance</string>
+    <string name="app_settings_language">Language</string>
+    <string name="app_settings_terms_and_conditions">Terms and Conditions</string>
+    <string name="app_settings_help">Help</string>
+    <string name="app_settings_logout">Logout</string>
+    <string name="app_settings_theme_system">System</string>
+    <string name="app_settings_theme_dark">Dark</string>
+    <string name="app_settings_theme_light">Light</string>
+    <string name="app_settings_lang_en">En</string>
+    <string name="app_settings_lang_ar">Ar</string>
+    <string name="app_settings_logout_confirm_title">Log out?</string>
+    <string name="app_settings_logout_confirm_message">Are you sure you want to log out of NutriScan?</string>
+    <string name="help_faq_section_title">Frequently Asked Questions</string>
+    <string name="help_faq_q_scan">How do I scan a food item?</string>
+    <string name="help_faq_a_scan">Tap the scan icon on the Home screen, point your camera at the product\'s barcode or label, and NutriScan looks up its nutrition info automatically.</string>
+    <string name="help_faq_q_receipt">Can I scan a grocery receipt instead of one item at a time?</string>
+    <string name="help_faq_a_receipt">Yes. Use Receipt Capture to scan a whole receipt and log multiple items at once.</string>
+    <string name="help_faq_q_nutrigpt">How does NutriGPT work?</string>
+    <string name="help_faq_a_nutrigpt">NutriGPT is an in-app AI assistant you can chat with for nutrition questions and personalized suggestions based on your logged data.</string>
+    <string name="help_faq_q_log">How do I log calories and exercises?</string>
+    <string name="help_faq_a_log">Open the Calories or Exercises tab to record meals and workouts; your daily totals update automatically.</string>
+    <string name="help_faq_q_family">Can I track nutrition for my family?</string>
+    <string name="help_faq_a_family">Yes. Add family members under Manage Family and switch between profiles when logging or scanning.</string>
+    <string name="help_faq_q_history">Where can I see my past scans?</string>
+    <string name="help_faq_a_history">Scan History keeps a record of every item you\'ve scanned, with the nutrition data attached.</string>
+    <string name="help_faq_q_news">What is the News tab for?</string>
+    <string name="help_faq_a_news">It surfaces nutrition and health articles curated for your profile.</string>
+    <string name="help_faq_q_profile">How do I edit my profile?</string>
+    <string name="help_faq_a_profile">Go to Settings then Profile Settings to update your name, avatar, and personal details.</string>
+    <string name="help_faq_q_privacy">Is my health data private?</string>
+    <string name="help_faq_a_privacy">Your data is stored securely and only used to power the app\'s features. See Terms and Conditions for details.</string>
+    <string name="help_faq_q_appearance">How do I change app language or theme?</string>
+    <string name="help_faq_a_appearance">Settings then Appearance and Language let you switch between light/dark and English/Arabic instantly.</string>
+    <string name="help_contact_section_title">Still need help?</string>
+    <string name="help_contact_support">Contact Support</string>
+    <string name="help_contact_support_subject">NutriScan Support Request</string>
+    <string name="help_credits_team">Made with care by the NutriScan Team</string>
+    <string name="help_credits_version">v%1$s</string>
+    <string name="terms_section_1_title">Acceptance of Terms</string>
+    <string name="terms_section_1_body">By creating an account and using NutriScan, you agree to these Terms and Conditions. If you don\'t agree, please don\'t use the app.</string>
+    <string name="terms_section_2_title">Use of the App</string>
+    <string name="terms_section_2_body">NutriScan is provided for personal nutrition tracking. You agree to use it only for lawful purposes and to keep your account credentials secure.</string>
+    <string name="terms_section_3_title">Not Medical Advice</string>
+    <string name="terms_section_3_body">Nutrition information, calorie estimates, and NutriGPT responses are for informational purposes only and are not a substitute for professional medical or dietary advice. Consult a qualified professional for medical decisions.</string>
+    <string name="terms_section_4_title">Scanning and Camera Data</string>
+    <string name="terms_section_4_body">Photos taken for barcode or receipt scanning are processed to extract nutrition data and are not shared with third parties beyond what\'s required to provide this feature.</string>
+    <string name="terms_section_5_title">AI Assistant (NutriGPT)</string>
+    <string name="terms_section_5_body">Responses from NutriGPT are generated automatically and may occasionally be inaccurate. Use your judgment before acting on AI-provided suggestions.</string>
+    <string name="terms_section_6_title">Account and Family Profiles</string>
+    <string name="terms_section_6_body">You\'re responsible for the accuracy of information entered for yourself and any family profiles you manage under your account.</string>
+    <string name="terms_section_7_title">Changes to These Terms</string>
+    <string name="terms_section_7_body">We may update these Terms from time to time. Continued use of the app after changes means you accept the updated Terms.</string>
+    <string name="terms_section_8_title">Contact</string>
+    <string name="terms_section_8_body">Questions about these Terms? Reach us from the Help screen\'s Contact Support option.</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">Edit Profile</string>
+    <string name="action_go_back">Go Back</string>
+
+    <!-- Camera Scan Screen -->
+    <string name="scan_status_processing">Processing</string>
+    <string name="scan_status_failed">Failed</string>
+    <string name="scan_status_completed">Completed</string>
+    <string name="scan_product_unknown">Scanned product</string>
+    <string name="scan_brand_unknown">Unknown brand</string>
+    <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
+    <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
+    <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
+    <string name="scan_add_to_list_content_description">Add product to list</string>
+    <string name="scan_mode_qr">QR</string>
+    <string name="scan_mode_photo">Photo</string>
+    <string name="scan_mode_gallery">Image</string>
+    <string name="scan_mode_gallery_change">Pick another image</string>
+    <string name="scan_center_action_capture">Capture</string>
+    <string name="scan_center_action_upload">Upload</string>
+    <string name="scan_gallery_selected_image_content_description">Selected image preview</string>
+    <string name="scan_mode_qr_hint">Align QR code inside the frame</string>
+    <string name="scan_mode_photo_hint">Align product and capture clearly</string>
+    <string name="scan_mode_gallery_hint">Upload a product image from gallery</string>
+    <string name="scan_mode_selector_content_desc">Scan mode selector</string>
+    <string name="scan_gallery_pick_prompt">Choose an image to scan</string>
+    <string name="scan_gallery_pick_failed">Could not read selected image</string>
+    <string name="scan_gallery_pick_cancelled">No image selected</string>
+    <string name="scan_capture_failed_generic">Image capture failed. Please try again.</string>
+    <string name="scan_saved_content_description">Save scan</string>
+    <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
+    <string name="scan_saved_to_bookmarks">Scan saved to Bookmarks</string>
+    <string name="scan_save_failed">Failed to save scan</string>
+    <string name="scan_capture_failed">Image capture failed: %1$s</string>
+    <!-- Email Verification -->
+    <string name="email_verification_title">Verify Your Email</string>
+    <string name="email_verification_subtitle">Confirm it\'s you to start scanning.</string>
+    <string name="email_verification_sent_to">A verification link was sent to:</string>
+    <string name="email_verification_instructions">Please check your email and click the verification link to activate your account. After verifying, you can sign in below.</string>
+    <string name="email_verification_go_to_sign_in">Go to Sign In</string>
+    <string name="email_verification_didnt_receive">Didn\'t receive it?</string>
+    <string name="email_verification_resend">Resend Verification Email.</string>
+    <string name="email_verification_resend_success">Verification email sent successfully!</string>
+    <string name="email_verification_resend_error">Failed to resend verification email. Please try again.</string>
+    <string name="register_error_email_taken">This email is already registered. Please sign in or use a different email.</string>
+    <string name="register_error_generic">Registration failed. Please try again.</string>
+
+    <!-- Calories Dashboard -->
+    <string name="step_history_active_mins">Active\nMinutes</string>
+    <string name="step_history_start_date">Start</string>
+    <string name="step_history_end_date">End</string>
+
+    <string name="daily_insight_title">Daily Insight</string>
+    <string name="nav_calories">Calories</string>
+    <string name="daily_products">Daily Products</string>
+    <string name="calorie_badge">Calorie</string>
+    <string name="add_food">Add Food</string>
+    <string name="calorie_goals">Calorie Goals</string>
+    <string name="your_tdee">Your TDEE</string>
+    <string name="calories_gained">Calories Gained</string>
+    <string name="calories_burned">Calories Burned</string>
+    <string name="your_bmi">Your BMI</string>
+    <string name="kcal_suffix">Kcal</string>
+    <string name="steps">Steps</string>
+    <string name="your_exercise">Your Exercise</string>
+    <string name="kcal_exercise">kcal</string>
+    <string name="min_today">min today</string>
+    <string name="water">Water</string>
+    <string name="cup_removed">Cup removed</string>
+    <string name="exercises_title">Exercises</string>
+    <string name="exercises_categories_title">Categories</string>
+    <string name="exercises_see_all">See All</string>
+    <string name="exercise_card_subtitle">%1$d Exercises • %2$d Min</string>
+    <string name="exercises_search_hint">Search here</string>
+    <string name="exercises_category_all">All</string>
+    <string name="exercises_category_warm_up">Warm Up</string>
+    <string name="exercises_category_yoga">Yoga</string>
+    <string name="exercises_category_biceps">Biceps</string>
+    <string name="exercises_category_chest">Chest</string>
+    <string name="exercises_category_back">Back</string>
+    <string name="exercises_category_legs">Legs</string>
+    <string name="exercise_warm_up_name">Full Body Warm Up</string>
+    <string name="exercise_warm_up_equipment">equipment</string>
+    <string name="exercise_warm_up_target">target</string>
+    <string name="exercise_warm_up_instructions">Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head or cross them over your chest. Slowly lift your torso off the ground, contracting your abdominal muscles. Pause for a moment at the top, then slowly lower yourself back down.</string>
+    
+    <string name="exercise_strength_name">Strength Exercise</string>
+    <string name="exercise_strength_equipment">equipment</string>
+    <string name="exercise_strength_target">target</string>
+    <string name="exercise_strength_instructions">Perform controlled push-ups and planks to build upper body strength. Keep your core tight and back flat throughout the movements.</string>
+
+    <string name="exercise_side_plank_name">Both Side Plank</string>
+    <string name="exercise_side_plank_equipment">equipment</string>
+    <string name="exercise_side_plank_target">target</string>
+    <string name="exercise_side_plank_instructions">Lie on your side with your body fully straight. Support your weight on your forearm and the side of your foot. Hold the position while keeping your body in a straight line, then switch sides.</string>
+
+    <string name="exercise_abs_workout_name">Abs Workout</string>
+    <string name="exercise_abs_workout_equipment">equipment</string>
+    <string name="exercise_abs_workout_target">target</string>
+    <string name="exercise_abs_workout_instructions">Lie on your back, lift your knees and perform crunches or leg raises to target your abdominal muscles.</string>
+
+    <string name="exercise_torso_trap_name">Torso and Trap Workout</string>
+    <string name="exercise_torso_trap_equipment">equipment</string>
+    <string name="exercise_torso_trap_target">target</string>
+    <string name="exercise_torso_trap_instructions">Focus on upper back and shoulders. Elevate your shoulders to perform shrugs and torso extensions to target trap muscles.</string>
+
+    <string name="exercise_lower_back_name">Lower Back Exercise</string>
+    <string name="exercise_lower_back_equipment">equipment</string>
+    <string name="exercise_lower_back_target">target</string>
+    <string name="exercise_lower_back_instructions">Lie face down on the floor, lift your chest and legs off the ground to strengthen the lower back muscles.</string>
+
+    <string name="exercise_equipment_target">%1$s  •  %2$s</string>
+    <string name="exercise_instructions_title">Instructions</string>
+    <string name="action_read_more">read more</string>
+    <string name="action_start_workout">Start Workout</string>
+    <string name="exercise_workout_title">Exercise</string>
+    <string name="exercise_total_time_label">Total Time</string>
+    <string name="exercise_start_button">Start</string>
+    <string name="exercise_restart_button">Restart</string>
+    <string name="exercise_pause_button">Pause</string>
+    <string name="exercise_resume_button">Resume</string>
+    <string name="exercise_cancel_workout">Cancel workout</string>
+    <string name="exercise_finish_button">Finish</string>
+    <string name="exercise_sets_label">Sets</string>
+    <string name="exercise_reps_label">Reps</string>
+    <string name="exercise_result_title">Workout Complete!</string>
+    <string name="exercise_result_message">You burned %1$s kcal in this session.</string>
+    <string name="exercise_result_confirm">Great!</string>
+    <string name="exercise_enter_value">Enter value</string>
+    <string name="exercises_load_error">Couldn\'t load exercises. Please try again.</string>
+    <string name="exercises_empty_state">No exercises found</string>
+    <string name="exercise_restart_confirm_title">Restart Workout?</string>
+    <string name="exercise_restart_confirm_message">Are you sure you want to restart? This will reset your timer and progress.</string>
+    <string name="exercise_restart_confirm_action">Yes, Restart</string>
+    <string name="exercise_discard_confirm_title">Discard Workout?</string>
+    <string name="exercise_discard_confirm_message">Are you sure you want to exit? You will lose your current timer progress.</string>
+    <string name="exercise_discard_confirm_action">Yes, Discard</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">Saved Products</string>
+    <string name="saved_screen_subtitle">Your favorite scanned products</string>
+    <string name="saved_count_badge">%1$d saved</string>
+    <string name="calories_tracking_title">Calories Tracking</string>
+    <string name="calories_tracking_subtitle">Track your daily intake</string>
+    <string name="saved_search_hint">Search here</string>
+    <string name="saved_empty_state">No saved products yet</string>
+    <string name="saved_empty_title">No Saved scans</string>
+    <string name="saved_empty_subtitle">You have nothing on your list yet.\nIt\'s never too late to change it :)</string>
+    <string name="saved_empty_button">Scan Now</string>
+    <string name="search_not_found_title">No results found</string>
+    <string name="search_not_found_subtitle">No results found. Please try again.</string>
+    <string name="search_not_found_button">Go to Scan</string>
+    <string name="product_card_swipe_hint">Swipe right to add</string>
+    <string name="product_card_kcal_unit">Kcal</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
+
+    <!-- Food Log -->
+    <string name="food_log_swipe_remove_hint">Swipe to remove</string>
+    <string name="food_log_remove_confirm_title">Remove item?</string>
+    <string name="food_log_remove_confirm_message">This will remove it from today\'s food log.</string>
+    <string name="food_log_added_snackbar">Added %1$s to today\'s food log</string>
+    <string name="food_log_add_error">Couldn\'t add this item. Please try again.</string>
+    <string name="food_log_remove_error">Couldn\'t remove this item. Please try again.</string>
+    <string name="calories_refresh_error">Couldn\'t refresh. Check your connection and try again.</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">Safe</string>
+    <string name="verdict_caution">Caution</string>
+    <string name="verdict_unsafe">Unsafe</string>
+
+    <!-- Product Details -->
+    <string name="product_details_title">Product Details</string>
+    <string name="nutrition_calories">Calories</string>
+    <string name="nutrition_serving_size">Serving</string>
+    <string name="nutrition_sugar">Sugar</string>
+    <string name="nutrition_fat">Fat</string>
+    <string name="nutrition_protein">Protein</string>
+    <string name="nutrition_carbs">Carbs</string>
+    <string name="nutrition_fiber">Fiber</string>
+    <string name="nutrition_sodium">Sodium</string>
+    <string name="unit_kcal">%s kcal</string>
+    <string name="unit_serving">%s serving</string>
+    <string name="unit_g">%s g</string>
+    <string name="unit_mg">%s mg</string>
+    <string name="no_specific_match_found">No specific match found.</string>
+    <string name="product_details_scanned_at">Scanned at</string>
+    <string name="product_details_for_you">For you</string>
+    <string name="product_details_why_unsafe">Why It\'s Unsafe?</string>
+    <string name="product_details_why_caution">Why Caution?</string>
+    <string name="product_details_why_safe">Why It\'s Safe?</string>
+    <string name="product_details_calories">Calories</string>
+    <string name="product_details_serving">Serving</string>
+    <string name="product_details_sugar">Sugar</string>
+    <string name="product_details_fat">Fat</string>
+    <string name="product_details_sat_fat">Sat. Fat</string>
+    <string name="product_details_bookmark_add">Save product</string>
+    <string name="product_details_bookmark_remove">Remove from saved</string>
+    <!-- News -->
+    <string name="news_screen_title">Discover</string>
+    <string name="news_screen_subtitle">News from all around the world</string>
+    <string name="news_search_placeholder">Search</string>
+    <string name="news_search_filter_content_description">Filter</string>
+    <string name="news_category_label">News</string>
+    <string name="news_source_time_separator"> · </string>
+    <string name="news_source_avatar_content_description">Source avatar</string>
+    <string name="news_read_full_article">Read Full Article on Web</string>
+    <string name="news_chip_all">Top Health</string>
+    <string name="news_load_error">Couldn\'t load news. Please try again.</string>
+    <string name="news_no_internet_title">No Internet Connection</string>
+    <string name="news_no_internet_subtitle">Please check your internet connection and try again.</string>
+    <string name="news_no_internet_retry">Try Again</string>
+    <string name="news_empty_state">No articles found for the selected topics.</string>
+    <string name="news_card_byline">By %1$s</string>
+    <string name="news_time_just_now">Just now</string>
+    <string name="news_time_minutes_ago">%1$dm ago</string>
+    <string name="news_time_hours_ago">%1$dh ago</string>
+    <string name="news_time_days_ago">%1$dd ago</string>
+    <string name="news_card_menu_content_description">More options</string>
+    
+    <!-- News Home Screen -->
+    <string name="news_home_breaking_news">Breaking News</string>
+    <string name="news_home_recommendation">Recommendation</string>
+    <string name="news_home_search_content_description">Search</string>
+    <!-- NutriGPT Chat -->
+    <string name="nutrigpt_title">Nutrition AI</string>
+    <string name="nutrigpt_input_hint">Ask about nutrition…</string>
+    <string name="nutrigpt_listening_hint">Listening…</string>
+    <string name="nutrigpt_voice_official_sources">Sources from official documents</string>
+    <string name="nutrigpt_voice_switch_text">Switch to Text Chat</string>
+    <string name="nutrigpt_voice_generating">Generating response...</string>
+    <string name="nutrigpt_sources_header">Sources</string>
+    <string name="nutrigpt_disclaimer">The provided documents may not contain sufficient information to answer your question. We recommend consulting additional sources.</string>
+    <string name="nutrigpt_send_content_description">Send</string>
+    <string name="nutrigpt_mic_content_description">Voice input</string>
+    <string name="nutrigpt_lang_en">EN</string>
+    <string name="nutrigpt_lang_ar">AR</string>
+    <string name="nutrigpt_score_format">%1$d%%</string>
+    <string name="nutrigpt_sparkle_content_description">AI Sparkle</string>
+    <string name="nutrigpt_empty_title">Ask anything about nutrition</string>
+    <string name="nutrigpt_empty_subtitle">Get answers backed by trusted health sources and research papers.</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">Delete Warning</string>
+    <string name="alert_remove_saved_title">Remove from Saved?</string>
+    <string name="alert_remove_saved_message">Are you sure you want to remove this scan from your saved list?</string>
+    <string name="alert_success_title">Success</string>
+    <string name="alert_error_title">Error</string>
+    <string name="alert_warning_title">Warning</string>
+    <string name="alert_internet_title">No Internet</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="alert_button_delete">Delete</string>
+    <string name="alert_button_ok">ok</string>
+    <string name="alert_button_retry">Retry</string>
+    <string name="alert_test_message">Are you sure you want to delete this profile? This action cannot be undone.</string>
+    <string name="alert_internet_message">Please check your internet connection and try again.</string>
+    <string name="offline_state_title">No connection</string>
+    <string name="offline_state_subtitle">Oops! It seems you\'re currently offline.</string>
+    <string name="offline_state_retry">Try again</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">Login Failed</string>
+    <string name="alert_registration_failed_title">Registration Failed</string>
+    <string name="alert_reset_failed_title">Reset Failed</string>
+    <string name="alert_verification_failed_title">Verification Failed</string>
+    <string name="error_invalid_credentials">Invalid email or password.</string>
+    <string name="error_server_down">Server is temporarily unavailable. Please try again later.</string>
+    <string name="success_account_created">Account created successfully.</string>
+    <string name="error_email_exists">This email is already in use.</string>
+    <string name="error_validation_fields">Please correct the highlighted fields and try again.</string>
+    <string name="error_login_failed">Login failed. Please try again.</string>
+    <string name="error_google_login_failed">Failed to complete Google login. Please try again.</string>
+    <string name="common_retry">Retry</string>
+    <string name="date_today">Today, %1$s</string>
+    <string name="date_yesterday">Yesterday, %1$s</string>
+    <string name="scan_history_title">Scan History</string>
+    <string name="filter_all">All</string>
+    <string name="filter_safe">Safe</string>
+    <string name="filter_caution">Caution</string>
+    <string name="filter_unsafe">Unsafe</string>
+    <string name="scan_history_empty_title">No scans yet</string>
+    <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
+    <string name="scan_history_empty_button">Start Scanning</string>
+    <string name="scan_history_error_load">Failed to load history</string>
+    <!-- Step History -->
+    <string name="step_history_title">Step history</string>
+    <string name="step_history_daily_average">Daily average</string>
+    <string name="step_history_total_steps">Total steps</string>
+    <string name="step_history_steps">steps</string>
+    <string name="step_history_period_week">Week</string>
+    <string name="step_history_period_month">Month</string>
+    <string name="step_history_period_3months">3 Months</string>
+    <string name="step_history_period_6months">6 Months</string>
+    <!-- Notification History -->
+    <string name="notification_history_title">Notifications</string>
+    <string name="notification_history_clear_all">Clear All</string>
+    <string name="notification_history_settings">Settings</string>
+    <string name="notification_history_empty_title">No notifications</string>
+    <string name="notification_history_empty_subtitle">No new notifications right now.\nWe\'ll let you know when something important happens.</string>
+    <string name="notification_history_empty_go_back">Go back</string>
+    
+    <string name="notification_permission_title">Turn on notifications</string>
+    <string name="notification_permission_subtitle">Enable notifications to receive scan updates, reminders, and important health alerts.</string>
+    <string name="notification_permission_button">Go to settings</string>
+    <string name="notification_history_time_just_now">Just now</string>
+    <string name="notification_history_time_minutes_ago">%1$d min ago</string>
+    <string name="notification_history_time_hours_ago">%1$d hr ago</string>
+    <string name="notification_history_time_days_ago">%1$d days ago</string>
+    <string name="notification_history_confirm_clear_title">Clear All Notifications?</string>
+    <string name="notification_history_confirm_clear_message">Are you sure you want to delete all notifications? This action cannot be undone.</string>
+    <string name="notification_history_confirm_clear_yes">Clear</string>
+    <string name="notification_history_confirm_clear_no">Cancel</string>
+    <string name="notification_history_deleted">Notification deleted</string>
+    <string name="notification_history_all_cleared">All notifications cleared</string>
+
+    <!-- Calories History -->
+    <string name="calories_history_title">Calories History</string>
+    <string name="calories_history_total_meals">Total\nMeals</string>
+    <string name="calories_history_water">Water</string>
+    <string name="calories_history_steps">Steps</string>
+    <string name="calories_history_exercise">Exercise</string>
+    <string name="calories_history_kcal">Kcal</string>
+    <string name="calories_history_cups">Cups</string>
+    <string name="calories_history_target">target</string>
+    <string name="calories_history_step_unit">step</string>
+    <string name="calories_history_min">min</string>
+    <string name="calories_history_error">Something went wrong. Please try again.</string>
+    <string name="calories_history_retry">Retry</string>
+    <string name="calories_history_date_confirm">Confirm</string>
+    <string name="calories_history_date_cancel">Cancel</string>
+    <string name="calories_history_empty_title">No Calories History</string>
+    <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
+    <string name="calories_history_empty_button">Add meals</string>
+
+    <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
+    <string name="delete_account_button_label">Delete Account</string>
+    <string name="delete_account_confirm_title">Delete Account?</string>
+    <string name="delete_account_confirm_message">This will schedule your account for permanent deletion. You have a 15-day grace period to restore it before all your data is lost forever.</string>
+    <string name="delete_account_confirm_action">Delete</string>
+
+    <!-- ── Account Pending Deletion Screen ───────────────────────────────────── -->
+    <string name="account_pending_deletion_header_title">Restore Account</string>
+    <string name="account_pending_deletion_header_subtitle">Your account is scheduled for deletion.</string>
+    <string name="account_pending_deletion_heading">Account Deletion Pending</string>
+    <string name="account_pending_deletion_description">You can restore your account within the grace period to retain all your data and settings.</string>
+    <string name="account_pending_deletion_days_remaining_label">Days remaining to restore:</string>
+    <string name="account_pending_deletion_days_remaining_value">%d days</string>
+    <string name="account_pending_deletion_scheduled_date_label">Scheduled Deletion Date:</string>
+    <string name="account_pending_deletion_restore_btn">Restore My Account</string>
+    <string name="account_pending_deletion_restoring">Restoring…</string>
+    <string name="account_pending_deletion_logout_prompt">Want to exit?</string>
+    <string name="account_pending_deletion_logout_link">Log Out</string>
+
+    <string-array name="daily_tips_array">
+        <item>Health is a state of complete harmony of the body, mind and spirit.</item>
+        <item>Eat food as your medicine, otherwise you will eat medicine as your food.</item>
+        <item>Hydration is the key to energy. Drink a fresh glass of water to kickstart your day!</item>
+        <item>Small healthy choices every day add up to massive lifetime transformations.</item>
+        <item>Nourish your body with real food; it\'s the only place you have to live.</item>
+        <item>A 30-minute brisk walk can boost your heart health and elevate your mood.</item>
+        <item>Consistency over perfection. Keep tracking your meals and stay mindful.</item>
+        <item>Track today, thank yourself tomorrow.</item>
+        <item>Proper sleep and adequate hydration build the foundation for vibrant energy.</item>
+        <item>Progress isn\'t always on the scale — energy and mood count too.</item>
+        <item>Colors on your plate mean vitamins in your body. Aim for a colorful meal!</item>
+        <item>Movement is medicine for your joints and clarity for your mind.</item>
+        <item>Drink water before you feel thirsty; stay proactive with your hydration.</item>
+        <item>Listen to your body\'s hunger cues and savor every single bite.</item>
+        <item>Your health is an investment, not an expense. Prioritize yourself today.</item>
+        <item>Fresh fruits and vegetables are natural boosters for your immune system.</item>
+        <item>Taking steps toward your goal counts, no matter how small they seem.</item>
+        <item>Skipping a log doesn\'t erase your progress. Just log the next one.</item>
+        <item>Consistency beats intensity — small wins, every single day.</item>
+        <item>Stretching for five minutes in the morning awakens your muscles and mind.</item>
+        <item>Mindful eating transforms food into genuine energy and vital vitality.</item>
+        <item>You don\'t have to be extreme, just consistent. Keep going strong!</item>
+        <item>Fueling your muscles with protein helps repair and build daily strength.</item>
+        <item>Replace sugary beverages with water or herbal tea for instant clarity.</item>
+        <item>A peaceful mind leads to a healthier body. Take time to relax today.</item>
+        <item>Strength doesn\'t come from what you can do occasionally, but from what you do consistently.</item>
+        <item>Fiber-rich meals keep your gut happy and your energy steady all day.</item>
+        <item>Celebrate every day you choose health. You are building a brighter future.</item>
+        <item>Good nutrition is a form of self-respect. Treat yourself right today!</item>
+        <item>Success is the sum of small habits repeated day in and day out.</item>
+    </string-array>
+</resources>

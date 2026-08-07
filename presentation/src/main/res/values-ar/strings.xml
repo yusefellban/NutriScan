@@ -1,0 +1,664 @@
+<resources>
+    <string name="app_name">نيوتري سكان</string>
+    <string name="not_found_title">404</string>
+    <string name="not_found_subtitle">عذراً! الصفحة التي تبحث\nعنها غير موجودة.</string>
+    <string name="signup_title">سجل مجاناً!</string>
+    <string name="first_name_label">الاسم الأول</string>
+    <string name="first_name_hint">أدخل اسمك الأول…</string>
+    <string name="last_name_label">اسم العائلة</string>
+    <string name="last_name_hint">أدخل اسم عائلتك…</string>
+    <string name="email_label">البريد الإلكتروني</string>
+    <string name="email_hint">أدخل بريدك الإلكتروني...</string>
+    <string name="password_label">كلمة المرور</string>
+    <string name="password_hint">****************</string>
+    <string name="confirm_password_label">تأكيد كلمة المرور</string>
+    <string name="success_account_created">تم إنشاء الحساب بنجاح.</string>
+    <string name="error_email_exists">هذا البريد الإلكتروني مستخدم بالفعل.</string>
+    <string name="error_validation_fields">يرجى تصحيح الحقول المظللة والمحاولة مرة أخرى.</string>
+    <string name="error_login_failed">فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.</string>
+    <string name="error_google_login_failed">فشل إكمال تسجيل الدخول عبر جوجل. يرجى المحاولة مرة أخرى.</string>
+    <string name="date_today">اليوم، %1$s</string>
+    <string name="date_yesterday">أمس، %1$s</string>
+    <string name="error_password_mismatch">خطأ: كلمات المرور غير متطابقة!</string>
+    <string name="error_invalid_email">خطأ: صيغة البريد الإلكتروني غير صحيحة.</string>
+    <string name="error_empty_field">خطأ: لا يمكن ترك الحقل فارغاً.</string>
+    <string name="action_sign_up">تسجيل حساب</string>
+    <string name="prompt_have_account">لديك حساب بالفعل؟ تسجيل الدخول.</string>
+    <string name="name_label">الاسم</string>
+    <string name="name_hint">أدخل اسمك...</string>
+    <string name="login_title">مرحباً بعودتك!</string>
+    <string name="action_sign_in">تسجيل الدخول</string>
+    <string name="prompt_no_account">ليس لديك حساب؟ سجل الآن.</string>
+
+    <!-- Exit Dialog -->
+    <string name="exit_dialog_title">الخروج من التطبيق</string>
+    <string name="exit_dialog_message">هل أنت متأكد من رغبتك في الخروج من نيوتري سكان؟</string>
+    <string name="exit_dialog_confirm">خروج</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">مرحباً، %1$s!</string>
+    <string name="home_subtitle">صحتك تأتي أولاً</string>
+    <string name="home_daily_tip_title">نصيحة صحية يومية</string>
+    <string name="home_daily_tip_body">حافظ على ترطيب جسمك! اشرب على الأقل\n٨ أكواب من الماء يومياً.</string>
+    <string name="home_ready_to_scan">جاهز للمسح؟</string>
+    <string name="home_scan_subtitle">تحقق من الحقائق الغذائية فوراً</string>
+    <string name="home_explore">استكشف</string>
+    <string name="home_health_news">أخبار صحية</string>
+    <string name="home_chat_with_ai">الدردشة مع الذكاء الاصطناعي</string>
+    <string name="home_recent_history">السجل الأخير</string>
+    <string name="home_view_all">عرض الكل</string>
+    <string name="verdict_healthy">صحي</string>
+    <string name="verdict_probiotic">بروبيوتيك</string>
+    <string name="verdict_high_sugar">سكر\nعالي</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_history">السجل</string>
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="nav_scan">مسح</string>
+    <string name="nav_saved">المحفوظات</string>
+    <string name="nav_profile">الملف الشخصي</string>
+    <string name="forgot_password_title">نسيت كلمة المرور؟</string>
+    <string name="forgot_password_subtitle">دعنا نقدم طلب إعادة تعيين كلمة المرور.</string>
+    <string name="reset_method_email">إرسال عبر البريد</string>
+    <string name="reset_method_email_desc">إعادة تعيين كلمة المرور عبر البريد الإلكتروني.</string>
+    <string name="reset_method_2fa">إرسال عبر المصادقة الثنائية</string>
+    <string name="reset_method_2fa_desc">إعادة تعيين كلمة المرور عبر المصادقة الثنائية.</string>
+    <string name="reset_method_gauth">إرسال عبر Google Auth</string>
+    <string name="reset_method_gauth_desc">إعادة تعيين كلمة المرور عبر G-Auth.</string>
+    <string name="reset_method_sms">إرسال عبر رسالة نصية</string>
+    <string name="reset_method_sms_desc">إعادة تعيين كلمة المرور عبر رسالة نصية.</string>
+    <string name="action_reset_password">إعادة تعيين كلمة المرور</string>
+    <string name="password_sent_title">تم الإرسال!</string>
+    <string name="password_sent_subtitle">لقد أرسلنا كلمة المرور إلى %1$s</string>
+    <string name="action_resend_code">إعادة إرسال الرمز</string>
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">افحص ملصقات الطعام فوراً</string>
+    <string name="onboarding_desc_1">وجه كاميرتك نحو أي ملصق طعام ودع الذكاء الاصطناعي يقرأ حتى أصغر المكونات باللغتين العربية والإنجليزية في ثوانٍ.</string>
+    <string name="onboarding_title_2">اعرف ما هو آمن لك</string>
+    <string name="onboarding_desc_2">احصل على تقييم سلامة مخصص بناءً على حساسية طعامك وحالتك الصحية، مع تفسيرات بسيطة يمكنك الوثوق بها.</string>
+    <string name="onboarding_title_3">تسوق بثقة</string>
+    <string name="onboarding_desc_3">اكتشف بدائل أكثر صحة، وتجنب المخاطر الخفية، واتخذ خيارات غذائية أكثر ذكاءً في كل مرة تتسوق فيها.</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_lets_start">ابدأ الآن</string>
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_back">رجوع</string>
+    <!-- Health Profile Setup -->
+    <string name="profile_setup_title">إعداد ملفك الصحي</string>
+    <string name="profile_setup_subtitle">ساعدنا في تخصيص NutriScan ليناسب احتياجاتك الغذائية وحالتك الصحية الخاصة.</string>
+    <string name="profile_setup_chronic_conditions">الأمراض المزمنة</string>
+    <string name="profile_setup_diabetes">السكري</string>
+    <string name="profile_setup_hypertension">ضغط الدم المرتفع</string>
+    <string name="profile_setup_celiac">الداء البطني</string>
+    <string name="profile_setup_allergies">الحساسية</string>
+    <string name="profile_setup_peanuts">الفول السوداني</string>
+    <string name="profile_setup_gluten">الجلوتين</string>
+    <string name="profile_setup_dairy">منتجات الألبان</string>
+    <string name="profile_setup_other">+ أخرى</string>
+    <string name="profile_setup_custom_input_hint">اكتب خياراً مخصصاً...</string>
+    <string name="action_save">حفظ</string>
+    <!-- Profile Setup Pager -->
+    <string name="profile_setup_gender_title_prefix">"ما هو "</string>
+    <string name="profile_setup_gender_title_highlight">جنسك</string>
+    <string name="profile_setup_gender_title_suffix">؟</string>
+    <string name="profile_setup_gender_subtitle">سنستخدم هذا لتخصيص تجربتك في NutriScan.</string>
+    <string name="profile_setup_gender_female">أنثى</string>
+    <string name="profile_setup_gender_male">ذكر</string>
+    <string name="profile_setup_dob_title_prefix">"تاريخ "</string>
+    <string name="profile_setup_dob_title_highlight">ميلادك</string>
+    <string name="profile_setup_dob_subtitle">عمرك يساعدنا في تقديم إرشادات غذائية وصحية أكثر دقة.</string>
+    <string name="profile_setup_dob_years">سنة</string>
+    <string name="profile_setup_dob_date_hint">يوم/شهر/سنة</string>
+    <string name="profile_setup_height_title_prefix">"ما هو "</string>
+    <string name="profile_setup_height_title_highlight">طولك</string>
+    <string name="profile_setup_height_title_suffix">؟</string>
+    <string name="profile_setup_height_subtitle">سنستخدم طولك لتخصيص رؤى التغذية وحسابات السعرات الحرارية.</string>
+    <string name="profile_setup_weight_title_prefix">"وزنك "</string>
+    <string name="profile_setup_weight_title_highlight">الحالي</string>
+    <string name="profile_setup_weight_subtitle">وزنك يساعدنا في تقدير احتياجاتك اليومية من السعرات الحرارية بدقة أكبر.</string>
+    <string name="profile_setup_placeholder_coming_soon">قريباً…</string>
+    <string name="profile_setup_load_error">حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</string>
+    <string name="action_retry">إعادة المحاولة</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_name_hint">الاسم</string>
+    <string name="edit_profile_username_hint">اسم المستخدم</string>
+    <string name="edit_profile_email_hint">البريد الإلكتروني</string>
+    <string name="edit_profile_password_hint">كلمة المرور</string>
+    <string name="edit_profile_confirm_title">حفظ تغييرات الملف الشخصي؟</string>
+    <string name="edit_profile_confirm_message">هل أنت متأكد من رغبتك في تعديل ملفك الصحي؟ سيؤدي ذلك إلى تحديث قرارات فحص سلامة الغذاء المستقبلية.</string>
+    <string name="edit_profile_avatar_uploading">جارٍ رفع الصورة…</string>
+    <string name="edit_profile_avatar_upload_error">تعذر رفع صورتك. يرجى المحاولة مرة أخرى.</string>
+    <string name="edit_profile_avatar_upload_retry">إعادة محاولة الرفع</string>
+    <string name="edit_profile_first_name_hint">الاسم الأول</string>
+    <string name="edit_profile_last_name_hint">اسم العائلة</string>
+    <string name="edit_profile_dob_hint">تاريخ الميلاد</string>
+    <string name="edit_profile_height_label">الطول</string>
+    <string name="edit_profile_weight_label">الوزن</string>
+    <string name="action_edit">تعديل</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_remove">إزالة</string>
+
+    <!-- User Profile Screen -->
+    <string name="user_profile_day_streak">%1$d يوم متتالي</string>
+    <string name="user_profile_edit_description">تعديل الملف الشخصي</string>
+    <string name="user_profile_avatar_description">الصورة الشخصية</string>
+    <string name="user_profile_family_members">أفراد الأسرة</string>
+    <string name="user_profile_add_member">إضافة فرد</string>
+    <string name="user_profile_show_details">عرض التفاصيل</string>
+    <string name="user_profile_member_avatar_description">صورة %1$s</string>
+    <string name="user_profile_scan_history">سجل المسح</string>
+    <string name="user_profile_notifications">الإشعارات</string>
+    <string name="user_profile_settings">الإعدادات</string>
+    <string name="user_profile_remove_member_title">إزالة فرد من العائلة؟</string>
+    <string name="user_profile_remove_member_message">هل تريد إزالة %1$s من عائلتك؟ لن يتم تتبع ملفه الصحي وسجل المسح الخاص به هنا بعد الآن.</string>
+    <string name="add_family_member_title">إضافة فرد من العائلة</string>
+    <string name="edit_family_member_title">تعديل فرد العائلة</string>
+    <string name="add_family_member_name_label">الاسم الكامل</string>
+    <string name="add_family_member_name_placeholder">مثال: أحمد مصطفى</string>
+    <string name="add_family_member_relation_label">الصلة</string>
+    <string name="add_family_member_relation_placeholder">مثال: أم، ابن، زوجة</string>
+    <string name="error_name_required">يرجى إدخال الاسم</string>
+    <string name="error_relation_required">يرجى إدخال الصلة</string>
+    <string name="add_family_member_generic_error">تعذر حفظ فرد العائلة. يرجى المحاولة مرة أخرى.</string>
+    <string name="family_member_image_add_action">إضافة صورة</string>
+    <string name="family_member_image_change_action">تغيير الصورة</string>
+    <string name="family_member_image_remove_action">إزالة الصورة</string>
+    <string name="family_member_image_upload_in_progress">جارٍ رفع الصورة…</string>
+
+    <!-- BMI categories — تُستخدم في بطاقة مؤشر كتلة الجسم بشاشة السعرات (انظر BmiCategory.kt) -->
+    <string name="user_profile_bmi_underweight">نقص الوزن</string>
+    <string name="user_profile_bmi_normal">طبيعي</string>
+    <string name="user_profile_bmi_overweight">زيادة الوزن</string>
+    <string name="user_profile_bmi_obese">سمنة</string>
+    <string name="bmi_tdee_not_available">ستظهر المقاييس الصحية بعد أول مزامنة للملف الشخصي.</string>
+
+    <!-- Notification Settings -->
+    <string name="notification_settings_title">إعدادات الإشعارات</string>
+    <string name="notification_settings_category_activity">اللياقة والتتبع</string>
+    <string name="notification_settings_category_reminders">التذكيرات</string>
+    <string name="notification_settings_category_content">المحتوى والأخبار</string>
+    <string name="notification_type_steps">الخطوات</string>
+    <string name="notification_type_water">الماء</string>
+    <string name="notification_type_workout">التمرين</string>
+    <string name="notification_type_food">سجل الطعام</string>
+    <string name="notification_type_news">الأخبار الصحية</string>
+    <string name="notification_type_quote">اقتباسات صحية</string>
+    <string name="notification_type_scan">تذكير المسح</string>
+    <string name="notification_type_streak">التتابع اليومي</string>
+    <string name="notification_type_break">تذكير الاستراحة</string>
+    <string name="notification_settings_quiet_hours_header">ساعات الهدوء</string>
+    <string name="notification_settings_quiet_hours_label">عدم الإزعاج</string>
+    <string name="notification_settings_progress_header">تقدم اليوم</string>
+    <string name="notification_settings_water_progress">%1$d / %2$d أكواب</string>
+    <string name="notification_settings_log_water_glass">+١ كوب</string>
+    <string name="notification_settings_workout_done">تم التمرين</string>
+    <string name="notification_settings_mark_workout_done">تحديد كمنجز</string>
+    <string name="notification_settings_streak_days">%1$d يوم متتابع</string>
+    <string name="notification_settings_steps_progress">%1$d / %2$d خطوة</string>
+    <string name="notification_push_water_title">حافظ على ترطيب جسمك</string>
+    <string name="notification_push_water_body">أنت عند %1$d/%2$d أكواب اليوم.</string>
+    <string name="notification_push_workout_title">حان وقت الحركة</string>
+    <string name="notification_push_workout_body">لم تسجل تمرينًا اليوم — حتى نزهة قصيرة تحتسب.</string>
+    <string name="notification_push_steps_title">واصل التقدم</string>
+    <string name="notification_push_steps_body">أنت عند %1$d/%2$d خطوة اليوم.</string>
+    <string name="notification_push_streak_title">لا تفقد تتابعك</string>
+    <string name="notification_push_streak_body">أنت في تتابع %1$d يوم — سجّل وجبة قبل منتصف الليل للحفاظ عليه.</string>
+    <string name="notification_push_food_title">سجّل وجبات اليوم</string>
+    <string name="notification_push_food_body">لم تسجل أي طعام اليوم — مسح سريع أو إدخال يدوي يحافظ على دقة سجلك.</string>
+    <string name="notification_push_news_title">أخبار صحية اليوم</string>
+    <string name="notification_push_news_body">مقالات جديدة عن التغذية والسلامة بانتظارك.</string>
+    <string name="notification_push_quote_title">نصيحة صحية</string>
+    <string name="notification_push_scan_title">امسح قبل الشراء</string>
+    <string name="notification_push_scan_body">مرت أيام منذ آخر مسح لك — تحقق من سلامة مشترياتك القادمة.</string>
+    <string name="notification_push_break_title">حان وقت الاستراحة</string>
+    <string name="notification_push_break_body">قف، تمدد، اشرب بعض الماء، وأرح عينيك لدقيقة.</string>
+    <string name="notification_push_test_title">إشعار تجريبي</string>
+    <string name="notification_push_test_body">إذا كنت ترى هذا، فالإشعارات تعمل بشكل صحيح.</string>
+    <string name="notification_settings_send_test">إرسال إشعار تجريبي</string>
+    <string name="notification_settings_test_sent">تم إرسال الإشعار التجريبي</string>
+    <string name="notification_settings_battery_header">التسليم في الخلفية</string>
+    <string name="notification_settings_battery_warning">قد يمنع موفر البطارية في هاتفك هذه الإشعارات عندما يكون تطبيق NutriScan مغلقًا. اضغط أدناه للعثور على NutriScan في إعدادات البطارية والسماح له بالعمل دون قيود، وتحقق أيضًا من إعدادات التشغيل التلقائي إذا استمر عدم وصولها إليك.</string>
+    <string name="notification_settings_battery_button">فتح إعدادات البطارية</string>
+
+    <!-- App Settings -->
+    <string name="app_settings_title">إعدادات التطبيق</string>
+    <string name="app_settings_subtitle">غيّر إعدادات التطبيق هنا</string>
+    <string name="app_settings_profile_settings">إعدادات الملف الشخصي</string>
+    <string name="app_settings_appearance">المظهر</string>
+    <string name="app_settings_language">اللغة</string>
+    <string name="app_settings_terms_and_conditions">الشروط والأحكام</string>
+    <string name="app_settings_help">مساعدة</string>
+    <string name="app_settings_logout">تسجيل الخروج</string>
+    <string name="app_settings_theme_system">النظام</string>
+    <string name="app_settings_theme_dark">داكن</string>
+    <string name="app_settings_theme_light">فاتح</string>
+    <string name="app_settings_lang_en">En</string>
+    <string name="app_settings_lang_ar">Ar</string>
+    <string name="app_settings_logout_confirm_title">تسجيل الخروج؟</string>
+    <string name="app_settings_logout_confirm_message">هل أنت متأكد أنك تريد تسجيل الخروج من نيوتري سكان؟</string>
+    <string name="help_faq_section_title">الأسئلة الشائعة</string>
+    <string name="help_faq_q_scan">كيف أقوم بمسح عنصر غذائي؟</string>
+    <string name="help_faq_a_scan">اضغط على أيقونة المسح في الشاشة الرئيسية، ووجّه الكاميرا نحو الباركود أو ملصق المنتج، وسيقوم NutriScan بجلب معلومات القيمة الغذائية تلقائيًا.</string>
+    <string name="help_faq_q_receipt">هل يمكنني مسح إيصال بدلاً من عنصر واحد في كل مرة؟</string>
+    <string name="help_faq_a_receipt">نعم. استخدم مسح الإيصال لمسح إيصال كامل وتسجيل عدة عناصر دفعة واحدة.</string>
+    <string name="help_faq_q_nutrigpt">كيف يعمل NutriGPT؟</string>
+    <string name="help_faq_a_nutrigpt">NutriGPT مساعد ذكاء اصطناعي داخل التطبيق يمكنك محادثته لأسئلة التغذية واقتراحات مخصصة بناءً على بياناتك المسجلة.</string>
+    <string name="help_faq_q_log">كيف أسجل السعرات الحرارية والتمارين؟</string>
+    <string name="help_faq_a_log">افتح تبويب السعرات الحرارية أو التمارين لتسجيل الوجبات والتمارين؛ يتم تحديث إجمالياتك اليومية تلقائيًا.</string>
+    <string name="help_faq_q_family">هل يمكنني تتبع تغذية عائلتي؟</string>
+    <string name="help_faq_a_family">نعم. أضف أفراد العائلة من إدارة العائلة وبدّل بين الملفات الشخصية عند التسجيل أو المسح.</string>
+    <string name="help_faq_q_history">أين يمكنني رؤية عمليات المسح السابقة؟</string>
+    <string name="help_faq_a_history">يحتفظ سجل المسح بسجل لكل عنصر قمت بمسحه، مع بيانات القيمة الغذائية المرفقة.</string>
+    <string name="help_faq_q_news">ما الغرض من تبويب الأخبار؟</string>
+    <string name="help_faq_a_news">يعرض مقالات عن التغذية والصحة مختارة خصيصًا لملفك الشخصي.</string>
+    <string name="help_faq_q_profile">كيف أعدّل ملفي الشخصي؟</string>
+    <string name="help_faq_a_profile">اذهب إلى الإعدادات ثم إعدادات الملف الشخصي لتحديث اسمك وصورتك وبياناتك الشخصية.</string>
+    <string name="help_faq_q_privacy">هل بياناتي الصحية خاصة؟</string>
+    <string name="help_faq_a_privacy">يتم تخزين بياناتك بأمان وتُستخدم فقط لتشغيل ميزات التطبيق. راجع الشروط والأحكام لمزيد من التفاصيل.</string>
+    <string name="help_faq_q_appearance">كيف أغيّر لغة التطبيق أو المظهر؟</string>
+    <string name="help_faq_a_appearance">الإعدادات ثم المظهر واللغة تتيح لك التبديل بين الوضع الفاتح/الداكن والعربية/الإنجليزية فورًا.</string>
+    <string name="help_contact_section_title">ما زلت بحاجة إلى مساعدة؟</string>
+    <string name="help_contact_support">تواصل مع الدعم</string>
+    <string name="help_contact_support_subject">طلب دعم NutriScan</string>
+    <string name="help_credits_team">صُنع بعناية بواسطة فريق NutriScan</string>
+    <string name="help_credits_version">الإصدار %1$s</string>
+    <string name="terms_section_1_title">قبول الشروط</string>
+    <string name="terms_section_1_body">من خلال إنشاء حساب واستخدام NutriScan، فإنك توافق على هذه الشروط والأحكام. إذا كنت لا توافق، يرجى عدم استخدام التطبيق.</string>
+    <string name="terms_section_2_title">استخدام التطبيق</string>
+    <string name="terms_section_2_body">يتم توفير NutriScan لتتبع التغذية الشخصية. أنت توافق على استخدامه فقط للأغراض القانونية والحفاظ على أمان بيانات حسابك.</string>
+    <string name="terms_section_3_title">ليست نصيحة طبية</string>
+    <string name="terms_section_3_body">معلومات التغذية وتقديرات السعرات الحرارية وردود NutriGPT هي لأغراض إعلامية فقط وليست بديلاً عن الاستشارة الطبية أو الغذائية المتخصصة. استشر مختصًا مؤهلاً للقرارات الطبية.</string>
+    <string name="terms_section_4_title">بيانات المسح والكاميرا</string>
+    <string name="terms_section_4_body">تتم معالجة الصور الملتقطة لمسح الباركود أو الإيصالات لاستخراج بيانات القيمة الغذائية ولا تتم مشاركتها مع أطراف ثالثة إلا بالقدر اللازم لتوفير هذه الميزة.</string>
+    <string name="terms_section_5_title">المساعد الذكي (NutriGPT)</string>
+    <string name="terms_section_5_body">يتم إنشاء ردود NutriGPT تلقائيًا وقد تكون غير دقيقة أحيانًا. استخدم تقديرك الشخصي قبل التصرف بناءً على اقتراحات الذكاء الاصطناعي.</string>
+    <string name="terms_section_6_title">الحساب والملفات العائلية</string>
+    <string name="terms_section_6_body">أنت مسؤول عن دقة المعلومات المُدخلة لنفسك ولأي ملفات عائلية تديرها ضمن حسابك.</string>
+    <string name="terms_section_7_title">التغييرات على هذه الشروط</string>
+    <string name="terms_section_7_body">قد نقوم بتحديث هذه الشروط من وقت لآخر. استمرار استخدامك للتطبيق بعد التغييرات يعني موافقتك على الشروط المحدّثة.</string>
+    <string name="terms_section_8_title">التواصل</string>
+    <string name="terms_section_8_body">لديك أسئلة حول هذه الشروط؟ تواصل معنا من خيار تواصل مع الدعم في شاشة المساعدة.</string>
+
+    <!-- Placeholder Screens -->
+    <string name="placeholder_edit_profile_title">تعديل الملف الشخصي</string>
+    <string name="action_go_back">رجوع</string>
+
+    <!-- Camera Scan Screen -->
+    <string name="scan_status_processing">جاري المعالجة</string>
+    <string name="scan_status_failed">فشل</string>
+    <string name="scan_status_completed">مكتمل</string>
+    <string name="scan_product_unknown">منتج تم مسحه</string>
+    <string name="scan_brand_unknown">علامة تجارية غير معروفة</string>
+    <string name="scan_camera_permission_denied">مطلوب الوصول إلى الكاميرا لمسح المنتجات</string>
+    <string name="scan_camera_permission_retry">منح الإذن</string>
+    <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
+    <string name="scan_frame_content_description">إطار ماسح الباركود</string>
+    <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>
+    <string name="scan_mode_qr">كيو آر</string>
+    <string name="scan_mode_photo">صورة</string>
+    <string name="scan_mode_gallery">صورة من المعرض</string>
+    <string name="scan_mode_gallery_change">اختر صورة أخرى</string>
+    <string name="scan_center_action_capture">التقاط</string>
+    <string name="scan_center_action_upload">رفع</string>
+    <string name="scan_gallery_selected_image_content_description">معاينة الصورة المختارة</string>
+    <string name="scan_mode_qr_hint">ضع رمز QR داخل الإطار</string>
+    <string name="scan_mode_photo_hint">ضع المنتج داخل الإطار والتقط بوضوح</string>
+    <string name="scan_mode_gallery_hint">ارفع صورة منتج من المعرض</string>
+    <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
+    <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
+    <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
+    <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
+    <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
+    <string name="scan_saved_content_description">حفظ الفحص</string>
+    <string name="scan_processing_placeholder_title">جاري المسح\nالباركود: %1$s</string>
+    <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
+    <string name="scan_save_failed">فشل حفظ الفحص</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">تحقق من بريدك الإلكتروني</string>
+    <string name="email_verification_subtitle">تأكد من هويتك لبدء المسح.</string>
+    <string name="email_verification_sent_to">تم إرسال رابط التحقق إلى:</string>
+    <string name="email_verification_instructions">يرجى التحقق من بريدك الإلكتروني والنقر على رابط التحقق لتفعيل حسابك. بعد التحقق، يمكنك تسجيل الدخول أدناه.</string>
+    <string name="email_verification_go_to_sign_in">انتقل إلى تسجيل الدخول</string>
+    <string name="email_verification_didnt_receive">لم تستلمه؟</string>
+    <string name="email_verification_resend">إعادة إرسال بريد التحقق.</string>
+    <string name="email_verification_resend_success">تم إرسال بريد التحقق بنجاح!</string>
+    <string name="email_verification_resend_error">فشل إعادة إرسال بريد التحقق. يرجى المحاولة مرة أخرى.</string>
+    <string name="register_error_email_taken">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.</string>
+    <string name="register_error_generic">فشل التسجيل. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Calories Dashboard -->
+    <string name="nav_calories">السعرات</string>
+    <string name="daily_products">المنتجات اليومية</string>
+    <string name="calorie_badge">سعر حراري</string>
+    <string name="add_food">إضافة طعام</string>
+    <string name="calorie_goals">أهداف السعرات</string>
+    <string name="your_tdee">إجمالي الحرق</string>
+    <string name="calories_gained">السعرات المكتسبة</string>
+    <string name="calories_burned">السعرات المحروقة</string>
+    <string name="your_bmi">مؤشر كتلة جسمك</string>
+    <string name="kcal_suffix">سعرة حرارية</string>
+    <string name="steps">خطوات</string>
+    <string name="your_exercise">تمارينك</string>
+    <string name="kcal_exercise">سعرة حرارية</string>
+    <string name="min_today">دقيقة اليوم</string>
+    <string name="water">الماء</string>
+    <string name="exercises_title">التمارين</string>
+    <string name="exercises_search_hint">ابحث هنا</string>
+    <string name="exercises_category_all">الكل</string>
+    <string name="exercises_category_warm_up">الإحماء</string>
+    <string name="exercises_category_yoga">اليوغا</string>
+    <string name="exercises_category_biceps">البايسبس</string>
+    <string name="exercises_category_chest">الصدر</string>
+    <string name="exercises_category_back">الظهر</string>
+    <string name="exercises_category_legs">الأرجل</string>
+    <string name="exercise_warm_up_name">Full Body Warm Up</string>
+    <string name="exercise_warm_up_equipment">equipment</string>
+    <string name="exercise_warm_up_target">target</string>
+    <string name="exercise_warm_up_instructions">استلقِ على ظهرك مع ثني ركبتيك وقدميك مستوية على الأرض. ضع يديك خلف رأسك أو متقاطعتين على صدرك. ارفع جذعك ببطء عن الأرض مع قبض عضلات بطنك. توقف لبرهة في الأعلى، ثم اخفض نفسك ببطء للأسفل.</string>
+    
+    <string name="exercise_strength_name">Strength Exercise</string>
+    <string name="exercise_strength_equipment">equipment</string>
+    <string name="exercise_strength_target">target</string>
+    <string name="exercise_strength_instructions">تمرين الضغط واللوح الخشبي لتقوية الجزء العلوي من الجسم.</string>
+
+    <string name="exercise_side_plank_name">Both Side Plank</string>
+    <string name="exercise_side_plank_equipment">equipment</string>
+    <string name="exercise_side_plank_target">target</string>
+    <string name="exercise_side_plank_instructions">استلقِ على جانبك مع إبقاء جسمك مستقيمًا تمامًا وادعم وزنك بكوعك.</string>
+
+    <string name="exercise_abs_workout_name">Abs Workout</string>
+    <string name="exercise_abs_workout_equipment">equipment</string>
+    <string name="exercise_abs_workout_target">target</string>
+    <string name="exercise_abs_workout_instructions">تمرين عضلات البطن لتقوية الأساس.</string>
+
+    <string name="exercise_torso_trap_name">Torso and Trap Workout</string>
+    <string name="exercise_torso_trap_equipment">equipment</string>
+    <string name="exercise_torso_trap_target">target</string>
+    <string name="exercise_torso_trap_instructions">تمرين الجزء العلوي من الظهر والكتفين.</string>
+
+    <string name="exercise_lower_back_name">Lower Back Exercise</string>
+    <string name="exercise_lower_back_equipment">equipment</string>
+    <string name="exercise_lower_back_target">target</string>
+    <string name="exercise_lower_back_instructions">تمرين أسفل الظهر لتقوية الفقرات القطنية.</string>
+
+    <string name="exercise_equipment_target">%1$s  •  %2$s</string>
+    <string name="exercise_instructions_title">التعليمات</string>
+    <string name="action_read_more">اقرأ المزيد</string>
+    <string name="action_start_workout">ابدأ التمرين</string>
+    <string name="exercises_categories_title">الفئات</string>
+    <string name="exercises_see_all">عرض الكل</string>
+    <string name="exercise_card_subtitle">%1$d تمرين • %2$d دقيقة</string>
+    <string name="exercise_workout_title">التمرين</string>
+    <string name="exercise_total_time_label">الوقت الإجمالي</string>
+    <string name="exercise_start_button">ابدأ</string>
+    <string name="exercise_restart_button">إعادة</string>
+    <string name="exercise_pause_button">إيقاف مؤقت</string>
+    <string name="exercise_resume_button">استئناف</string>
+    <string name="exercise_cancel_workout">إلغاء التمرين</string>
+    <string name="exercise_finish_button">إنهاء</string>
+    <string name="exercise_sets_label">مجموعات</string>
+    <string name="exercise_reps_label">تكرارات</string>
+    <string name="exercise_result_title">اكتمل التمرين!</string>
+    <string name="exercise_result_message">لقد حرقت %1$s سعرة حرارية في هذا التمرين.</string>
+    <string name="exercise_result_confirm">رائع!</string>
+    <string name="exercise_enter_value">أدخل القيمة</string>
+    <string name="exercises_load_error">تعذّر تحميل التمارين. يرجى المحاولة مرة أخرى.</string>
+    <string name="exercises_empty_state">لم يتم العثور على تمارين</string>
+    <string name="exercise_restart_confirm_title">إعادة التمرين؟</string>
+    <string name="exercise_restart_confirm_message">هل أنت متأكد من رغبتك في إعادة التمرين؟ سيؤدي هذا إلى إعادة ضبط المؤقت والتقدم.</string>
+    <string name="exercise_restart_confirm_action">نعم، إعادة</string>
+    <string name="exercise_discard_confirm_title">إلغاء التمرين؟</string>
+    <string name="exercise_discard_confirm_message">هل أنت متأكد من رغبتك في الخروج؟ ستفقد تقدم المؤقت الحالي.</string>
+    <string name="exercise_discard_confirm_action">نعم، إلغاء</string>
+
+    <!-- Saved Screen -->
+    <string name="saved_screen_title">المنتجات المحفوظة</string>
+    <string name="saved_screen_subtitle">منتجاتك المفضلة التي تم مسحها</string>
+    <string name="saved_count_badge">%1$d محفوظ</string>
+    <string name="calories_tracking_title">تتبع السعرات</string>
+    <string name="calories_tracking_subtitle">تتبع استهلاكك اليومي</string>
+    <string name="saved_search_hint">ابحث هنا</string>
+    <string name="saved_empty_state">لا توجد منتجات محفوظة حتى الآن</string>
+    <string name="saved_empty_title">لا توجد محفوظات</string>
+    <string name="saved_empty_subtitle">ليس لديك أي منتجات محفوظة في القائمة بعد.\nلم يفت الأوان لتغيير ذلك :)</string>
+    <string name="saved_empty_button">افحص الآن</string>
+    <string name="search_not_found_title">لم يتم العثور على نتائج</string>
+    <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
+    <string name="search_not_found_button">الذهاب للفحص</string>
+    <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
+    <string name="product_card_kcal_unit">سعرة</string>
+    <string name="product_card_quantity_badge">x%1$d</string>
+
+    <!-- Food Log -->
+    <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>
+    <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
+    <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
+    <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
+    <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
+    <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
+    <string name="calories_refresh_error">تعذّر التحديث. تحقّق من اتصالك وحاول مرة أخرى.</string>
+
+    <!-- Verdicts -->
+    <string name="verdict_safe">آمن</string>
+    <string name="verdict_caution">حذر</string>
+    <string name="verdict_unsafe">غير آمن</string>
+
+    <!-- Product Details -->
+    <string name="product_details_title">تفاصيل المنتج</string>
+    <string name="nutrition_calories">سعرات</string>
+    <string name="nutrition_serving_size">حصة</string>
+    <string name="nutrition_sugar">سكر</string>
+    <string name="nutrition_fat">دهون</string>
+    <string name="nutrition_protein">بروتين</string>
+    <string name="nutrition_carbs">كربوهيدرات</string>
+    <string name="nutrition_fiber">ألياف</string>
+    <string name="nutrition_sodium">صوديوم</string>
+    <string name="unit_kcal">%s سعرة</string>
+    <string name="unit_serving">%s حصة</string>
+    <string name="unit_g">%s جم</string>
+    <string name="unit_mg">%s مجم</string>
+    <string name="no_specific_match_found">لم يتم العثور على تطابق محدد.</string>
+    <string name="product_details_scanned_at">تم المسح في</string>
+    <string name="product_details_for_you">لك</string>
+    <string name="product_details_why_unsafe">لماذا هو غير آمن؟</string>
+    <string name="product_details_why_caution">لماذا الحذر؟</string>
+    <string name="product_details_why_safe">لماذا هو آمن؟</string>
+    <string name="product_details_calories">السعرات الحرارية</string>
+    <string name="product_details_serving">الحصة</string>
+    <string name="product_details_sugar">السكر</string>
+    <string name="product_details_fat">الدهون</string>
+    <string name="product_details_sat_fat">دهون مشبعة</string>
+    <string name="product_details_bookmark_add">حفظ المنتج</string>
+    <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
+    <!-- News -->
+    <string name="news_screen_title">اكتشف</string>
+    <string name="news_screen_subtitle">أخبار من جميع أنحاء العالم</string>
+    <string name="news_search_placeholder">بحث</string>
+    <string name="news_search_filter_content_description">تصفية</string>
+    <string name="news_category_label">أخبار</string>
+    <string name="news_source_time_separator"> · </string>
+    <string name="news_source_avatar_content_description">أيقونة المصدر</string>
+    <string name="news_read_full_article">قراءة المقال كاملاً على الويب</string>
+    <string name="news_chip_all">أهم الأخبار الصحية</string>
+    <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
+    <string name="news_no_internet_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="news_no_internet_subtitle">يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.</string>
+    <string name="news_no_internet_retry">إعادة المحاولة</string>
+    <string name="news_empty_state">لا توجد مقالات للمواضيع المحددة.</string>
+    <string name="news_card_byline">بقلم %1$s</string>
+    <string name="news_time_just_now">الآن</string>
+    <string name="news_time_minutes_ago">منذ %1$d د</string>
+    <string name="news_time_hours_ago">منذ %1$d س</string>
+    <string name="news_time_days_ago">منذ %1$d ي</string>
+    <string name="news_card_menu_content_description">خيارات إضافية</string>
+    
+    <!-- News Home Screen -->
+    <string name="news_home_breaking_news">أخبار عاجلة</string>
+    <string name="news_home_recommendation">اقتراحات</string>
+    <string name="news_home_search_content_description">بحث</string>
+    <!-- NutriGPT Chat -->
+    <string name="nutrigpt_title">المساعد الذكي</string>
+    <string name="nutrigpt_empty_title">اسأل أي شيء عن التغذية</string>
+    <string name="nutrigpt_empty_subtitle">احصل على إجابات مدعومة بمصادر صحية موثوقة وأبحاث علمية.</string>
+    <string name="nutrigpt_input_hint">اسأل عن التغذية…</string>
+    <string name="nutrigpt_listening_hint">جاري الاستماع…</string>
+    <string name="nutrigpt_voice_official_sources">مصادر من وثائق رسمية</string>
+    <string name="nutrigpt_voice_switch_text">التبديل إلى الدردشة النصية</string>
+    <string name="nutrigpt_voice_generating">جاري الرد...</string>
+    <string name="nutrigpt_sources_header">المصادر</string>
+    <string name="nutrigpt_disclaimer">الوثائق المقدمة لا تحتوي على معلومات كافية للإجابة على سؤالك. يرجى استشارة مصادر إضافية.</string>
+    <string name="nutrigpt_send_content_description">إرسال</string>
+    <string name="nutrigpt_mic_content_description">إدخال صوتي</string>
+    <string name="nutrigpt_lang_en">EN</string>
+    <string name="nutrigpt_lang_ar">AR</string>
+    <string name="nutrigpt_score_format">%% %1$d</string>
+    <string name="nutrigpt_sparkle_content_description">ذكاء اصطناعي</string>
+
+    <!-- Custom Alerts -->
+    <string name="alert_delete_warning_title">تحذير الحذف</string>
+    <string name="alert_remove_saved_title">إزالة من المحفوظات؟</string>
+    <string name="alert_remove_saved_message">هل أنت متأكد من رغبتك في إزالة هذا الفحص من قائمة المحفوظات الخاصة بك؟</string>
+    <string name="alert_success_title">نجاح</string>
+    <string name="alert_error_title">خطأ</string>
+    <string name="alert_warning_title">تحذير</string>
+    <string name="alert_internet_title">لا يوجد اتصال</string>
+    <string name="alert_button_cancel">إلغاء</string>
+    <string name="alert_button_delete">حذف</string>
+    <string name="alert_button_ok">موافق</string>
+    <string name="alert_button_retry">إعادة المحاولة</string>
+    <string name="alert_test_message">هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_internet_message">يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    <string name="offline_state_title">لا يوجد اتصال</string>
+    <string name="offline_state_subtitle">عذراً! يبدو أنك غير متصل بالإنترنت حالياً.</string>
+    <string name="offline_state_retry">إعادة المحاولة</string>
+    
+    <!-- Auth Alerts -->
+    <string name="alert_login_failed_title">فشل تسجيل الدخول</string>
+    <string name="alert_registration_failed_title">فشل التسجيل</string>
+    <string name="alert_reset_failed_title">فشل إعادة التعيين</string>
+    <string name="scan_history_title">سجل المسح</string>
+    <string name="filter_all">الكل</string>
+    <string name="filter_safe">آمن</string>
+    <string name="filter_caution">حذر</string>
+    <string name="filter_unsafe">غير آمن</string>
+    <string name="scan_history_empty_title">لا توجد عمليات مسح حتى الآن</string>
+    <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
+    <string name="scan_history_empty_button">ابدأ المسح</string>
+    <string name="scan_history_error_load">فشل تحميل السجل</string>
+    <!-- Step History -->
+    <string name="step_history_title">سجل الخطوات</string>
+    <string name="step_history_daily_average">المتوسط اليومي</string>
+    <string name="step_history_active_mins">الدقائق\nالنشطة</string>
+    <string name="step_history_start_date">البداية</string>
+    <string name="step_history_end_date">النهاية</string>
+    <string name="step_history_total_steps">إجمالي الخطوات</string>
+    <string name="step_history_steps">خطوة</string>
+
+    <string name="daily_insight_title">رؤية يومية</string>
+    <string name="step_history_period_week">أسبوع</string>
+    <string name="step_history_period_month">شهر</string>
+    <string name="step_history_period_3months">٣ أشهر</string>
+    <string name="step_history_period_6months">٦ أشهر</string>
+
+    <string name="cup_removed">تمت إزالة الكوب</string>
+    <string name="alert_verification_failed_title">فشل التحقق</string>
+    <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة.</string>
+    <string name="error_server_down">الخادم غير متاح مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="common_retry">إعادة المحاولة</string>
+
+    <string name="action_dismiss">إغلاق</string>
+    <string name="scan_capture_failed">فشل التقاط الصورة: %1$s</string>
+    <!-- Calories History -->
+    <string name="calories_history_title">سجل السعرات</string>
+    <string name="calories_history_total_meals">إجمالي\nالوجبات</string>
+    <string name="calories_history_water">ماء</string>
+    <string name="calories_history_steps">خطوات</string>
+    <string name="calories_history_exercise">تمرين</string>
+    <string name="calories_history_kcal">كيلو سعر</string>
+    <string name="calories_history_cups">أكواب</string>
+    <string name="calories_history_target">الهدف</string>
+    <string name="calories_history_step_unit">خطوة</string>
+    <string name="calories_history_min">د</string>
+    <string name="calories_history_error">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
+    <string name="calories_history_retry">إعادة المحاولة</string>
+    <string name="calories_history_date_confirm">تأكيد</string>
+    <string name="calories_history_date_cancel">إلغاء</string>
+    <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
+    <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
+    <string name="calories_history_empty_button">إضافة وجبات</string>
+    <!-- Notification History -->
+    <string name="notification_history_title">الإشعارات</string>
+    <string name="notification_history_clear_all">مسح الكل</string>
+    <string name="notification_history_settings">الإعدادات</string>
+    <string name="notification_history_empty_title">لا توجد إشعارات</string>
+    <string name="notification_history_empty_subtitle">لا توجد إشعارات جديدة حالياً.\nسنخبرك عندما يحتاج أمر مهم لاهتمامك.</string>
+    <string name="notification_history_empty_go_back">العودة للخلف</string>
+
+    <string name="notification_permission_title">تفعيل الإشعارات</string>
+    <string name="notification_permission_subtitle">قم بتفعيل الإشعارات لتلقي تحديثات المسح، والتذكيرات، وتنبيهات صحية هامة.</string>
+    <string name="notification_permission_button">الانتقال إلى الإعدادات</string>
+    <string name="notification_history_time_just_now">الآن</string>
+    <string name="notification_history_time_minutes_ago">منذ %1$d دقيقة</string>
+    <string name="notification_history_time_hours_ago">منذ %1$d ساعة</string>
+    <string name="notification_history_time_days_ago">منذ %1$d أيام</string>
+    <string name="notification_history_confirm_clear_title">مسح جميع الإشعارات؟</string>
+    <string name="notification_history_confirm_clear_message">هل أنت متأكد أنك تريد حذف جميع الإشعارات؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="notification_history_confirm_clear_yes">مسح</string>
+    <string name="notification_history_confirm_clear_no">إلغاء</string>
+    <string name="notification_history_deleted">تم حذف الإشعار</string>
+    <string name="notification_history_all_cleared">تم مسح جميع الإشعارات</string>
+
+    <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
+    <string name="delete_account_button_label">حذف الحساب</string>
+    <string name="delete_account_confirm_title">حذف الحساب؟</string>
+    <string name="delete_account_confirm_message">سيتم جدولة حسابك للحذف النهائي. لديك مهلة 15 يومًا لاسترجاعه قبل فقدان جميع بياناتك إلى الأبد.</string>
+    <string name="delete_account_confirm_action">حذف</string>
+
+    <!-- ── Account Pending Deletion Screen ───────────────────────────────────── -->
+    <string name="account_pending_deletion_header_title">استعادة الحساب</string>
+    <string name="account_pending_deletion_header_subtitle">تم جدولة حسابك للحذف.</string>
+    <string name="account_pending_deletion_heading">الحذف قيد الانتظار</string>
+    <string name="account_pending_deletion_description">يمكنك استعادة حسابك خلال فترة السماح للاحتفاظ بجميع بياناتك وإعداداتك.</string>
+    <string name="account_pending_deletion_days_remaining_label">الأيام المتبقية للاستعادة:</string>
+    <string name="account_pending_deletion_days_remaining_value">%d أيام</string>
+    <string name="account_pending_deletion_scheduled_date_label">تاريخ الحذف المجدول:</string>
+    <string name="account_pending_deletion_restore_btn">استعادة حسابي</string>
+    <string name="account_pending_deletion_restoring">جارٍ الاستعادة…</string>
+    <string name="account_pending_deletion_logout_prompt">تريد الخروج؟</string>
+    <string name="account_pending_deletion_logout_link">تسجيل الخروج</string>
+
+    <string-array name="daily_tips_array">
+        <item>الصحة هي حالة من الانسجام التام بين الجسد والعقل والروح.</item>
+        <item>اجعل طعامك دواءك، وإلا ستأكل الدواء كأنه طعامك.</item>
+        <item>الترطيب هو مفتاح الطاقة. ابدأ يومك بكوب من الماء المنعش!</item>
+        <item>الاختيارات الصحية الصغيرة كل يوم تتراكم لتصنع تحولات هائلة في حياتك.</item>
+        <item>غذِّ جسمك بالطعام الحقيقي؛ فهو المكان الوحيد الذي ستعيش فيه.</item>
+        <item>المشي السريع لمدة 30 دقيقة يعزز صحة قلبك ويحسن مزاجك.</item>
+        <item>الاستمرارية أهم من المثالية. استمر في تتبع وجباتك وكن واعياً بما تأكله.</item>
+        <item>سجّل وجباتك اليوم، واشكر نفسك غداً.</item>
+        <item>النوم الجيد والترطيب الكافي هما أساس الطاقة الحيوية والنشاط.</item>
+        <item>التقدم لا يقتصر دائماً على الميزان، فطاقتك ومزاجك لهما أهمية كبيرة أيضاً.</item>
+        <item>الألوان في طبقك تعني الفيتامينات في جسمك. احرص على تناول وجبات ملونة!</item>
+        <item>الحركة هي دواء لمفاصلك وصفاء لعقلك.</item>
+        <item>اشرب الماء قبل أن تشعر بالعطش؛ كن استباقياً في ترطيب جسمك.</item>
+        <item>استمع لإشارات الجوع في جسمك، واستمتع بكل قضمة.</item>
+        <item>صحتك استثمار وليست تكلفة. اجعل نفسك أولوية اليوم.</item>
+        <item>الفواكه والخضروات الطازجة هي معززات طبيعية لجهازك المناعي.</item>
+        <item>اتخاذ أي خطوة نحو هدفك هو إنجاز، مهما بدت صغيرة.</item>
+        <item>تخطي تسجيل وجبة لا يمحو تقدمك. فقط استمر وسجل الوجبة القادمة.</item>
+        <item>الاستمرارية تتفوق على الكثافة، الانتصارات الصغيرة كل يوم تصنع الفارق.</item>
+        <item>التمدد لمدة خمس دقائق في الصباح يوقظ عضلاتك وينشط عقلك.</item>
+        <item>الأكل بوعي يحول الطعام إلى طاقة حقيقية وحيوية مفعمة بالنشاط.</item>
+        <item>لا داعي للتطرف، فقط كن مستمراً. واصل بقوة!</item>
+        <item>تغذية عضلاتك بالبروتين تساعد على الشفاء وبناء قوتك اليومية.</item>
+        <item>استبدل المشروبات السكرية بالماء أو شاي الأعشاب لصفاء ذهني فوري.</item>
+        <item>العقل الهادئ يقود إلى جسم أكثر صحة. خذ وقتاً للاسترخاء اليوم.</item>
+        <item>القوة لا تأتي مما تفعله من حين لآخر، بل مما تفعله باستمرار.</item>
+        <item>الوجبات الغنية بالألياف تحافظ على صحة أمعائك وتمدك بطاقة مستقرة طوال اليوم.</item>
+        <item>احتفل بكل يوم تختار فيه الصحة. أنت تبني مستقبلاً أكثر إشراقاً.</item>
+        <item>التغذية الجيدة هي شكل من أشكال احترام الذات. اعتنِ بنفسك جيداً اليوم!</item>
+        <item>النجاح هو مجموع العادات الصغيرة المتكررة يوماً بعد يوم.</item>
+    </string-array>
+</resources>
