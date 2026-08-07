@@ -213,8 +213,8 @@ Key changes:
 1. Implement deleteAccount() — call remote, map DTO to domain model.
 2. Implement restoreAccount() — call remote, check response.
 3. CRITICAL: In fetchAndSyncProfile(), when a 409 ACCOUNT_PENDING_DELETION HTTP error
-   is received, parse the scheduled date from the error body and THROW
-   AccountPendingDeletionException instead of swallowing it:
+   is received, parse the scheduled date from the error body and emit it via a SharedFlow
+   (`accountPendingDeletionEvent`) instead of throwing an exception:
 
 ```kotlin
 // Inside the catch block of fetchAndSyncProfile():
@@ -225,15 +225,16 @@ Key changes:
         if (parsed.error == "ACCOUNT_PENDING_DELETION") {
             // Extract date from message: "Account is already scheduled for deletion on 2026-08-22"
             val scheduledDate = parsed.message.substringAfterLast("on ").trim()
-            throw AccountPendingDeletionException(scheduledDate)
+            _accountPendingDeletionEvent.emit(scheduledDate)
+            return Result.failure(AccountPendingDeletionException(scheduledDate))
         }
     }
     Result.failure(e)
 }
 ```
 
-Since userDataFlow is a channelFlow, this exception will propagate to every
-active collector (e.g., HomeViewModel).
+Since this uses a `SharedFlow`, the app does not crash, and the UI layer (HomeViewModel)
+can safely observe this event and navigate to the pending deletion screen.
 
 ---
 
@@ -433,16 +434,13 @@ data class NavigateToAccountPendingDeletion(
 ```
 
 #### [MODIFY] presentation/src/main/kotlin/iti/grad/nutriscan/presentation/home/viewmodel/HomeViewModel.kt
-Change getUserData().collectLatest to:
+Observe the `accountPendingDeletionEvent` from UserRepository:
 ```kotlin
-userRepository.getUserData()
-    .catch { e ->
-        if (e is AccountPendingDeletionException) {
-            emitEffect(HomeEffect.NavigateToAccountPendingDeletion(e.scheduledDeletionAt))
-        }
-        // other exceptions: log via Timber, do not crash
+viewModelScope.launch {
+    userRepository.accountPendingDeletionEvent.collect { scheduledDeletionAt ->
+        emitEffect(HomeEffect.NavigateToAccountPendingDeletion(scheduledDeletionAt))
     }
-    .collectLatest { user -> ... }
+}
 ```
 
 #### [MODIFY] presentation/src/main/kotlin/iti/grad/nutriscan/presentation/home/view/HomeScreen.kt
@@ -497,8 +495,19 @@ composable<AccountPendingDeletionRoute> { backStackEntry ->
 | 7 | String Resources EN + AR | Resources | Low |
 | 8 | AppColors Extension4 | Presentation/Theme | Low |
 | 9 | Navigation wiring | App / Nav | High (many touch points) |
+| 10 | Comprehensive Unit Tests | Tests | Medium |
 
 Start with Task 1. Do not skip tasks.
+
+---
+
+### TASK 10 — Unit Tests
+
+**Files to create/modify:**
+- `DeleteAccountUseCaseTest.kt` & `RestoreAccountUseCaseTest.kt`: Verify API calls.
+- `AppSettingsViewModelTest.kt`: Test `DeleteAccountClicked`, `DeleteAccountConfirmed`, `DeleteAccountDismissed`.
+- `AccountPendingDeletionViewModelTest.kt`: Test `RestoreAccountClicked` and `LogoutClicked`.
+- Fix legacy broken tests due to constructor injection changes.
 
 ---
 
@@ -508,10 +517,7 @@ Start with Task 1. Do not skip tasks.
 If the backend returns 409, the user MUST be redirected to the pending deletion screen.
 Failing silently here would leave the user in an inconsistent state.
 
-**Polling behaviour:** UserRepositoryImpl.userDataFlow polls every 15 seconds via a
-channelFlow. When AccountPendingDeletionException is thrown inside that flow,
-the channelFlow terminates and the exception propagates to HomeViewModel via catch { }.
-This is intentional — polling must stop once we know the account is pending deletion.
+**Polling behaviour:** UserRepositoryImpl triggers fetchAndSyncProfile periodically. When AccountPendingDeletionException is encountered, we emit it to a SharedFlow which navigates the user out, stopping them from seeing their data.
 
 **Local data cleanup:** On successful deleteAccount(), the local Room database does NOT
 need to be wiped immediately — the subsequent logoutUseCase() call handles that.
