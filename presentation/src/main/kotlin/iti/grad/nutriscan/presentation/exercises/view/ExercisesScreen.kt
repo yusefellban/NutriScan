@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
-import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
@@ -167,10 +167,12 @@ fun ExercisesScreen(
                                 showButton = false
                             )
                         } else {
-                            EmptyStateWidget(
-                                message = stringResource(id = R.string.exercises_empty_state),
-                                iconResId = R.drawable.dumbell,
-                                modifier = Modifier.fillMaxWidth()
+                            AppEmptyStateWidget(
+                                lightImageRes = R.drawable.search_reasult_not_found_light,
+                                darkImageRes = R.drawable.search_reasult_not_found_dark,
+                                title = stringResource(id = R.string.exercises_empty_state),
+                                subtitle = "",
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
                             )
                         }
                     }
