@@ -29,13 +29,15 @@ import iti.grad.nutriscan.domain.auth.usecase.GetOidcAuthConfigUseCase
 import iti.grad.nutriscan.presentation.common.Validation
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
+import iti.grad.nutriscan.domain.user.usecase.CheckIfProfileSetupUseCase
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginWithEmailUseCase: LoginWithEmailUseCase,
     private val getOidcAuthConfigUseCase: GetOidcAuthConfigUseCase,
     private val saveGoogleLoginTokensUseCase: SaveGoogleLoginTokensUseCase,
-    private val fetchAndSyncUserDataUseCase: FetchAndSyncUserDataUseCase
+    private val fetchAndSyncUserDataUseCase: FetchAndSyncUserDataUseCase,
+    private val checkIfProfileSetupUseCase: CheckIfProfileSetupUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -95,7 +97,11 @@ class LoginViewModel @Inject constructor(
             result.onSuccess {
                 fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(LoginEffect.NavigateToHome)
+                if (checkIfProfileSetupUseCase()) {
+                    _effect.send(LoginEffect.NavigateToHome)
+                } else {
+                    _effect.send(LoginEffect.NavigateToProfileSetup)
+                }
             }.onFailure { error ->
                 val newAlertState = when (error) {
                     is DomainException.NetworkException -> InternetError
@@ -127,7 +133,11 @@ class LoginViewModel @Inject constructor(
             result.onSuccess {
                 fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
-                _effect.send(LoginEffect.NavigateToHome)
+                if (checkIfProfileSetupUseCase()) {
+                    _effect.send(LoginEffect.NavigateToHome)
+                } else {
+                    _effect.send(LoginEffect.NavigateToProfileSetup)
+                }
             }.onFailure { error ->
                 _state.update { 
                     it.copy(

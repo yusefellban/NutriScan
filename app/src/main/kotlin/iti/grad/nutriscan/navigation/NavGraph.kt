@@ -80,6 +80,11 @@ fun AppNavGraph(
                     navController.navigate(MainRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
+                },
+                onNavigateToProfileSetup = {
+                    navController.navigate(ProfileSetupPagerRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
                 }
             )
         }
@@ -110,14 +115,13 @@ fun AppNavGraph(
             val route = backStackEntry.toRoute<LoginRoute>()
             LoginScreen(
                 onNavigateToHome = {
-                    if (route.isFromRegistration) {
-                        navController.navigate(ProfileSetupPagerRoute) {
-                            popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(MainRoute()) {
-                            popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
-                        }
+                    navController.navigate(MainRoute()) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
+                    }
+                },
+                onNavigateToProfileSetup = {
+                    navController.navigate(ProfileSetupPagerRoute) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
                     }
                 },
                 onNavigateToRegister = {
