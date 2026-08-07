@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,13 +31,19 @@ fun LogoutButton(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** When true, renders with Error color + Delete icon for the Delete Account action. */
+    isDestructive: Boolean = false,
 ) {
+    val accentColor = if (isDestructive) AppTheme.colors.Error else AppTheme.colors.AppSettingsLogoutAccent
+    val iconBgColor = if (isDestructive) AppTheme.colors.ErrorBackground else AppTheme.colors.AppSettingsLogoutIconBackground
+    val icon = if (isDestructive) Icons.Default.DeleteForever else Icons.AutoMirrored.Filled.Logout
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(61.dp)
             .clip(RoundedCornerShape(16.dp))
-            .border(width = 1.dp, color = AppTheme.colors.AppSettingsLogoutAccent, shape = RoundedCornerShape(16.dp))
+            .border(width = 1.dp, color = accentColor, shape = RoundedCornerShape(16.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -49,13 +56,13 @@ fun LogoutButton(
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.AppSettingsLogoutIconBackground.copy(alpha = 0.55f)),
+                .background(iconBgColor.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Logout,
+                imageVector = icon,
                 contentDescription = null,
-                tint = AppTheme.colors.AppSettingsLogoutAccent,
+                tint = accentColor,
                 modifier = Modifier.size(22.dp),
             )
         }
@@ -63,7 +70,7 @@ fun LogoutButton(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.AppSettingsLogoutAccent,
+            color = accentColor,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .weight(1f)

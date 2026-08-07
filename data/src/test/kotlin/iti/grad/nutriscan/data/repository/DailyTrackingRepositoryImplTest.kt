@@ -93,7 +93,7 @@ class DailyTrackingRepositoryImplTest {
         streakRepository = mockk(relaxed = true)
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
         coEvery { userRepository.getUserData() } returns MutableStateFlow(user())
-        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, streakRepository, testDispatcher)
+        repository = DailyTrackingRepositoryImpl(dao, api, authRepository, userRepository, testDispatcher)
     }
 
     @Test
@@ -327,7 +327,7 @@ class DailyTrackingRepositoryImplTest {
     }
 
     @Test
-    fun `addExerciseWorkout does not mark the row unsynced`() = runTest(testDispatcher.scheduler) {
+    fun `addExerciseWorkout marks the row unsynced`() = runTest(testDispatcher.scheduler) {
         val date = CairoDateProvider.today()
         repository.updateWaterCnt(4)
         coEvery { api.updateDay(date.toString(), any()) } returns DailyTrackingResponseDto(date = date.toString())
@@ -336,7 +336,7 @@ class DailyTrackingRepositoryImplTest {
         repository.addExerciseWorkout(kcalBurned = 100, minutes = 10)
 
         val today = repository.observeToday().first()
-        assertTrue(today.syncedToBackend)
+        assertFalse(today.syncedToBackend)
     }
 
     @Test

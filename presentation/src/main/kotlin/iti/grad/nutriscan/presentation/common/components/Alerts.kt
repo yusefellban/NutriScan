@@ -72,8 +72,8 @@ fun DeleteWarningAlert(
         )
         AlertButton(
             text = confirmText,
-            backgroundColor = AppTheme.colors.VerdictRed,
-            textColor = AppTheme.colors.OnPrimary,
+            backgroundColor = AppTheme.colors.AppSettingsLogoutAccent,
+            textColor = AppTheme.colors.Background,
             onClick = onConfirm
         )
     }

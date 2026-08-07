@@ -1,43 +1,48 @@
 package iti.grad.nutriscan.presentation.settings.app.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.collectLatest
-import iti.grad.nutriscan.domain.settings.model.ThemeMode
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.res.stringResource
-import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsToggleRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.foundation.layout.WindowInsets
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
-import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
-import androidx.compose.material.icons.filled.Language
-import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
-import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsActionRow
-import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
-import androidx.compose.foundation.layout.Arrangement
 import iti.grad.nutriscan.domain.settings.model.AppLanguage
-import iti.grad.nutriscan.presentation.settings.app.view.components.LogoutButton
-import androidx.compose.runtime.Composable
-import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
+import iti.grad.nutriscan.domain.settings.model.ThemeMode
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
+import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import iti.grad.nutriscan.presentation.common.components.LogoutAlert
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEffect
 import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsEvent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
+import iti.grad.nutriscan.presentation.settings.app.state.AppSettingsState
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
+import iti.grad.nutriscan.presentation.settings.app.view.components.LogoutButton
+import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsActionRow
+import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsToggleRow
+import iti.grad.nutriscan.presentation.settings.app.viewmodel.AppSettingsViewModel
+import iti.grad.presentation.R
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AppSettingsScreen(
@@ -58,6 +63,7 @@ fun AppSettingsScreen(
                 is AppSettingsEffect.NavigateToTermsAndConditions -> onNavigateToTermsAndConditions()
                 is AppSettingsEffect.NavigateToHelp -> onNavigateToHelp()
                 is AppSettingsEffect.NavigateToLogin -> onNavigateToLogin()
+                is AppSettingsEffect.AccountDeleted -> onNavigateToLogin()
             }
         }
     }
@@ -147,6 +153,12 @@ private fun AppSettingsContent(
                     label = stringResource(R.string.app_settings_logout),
                     onClick = { onEvent(AppSettingsEvent.LogoutClicked) },
                 )
+
+                LogoutButton(
+                    label = stringResource(R.string.delete_account_button_label),
+                    onClick = { onEvent(AppSettingsEvent.DeleteAccountClicked) },
+                    isDestructive = true,
+                )
             }
         }
     }
@@ -159,6 +171,35 @@ private fun AppSettingsContent(
             cancelText = stringResource(R.string.action_cancel),
             onConfirm = { onEvent(AppSettingsEvent.LogoutConfirmed) },
             onDismiss = { onEvent(AppSettingsEvent.LogoutDismissed) },
+        )
+    }
+
+    if (state.showDeleteAccountConfirmDialog) {
+        DeleteWarningAlert(
+            title = stringResource(R.string.delete_account_confirm_title),
+            message = stringResource(R.string.delete_account_confirm_message),
+            confirmText = stringResource(R.string.delete_account_confirm_action),
+            onConfirm = { onEvent(AppSettingsEvent.DeleteAccountConfirmed) },
+            onDismiss = { onEvent(AppSettingsEvent.DeleteAccountDismissed) },
+        )
+    }
+
+    if (state.isDeletingAccount) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppTheme.colors.Background.copy(alpha = 0.7f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = AppTheme.colors.Teal1000)
+        }
+    }
+
+    state.deleteAccountError?.let { error ->
+        ErrorAlert(
+            title = stringResource(R.string.delete_account_confirm_title),
+            message = error,
+            onDismiss = { onEvent(AppSettingsEvent.DeleteAccountDismissed) },
         )
     }
 }

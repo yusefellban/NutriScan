@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.data.remote.datasource
 
+import iti.grad.nutriscan.data.remote.dto.AccountDeletionResponseDto
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
@@ -12,4 +13,6 @@ interface IUserRemoteDataSource {
     suspend fun updateProfile(request: UpdateUserProfileRequestDto): Response<ResponseBody>
     suspend fun uploadProfileImage(image: MultipartBody.Part): UserDto
     suspend fun updateDailyStreak(): Response<Unit>
+    suspend fun deleteAccount(): AccountDeletionResponseDto
+    suspend fun restoreAccount(): Response<Unit>
 }

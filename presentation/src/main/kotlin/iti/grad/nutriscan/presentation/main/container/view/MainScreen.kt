@@ -50,6 +50,7 @@ fun MainScreen(
     onNavigateToExercises: () -> Unit,
     onNavigateToStepHistory: () -> Unit,
     onNavigateToCaloriesHistory: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit,
     modifier: Modifier = Modifier,
     initialTab: BottomNavTab = BottomNavTab.HOME
 ) {
@@ -121,6 +122,7 @@ fun MainScreen(
                         onNavigateToChatWithAi = onNavigateToChatWithAi,
                         onNavigateToEditProfile = onNavigateToEditProfile,
                         onNavigateToScan = { selectedTab = BottomNavTab.SCAN },
+                        onNavigateToAccountPendingDeletion = onNavigateToAccountPendingDeletion,
                     )
                 }
                 BottomNavTab.CALORIES -> {

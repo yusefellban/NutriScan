@@ -46,6 +46,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.scan_history.view.ScanHistoryScreen
 import iti.grad.nutriscan.presentation.notification_history.view.NotificationHistoryScreen
+import iti.grad.nutriscan.presentation.account_deletion.view.AccountPendingDeletionScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
@@ -212,6 +213,20 @@ fun AppNavGraph(
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
                 onNavigateToStepHistory = { navController.navigate(StepHistoryRoute) },
                 onNavigateToCaloriesHistory = { navController.navigate(CaloriesHistoryRoute) },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDeletionAt = scheduledDate)) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<AccountPendingDeletionRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<AccountPendingDeletionRoute>()
+            AccountPendingDeletionScreen(
+                scheduledDeletionAt = route.scheduledDeletionAt,
+                onNavigateToHome = { navController.navigate(MainRoute()) { popUpTo(0) { inclusive = true } } },
+                onNavigateToLogin = { navController.navigate(LoginRoute()) { popUpTo(0) { inclusive = true } } }
             )
         }
 

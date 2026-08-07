@@ -590,4 +590,23 @@
     <string name="notification_history_deleted">تم حذف الإشعار</string>
     <string name="notification_history_all_cleared">تم مسح جميع الإشعارات</string>
 
+    <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
+    <string name="delete_account_button_label">حذف الحساب</string>
+    <string name="delete_account_confirm_title">حذف الحساب؟</string>
+    <string name="delete_account_confirm_message">سيتم جدولة حسابك للحذف النهائي. لديك مهلة 15 يومًا لاسترجاعه قبل فقدان جميع بياناتك إلى الأبد.</string>
+    <string name="delete_account_confirm_action">حذف</string>
+
+    <!-- ── Account Pending Deletion Screen ───────────────────────────────────── -->
+    <string name="account_pending_deletion_header_title">استعادة الحساب</string>
+    <string name="account_pending_deletion_header_subtitle">تم جدولة حسابك للحذف.</string>
+    <string name="account_pending_deletion_heading">الحذف قيد الانتظار</string>
+    <string name="account_pending_deletion_description">يمكنك استعادة حسابك خلال فترة السماح للاحتفاظ بجميع بياناتك وإعداداتك.</string>
+    <string name="account_pending_deletion_days_remaining_label">الأيام المتبقية للاستعادة:</string>
+    <string name="account_pending_deletion_days_remaining_value">%d أيام</string>
+    <string name="account_pending_deletion_scheduled_date_label">تاريخ الحذف المجدول:</string>
+    <string name="account_pending_deletion_restore_btn">استعادة حسابي</string>
+    <string name="account_pending_deletion_restoring">جارٍ الاستعادة…</string>
+    <string name="account_pending_deletion_logout_prompt">تريد الخروج؟</string>
+    <string name="account_pending_deletion_logout_link">تسجيل الخروج</string>
+
 </resources>
