@@ -68,6 +68,8 @@ android {
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             optimization {
                 enable = false
             }
