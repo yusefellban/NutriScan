@@ -51,7 +51,7 @@ class StreakNotificationWorker @AssistedInject constructor(
         val prefs = observePrefs().first()
         val loggedToday = observeTodayFoodLog().first().isNotEmpty()
         val streak = observeStreak().first()
-        if (!shouldNotifyStreak(prefs, loggedToday, streak.currentStreak > 0, LocalTime.now())) {
+        if (!shouldNotifyStreak(prefs, loggedToday, streak > 0, LocalTime.now())) {
             return Result.success()
         }
 

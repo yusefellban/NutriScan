@@ -76,7 +76,7 @@ class UserProfileViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         familyMembers = members.map { member ->
-                            FamilyMemberUiModel(id = member.id, name = member.name, avatarUrl = null)
+                            FamilyMemberUiModel(id = member.id, name = member.name, avatarUrl = member.imageUrl)
                         }.toPersistentList()
                     )
                 }

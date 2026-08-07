@@ -26,6 +26,11 @@ data class AddFamilyMemberState(
     val selectedAllergyIds: ImmutableList<Int> = persistentListOf(),
     val isAllergiesLoading: Boolean = false,
     val allergiesErrorMessage: String? = null,
+    val selectedImagePath: String? = null,
+    val currentImageUrl: String? = null,
+    val pendingImageUploadMemberId: String? = null,
+    val isImageUploading: Boolean = false,
+    val imageUploadErrorMessage: String? = null,
     val isSaving: Boolean = false,
     val editingMemberId: String? = null,
 )

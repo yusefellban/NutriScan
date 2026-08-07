@@ -14,6 +14,7 @@ import iti.grad.nutriscan.domain.family.model.FamilyMemberInput
 import iti.grad.nutriscan.domain.family.repository.IFamilyMemberRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.data.local.datasource.TokenManager
+import iti.grad.nutriscan.data.util.ImageCompressor
 import iti.grad.nutriscan.data.local.util.JwtDecoder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -27,8 +28,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -160,6 +166,49 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         return syncListToBackend(userId = userId, fullList = updatedList, rollbackTo = existing)
     }
 
+    override suspend fun uploadFamilyMemberImage(memberId: String, imageFile: File): Result<Unit> {
+        if (memberId.isBlank()) {
+            return Result.failure(IllegalArgumentException("Family member id is required"))
+        }
+
+        return withContext(ioDispatcher) {
+            val user = userDao.getUserFlow().firstOrNull()
+            val existing = user?.familyMembers.orEmpty()
+
+            try {
+                val compressedFile = ImageCompressor.compress(imageFile)
+                val requestFile = compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val part = MultipartBody.Part.createFormData(
+                    "image",
+                    compressedFile.name,
+                    requestFile
+                )
+
+                val updatedMemberDto = remoteDataSource.uploadFamilyMemberImage(memberId, part)
+
+                if (compressedFile.absolutePath != imageFile.absolutePath) {
+                    compressedFile.delete()
+                }
+
+                val updatedEntity = updatedMemberDto.toEntity()
+                if (user != null) {
+                    val updatedList = user.familyMembers.map { member ->
+                        if (member.id == memberId) updatedEntity else member
+                    }
+                    userDao.insertOrUpdateUser(user.copy(familyMembers = updatedList))
+                }
+
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Timber.e(e, "Exception while uploading family member image")
+                if (user != null) {
+                    userDao.insertOrUpdateUser(user.copy(familyMembers = existing))
+                }
+                Result.failure(e)
+            }
+        }
+    }
+
     /**
      * Sends the full family-member list via `PATCH /v1/users/profile`, then reconciles
      * Room with the server's response so temp ids get replaced with real server ids.
@@ -217,6 +266,7 @@ class FamilyMemberRepositoryImpl @Inject constructor(
         id = id,
         name = name,
         relation = relation,
+        imageUrl = imageUrl,
         allergyIds = allergyIds,
         diseaseIds = diseaseIds,
     )

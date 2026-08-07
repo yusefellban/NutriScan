@@ -157,6 +157,10 @@
     <string name="error_name_required">Please enter a name</string>
     <string name="error_relation_required">Please enter a relation</string>
     <string name="add_family_member_generic_error">Couldn\'t save this family member. Please try again.</string>
+    <string name="family_member_image_add_action">Add photo</string>
+    <string name="family_member_image_change_action">Change photo</string>
+    <string name="family_member_image_remove_action">Remove photo</string>
+    <string name="family_member_image_upload_in_progress">Uploading photo…</string>
 
     <!-- BMI categories — used by the Calories screen's BMI card (see BmiCategory.kt) -->
     <string name="user_profile_bmi_underweight">Underweight</string>
