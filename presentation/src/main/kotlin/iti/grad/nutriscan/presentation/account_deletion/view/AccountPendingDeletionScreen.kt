@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -49,6 +49,8 @@ import iti.grad.nutriscan.presentation.account_deletion.state.AccountPendingDele
 import iti.grad.nutriscan.presentation.account_deletion.viewmodel.AccountPendingDeletionViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.ErrorAlert
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderSubtitle
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -97,28 +99,21 @@ private fun AccountPendingDeletionContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.verticalGradient(
-                        listOf(colors.Teal1000, colors.Teal1000.copy(alpha = 0.85f))
-                    )
+                    color = AppTheme.colors.Teal1000,
+                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
                 )
-                .padding(top = 56.dp, bottom = 32.dp),
-            contentAlignment = Alignment.Center,
+                .statusBarsPadding()
+                .height(242.dp)
+                .padding(start = 24.dp, end = 24.dp, top = 24.dp),
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.account_pending_deletion_header_title),
-                    style = AppTheme.typography.headlineMedium,
-                    color = colors.OnPrimary,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.account_pending_deletion_header_subtitle),
-                    style = AppTheme.typography.bodyMedium,
-                    color = colors.OnPrimary.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp),
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 88.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                HeroHeaderTitle(text = stringResource(R.string.account_pending_deletion_header_title))
+                HeroHeaderSubtitle(text = stringResource(R.string.account_pending_deletion_header_subtitle))
             }
         }
 
