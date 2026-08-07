@@ -239,14 +239,6 @@ class UserProfileViewModelTest {
     }
 
     @Test
-    fun `when NotificationsClicked, effect is NavigateToNotifications`() = runTest(testDispatcher) {
-        viewModel.effect.test {
-            viewModel.onEvent(UserProfileEvent.NotificationsClicked)
-            assertEquals(UserProfileEffect.NavigateToNotifications, awaitItem())
-        }
-    }
-
-    @Test
     fun `when SettingsClicked, effect is NavigateToSettings`() = runTest(testDispatcher) {
         viewModel.effect.test {
             viewModel.onEvent(UserProfileEvent.SettingsClicked)

@@ -27,6 +27,10 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertEquals
+import iti.grad.nutriscan.domain.user.usecase.DeleteAccountUseCase
 import org.junit.jupiter.api.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -38,6 +42,7 @@ class AppSettingsViewModelTest {
     private val getLanguageUseCase: GetLanguageUseCase = mockk()
     private val setLanguageUseCase: SetLanguageUseCase = mockk()
     private val logoutUseCase: LogoutUseCase = mockk()
+    private val deleteAccountUseCase: DeleteAccountUseCase = mockk()
     private val userRepository: IUserRepository = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
@@ -50,12 +55,14 @@ class AppSettingsViewModelTest {
         coEvery { setLanguageUseCase(any()) } returns Unit
         coEvery { logoutUseCase() } returns Result.success(Unit)
         coEvery { userRepository.getUserData() } returns flowOf(null)
+        coEvery { deleteAccountUseCase() } returns Result.success(mockk(relaxed = true))
         viewModel = AppSettingsViewModel(
             getThemeModeUseCase,
             setThemeModeUseCase,
             getLanguageUseCase,
             setLanguageUseCase,
             logoutUseCase,
+            deleteAccountUseCase,
             userRepository,
         )
     }
@@ -87,6 +94,7 @@ class AppSettingsViewModelTest {
                 getLanguageUseCase,
                 setLanguageUseCase,
                 logoutUseCase,
+                deleteAccountUseCase,
                 userRepository,
             )
             testScheduler.advanceUntilIdle()
@@ -210,5 +218,60 @@ class AppSettingsViewModelTest {
                 coVerify(exactly = 1) { logoutUseCase() }
             }
         }
+    @Test
+    fun `DeleteAccountClicked event should show confirmation dialog`() = runTest {
+        viewModel.onEvent(AppSettingsEvent.DeleteAccountClicked)
+        
+        viewModel.state.test {
+            val state = awaitItem()
+            assertTrue(state.showDeleteAccountConfirmDialog)
+        }
     }
+
+    @Test
+    fun `DeleteAccountDismissed event should hide confirmation dialog`() = runTest {
+        viewModel.onEvent(AppSettingsEvent.DeleteAccountClicked)
+        viewModel.onEvent(AppSettingsEvent.DeleteAccountDismissed)
+        
+        viewModel.state.test {
+            val state = awaitItem()
+            assertFalse(state.showDeleteAccountConfirmDialog)
+            assertFalse(state.isDeletingAccount)
+        }
+    }
+
+    @Test
+    fun `DeleteAccountConfirmed on success should logout and emit AccountDeleted effect`() = runTest(testDispatcher) {
+        val info = iti.grad.nutriscan.domain.user.model.AccountDeletionInfo("2026-08-22", 15)
+        coEvery { deleteAccountUseCase() } returns Result.success(info)
+        coEvery { logoutUseCase() } returns Result.success(Unit)
+
+        viewModel.effect.test {
+            viewModel.onEvent(AppSettingsEvent.DeleteAccountConfirmed)
+            
+            testScheduler.advanceUntilIdle()
+
+            assertEquals(AppSettingsEffect.AccountDeleted, awaitItem())
+            
+            coVerify(exactly = 1) { deleteAccountUseCase() }
+            coVerify(exactly = 1) { logoutUseCase() }
+        }
+    }
+
+    @Test
+    fun `DeleteAccountConfirmed on failure should hide loading and show error`() = runTest(testDispatcher) {
+        val errorMessage = "Network Error"
+        coEvery { deleteAccountUseCase() } returns Result.failure(Exception(errorMessage))
+
+        viewModel.onEvent(AppSettingsEvent.DeleteAccountConfirmed)
+        testScheduler.advanceUntilIdle()
+
+        viewModel.state.test {
+            val state = awaitItem()
+            assertFalse(state.showDeleteAccountConfirmDialog)
+            assertFalse(state.isDeletingAccount)
+            assertEquals(errorMessage, state.deleteAccountError)
+        }
+    }
+}
 }

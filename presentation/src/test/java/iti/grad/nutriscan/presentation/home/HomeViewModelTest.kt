@@ -39,19 +39,23 @@ class HomeViewModelTest {
 
     private lateinit var viewModel: HomeViewModel
     private val userData = MutableStateFlow<User?>(null)
+    private val accountPendingDeletionEvent = kotlinx.coroutines.flow.MutableSharedFlow<String>()
     private val userRepository: IUserRepository = mockk {
         coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
         every { getUserData() } returns userData
+        every { this@mockk.accountPendingDeletionEvent } returns accountPendingDeletionEvent
     }
     private val getRecentScansUseCase: GetRecentScansUseCase = mockk()
     private val reconcileTodayUseCase: ReconcileTodayUseCase = mockk()
+    private val syncDailyStreakUseCase: iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase = mockk()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { getRecentScansUseCase(page = 0, size = 3) } returns Result.success(emptyList())
         coEvery { reconcileTodayUseCase() } returns Result.success(Unit)
-        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase)
+        coEvery { syncDailyStreakUseCase() } returns Result.success(Unit)
+        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase, syncDailyStreakUseCase)
     }
 
     @AfterEach
@@ -81,7 +85,7 @@ class HomeViewModelTest {
                 )
             )
         )
-        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase)
+        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase, syncDailyStreakUseCase)
         testScheduler.advanceUntilIdle()
 
         val firstItem = viewModel.state.value.recentHistory[0]
@@ -144,8 +148,6 @@ class HomeViewModelTest {
             assertEquals(HomeEffect.NavigateToScanResult("scan_002"), awaitItem())
         }
     }
-
-
 
     @Test
     fun `when HealthNewsClicked, effect is NavigateToNews`() = runTest(testDispatcher) {

@@ -11,12 +11,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotificationHistoryRecorderImplTest {
 
     private val dao: NotificationHistoryDao = mockk()
-    private val recorder = NotificationHistoryRecorderImpl(dao)
+    private val recorder = NotificationHistoryRecorderImpl(dao, UnconfinedTestDispatcher())
 
     @Test
     fun `record inserts into dao with correct mapping`() = runTest {
