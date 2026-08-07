@@ -56,6 +56,7 @@ fun ScanModeSelector(
             },
     ) {
         ScanInputMode.entries.forEach { mode ->
+            val isModeEnabled = mode != ScanInputMode.QR
             ModeItem(
                 mode = mode,
                 labelResId = if (mode == ScanInputMode.GALLERY && hasSelectedGalleryImage) {
@@ -63,8 +64,13 @@ fun ScanModeSelector(
                 } else {
                     mode.labelResId
                 },
+                isEnabled = isModeEnabled,
                 isSelected = mode == selectedMode,
-                onClick = { onModeSelected(mode) },
+                onClick = {
+                    if (isModeEnabled) {
+                        onModeSelected(mode)
+                    }
+                },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -75,6 +81,7 @@ fun ScanModeSelector(
 private fun ModeItem(
     mode: ScanInputMode,
     labelResId: Int,
+    isEnabled: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -84,7 +91,11 @@ private fun ModeItem(
         animationSpec = spring(dampingRatio = 0.8f, stiffness = 450f),
         label = "modeIconScale",
     )
-    val alpha = if (isSelected) 1f else 0.72f
+    val alpha = when {
+        !isEnabled -> 0.35f
+        isSelected -> 1f
+        else -> 0.72f
+    }
 
     Box(
         modifier = modifier
@@ -94,6 +105,7 @@ private fun ModeItem(
                 shape = RoundedCornerShape(16.dp),
             )
             .clickable(
+                enabled = isEnabled,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick,

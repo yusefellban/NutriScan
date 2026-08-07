@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
@@ -238,6 +240,9 @@ private fun CameraScanContent(
     val isGalleryMode = state.selectedMode == ScanInputMode.GALLERY
     val showQrFrame = state.selectedMode == ScanInputMode.QR
     val galleryPreviewPath = state.pendingGalleryImagePath ?: state.activeScan?.thumbnailUrl
+    val optionsBottomOffset = bottomPadding + 64.dp
+    val activeScanBottomOffset = bottomPadding + 164.dp
+    val separatorBottomOffset = bottomPadding + 126.dp
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -322,7 +327,7 @@ private fun CameraScanContent(
                 backgroundContent = {},
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = bottomPadding + 64.dp),
+                    .padding(bottom = activeScanBottomOffset),
             ) {
                 ActiveScanCard(
                     scan = scan,
@@ -330,6 +335,18 @@ private fun CameraScanContent(
                     onCardClick = { onEvent(CameraScanEvent.CardClicked) },
                 )
             }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = separatorBottomOffset)
+                    .width(72.dp)
+                    .height(4.dp)
+                    .background(
+                        color = AppTheme.colors.OnPrimary.copy(alpha = 0.32f),
+                        shape = RoundedCornerShape(50),
+                    ),
+            )
         }
 
         ScanModeSelector(
@@ -339,21 +356,9 @@ private fun CameraScanContent(
             onModeSelected = { onEvent(CameraScanEvent.ModeSelected(it)) },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = bottomPadding + if (state.activeScan != null) 152.dp else 88.dp),
+                .padding(bottom = optionsBottomOffset),
         )
 
-        if (state.selectedMode == ScanInputMode.GALLERY) {
-            Text(
-                text = stringResource(R.string.scan_gallery_pick_prompt),
-                style = AppTheme.typography.bodyMedium,
-                color = AppTheme.colors.OnPrimary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(start = 24.dp, end = 24.dp, bottom = bottomPadding + 56.dp),
-            )
-        }
     }
 }
 

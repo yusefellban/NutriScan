@@ -88,6 +88,10 @@ class CameraScanViewModel @Inject constructor(
     }
 
     private fun handleModeSelected(mode: ScanInputMode) {
+        if (mode == ScanInputMode.QR) {
+            return
+        }
+
         val currentMode = _state.value.selectedMode
         if (currentMode == mode) {
             if (mode == ScanInputMode.GALLERY) {
@@ -181,14 +185,8 @@ class CameraScanViewModel @Inject constructor(
                 isScanning = true,
                 isProcessingCenterAction = false,
                 pendingGalleryImagePath = file.absolutePath,
-                activeScan = ActiveScanUiModel(
-                    scanId = state.activeScan?.scanId.orEmpty(),
-                    thumbnailUrl = file.absolutePath,
-                    isProcessing = false,
-                    isFailed = false,
-                    isSaved = state.activeScan?.isSaved ?: false,
-                    fullResult = null,
-                ),
+                // Keep only gallery preview state; do not show scan card until upload is pressed.
+                activeScan = null,
             )
         }
     }
@@ -218,7 +216,8 @@ class CameraScanViewModel @Inject constructor(
                 _state.update { state ->
                     state.copy(
                         isProcessingCenterAction = false,
-                        pendingGalleryImagePath = null,
+                        // Keep the local gallery path so user can re-upload the same image.
+                        pendingGalleryImagePath = state.pendingGalleryImagePath,
                         activeScan = state.activeScan?.copy(scanId = scanId),
                     )
                 }
@@ -255,25 +254,38 @@ class CameraScanViewModel @Inject constructor(
     }
 
     private fun handleGalleryPickCancelled() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
         _state.update {
-            it.copy(
-                selectedMode = ScanInputMode.PHOTO,
-                isProcessingCenterAction = false,
-                pendingGalleryImagePath = null,
-            )
-        }
-        viewModelScope.launch {
-            _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_gallery_pick_cancelled))
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
         }
     }
 
     private fun handleGalleryPickFailed() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
         _state.update {
-            it.copy(
-                selectedMode = ScanInputMode.PHOTO,
-                isProcessingCenterAction = false,
-                pendingGalleryImagePath = null,
-            )
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
         }
         viewModelScope.launch {
             _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_gallery_pick_failed))
@@ -339,7 +351,6 @@ class CameraScanViewModel @Inject constructor(
                             activeScan = state.activeScan?.copy(isSaved = true)
                         )
                     }
-                    _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_saved_to_bookmarks))
                 } else {
                     _effect.send(
                         CameraScanEffect.ShowSnackBarRes(
@@ -398,9 +409,17 @@ class CameraScanViewModel @Inject constructor(
     private fun handleDismissScanClicked() {
         currentScanJob?.cancel()
         _state.update {
+            val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
+            val previewToKeep = if (shouldKeepGalleryPreview) {
+                // Keep only local file path; remote thumbnail URL cannot be uploaded as File.
+                it.pendingGalleryImagePath
+            } else {
+                null
+            }
             it.copy(
                 isScanning = true,
                 isProcessingCenterAction = false,
+                pendingGalleryImagePath = previewToKeep,
                 activeScan = null,
             )
         }
