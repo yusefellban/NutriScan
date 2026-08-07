@@ -40,6 +40,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.appdistribution.InterruptionLevel
+import com.google.firebase.appdistribution.appDistribution
+import iti.grad.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
 
 import iti.grad.nutriscan.domain.settings.model.AppLanguage
@@ -61,6 +65,9 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
+        Firebase.appDistribution.showFeedbackNotification(
+            R.string.additionalFormText,
+            InterruptionLevel.HIGH)
         setContent {
 
 

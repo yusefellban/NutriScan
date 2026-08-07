@@ -166,6 +166,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.appdistribution.api)
 }
 
 tasks.withType<Test> {
