@@ -5,4 +5,5 @@ sealed interface SplashEffect {
     data object NavigateToLogin : SplashEffect
     data object NavigateToHome : SplashEffect
     data object NavigateToProfileSetup : SplashEffect
+    data class NavigateToAccountPendingDeletion(val scheduledDeletionAt: String) : SplashEffect
 }

@@ -85,6 +85,11 @@ fun AppNavGraph(
                     navController.navigate(ProfileSetupPagerRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
                 }
             )
         }
@@ -129,6 +134,11 @@ fun AppNavGraph(
                 },
                 onNavigateToForgotPassword = {
                     navController.navigate(ForgotPasswordRoute)
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
+                    }
                 }
             )
         }

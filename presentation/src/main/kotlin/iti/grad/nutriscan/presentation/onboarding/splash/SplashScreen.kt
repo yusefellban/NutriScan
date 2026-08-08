@@ -66,6 +66,7 @@ fun SplashScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToProfileSetup: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit = {},
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -185,6 +186,9 @@ fun SplashScreen(
                 SplashEffect.NavigateToLogin -> onNavigateToLogin()
                 SplashEffect.NavigateToHome -> onNavigateToHome()
                 SplashEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
+                is SplashEffect.NavigateToAccountPendingDeletion -> {
+                    onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
+                }
             }
         }
     }
