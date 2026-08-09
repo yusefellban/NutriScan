@@ -8,6 +8,7 @@ import android.media.MediaActionSound
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.compose.animation.Crossfade
@@ -61,6 +62,8 @@ import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
 import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ActiveScanCard
+import iti.grad.nutriscan.presentation.scan.camera.view.components.BarcodeArOverlay
+import iti.grad.nutriscan.presentation.scan.camera.view.components.BarcodeScanAnalyzer
 import iti.grad.nutriscan.presentation.scan.camera.view.components.CameraPreview
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOverlay
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanModeSelector
@@ -92,6 +95,18 @@ fun CameraScanScreen(
     val mediaActionSound = remember { MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) } }
     val flashAlpha = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
+
+    // Create the ML Kit barcode analyzer only while in BARCODE mode.
+    // Keyed on selectedMode so it is re-created (and the old one discarded) on mode switches.
+    val barcodeAnalyzer: ImageAnalysis.Analyzer? = remember(state.selectedMode) {
+        if (state.selectedMode == ScanInputMode.BARCODE) {
+            BarcodeScanAnalyzer { barcode, bounds ->
+                viewModel.onEvent(CameraScanEvent.BarcodeDetected(barcode, bounds))
+            }
+        } else {
+            null
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -200,6 +215,7 @@ fun CameraScanScreen(
     CameraScanContent(
         state = state,
         imageCapture = imageCapture,
+        barcodeAnalyzer = barcodeAnalyzer,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
         flashAlpha = flashAlpha.value,
@@ -211,6 +227,7 @@ fun CameraScanScreen(
 private fun CameraScanContent(
     state: CameraScanState,
     imageCapture: ImageCapture,
+    barcodeAnalyzer: ImageAnalysis.Analyzer?,
     onEvent: (CameraScanEvent) -> Unit,
     bottomPadding: Dp,
     flashAlpha: Float,
@@ -238,7 +255,6 @@ private fun CameraScanContent(
     }
 
     val isGalleryMode = state.selectedMode == ScanInputMode.GALLERY
-    val showQrFrame = state.selectedMode == ScanInputMode.QR
     val galleryPreviewPath = state.pendingGalleryImagePath ?: state.activeScan?.thumbnailUrl
     val optionsBottomOffset = bottomPadding + 64.dp
     val activeScanBottomOffset = bottomPadding + 164.dp
@@ -250,6 +266,7 @@ private fun CameraScanContent(
                 CameraPreview(
                     isScanning = state.isScanning,
                     imageCapture = imageCapture,
+                    barcodeAnalyzer = barcodeAnalyzer,
                     isPreviewActive = true,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -260,10 +277,13 @@ private fun CameraScanContent(
                             .background(Color.White.copy(alpha = flashAlpha)),
                     )
                 }
-                if (showQrFrame) {
-                    ScanFrameOverlay(
-                        selectedMode = state.selectedMode,
-                        modifier = Modifier.fillMaxSize(),
+                // AR overlay replaces the static ScanFrameOverlay in BARCODE mode.
+                if (state.selectedMode == ScanInputMode.BARCODE) {
+                    BarcodeArOverlay(
+                        normalizedBounds = state.detectedBarcodeBounds,
+                        barcodeValue     = state.trackedBarcodeValue,
+                        isLocked         = state.isProcessingCenterAction,
+                        modifier         = Modifier.fillMaxSize(),
                     )
                 }
             }
@@ -294,12 +314,6 @@ private fun CameraScanContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(AppTheme.colors.Background.copy(alpha = 0.94f)),
-                    )
-                }
-                if (showQrFrame) {
-                    ScanFrameOverlay(
-                        selectedMode = state.selectedMode,
-                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }

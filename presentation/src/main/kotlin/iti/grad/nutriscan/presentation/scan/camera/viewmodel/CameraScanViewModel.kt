@@ -9,6 +9,7 @@ import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
+import iti.grad.nutriscan.domain.scan.usecase.SubmitBarcodeScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
@@ -34,6 +35,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class CameraScanViewModel @Inject constructor(
     private val submitScanImageUseCase: SubmitScanImageUseCase,
+    private val submitBarcodeScanUseCase: SubmitBarcodeScanUseCase,
     private val getScanResultUseCase: GetScanResultUseCase,
     private val saveScanUseCase: SaveScanUseCase,
     private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
@@ -47,6 +49,15 @@ class CameraScanViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     private var currentScanJob: Job? = null
+
+    /** Debounce job for the 1.5 s barcode stability timer. */
+    private var barcodeLockJob: Job? = null
+
+    /**
+     * The barcode value for which a lock timer is currently running.
+     * Used to detect when a different barcode enters the frame mid-timer so we can reset.
+     */
+    private var lastLockedBarcode: String? = null
 
     init {
         viewModelScope.launch {
@@ -69,29 +80,27 @@ class CameraScanViewModel @Inject constructor(
 
     fun onEvent(event: CameraScanEvent) {
         when (event) {
-            is CameraScanEvent.ModeSelected -> handleModeSelected(event.mode)
-            is CameraScanEvent.PermissionResult -> handlePermissionResult(event.granted)
+            is CameraScanEvent.ModeSelected         -> handleModeSelected(event.mode)
+            is CameraScanEvent.PermissionResult     -> handlePermissionResult(event.granted)
             is CameraScanEvent.RequestPermissionClicked -> requestPermission()
-            is CameraScanEvent.CenterActionClicked -> handleCenterActionClicked()
+            is CameraScanEvent.CenterActionClicked  -> handleCenterActionClicked()
             is CameraScanEvent.GalleryImageSelected -> handleGalleryImageSelected(event.file)
-            is CameraScanEvent.ImageCaptured -> handleImageCaptured(event.file)
-            is CameraScanEvent.ImageCaptureFailed -> handleImageCaptureFailed(event.error)
+            is CameraScanEvent.ImageCaptured        -> handleImageCaptured(event.file)
+            is CameraScanEvent.ImageCaptureFailed   -> handleImageCaptureFailed(event.error)
             is CameraScanEvent.GalleryPickCancelled -> handleGalleryPickCancelled()
-            is CameraScanEvent.GalleryPickFailed -> handleGalleryPickFailed()
-            is CameraScanEvent.BookmarkClicked -> handleBookmarkClicked()
-            is CameraScanEvent.RetryClicked -> handleRetryClicked()
-            is CameraScanEvent.DismissScanClicked -> handleDismissScanClicked()
-            is CameraScanEvent.CardClicked -> handleCardClicked()
+            is CameraScanEvent.GalleryPickFailed    -> handleGalleryPickFailed()
+            is CameraScanEvent.BookmarkClicked      -> handleBookmarkClicked()
+            is CameraScanEvent.RetryClicked         -> handleRetryClicked()
+            is CameraScanEvent.DismissScanClicked   -> handleDismissScanClicked()
+            is CameraScanEvent.CardClicked          -> handleCardClicked()
             is CameraScanEvent.ConfirmDeleteBookmark -> handleConfirmDeleteBookmark()
             is CameraScanEvent.DismissDeleteBookmark -> handleDismissDeleteBookmark()
+            is CameraScanEvent.BarcodeDetected      -> handleBarcodeDetected(event.barcode, event.normalizedBounds)
+            is CameraScanEvent.BarcodeLocked        -> handleBarcodeLocked(event.barcode)
         }
     }
 
     private fun handleModeSelected(mode: ScanInputMode) {
-        if (mode == ScanInputMode.QR) {
-            return
-        }
-
         val currentMode = _state.value.selectedMode
         if (currentMode == mode) {
             if (mode == ScanInputMode.GALLERY) {
@@ -100,8 +109,12 @@ class CameraScanViewModel @Inject constructor(
             return
         }
 
-        if (mode == ScanInputMode.GALLERY) {
+        // Cancel any in-flight image scan or barcode lock when switching modes.
+        if (mode == ScanInputMode.GALLERY || mode == ScanInputMode.PHOTO) {
             currentScanJob?.cancel()
+        }
+        if (mode != ScanInputMode.BARCODE) {
+            cancelBarcodeLock()
         }
 
         _state.update {
@@ -109,6 +122,8 @@ class CameraScanViewModel @Inject constructor(
                 selectedMode = mode,
                 isProcessingCenterAction = false,
                 pendingGalleryImagePath = if (mode == ScanInputMode.GALLERY) it.pendingGalleryImagePath else null,
+                detectedBarcodeBounds = null,
+                trackedBarcodeValue = null,
             )
         }
 
@@ -135,7 +150,7 @@ class CameraScanViewModel @Inject constructor(
     private fun handleCenterActionClicked() {
         val selectedMode = _state.value.selectedMode
         when (selectedMode) {
-            ScanInputMode.QR,
+            ScanInputMode.BARCODE,
             ScanInputMode.PHOTO,
             -> handleCaptureClicked()
 
@@ -408,6 +423,7 @@ class CameraScanViewModel @Inject constructor(
 
     private fun handleDismissScanClicked() {
         currentScanJob?.cancel()
+        cancelBarcodeLock()
         _state.update {
             val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
             val previewToKeep = if (shouldKeepGalleryPreview) {
@@ -421,7 +437,123 @@ class CameraScanViewModel @Inject constructor(
                 isProcessingCenterAction = false,
                 pendingGalleryImagePath = previewToKeep,
                 activeScan = null,
+                detectedBarcodeBounds = null,
+                trackedBarcodeValue = null,
             )
         }
+    }
+
+    // ── Barcode scan helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Called on every analysis frame by [BarcodeScanAnalyzer] via [CameraScanEvent.BarcodeDetected].
+     *
+     * Always updates the AR overlay position. If the barcode is new (or changed) starts a
+     * [BARCODE_LOCK_DELAY_MS] debounce timer. If the same barcode was already being timed,
+     * the timer is left running. A null detection cancels any pending timer.
+     */
+    private fun handleBarcodeDetected(
+        barcode: String?,
+        normalizedBounds: android.graphics.RectF?,
+    ) {
+        // Always refresh the AR overlay, even while a submission is in-flight,
+        // so the bracket keeps tracking the product if the camera moves.
+        _state.update {
+            it.copy(
+                detectedBarcodeBounds = normalizedBounds,
+                trackedBarcodeValue   = barcode,
+            )
+        }
+
+        // If a submission is already in-flight, do not start a new lock timer.
+        if (_state.value.isProcessingCenterAction) return
+
+        if (barcode == null) {
+            cancelBarcodeLock()
+            return
+        }
+
+        // Same barcode — let the existing timer finish.
+        if (barcode == lastLockedBarcode && barcodeLockJob?.isActive == true) return
+
+        // New (or changed) barcode — reset the stability timer.
+        cancelBarcodeLock()
+        lastLockedBarcode = barcode
+        barcodeLockJob = viewModelScope.launch {
+            delay(BARCODE_LOCK_DELAY_MS.milliseconds)
+            onEvent(CameraScanEvent.BarcodeLocked(barcode))
+        }
+    }
+
+    /**
+     * Called after [BARCODE_LOCK_DELAY_MS] of stable detection.
+     * Guards against double-submission if the barcode lock fires while a scan is already running.
+     */
+    private fun handleBarcodeLocked(barcode: String) {
+        if (_state.value.isProcessingCenterAction) return
+        submitBarcode(barcode)
+    }
+
+    /**
+     * Submits [barcode] to the backend via [SubmitBarcodeScanUseCase], then polls for the result.
+     * Mirrors [submitImageFile] in structure — identical state transitions and error handling.
+     */
+    private fun submitBarcode(barcode: String) {
+        currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isProcessingCenterAction = true,
+                trackedBarcodeValue = barcode,
+                activeScan = ActiveScanUiModel(
+                    scanId = "",
+                    thumbnailUrl = null,
+                    isProcessing = true,
+                ),
+            )
+        }
+        currentScanJob = viewModelScope.launch {
+            val result = submitBarcodeScanUseCase(barcode)
+            result.onSuccess { scanResult ->
+                val scanId = scanResult.scanId
+                _state.update { state ->
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        activeScan = state.activeScan?.copy(scanId = scanId),
+                    )
+                }
+                pollScanResult(scanId)
+            }.onFailure {
+                _state.update { state ->
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        activeScan = state.activeScan?.copy(
+                            isProcessing = false,
+                            isFailed = true,
+                        ),
+                    )
+                }
+                _effect.send(
+                    CameraScanEffect.ShowSnackBarRes(
+                        messageResId = R.string.scan_capture_failed_generic,
+                    ),
+                )
+            }
+        }
+    }
+
+    /** Cancels any pending barcode stability timer and clears associated tracking state. */
+    private fun cancelBarcodeLock() {
+        barcodeLockJob?.cancel()
+        barcodeLockJob = null
+        lastLockedBarcode = null
+    }
+
+    companion object {
+        /**
+         * Duration in milliseconds that the same barcode must be continuously detected before
+         * we auto-submit it to the backend. 1 500 ms balances responsiveness with accuracy —
+         * long enough to avoid accidental triggers during a camera sweep.
+         */
+        const val BARCODE_LOCK_DELAY_MS = 1_500L
     }
 }

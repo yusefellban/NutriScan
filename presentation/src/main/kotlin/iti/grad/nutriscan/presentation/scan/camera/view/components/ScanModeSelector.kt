@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +56,6 @@ fun ScanModeSelector(
             },
     ) {
         ScanInputMode.entries.forEach { mode ->
-            val isModeEnabled = mode != ScanInputMode.QR
             ModeItem(
                 mode = mode,
                 labelResId = if (mode == ScanInputMode.GALLERY && hasSelectedGalleryImage) {
@@ -64,13 +63,9 @@ fun ScanModeSelector(
                 } else {
                     mode.labelResId
                 },
-                isEnabled = isModeEnabled,
+                isEnabled = true,
                 isSelected = mode == selectedMode,
-                onClick = {
-                    if (isModeEnabled) {
-                        onModeSelected(mode)
-                    }
-                },
+                onClick = { onModeSelected(mode) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -135,7 +130,7 @@ private fun ModeItem(
 }
 
 private fun ScanInputMode.icon(): ImageVector = when (this) {
-    ScanInputMode.QR -> Icons.Default.QrCode2
-    ScanInputMode.PHOTO -> Icons.Default.PhotoCamera
+    ScanInputMode.BARCODE -> Icons.Default.BarChart
+    ScanInputMode.PHOTO   -> Icons.Default.PhotoCamera
     ScanInputMode.GALLERY -> Icons.Default.Image
 }
