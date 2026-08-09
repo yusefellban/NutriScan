@@ -298,7 +298,7 @@ private fun CaloriesHeader(caloriesGained: Int, modifier: Modifier = Modifier) {
         Text(
             text = stringResource(R.string.daily_products),
             style = CaloriesTypography.headerTitle,
-            color = AppTheme.colors.CaloriesAccentTeal1200,
+            color = AppTheme.colors.SectionSubtitle,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),

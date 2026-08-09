@@ -96,6 +96,7 @@ internal data class AppColorsExtension(
     // they can't be reused where the Figma spec pins an exact literal swatch
     // in both themes. These three are fixed (same value in light and dark).
     val CaloriesAccentTeal1200: Color,
+    val SectionSubtitle: Color,
     val CaloriesMutedTeal: Color,
     val CaloriesIconOnAccent: Color,
     val ExerciseSecondaryText: Color,
@@ -417,6 +418,7 @@ data class AppColors internal constructor(
     val AppSettingsLogoutIconBackground: Color get() = extension.AppSettingsLogoutIconBackground
 
     val CaloriesAccentTeal1200: Color get() = extension.CaloriesAccentTeal1200
+    val SectionSubtitle: Color get() = extension.SectionSubtitle
     val CaloriesMutedTeal: Color get() = extension.CaloriesMutedTeal
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
@@ -741,6 +743,7 @@ fun lightColors() = AppColors(
 
         // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
         CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        SectionSubtitle = Color(0xFF11939A), // Teal/1200 — unified title/sub-title color; fixed, identical in both themes (see docs/plans/2026-08-08-unify-section-subtitle-color-v2.md)
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
@@ -1085,6 +1088,7 @@ fun darkColors() = AppColors(
 
         // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
         CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        SectionSubtitle = Color(0xFF11939A), // Teal/1200 — intentionally identical to light mode
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value

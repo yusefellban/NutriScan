@@ -47,7 +47,6 @@ fun WaterTrackerCard(
     modifier: Modifier = Modifier,
 ) {
     val isDark = AppTheme.isDark
-    val headerColor = if (isDark) AppTheme.colors.Teal300 else AppTheme.colors.Gray1600
     val filledGlassTint = AppTheme.colors.Teal700
     val emptyGlassTint = if (isDark) AppTheme.colors.Teal1300 else AppTheme.colors.Gray400
     val addButtonBackground = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Gray200
@@ -65,7 +64,7 @@ fun WaterTrackerCard(
             Text(
                 text = stringResource(R.string.water),
                 style = CaloriesTypography.sectionTitle,
-                color = headerColor,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Text(
                 text = "$waterConsumed/$waterGoal",

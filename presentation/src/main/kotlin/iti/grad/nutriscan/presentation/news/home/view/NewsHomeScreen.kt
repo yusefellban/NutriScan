@@ -151,7 +151,7 @@ private fun NewsHomeContent(
                     Text(
                         text = stringResource(id = R.string.news_home_breaking_news),
                         style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = AppTheme.colors.NewsScreenTitle,
+                        color = AppTheme.colors.SectionSubtitle,
                         modifier = Modifier.padding(horizontal = 22.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +176,7 @@ private fun NewsHomeContent(
                     Text(
                         text = stringResource(id = R.string.news_home_recommendation),
                         style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = AppTheme.colors.NewsScreenTitle,
+                        color = AppTheme.colors.SectionSubtitle,
                         modifier = Modifier.padding(horizontal = 22.dp),
                     )
                     Spacer(modifier = Modifier.height(12.dp))

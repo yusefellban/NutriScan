@@ -167,7 +167,7 @@ private fun HomeFeedContent(
                 Text(
                     text = stringResource(R.string.home_explore),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.PrimaryVariant,
+                    color = AppTheme.colors.SectionSubtitle,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -201,7 +201,7 @@ private fun HomeFeedContent(
                     Text(
                         text = stringResource(R.string.home_recent_history),
                         style = AppTheme.typography.headlineMedium,
-                        color = AppTheme.colors.PrimaryVariant,
+                        color = AppTheme.colors.SectionSubtitle,
                     )
                     Text(
                         text = stringResource(R.string.home_view_all),

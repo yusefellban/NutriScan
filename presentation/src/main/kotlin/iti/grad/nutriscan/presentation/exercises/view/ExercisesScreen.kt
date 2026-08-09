@@ -95,7 +95,7 @@ fun ExercisesScreen(
             Text(
                 text = stringResource(id = R.string.exercises_title),
                 style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.ExerciseScreenTitle,
+                color = AppTheme.colors.TextPrimary,
                 modifier = Modifier.padding(start = 12.dp)
             )
         }

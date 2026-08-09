@@ -54,7 +54,7 @@ fun ChatTopBar(
             text = stringResource(id = R.string.nutrigpt_title),
             style = AppTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.SemiBold,
-                color = AppTheme.colors.PrimaryVariant
+                color = AppTheme.colors.TextPrimary
             ),
             modifier = Modifier.weight(1f)
         )

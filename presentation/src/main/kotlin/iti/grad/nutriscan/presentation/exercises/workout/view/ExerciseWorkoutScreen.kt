@@ -186,7 +186,7 @@ fun ExerciseWorkoutScreen(
             Text(
                 text = stringResource(id = R.string.exercise_workout_title),
                 style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.ExerciseWorkoutHeaderTitle,
+                color = AppTheme.colors.TextPrimary,
                 modifier = Modifier.padding(start = 12.dp)
             )
         }

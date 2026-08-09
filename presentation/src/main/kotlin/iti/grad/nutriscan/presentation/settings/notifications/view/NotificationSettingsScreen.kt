@@ -181,7 +181,7 @@ private fun NotificationSettingsContent(
                     Text(
                         text = stringResource(R.string.notification_settings_quiet_hours_header),
                         style = AppTheme.typography.titleSmall,
-                        color = AppTheme.colors.Gray500,
+                        color = AppTheme.colors.SectionSubtitle,
                     )
                     QuietHoursRow(
                         icon = rememberVectorPainter(Icons.Filled.NightsStay),
@@ -205,7 +205,7 @@ private fun NotificationSettingsContent(
                         Text(
                             text = stringResource(R.string.notification_settings_battery_header),
                             style = AppTheme.typography.titleSmall,
-                            color = AppTheme.colors.Gray500,
+                            color = AppTheme.colors.SectionSubtitle,
                         )
                         Text(
                             text = stringResource(R.string.notification_settings_battery_warning),
@@ -235,7 +235,7 @@ private fun NotificationCategorySection(
         Text(
             text = title,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.Gray500,
+            color = AppTheme.colors.SectionSubtitle,
         )
         types.forEach { type ->
             SettingsSwitchRow(

@@ -10,6 +10,42 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
+
+val makeDummyGoogleServicesJson = run {
+    val googleServicesJson = file("google-services.json")
+    if (!googleServicesJson.exists()) {
+        googleServicesJson.writeText(
+            """
+            {
+              "project_info": {
+                "project_number": "1234567890",
+                "project_id": "dummy-id",
+                "storage_bucket": "dummy.appspot.com"
+              },
+              "client": [
+                {
+                  "client_info": {
+                    "mobilesdk_app_id": "1:1234567890:android:abcdef",
+                    "android_client_info": {
+                      "package_name": "iti.grad.nutriscan"
+                    }
+                  },
+                  "oauth_client": [],
+                  "api_key": [
+                    {
+                      "current_key": "dummy_key"
+                    }
+                  ],
+                  "services": {}
+                }
+              ],
+              "configuration_version": "1"
+            }
+            """.trimIndent()
+        )
+    }
+}
+
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) load(FileInputStream(file))
@@ -83,17 +119,28 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
+        val storeFilePath = keystoreProperties["storeFile"] as? String
+        val storePass = keystoreProperties["storePassword"] as? String
+        val alias = keystoreProperties["keyAlias"] as? String
+        val keyPass = keystoreProperties["keyPassword"] as? String
+
+        if (!storeFilePath.isNullOrEmpty() &&
+            !storePass.isNullOrEmpty() &&
+            !alias.isNullOrEmpty() &&
+            !keyPass.isNullOrEmpty()
+        ) {
+            create("release") {
+                storeFile = file(storeFilePath)
+                storePassword = storePass
+                keyAlias = alias
+                keyPassword = keyPass
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")
             optimization {
                 enable = false
             }

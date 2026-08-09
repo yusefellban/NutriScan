@@ -51,7 +51,7 @@ fun CaloriesHistoryTopBar(
         Text(
             text = stringResource(R.string.calories_history_title),
             style = AppTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-            color = AppTheme.colors.CaloriesHistoryTitle,
+            color = AppTheme.colors.TextPrimary,
         )
 
         Spacer(modifier = Modifier.weight(1f))
