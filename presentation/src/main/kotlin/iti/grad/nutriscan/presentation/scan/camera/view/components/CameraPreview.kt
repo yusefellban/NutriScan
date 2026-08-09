@@ -51,6 +51,12 @@ fun CameraPreview(
         if (barcodeAnalyzer != null) Executors.newSingleThreadExecutor() else null
     }
 
+    DisposableEffect(analysisExecutor) {
+        onDispose {
+            analysisExecutor?.shutdown()
+        }
+    }
+
     AndroidView(
         factory = { ctx ->
             PreviewView(ctx).apply {
@@ -113,7 +119,6 @@ fun CameraPreview(
                         ProcessCameraProvider.getInstance(context).get().unbindAll()
                     }
                 }
-                analysisExecutor?.shutdown()
             }
         }
     }

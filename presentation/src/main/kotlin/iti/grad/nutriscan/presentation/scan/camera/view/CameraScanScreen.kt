@@ -347,6 +347,7 @@ private fun CameraScanContent(
                     scan = scan,
                     onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
                     onCardClick = { onEvent(CameraScanEvent.CardClicked) },
+                    onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
                 )
             }
 

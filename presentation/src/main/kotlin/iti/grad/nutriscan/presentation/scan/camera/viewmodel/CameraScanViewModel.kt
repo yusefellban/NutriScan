@@ -59,6 +59,25 @@ class CameraScanViewModel @Inject constructor(
      */
     private var lastLockedBarcode: String? = null
 
+    /** 
+     * Debounce job for clearing the barcode state. ML Kit often drops detection for a few 
+     * frames. Instead of instantly hiding the AR overlay (causing flashing/trembling), 
+     * we wait 500ms before clearing. 
+     */
+    private var barcodeLossJob: Job? = null
+
+    /** 
+     * Fixed dimensions to prevent the AR overlay from trembling/breathing in size. 
+     * Once caught, the size remains constant but the center follows the barcode. 
+     */
+    private var lockedBoundsWidth: Float? = null
+    private var lockedBoundsHeight: Float? = null
+    private var lastTrackedBarcodeForSize: String? = null
+
+    /** Used by the dead-band filter to prevent micro-jitter in the center point. */
+    private var lastEmittedCenterX: Float? = null
+    private var lastEmittedCenterY: Float? = null
+
     init {
         viewModelScope.launch {
             _effect.send(CameraScanEffect.RequestCameraPermission)
@@ -114,7 +133,7 @@ class CameraScanViewModel @Inject constructor(
             currentScanJob?.cancel()
         }
         if (mode != ScanInputMode.BARCODE) {
-            cancelBarcodeLock()
+            clearBarcodeState()
         }
 
         _state.update {
@@ -313,31 +332,36 @@ class CameraScanViewModel @Inject constructor(
             result.onSuccess { scanResult ->
                 when (scanResult.status) {
                     ScanStatus.COMPLETED -> {
-                        _state.update { state ->
-                            state.copy(
-                                activeScan = state.activeScan?.copy(
-                                    isProcessing = false,
-                                    thumbnailUrl = scanResult.imageUrl,
-                                    healthTagResId = scanResult.foodSafetyResponse?.verdict?.let {
-                                        when (it) {
-                                           ProductVerdict.SAFE -> R.string.verdict_safe
-                                            ProductVerdict.CAUTION -> R.string.verdict_caution
-                                            ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                                        }
-                                    },
-                                    fullResult = scanResult
-                                )
+                        val finalScan = _state.value.activeScan?.copy(
+                            isProcessing = false,
+                            thumbnailUrl = scanResult.imageUrl,
+                            healthTagResId = scanResult.foodSafetyResponse?.verdict?.let {
+                                when (it) {
+                                    ProductVerdict.SAFE -> R.string.verdict_safe
+                                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                                }
+                            },
+                            fullResult = scanResult
+                        )
+                        _state.update {
+                            it.copy(
+                                activeScan = finalScan,
+                                isProcessingCenterAction = false,
+                                isScanning = false
                             )
                         }
                         return
                     }
                     ScanStatus.FAILED -> {
-                        _state.update { state ->
-                            state.copy(
-                                activeScan = state.activeScan?.copy(
-                                    isProcessing = false,
-                                    isFailed = true
-                                )
+                        val finalScan = _state.value.activeScan?.copy(
+                            isProcessing = false,
+                            isFailed = true
+                        )
+                        _state.update {
+                            it.copy(
+                                activeScan = finalScan,
+                                isProcessingCenterAction = false,
                             )
                         }
                         return
@@ -423,7 +447,7 @@ class CameraScanViewModel @Inject constructor(
 
     private fun handleDismissScanClicked() {
         currentScanJob?.cancel()
-        cancelBarcodeLock()
+        clearBarcodeState()
         _state.update {
             val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
             val previewToKeep = if (shouldKeepGalleryPreview) {
@@ -448,35 +472,80 @@ class CameraScanViewModel @Inject constructor(
     /**
      * Called on every analysis frame by [BarcodeScanAnalyzer] via [CameraScanEvent.BarcodeDetected].
      *
-     * Always updates the AR overlay position. If the barcode is new (or changed) starts a
-     * [BARCODE_LOCK_DELAY_MS] debounce timer. If the same barcode was already being timed,
-     * the timer is left running. A null detection cancels any pending timer.
+     * Resolves AR trembling/flashing via three strategies:
+     * 1. **Frame-drop tolerance**: ML Kit often misses a frame. We wait 500ms before clearing.
+     * 2. **Fixed size**: We lock the width/height on first detection so it doesn't breathe.
+     * 3. **Dead-band filter**: The center only updates if it moves > 1.5% of the screen.
      */
     private fun handleBarcodeDetected(
         barcode: String?,
         normalizedBounds: android.graphics.RectF?,
     ) {
-        // Always refresh the AR overlay, even while a submission is in-flight,
-        // so the bracket keeps tracking the product if the camera moves.
-        _state.update {
-            it.copy(
-                detectedBarcodeBounds = normalizedBounds,
-                trackedBarcodeValue   = barcode,
+        if (barcode == null || normalizedBounds == null) {
+            // ML Kit missed a frame. Don't clear instantly to avoid flickering.
+            if (barcodeLossJob == null && _state.value.detectedBarcodeBounds != null) {
+                barcodeLossJob = viewModelScope.launch {
+                    delay(500.milliseconds)
+                    clearBarcodeState()
+                }
+            }
+            return
+        }
+
+        // Barcode detected! Cancel any pending loss job.
+        barcodeLossJob?.cancel()
+        barcodeLossJob = null
+
+        // Reset the cached size if tracking a new/different barcode
+        if (barcode != lastTrackedBarcodeForSize) {
+            lockedBoundsWidth = null
+            lockedBoundsHeight = null
+            lastEmittedCenterX = null
+            lastEmittedCenterY = null
+            lastTrackedBarcodeForSize = barcode
+        }
+
+        // Lock the width and height to the first detected bounds
+        val w = lockedBoundsWidth ?: normalizedBounds.width().also { lockedBoundsWidth = it }
+        val h = lockedBoundsHeight ?: normalizedBounds.height().also { lockedBoundsHeight = it }
+        
+        val cx = normalizedBounds.centerX()
+        val cy = normalizedBounds.centerY()
+        val prevCx = lastEmittedCenterX
+        val prevCy = lastEmittedCenterY
+
+        // Dead-band filter: Only update the center if it moved more than 5% (0.05f)
+        // This makes the AR overlay rock-solid and extremely stable, ignoring all minor shifts.
+        val shouldUpdateCenter = prevCx == null || prevCy == null ||
+            kotlin.math.abs(cx - prevCx) > 0.05f ||
+            kotlin.math.abs(cy - prevCy) > 0.05f
+
+        if (shouldUpdateCenter) {
+            lastEmittedCenterX = cx
+            lastEmittedCenterY = cy
+
+            val stableBounds = android.graphics.RectF(
+                cx - w / 2f,
+                cy - h / 2f,
+                cx + w / 2f,
+                cy + h / 2f,
             )
+
+            _state.update {
+                it.copy(
+                    detectedBarcodeBounds = stableBounds,
+                    trackedBarcodeValue   = barcode,
+                )
+            }
         }
 
         // If a submission is already in-flight, do not start a new lock timer.
         if (_state.value.isProcessingCenterAction) return
 
-        if (barcode == null) {
-            cancelBarcodeLock()
-            return
-        }
-
         // Same barcode — let the existing timer finish.
         if (barcode == lastLockedBarcode && barcodeLockJob?.isActive == true) return
 
-        // New (or changed) barcode — reset the stability timer.
+        // New (or changed) barcode — reset the stability timer (1.5s delay).
         cancelBarcodeLock()
         lastLockedBarcode = barcode
         barcodeLockJob = viewModelScope.launch {
@@ -502,6 +571,7 @@ class CameraScanViewModel @Inject constructor(
         currentScanJob?.cancel()
         _state.update { state ->
             state.copy(
+                isScanning = false, // FREEZE the camera and AR overlay immediately
                 isProcessingCenterAction = true,
                 trackedBarcodeValue = barcode,
                 activeScan = ActiveScanUiModel(
@@ -541,11 +611,24 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
-    /** Cancels any pending barcode stability timer and clears associated tracking state. */
+    /** Cancels the submission timer, but leaves the visual tracking state intact. */
     private fun cancelBarcodeLock() {
         barcodeLockJob?.cancel()
         barcodeLockJob = null
         lastLockedBarcode = null
+    }
+
+    /** Fully clears all barcode tracking state, instantly hiding the AR overlay. */
+    private fun clearBarcodeState() {
+        cancelBarcodeLock()
+        barcodeLossJob?.cancel()
+        barcodeLossJob = null
+        lockedBoundsWidth = null
+        lockedBoundsHeight = null
+        lastTrackedBarcodeForSize = null
+        lastEmittedCenterX = null
+        lastEmittedCenterY = null
+        _state.update { it.copy(detectedBarcodeBounds = null, trackedBarcodeValue = null) }
     }
 
     companion object {
