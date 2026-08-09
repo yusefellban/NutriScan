@@ -64,10 +64,17 @@ class BarcodeScanAnalyzer(
 
         val imageWidth  = imageProxy.width.toFloat()
         val imageHeight = imageProxy.height.toFloat()
+        val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+
+        val (rotatedWidth, rotatedHeight) = if (rotationDegrees == 90 || rotationDegrees == 270) {
+            imageHeight to imageWidth
+        } else {
+            imageWidth to imageHeight
+        }
 
         val inputImage = InputImage.fromMediaImage(
             mediaImage,
-            imageProxy.imageInfo.rotationDegrees,
+            rotationDegrees,
         )
 
         scanner.process(inputImage)
@@ -83,10 +90,10 @@ class BarcodeScanAnalyzer(
                         // Clamp to [0,1] to guard against rounding-error coordinates
                         // that would place the overlay fractionally outside the preview.
                         RectF(
-                            (r.left   / imageWidth ).coerceIn(0f, 1f),
-                            (r.top    / imageHeight).coerceIn(0f, 1f),
-                            (r.right  / imageWidth ).coerceIn(0f, 1f),
-                            (r.bottom / imageHeight).coerceIn(0f, 1f),
+                            (r.left   / rotatedWidth ).coerceIn(0f, 1f),
+                            (r.top    / rotatedHeight).coerceIn(0f, 1f),
+                            (r.right  / rotatedWidth ).coerceIn(0f, 1f),
+                            (r.bottom / rotatedHeight).coerceIn(0f, 1f),
                         )
                     }
                     onResult(best.rawValue, normalizedBounds)

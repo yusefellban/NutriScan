@@ -123,7 +123,7 @@ fun ActiveScanCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(AppTheme.colors.VerdictGreen.copy(alpha = 0.3f))
+                        .background(AppTheme.colors.Error.copy(alpha = 0.3f))
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
