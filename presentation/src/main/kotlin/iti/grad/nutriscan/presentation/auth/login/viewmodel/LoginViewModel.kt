@@ -30,6 +30,7 @@ import iti.grad.nutriscan.presentation.common.Validation
 import iti.grad.nutriscan.presentation.common.state.AuthAlertState.Error
 import iti.grad.nutriscan.domain.auth.usecase.LoginWithEmailUseCase
 import iti.grad.nutriscan.domain.user.usecase.CheckIfProfileSetupUseCase
+import iti.grad.nutriscan.domain.user.model.AccountPendingDeletionException
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -95,8 +96,15 @@ class LoginViewModel @Inject constructor(
             val result = loginWithEmailUseCase(_state.value.email, _state.value.password)
             
             result.onSuccess {
-                fetchAndSyncUserDataUseCase()
+                val syncResult = fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
+
+                val pendingDeletion = syncResult.exceptionOrNull() as? AccountPendingDeletionException
+                if (pendingDeletion != null) {
+                    _effect.send(LoginEffect.NavigateToAccountPendingDeletion(pendingDeletion.scheduledDeletionAt))
+                    return@launch
+                }
+
                 if (checkIfProfileSetupUseCase()) {
                     _effect.send(LoginEffect.NavigateToHome)
                 } else {
@@ -131,8 +139,15 @@ class LoginViewModel @Inject constructor(
             val result = saveGoogleLoginTokensUseCase(event.authTokens)
             
             result.onSuccess {
-                fetchAndSyncUserDataUseCase()
+                val syncResult = fetchAndSyncUserDataUseCase()
                 _state.update { it.copy(isLoading = false) }
+
+                val pendingDeletion = syncResult.exceptionOrNull() as? AccountPendingDeletionException
+                if (pendingDeletion != null) {
+                    _effect.send(LoginEffect.NavigateToAccountPendingDeletion(pendingDeletion.scheduledDeletionAt))
+                    return@launch
+                }
+
                 if (checkIfProfileSetupUseCase()) {
                     _effect.send(LoginEffect.NavigateToHome)
                 } else {

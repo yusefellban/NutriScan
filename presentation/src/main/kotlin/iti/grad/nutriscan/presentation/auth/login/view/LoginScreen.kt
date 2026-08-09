@@ -57,7 +57,8 @@ fun LoginScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToProfileSetup: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit
+    onNavigateToForgotPassword: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -99,6 +100,9 @@ fun LoginScreen(
                 is LoginEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
                 is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
+                is LoginEffect.NavigateToAccountPendingDeletion -> {
+                    onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
+                }
                 is LoginEffect.LaunchGoogleLogin -> {
                     val serviceConfig = AuthorizationServiceConfiguration(
                         Uri.parse(effect.config.authorizationEndpoint),

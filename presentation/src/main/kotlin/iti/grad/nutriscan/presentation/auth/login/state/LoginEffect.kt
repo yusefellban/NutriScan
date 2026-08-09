@@ -9,4 +9,5 @@ sealed interface LoginEffect {
     data object NavigateToRegister : LoginEffect
     data object NavigateToForgotPassword : LoginEffect
     data class LaunchGoogleLogin(val config: OidcAuthConfig) : LoginEffect
+    data class NavigateToAccountPendingDeletion(val scheduledDeletionAt: String) : LoginEffect
 }

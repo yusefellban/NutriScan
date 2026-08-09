@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.onboarding.usecase.CompleteOnboardingUseCase
+import iti.grad.nutriscan.domain.onboarding.usecase.MarkProfileSetupCompletedUseCase
 import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEffect
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.collectLatest
 @HiltViewModel
 class ProfileSetupPagerViewModel @Inject constructor(
     private val completeOnboardingUseCase: CompleteOnboardingUseCase,
+    private val markProfileSetupCompletedUseCase: MarkProfileSetupCompletedUseCase,
     private val getDiseasesUseCase: GetDiseasesUseCase,
     private val getAllergiesUseCase: GetAllergiesUseCase,
     private val syncDiseasesUseCase: SyncDiseasesUseCase,
@@ -200,6 +202,7 @@ class ProfileSetupPagerViewModel @Inject constructor(
                 weightKg = currentState.selectedWeightKg.toDouble()
             )
                 .onSuccess {
+                    markProfileSetupCompletedUseCase()
                     completeOnboardingUseCase()
                     _effect.send(ProfileSetupPagerEffect.NavigateToHome)
                 }
