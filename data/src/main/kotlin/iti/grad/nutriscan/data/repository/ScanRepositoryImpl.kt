@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
+import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
 import iti.grad.nutriscan.domain.scan.model.ProductResult
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
@@ -112,6 +113,25 @@ class ScanRepositoryImpl @Inject constructor(
                 val domainResult = response.toDomain()
                 
                 Result.success(domainResult)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    /**
+     * Submit a barcode value for AI nutritional analysis.
+     *
+     * Hits POST /v1/scans/barcode with { "barcode": "<value>" }.
+     * Returns a [ScanResult] in PROCESSING status. The caller is responsible for polling
+     * [getScanResult] until the status transitions to COMPLETED or FAILED before
+     * surfacing any verdict — see [IScanRepository.submitBarcodeScan] KDoc.
+     */
+    override suspend fun submitBarcodeScan(barcode: String): Result<ScanResult> {
+        return withContext(ioDispatcher) {
+            try {
+                val response = scanApiService.submitBarcodeScan(BarcodeScanRequestDto(barcode))
+                Result.success(response.toDomain())
             } catch (e: Exception) {
                 Result.failure(e)
             }

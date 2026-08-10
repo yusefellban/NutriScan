@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.data.remote.api
 
+import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
 import iti.grad.nutriscan.data.remote.dto.PageDto
 import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
 import iti.grad.nutriscan.data.remote.dto.ScanResultResponseDto
@@ -19,6 +20,19 @@ interface ScanApiService {
     @Multipart
     @POST("v1/scans")
     suspend fun submitScan(@Part image: MultipartBody.Part): ScanSubmissionResponseDto
+
+    /**
+     * Submit a barcode value for AI nutritional analysis.
+     *
+     * POST /v1/scans/barcode
+     * Body: { "barcode": "5922157657516" }
+     * Response: { "scanId": "...", "status": "PROCESSING" }
+     *
+     * The returned [ScanSubmissionResponseDto.scanId] must be polled via [getScanResult]
+     * until status transitions to COMPLETED or FAILED.
+     */
+    @POST("v1/scans/barcode")
+    suspend fun submitBarcodeScan(@Body body: BarcodeScanRequestDto): ScanSubmissionResponseDto
 
     @GET("v1/scans/{scanId}")
     suspend fun getScanResult(@Path("scanId") scanId: String): ScanResultResponseDto

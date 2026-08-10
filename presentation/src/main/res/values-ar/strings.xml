@@ -296,14 +296,14 @@
     <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
     <string name="scan_frame_content_description">إطار ماسح الباركود</string>
     <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>
-    <string name="scan_mode_qr">كيو آر</string>
+    <string name="scan_mode_barcode">باركود</string>
     <string name="scan_mode_photo">صورة</string>
     <string name="scan_mode_gallery">صورة من المعرض</string>
     <string name="scan_mode_gallery_change">اختر صورة أخرى</string>
     <string name="scan_center_action_capture">التقاط</string>
     <string name="scan_center_action_upload">رفع</string>
     <string name="scan_gallery_selected_image_content_description">معاينة الصورة المختارة</string>
-    <string name="scan_mode_qr_hint">ضع رمز QR داخل الإطار</string>
+    <string name="scan_mode_barcode_hint">وجّه الكاميرا نحو باركود المنتج</string>
     <string name="scan_mode_photo_hint">ضع المنتج داخل الإطار والتقط بوضوح</string>
     <string name="scan_mode_gallery_hint">ارفع صورة منتج من المعرض</string>
     <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>

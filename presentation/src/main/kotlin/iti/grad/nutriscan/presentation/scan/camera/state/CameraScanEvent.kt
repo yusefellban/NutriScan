@@ -1,6 +1,6 @@
 package iti.grad.nutriscan.presentation.scan.camera.state
 
-
+import android.graphics.RectF
 import java.io.File
 
 sealed interface CameraScanEvent {
@@ -19,4 +19,19 @@ sealed interface CameraScanEvent {
     data object CardClicked : CameraScanEvent
     data object ConfirmDeleteBookmark : CameraScanEvent
     data object DismissDeleteBookmark : CameraScanEvent
+
+    /**
+     * Fired by [BarcodeScanAnalyzer] on every CameraX analysis frame.
+     * [barcode] and [normalizedBounds] are both null when no barcode is visible in frame.
+     */
+    data class BarcodeDetected(
+        val barcode: String?,
+        val normalizedBounds: RectF?,
+    ) : CameraScanEvent
+
+    /**
+     * Fired internally by the ViewModel after [barcode] has been stably detected for
+     * [CameraScanViewModel.BARCODE_LOCK_DELAY_MS] milliseconds. Triggers backend submission.
+     */
+    data class BarcodeLocked(val barcode: String) : CameraScanEvent
 }

@@ -292,14 +292,14 @@
     <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
-    <string name="scan_mode_qr">QR</string>
+    <string name="scan_mode_barcode">Barcode</string>
     <string name="scan_mode_photo">Photo</string>
     <string name="scan_mode_gallery">Image</string>
     <string name="scan_mode_gallery_change">Pick another image</string>
     <string name="scan_center_action_capture">Capture</string>
     <string name="scan_center_action_upload">Upload</string>
     <string name="scan_gallery_selected_image_content_description">Selected image preview</string>
-    <string name="scan_mode_qr_hint">Align QR code inside the frame</string>
+    <string name="scan_mode_barcode_hint">Point at a product barcode to scan</string>
     <string name="scan_mode_photo_hint">Align product and capture clearly</string>
     <string name="scan_mode_gallery_hint">Upload a product image from gallery</string>
     <string name="scan_mode_selector_content_desc">Scan mode selector</string>
