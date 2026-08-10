@@ -2,6 +2,7 @@ package iti.grad.nutriscan.data.manager
 
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -30,8 +31,30 @@ class VoiceManagerImpl @Inject constructor(
 
     private var speechRecognizer: SpeechRecognizer? = null
     private var textToSpeech: TextToSpeech? = null
-    
+
     private var isTtsInitialized = false
+
+    private val audioManager =
+        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    /** True while the user is physically holding the mic button. */
+    @Volatile private var isHoldListening = false
+
+    /**
+     * True during the silent restart gap between two recognizer sessions.
+     * While this is true we skip the Listening(0f) reset so the waveform stays smooth.
+     */
+    @Volatile private var isRestarting = false
+
+    /** Language code used in the current hold session — needed for auto-restarts. */
+    private var currentLanguageCode = "en-US"
+
+    /**
+     * Text confirmed by previous recognizer sessions within the same hold.
+     * Prepended to every partial result so the on-screen text never blanks out
+     * between invisible restarts.
+     */
+    private var accumulatedText = ""
 
     init {
         // Initialize SpeechRecognizer on the main thread
@@ -71,25 +94,48 @@ class VoiceManagerImpl @Inject constructor(
                 _state.update { VoiceState.Error("Speech recognition not initialized") }
                 return@post
             }
-            
+
             // Stop any ongoing TTS before listening
             stopSpeaking()
 
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
-            }
+            // Begin a fresh hold session
+            isHoldListening = true
+            isRestarting = false
+            currentLanguageCode = languageCode
+            accumulatedText = ""
 
-            _state.update { VoiceState.Listening }
-            speechRecognizer?.startListening(intent)
+            startRecognizerInternal(languageCode)
         }
+    }
+
+    /** Starts (or restarts) the underlying SpeechRecognizer — must be called on the main thread. */
+    private fun startRecognizerInternal(languageCode: String) {
+        if (isRestarting) {
+            // Mute both streams — different OEMs route the recognizer beep to different streams.
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING,  AudioManager.ADJUST_MUTE, 0)
+        }
+
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
+            putExtra("android.speech.extra.SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS", 10_000L)
+            putExtra("android.speech.extra.SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS", 10_000L)
+            putExtra("android.speech.extra.SPEECH_INPUT_MINIMUM_LENGTH_MILLIS", 0L)
+        }
+        // Only reset waveform on the first start, not on silent restarts.
+        if (!isRestarting) {
+            _state.update { VoiceState.Listening(0f) }
+        }
+        speechRecognizer?.startListening(intent)
     }
 
     override fun stopListening() {
         Handler(Looper.getMainLooper()).post {
+            isHoldListening = false
+            // stopListening() signals the recognizer to finalize what it heard → onResults() fires.
             speechRecognizer?.stopListening()
-            _state.update { VoiceState.Idle }
         }
     }
 
@@ -118,17 +164,41 @@ class VoiceManagerImpl @Inject constructor(
 
     // --- RecognitionListener Implementation ---
     
-    override fun onReadyForSpeech(params: Bundle?) {}
+    override fun onReadyForSpeech(params: Bundle?) {
+        // Recognizer is active — restore both streams if we muted them for a silent restart.
+        if (isRestarting) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING,  AudioManager.ADJUST_UNMUTE, 0)
+            isRestarting = false
+        }
+    }
 
     override fun onBeginningOfSpeech() {}
 
-    override fun onRmsChanged(rmsdB: Float) {}
+    override fun onRmsChanged(rmsdB: Float) {
+        val currentState = _state.value
+        if (currentState is VoiceState.Listening) {
+            _state.value = VoiceState.Listening(rmsdB)
+        }
+    }
 
     override fun onBufferReceived(buffer: ByteArray?) {}
 
     override fun onEndOfSpeech() {}
 
     override fun onError(error: Int) {
+        // While the button is held, silence/no-match errors just mean the user paused —
+        // restart the recognizer so they can continue speaking.
+        if (isHoldListening && (error == SpeechRecognizer.ERROR_NO_MATCH ||
+                    error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT))
+        {
+            isRestarting = true
+            Handler(Looper.getMainLooper()).post {
+                if (isHoldListening) startRecognizerInternal(currentLanguageCode)
+            }
+            return
+        }
+
         val message = when (error) {
             SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
             SpeechRecognizer.ERROR_CLIENT -> "Client side error"
@@ -146,16 +216,44 @@ class VoiceManagerImpl @Inject constructor(
 
     override fun onResults(results: Bundle?) {
         val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-        if (!matches.isNullOrEmpty()) {
-            _state.update { VoiceState.FinalResult(matches[0]) }
+        val chunk = matches?.firstOrNull { it.isNotBlank() }?.trim().orEmpty()
+
+        if (isHoldListening) {
+            // Recognizer stopped on silence while button is still held.
+            // Save this chunk, mark as restarting (mutes beep + keeps waveform), restart.
+            if (chunk.isNotBlank()) {
+                accumulatedText = if (accumulatedText.isBlank()) chunk
+                                  else "$accumulatedText $chunk"
+            }
+            isRestarting = true
+            Handler(Looper.getMainLooper()).post {
+                if (isHoldListening) startRecognizerInternal(currentLanguageCode)
+            }
+        } else {
+            // User released the button — combine accumulated + this final chunk.
+            val finalText = buildString {
+                if (accumulatedText.isNotBlank()) append(accumulatedText)
+                if (chunk.isNotBlank()) {
+                    if (isNotEmpty()) append(" ")
+                    append(chunk)
+                }
+            }.trim()
+            accumulatedText = ""
+            if (finalText.isNotBlank()) {
+                _state.update { VoiceState.FinalResult(finalText) }
+            } else {
+                _state.update { VoiceState.Idle }
+            }
         }
     }
 
     override fun onPartialResults(partialResults: Bundle?) {
         val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-        if (!matches.isNullOrEmpty()) {
-            _state.update { VoiceState.PartialResult(matches[0]) }
-        }
+        val currentPartial = matches?.firstOrNull { it.isNotBlank() } ?: return
+        // Always prepend accumulated text so the screen never goes blank between restarts.
+        val display = if (accumulatedText.isBlank()) currentPartial
+                      else "$accumulatedText $currentPartial"
+        _state.update { VoiceState.PartialResult(display) }
     }
 
     override fun onEvent(eventType: Int, params: Bundle?) {}

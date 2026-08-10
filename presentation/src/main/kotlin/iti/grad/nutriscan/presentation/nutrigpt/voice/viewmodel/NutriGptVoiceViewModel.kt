@@ -38,22 +38,24 @@ class NutriGptVoiceViewModel @Inject constructor(
             voiceManager.state.collect { voiceState ->
                 when (voiceState) {
                     is VoiceState.Idle -> {
-                        _state.update { it.copy(isListening = false) }
+                        _state.update { it.copy(isListening = false, speechVolume = 0f) }
                     }
                     is VoiceState.Listening -> {
-                        _state.update { it.copy(isListening = true) }
+                        _state.update { it.copy(isListening = true, speechVolume = voiceState.rmsdB) }
                     }
                     is VoiceState.PartialResult -> {
                         _state.update { it.copy(currentQuery = voiceState.text) }
                     }
                     is VoiceState.FinalResult -> {
-                        _state.update { it.copy(currentQuery = voiceState.text, isListening = false) }
-                        if (voiceState.text.isNotBlank()) {
-                            sendMessage(voiceState.text)
+                        // stopListening() emits FinalResult — store and submit it.
+                        val text = voiceState.text.trim()
+                        _state.update { it.copy(currentQuery = text, speechVolume = 0f) }
+                        if (text.isNotBlank()) {
+                            sendMessage(text)
                         }
                     }
                     is VoiceState.Error -> {
-                        _state.update { it.copy(isListening = false) }
+                        _state.update { it.copy(isListening = false, speechVolume = 0f) }
                         _effect.send(NutriGptVoiceEffect.ShowError(voiceState.message))
                     }
                     is VoiceState.DoneSpeaking -> {
@@ -74,9 +76,13 @@ class NutriGptVoiceViewModel @Inject constructor(
             }
             is NutriGptVoiceEvent.SetListeningState -> {
                 if (event.isListening) {
+                    _state.update { it.copy(currentQuery = "", error = null) }
                     val langCode = if (state.value.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
                     voiceManager.startListening(langCode)
                 } else {
+                    // Mark UI as no longer listening immediately, then let stopListening()
+                    // emit FinalResult which triggers submission below.
+                    _state.update { it.copy(isListening = false) }
                     voiceManager.stopListening()
                 }
             }

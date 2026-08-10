@@ -5,9 +5,13 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +23,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,9 +56,7 @@ fun NutriGptVoiceScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-        } else {
+        if (!isGranted) {
             Toast.makeText(context, "Microphone permission is required", Toast.LENGTH_SHORT).show()
         }
     }
@@ -70,16 +74,14 @@ fun NutriGptVoiceScreen(
         }
     }
 
-    // Auto-start listening when entering screen (if permission granted)
+    // Request permission on startup if not granted
     LaunchedEffect(Unit) {
         val hasPermission = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
         
-        if (hasPermission) {
-            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-        } else {
+        if (!hasPermission) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
@@ -111,7 +113,15 @@ fun NutriGptVoiceScreen(
                         .size(48.dp)
                         .border(1.dp, AppTheme.colors.Primary.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable { viewModel.onNavigateBack() },
+                        .pointerInput(Unit) {
+                            awaitEachGesture {
+                                awaitFirstDown()
+                                viewModel.onNavigateBack()
+                                do {
+                                    val event = awaitPointerEvent()
+                                } while (event.changes.any { it.pressed })
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -189,25 +199,53 @@ fun NutriGptVoiceScreen(
                     .padding(bottom = 48.dp)
             )
 
-            // Main Action Button (Mic / Fast Forward)
+            // Main Action Button (Mic)
+            val animatedScale by animateFloatAsState(
+                targetValue = if (state.isListening) 1f + (state.speechVolume.coerceIn(0f, 10f) / 30f) else 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                ),
+                label = "mic_scale"
+            )
+
             Box(
                 modifier = Modifier
+                    .scale(animatedScale)
                     .size(80.dp)
                     .clip(CircleShape)
                     .background(AppTheme.colors.Primary)
-                    .clickable {
-                        if (state.isListening) {
-                            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
-                        } else if (state.isPlaying || state.isGenerating) {
-                            viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
-                        } else {
-                            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+                    .pointerInput(Unit) {
+                        awaitEachGesture {
+                            awaitFirstDown(requireUnconsumed = false)
+                            val hasPermission = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.RECORD_AUDIO
+                            ) == PackageManager.PERMISSION_GRANTED
+                            
+                            if (hasPermission) {
+                                if (state.isPlaying || state.isGenerating) {
+                                    viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
+                                }
+                                viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+                                
+                                do {
+                                    val event = awaitPointerEvent()
+                                } while (event.changes.any { it.pressed })
+                                
+                                viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                do {
+                                    val event = awaitPointerEvent()
+                                } while (event.changes.any { it.pressed })
+                            }
                         }
                     },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (state.isPlaying || state.isGenerating) Icons.Rounded.FastForward else Icons.Rounded.Mic,
+                    imageVector = Icons.Rounded.Mic,
                     contentDescription = "Action",
                     tint = Color.White,
                     modifier = Modifier.size(36.dp)

@@ -13,5 +13,6 @@ data class NutriGptVoiceState(
     val currentQuery: String = "",
     val answer: String = "",
     val sources: ImmutableList<NutriGptSource> = persistentListOf(),
-    val error: String? = null
+    val error: String? = null,
+    val speechVolume: Float = 0f
 )

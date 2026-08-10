@@ -2,6 +2,7 @@ package iti.grad.nutriscan.presentation.nutrigpt.voice.viewmodel
 
 import app.cash.turbine.test
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -86,17 +87,33 @@ class NutriGptVoiceViewModelTest {
     }
 
     @Test
-    fun `VoiceManager emitting FinalResult triggers SendMessage on success`() = runTest {
+    fun `VoiceManager emitting FinalResult does not send message before release`() = runTest {
+        val finalQuery = "Is apple healthy?"
+        
+        viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+        voiceStateFlow.value = VoiceState.FinalResult(finalQuery)
+        testDispatcher.scheduler.advanceUntilIdle()
+        
+        assertEquals(finalQuery, viewModel.state.value.currentQuery)
+        coVerify(exactly = 0) { sendNutriGptMessageUseCase(any()) }
+    }
+
+    @Test
+    fun `Release after final result sends message`() = runTest {
         val finalQuery = "Is apple healthy?"
         val response = NutriGptMessage(id = "1", text = "Yes, very healthy.", isFromUser = false, sources = emptyList())
         coEvery { sendNutriGptMessageUseCase(finalQuery) } returns Result.success(response)
+
+        viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
         
         voiceStateFlow.value = VoiceState.FinalResult(finalQuery)
+        viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
         testDispatcher.scheduler.advanceUntilIdle()
         
         assertFalse(viewModel.state.value.isGenerating)
         assertTrue(viewModel.state.value.isPlaying)
         assertEquals("Yes, very healthy.", viewModel.state.value.answer)
+        coVerify(exactly = 1) { sendNutriGptMessageUseCase(finalQuery) }
         verify { voiceManager.speak("Yes, very healthy.", "en") }
     }
     
