@@ -562,6 +562,8 @@
     <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
     <string name="scan_history_empty_button">Start Scanning</string>
     <string name="scan_history_error_load">Failed to load history</string>
+    <string name="scan_history_search_hint">Search by product name…</string>
+    <string name="scan_history_search_clear">Clear search</string>
     <!-- Step History -->
     <string name="step_history_title">Step history</string>
     <string name="step_history_daily_average">Daily average</string>

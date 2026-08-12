@@ -9,4 +9,9 @@ sealed interface ScanHistoryEvent {
     data class DateSelected(val dateMillis: Long?) : ScanHistoryEvent
     data class ShowDatePicker(val show: Boolean) : ScanHistoryEvent
     object ResetFilters : ScanHistoryEvent
+    // ── Search ──
+    data class SearchQueryChanged(val query: String) : ScanHistoryEvent
+    data class SuggestionSelected(val suggestion: String) : ScanHistoryEvent
+    object SearchSubmitted : ScanHistoryEvent
+    object SearchCleared : ScanHistoryEvent
 }

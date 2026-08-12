@@ -47,6 +47,11 @@ interface ScanApiService {
         @Query("scanStatus") scanStatus: String? = null
     ): PageDto<ScanHistoryItemDto>
 
+    @GET("v1/scans/suggestions")
+    suspend fun getScanSuggestions(
+        @Query("query") query: String
+    ): List<String>
+
     @PATCH("v1/scans/{scanId}")
     suspend fun updateScan(
         @Path("scanId") scanId: String,

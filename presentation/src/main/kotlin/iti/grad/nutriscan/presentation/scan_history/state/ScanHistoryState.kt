@@ -22,4 +22,9 @@ data class ScanHistoryState(
     val isLastPage: Boolean = false,
     val selectedDate: String? = null,
     val showDatePicker: Boolean = false,
+    // ── Search ──
+    val searchQuery: String = "",
+    val suggestions: ImmutableList<String> = persistentListOf(),
+    val isSuggestionsLoading: Boolean = false,
+    val isSearchActive: Boolean = false,
 )

@@ -105,7 +105,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isHistoryLoading = true, historyError = null) }
             
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { state ->
                         state.copy(

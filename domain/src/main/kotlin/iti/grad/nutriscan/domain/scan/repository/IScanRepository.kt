@@ -42,4 +42,10 @@ interface IScanRepository {
         query: String? = null,
         scanStatus: String? = null,
     ): Result<List<ScanHistoryEntry>>
+
+    /**
+     * Fetch autocomplete suggestions for product name search.
+     * Used in the Scan History search bar with debouncing.
+     */
+    suspend fun getScanSuggestions(query: String): Result<List<String>>
 }

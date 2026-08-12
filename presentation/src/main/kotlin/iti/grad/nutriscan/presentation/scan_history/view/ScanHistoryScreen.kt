@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import iti.grad.nutriscan.presentation.common.components.AppSearchBar
 import iti.grad.nutriscan.presentation.common.components.AppTopHeader
-
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.SelectableChip
@@ -85,7 +85,7 @@ private fun ScanHistoryContent(
             .fillMaxSize()
             .background(AppTheme.colors.Background)
     ) {
-        // ── Custom Top Header (like ProductDetails) ──
+        // ── Top Header ──────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,11 +100,27 @@ private fun ScanHistoryContent(
             )
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Filters
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // ── Search Bar ──────────────────────────────────
+                AppSearchBar(
+                    query = state.searchQuery,
+                    hint = stringResource(R.string.scan_history_search_hint),
+                    suggestions = state.suggestions,
+                    showSuggestions = state.isSearchActive,
+                    isSuggestionsLoading = state.isSuggestionsLoading,
+                    onQueryChange = { onEvent(ScanHistoryEvent.SearchQueryChanged(it)) },
+                    onSuggestionSelected = { onEvent(ScanHistoryEvent.SuggestionSelected(it)) },
+                    onSearchSubmitted = { onEvent(ScanHistoryEvent.SearchSubmitted) },
+                    onClearClicked = { onEvent(ScanHistoryEvent.SearchCleared) },
+                    borderColor = AppTheme.colors.SavedSearchBarBorder,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+
+                // ── Filter Chips ────────────────────────────────
                 FilterRow(
                     selectedFilter = state.selectedFilter,
                     selectedDate = state.selectedDate,
@@ -112,6 +128,7 @@ private fun ScanHistoryContent(
                     onReset = { onEvent(ScanHistoryEvent.ResetFilters) }
                 )
 
+                // ── Content ─────────────────────────────────────
                 if (state.isLoading) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -143,7 +160,7 @@ private fun ScanHistoryContent(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp) // padding for pagination loader
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(
                             items = state.displayedHistoryItems,
@@ -155,7 +172,7 @@ private fun ScanHistoryContent(
                                 modifier = Modifier.padding(vertical = 6.dp)
                             )
                         }
-                        
+
                         if (state.isPaginationLoading) {
                             item {
                                 Box(
@@ -221,7 +238,7 @@ private fun FilterRow(
                 )
             }
         }
-        
+
         items(filters) { (filter, label) ->
             SelectableChip(
                 text = label,

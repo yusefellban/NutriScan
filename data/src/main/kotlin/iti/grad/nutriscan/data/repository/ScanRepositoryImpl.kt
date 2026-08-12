@@ -207,4 +207,14 @@ class ScanRepositoryImpl @Inject constructor(
 
     // ponytail: returns null until scan history is persisted (no scan-history storage exists yet)
     override suspend fun getLastScanDate(): LocalDate? = null
+
+    override suspend fun getScanSuggestions(query: String): Result<List<String>> {
+        return withContext(ioDispatcher) {
+            try {
+                Result.success(scanApiService.getScanSuggestions(query))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 }
