@@ -347,6 +347,7 @@
     <string name="verdict_safe">آمن</string>
     <string name="verdict_caution">حذر</string>
     <string name="verdict_unsafe">غير آمن</string>
+    <string name="verdict_unknown">غير معروف</string>
 
     <!-- Product Details -->
     <string name="product_details_title">تفاصيل المنتج</string>

@@ -344,6 +344,7 @@
     <string name="verdict_safe">Safe</string>
     <string name="verdict_caution">Caution</string>
     <string name="verdict_unsafe">Unsafe</string>
+    <string name="verdict_unknown">Unknown</string>
 
     <!-- Product Details -->
     <string name="product_details_title">Product Details</string>

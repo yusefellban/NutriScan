@@ -119,6 +119,7 @@ class ProductDetailsViewModel @Inject constructor(
             productName = scanResult.productName ?: "Unknown Product",
             brand = "Unknown Brand",
             imageUrl = scanResult.imageUrl ?: "",
+            status = scanResult.status,
             verdict = scanResult.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
             scanDate = scanResult.scannedAt?.let { 
                 try { LocalDate.parse(it.substringBefore("T")) } catch (e: Exception) { LocalDate.now() } 
@@ -143,7 +144,7 @@ class ProductDetailsViewModel @Inject constructor(
     private fun mapToScanResult(detail: ProductDetail): ScanResult {
         return ScanResult(
             scanId = detail.id,
-            status = ScanStatus.COMPLETED,
+            status = detail.status,
             scannedAt = java.time.Instant.now().toString(),
             imageUrl = detail.imageUrl,
             productName = detail.productName,

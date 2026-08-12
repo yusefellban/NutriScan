@@ -16,10 +16,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.presentation.common.components.VerdictBadge
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
@@ -31,6 +33,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ProductInfoHeader(
     productName: String,
+    status: ScanStatus,
     verdict: ProductVerdict,
     scanDate: LocalDate?,
     safetyReasonText: String?,
@@ -84,12 +87,16 @@ fun ProductInfoHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            VerdictBadge(verdict = verdict)
-            Text(
-                text = stringResource(R.string.product_details_for_you),
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.colors.Teal1000,
-            )
+            if (status == ScanStatus.FAILED) {
+                FailedStatusBadge()
+            } else {
+                VerdictBadge(verdict = verdict)
+                Text(
+                    text = stringResource(R.string.product_details_for_you),
+                    style = AppTheme.typography.labelLarge,
+                    color = AppTheme.colors.Teal1000,
+                )
+            }
         }
 
         // ── Safety Reason ──
@@ -114,5 +121,23 @@ fun ProductInfoHeader(
                 color = AppTheme.colors.ProductDetailSafetyReasonText,
             )
         }
+    }
+}
+
+@Composable
+private fun FailedStatusBadge(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(999.dp))
+            .background(AppTheme.colors.VerdictRedBackground)
+            .padding(horizontal = 10.dp, vertical = 5.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.scan_status_failed),
+            style = AppTheme.typography.labelSmall,
+            color = AppTheme.colors.VerdictRedText,
+        )
     }
 }

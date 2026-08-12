@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
@@ -126,17 +127,25 @@ class HomeViewModel @Inject constructor(
 
     private fun mapScansToUi(scans: List<ScanHistoryEntry>): ImmutableList<HistoryItemUiModel> {
         return scans.map { entry ->
-            val verdictType = when (entry.verdict) {
-                ProductVerdict.SAFE -> VerdictType.GREEN
-                ProductVerdict.CAUTION -> VerdictType.YELLOW
-                ProductVerdict.UNSAFE -> VerdictType.RED
-                null -> VerdictType.CYAN
+            val verdictType = if (entry.status == ScanStatus.FAILED) {
+                VerdictType.RED
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> VerdictType.GREEN
+                    ProductVerdict.CAUTION -> VerdictType.YELLOW
+                    ProductVerdict.UNSAFE -> VerdictType.RED
+                    null -> VerdictType.CYAN
+                }
             }
-            val verdictLabelResId = when (entry.verdict) {
-                ProductVerdict.SAFE -> R.string.verdict_safe
-                ProductVerdict.CAUTION -> R.string.verdict_caution
-                ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                null -> R.string.verdict_safe
+            val verdictLabelResId = if (entry.status == ScanStatus.FAILED) {
+                R.string.scan_status_failed
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> R.string.verdict_safe
+                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                    null -> R.string.verdict_unknown
+                }
             }
             
             val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")

@@ -154,6 +154,7 @@ private fun ProductDetailsContent(
                                 // ── Name + Verdict + Safety Text ──
                                 ProductInfoHeader(
                                     productName = product.productName,
+                                    status = product.status,
                                     verdict = product.verdict,
                                     scanDate = product.scanDate,
                                     safetyReasonText = product.safetyReasonText,

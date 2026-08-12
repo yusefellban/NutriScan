@@ -14,6 +14,7 @@ data class ProductDetail(
     val productName: String,
     val brand: String?,
     val imageUrl: String?,
+    val status: ScanStatus,
     val verdict: ProductVerdict,
     val scanDate: LocalDate?,
     val safetyReasonText: String?,

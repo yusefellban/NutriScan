@@ -24,7 +24,9 @@ interface ScanApiService {
     suspend fun getRecentScans(
         @Query("page") page: Int,
         @Query("size") size: Int,
+        @Query("query") query: String? = null,
         @Query("date") date: String? = null,
-        @Query("verdict") verdict: String? = null
+        @Query("verdict") verdict: String? = null,
+        @Query("scanStatus") scanStatus: String? = null
     ): PageDto<ScanHistoryItemDto>
 }
