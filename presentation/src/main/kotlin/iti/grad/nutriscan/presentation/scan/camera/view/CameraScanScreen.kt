@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -139,10 +140,24 @@ fun CameraScanScreen(
         }
     }
 
+    var permissionRequestedFromButton by remember { mutableStateOf(false) }
+    var permissionRequestedAt by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
+        if (!granted && permissionRequestedFromButton) {
+            val timeElapsed = System.currentTimeMillis() - permissionRequestedAt
+            if (timeElapsed < 350) {
+                val intent = Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.packageName, null)
+                )
+                context.startActivity(intent)
+            }
+        }
+        permissionRequestedFromButton = false
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -236,11 +251,21 @@ fun CameraScanScreen(
         }
     }
 
+    val handleEvent: (CameraScanEvent) -> Unit = { event ->
+        if (event == CameraScanEvent.RequestPermissionClicked) {
+            permissionRequestedFromButton = true
+            permissionRequestedAt = System.currentTimeMillis()
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            viewModel.onEvent(event)
+        }
+    }
+
     CameraScanContent(
         state = state,
         imageCapture = imageCapture,
         barcodeAnalyzer = barcodeAnalyzer,
-        onEvent = viewModel::onEvent,
+        onEvent = handleEvent,
         bottomPadding = bottomPadding,
         flashAlpha = flashAlpha.value,
     )
@@ -322,11 +347,7 @@ private fun CameraScanContent(
                 ) {
                     CameraPermissionDeniedContent(
                         onRetry = {
-                            val intent = Intent(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                Uri.fromParts("package", context.packageName, null)
-                            )
-                            context.startActivity(intent)
+                            onEvent(CameraScanEvent.RequestPermissionClicked)
                         },
                     )
                 }
