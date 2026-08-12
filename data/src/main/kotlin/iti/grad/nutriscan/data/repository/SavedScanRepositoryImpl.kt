@@ -139,6 +139,7 @@ class SavedScanRepositoryImpl @Inject constructor(
         scannedAt = scannedAt,
         imageUrl = imageUrl,
         verdict = foodSafetyResponse?.verdict?.name,
+        status = status.name,
         summary = foodSafetyResponse?.summary,
         productName = productName,
         flaggedIngredientsJson = foodSafetyResponse?.flaggedIngredients?.let { ingredients ->
@@ -160,6 +161,7 @@ class SavedScanRepositoryImpl @Inject constructor(
         scannedAt = scannedAt,
         imageUrl = imageUrl,
         verdict = verdict?.name,
+        status = status,
         summary = null,
         productName = productName,
         flaggedIngredientsJson = null,
@@ -199,10 +201,11 @@ class SavedScanRepositoryImpl @Inject constructor(
         }
 
         val parsedVerdict = verdict?.let { runCatching { ProductVerdict.valueOf(it) }.getOrNull() }
+        val parsedStatus = runCatching { ScanStatus.valueOf(status) }.getOrDefault(ScanStatus.COMPLETED)
 
         return ScanResult(
             scanId = scanId,
-            status = ScanStatus.COMPLETED,
+            status = parsedStatus,
             scannedAt = scannedAt,
             imageUrl = imageUrl,
             productName = productName,

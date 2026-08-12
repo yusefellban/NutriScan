@@ -12,6 +12,8 @@ data class ProductUiModel(
     val imageUrl: String?,
     val verdict: ProductVerdict,
     val calories: String,
+    /** True when the scan itself failed (status == "FAILED") — shows a "Failed" badge instead of verdict. */
+    val isFailed: Boolean = false,
     /** How many times this product was logged today — shown as an "x2"-style badge instead of
      * duplicating the card. 1 means no badge. */
     val quantity: Int = 1,
