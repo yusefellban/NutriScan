@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanSuggestionsUseCase
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
 import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.common.model.VerdictType
@@ -16,6 +17,7 @@ import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.presentation.R
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -89,8 +91,11 @@ class ScanHistoryViewModel @Inject constructor(
         _state.update {
             it.copy(
                 searchQuery = suggestion,
-                suggestions = kotlinx.collections.immutable.persistentListOf(),
+                committedQuery = suggestion,
+                suggestions = persistentListOf(),
                 isSearchActive = false,
+                selectedFilter = HistoryFilter.ALL,
+                selectedDate = null,
             )
         }
         loadInitial()
@@ -99,7 +104,8 @@ class ScanHistoryViewModel @Inject constructor(
     private fun handleSearchSubmitted() {
         _state.update {
             it.copy(
-                suggestions = kotlinx.collections.immutable.persistentListOf(),
+                committedQuery = it.searchQuery,
+                suggestions = persistentListOf(),
                 isSearchActive = false,
             )
         }
@@ -107,16 +113,20 @@ class ScanHistoryViewModel @Inject constructor(
     }
 
     private fun handleSearchCleared() {
+        val wasCommitted = _state.value.committedQuery.isNotBlank()
         _state.update {
             it.copy(
                 searchQuery = "",
-                suggestions = kotlinx.collections.immutable.persistentListOf(),
+                committedQuery = "",
+                suggestions = persistentListOf(),
                 isSearchActive = false,
                 isSuggestionsLoading = false,
             )
         }
         _searchQueryFlow.value = ""
-        loadInitial()
+        // Only re-fetch if a real search was previously committed;
+        // otherwise the user just typed without selecting — no need to reload.
+        if (wasCommitted) loadInitial()
     }
 
     /** Watches the raw query flow, debounces 300 ms, then fetches suggestions. */
@@ -141,7 +151,7 @@ class ScanHistoryViewModel @Inject constructor(
                             // Degrade gracefully — no dropdown on network error
                             _state.update {
                                 it.copy(
-                                    suggestions = kotlinx.collections.immutable.persistentListOf(),
+                                    suggestions = persistentListOf(),
                                     isSuggestionsLoading = false,
                                 )
                             }
@@ -178,7 +188,8 @@ class ScanHistoryViewModel @Inject constructor(
                 selectedFilter = HistoryFilter.ALL,
                 selectedDate = null,
                 searchQuery = "",
-                suggestions = kotlinx.collections.immutable.persistentListOf(),
+                committedQuery = "",
+                suggestions = persistentListOf(),
                 isSearchActive = false,
             )
         }
@@ -230,10 +241,12 @@ class ScanHistoryViewModel @Inject constructor(
                     }
                 }
                 .onFailure { error ->
+                    val errorType = throwableToAppErrorType(error)
                     _state.update {
                         it.copy(
                             isLoading = false,
                             error = error.message ?: "Failed to load history",
+                            errorType = errorType,
                         )
                     }
                 }

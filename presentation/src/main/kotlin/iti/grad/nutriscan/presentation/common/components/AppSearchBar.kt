@@ -30,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -83,6 +85,8 @@ fun AppSearchBar(
 ) {
     var textFieldWidth by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(modifier = modifier.fillMaxWidth()) {
         // ── Input Row ─────────────────────────────────────────────
@@ -172,7 +176,11 @@ fun AppSearchBar(
                                 suggestion = suggestion,
                                 query = query,
                                 textColor = textColor,
-                                onClick = { onSuggestionSelected(suggestion) },
+                                onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    onSuggestionSelected(suggestion)
+                                },
                             )
                             if (index < suggestions.lastIndex) {
                                 HorizontalDivider(

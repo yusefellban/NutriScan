@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppSearchBar
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -32,7 +33,7 @@ import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
-import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppSearchBar
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -139,13 +140,9 @@ private fun ScanHistoryContent(
                         }
                     }
                 } else if (state.error != null && state.allHistoryItems.isEmpty()) {
-                    AppEmptyStateWidget(
-                        lightImageRes = R.drawable.no_network_connection_light,
-                        darkImageRes = R.drawable.no_network_connection_dark,
-                        title = stringResource(R.string.offline_state_title),
-                        subtitle = stringResource(R.string.offline_state_subtitle),
-                        buttonText = stringResource(R.string.offline_state_retry),
-                        onButtonClick = { onEvent(ScanHistoryEvent.RetryLoad) },
+                    AppErrorWidget(
+                        errorType = state.errorType,
+                        onRetry = { onEvent(ScanHistoryEvent.RetryLoad) },
                     )
                 } else if (state.displayedHistoryItems.isEmpty()) {
                     AppEmptyStateWidget(

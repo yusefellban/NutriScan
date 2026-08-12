@@ -15,6 +15,8 @@ import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.VerdictType
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.presentation.R
@@ -115,11 +117,12 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 .onFailure { error ->
-                    _state.update { 
+                    _state.update {
                         it.copy(
-                            isHistoryLoading = false, 
-                            historyError = error.message ?: "Failed to load recent scans"
-                        ) 
+                            isHistoryLoading = false,
+                            historyError = error.message ?: "Failed to load recent scans",
+                            historyErrorType = throwableToAppErrorType(error),
+                        )
                     }
                 }
         }
@@ -137,7 +140,12 @@ class HomeViewModel @Inject constructor(
                     _state.update { it.copy(recentHistory = mapScansToUi(scans), historyError = null) }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(historyError = error.message ?: "Failed to load recent scans") }
+                    _state.update {
+                        it.copy(
+                            historyError = error.message ?: "Failed to load recent scans",
+                            historyErrorType = throwableToAppErrorType(error),
+                        )
+                    }
                 }
             _state.update { it.copy(isRefreshing = false) }
         }
