@@ -159,7 +159,7 @@ class HomeViewModel @Inject constructor(
     private fun mapScansToUi(scans: List<ScanHistoryEntry>): ImmutableList<HistoryItemUiModel> {
         return scans.map { entry ->
             val verdictType = if (entry.status == ScanStatus.FAILED) {
-                VerdictType.RED
+                VerdictType.FAILED
             } else {
                 when (entry.verdict) {
                     ProductVerdict.SAFE -> VerdictType.GREEN

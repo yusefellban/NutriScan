@@ -182,8 +182,9 @@ class ScanRepositoryImpl @Inject constructor(
         scanStatus: String?,
     ): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
+            val userId = authRepository.getCurrentUserId()
             val isFiltered = date != null || verdict != null || query != null || scanStatus != null
-            if (!isFiltered && page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
+            if (!isFiltered && page == 0 && localRecentScans != null && localRecentScans!!.size >= size && cachedScansUserId == userId) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
             try {

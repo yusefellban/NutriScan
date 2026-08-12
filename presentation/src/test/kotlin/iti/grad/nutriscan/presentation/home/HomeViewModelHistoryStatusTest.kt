@@ -74,7 +74,7 @@ class HomeViewModelHistoryStatusTest {
 
         val item = viewModel.state.value.recentHistory.first()
         assertEquals(R.string.scan_status_failed, item.verdictLabelResId)
-        assertEquals(VerdictType.RED, item.verdictType)
+        assertEquals(VerdictType.FAILED, item.verdictType)
     }
 
     @Test

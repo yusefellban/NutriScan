@@ -36,8 +36,6 @@ import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
-import iti.grad.nutriscan.presentation.scan_history.state.*
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 @Composable
 fun ScanHistoryScreen(
