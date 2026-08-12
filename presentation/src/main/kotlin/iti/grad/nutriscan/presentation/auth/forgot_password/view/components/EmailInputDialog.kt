@@ -40,6 +40,7 @@ fun EmailInputDialog(
     email: String,
     onEmailChange: (String) -> Unit,
     errorResId: Int? = null,
+    isLoading: Boolean = false,
     onSend: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -109,7 +110,7 @@ fun EmailInputDialog(
 
                     AppButton(
                         textResId = R.string.action_reset_password,
-                        isLoading = false,
+                        isLoading = isLoading,
                         onClick = onSend
                     )
                 }

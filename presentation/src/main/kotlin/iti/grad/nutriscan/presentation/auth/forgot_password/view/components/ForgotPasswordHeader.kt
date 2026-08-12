@@ -66,6 +66,8 @@ fun ForgotPasswordHeader(
             // ── Back button ──────────────────────────────────────────────
             AppBackButton(
                 onClick = onBackClick,
+                iconTint = Color.White,
+                borderColor = Color.White.copy(alpha = 0.2f),
                 modifier = Modifier
                     .padding(start = 24.dp, top = 4.dp)
                     .align(Alignment.TopStart)

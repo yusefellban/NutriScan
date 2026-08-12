@@ -182,6 +182,7 @@ private fun ForgotPasswordScreenContent(
             email = state.email,
             onEmailChange = { onEvent(ForgotPasswordEvent.EmailChanged(it)) },
             errorResId = state.emailErrorResId,
+            isLoading = state.isLoading,
             onSend = { onEvent(ForgotPasswordEvent.SendResetLink) },
             onDismiss = { onEvent(ForgotPasswordEvent.DismissEmailInputDialog) }
         )
