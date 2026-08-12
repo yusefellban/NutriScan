@@ -203,7 +203,7 @@ private fun SuggestionItem(
 
         if (matchStart >= 0 && lowerQuery.isNotEmpty()) {
             append(suggestion.substring(0, matchStart))
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = AppTheme.colors.Primary)) {
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = AppTheme.colors.PrimaryVariant)) {
                 append(suggestion.substring(matchStart, matchStart + lowerQuery.length))
             }
             append(suggestion.substring(matchStart + lowerQuery.length))
