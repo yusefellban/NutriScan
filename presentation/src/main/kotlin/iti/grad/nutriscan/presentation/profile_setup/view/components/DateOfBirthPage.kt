@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.SelectableDates
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -198,7 +198,15 @@ fun DateOfBirthPage(
 
     if (isDatePickerVisible) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = selectedDateMillis ?: Instant.now().toEpochMilli()
+            initialSelectedDateMillis = selectedDateMillis ?: Instant.now().toEpochMilli(),
+            selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return utcTimeMillis <= System.currentTimeMillis()
+                }
+                override fun isSelectableYear(year: Int): Boolean {
+                    return year <= LocalDate.now().year
+                }
+            }
         )
         DatePickerDialog(
             onDismissRequest = { isDatePickerVisible = false },

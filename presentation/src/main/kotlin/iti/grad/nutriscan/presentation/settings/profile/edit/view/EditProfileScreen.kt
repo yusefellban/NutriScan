@@ -78,6 +78,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.Edi
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
 import iti.grad.nutriscan.presentation.common.components.WarningAlert
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
@@ -131,7 +132,16 @@ private fun EditProfileContent(
     onSelectAvatarClick: () -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+            override fun isSelectableYear(year: Int): Boolean {
+                return year <= java.time.LocalDate.now().year
+            }
+        }
+    )
 
     Scaffold(
         containerColor = AppTheme.colors.Background,
