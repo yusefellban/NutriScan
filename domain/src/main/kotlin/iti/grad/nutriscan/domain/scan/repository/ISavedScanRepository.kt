@@ -25,4 +25,16 @@ interface ISavedScanRepository {
      * Retrieve a specific scan by its ID.
      */
     suspend fun getSavedScanById(scanId: String): Result<ScanResult?>
+
+    /**
+     * Retries any save/delete that failed to reach the backend earlier.
+     * Called by the periodic daily-tracking sync worker.
+     */
+    suspend fun retryPendingSync(): Result<Unit>
+
+    /**
+     * Pull-to-refresh entry point: flushes pending saves and re-reads the backend's favorites
+     * immediately, instead of waiting out the background reconcile interval.
+     */
+    suspend fun refresh(): Result<Unit>
 }

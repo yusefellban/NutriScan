@@ -55,8 +55,10 @@ import net.openid.appauth.TokenResponse
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
+    onNavigateToProfileSetup: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit
+    onNavigateToForgotPassword: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -95,8 +97,12 @@ fun LoginScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
+                is LoginEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
                 is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
+                is LoginEffect.NavigateToAccountPendingDeletion -> {
+                    onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
+                }
                 is LoginEffect.LaunchGoogleLogin -> {
                     val serviceConfig = AuthorizationServiceConfiguration(
                         Uri.parse(effect.config.authorizationEndpoint),

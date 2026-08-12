@@ -16,6 +16,17 @@ interface IScanRepository {
     suspend fun submitScanImage(imageFile: File): Result<ScanResult>
 
     /**
+     * Submit a barcode value for AI nutritional analysis (via JSON to /v1/scans/barcode).
+     *
+     * ⚠️ Health-critical: Returns a [ScanResult] whose status will initially be PROCESSING.
+     * The caller MUST poll via [getScanResult] until status is COMPLETED before surfacing
+     * any verdict to the user. Treating a PROCESSING result as safe is a critical failure.
+     *
+     * @param barcode The raw barcode string detected by ML Kit (e.g. "5922157657516").
+     */
+    suspend fun submitBarcodeScan(barcode: String): Result<ScanResult>
+
+    /**
      * Get the result of an ongoing or completed scan.
      */
     suspend fun getScanResult(scanId: String): Result<ScanResult>

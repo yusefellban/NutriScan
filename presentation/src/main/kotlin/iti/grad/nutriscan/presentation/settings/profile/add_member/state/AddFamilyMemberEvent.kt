@@ -10,6 +10,9 @@ sealed interface AddFamilyMemberEvent {
     data class RelationChanged(val relation: String) : AddFamilyMemberEvent
     data class ToggleDisease(val id: Int) : AddFamilyMemberEvent
     data class ToggleAllergy(val id: Int) : AddFamilyMemberEvent
+    data class ImageSelected(val imageFilePath: String) : AddFamilyMemberEvent
+    data object RemoveSelectedImage : AddFamilyMemberEvent
+    data object RetryImageUpload : AddFamilyMemberEvent
     data object RetryLoadDiseases : AddFamilyMemberEvent
     data object RetryLoadAllergies : AddFamilyMemberEvent
     data object SaveClicked : AddFamilyMemberEvent

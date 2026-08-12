@@ -42,6 +42,8 @@ class RegisterViewModelTest {
 
     @Test
     fun `SignUpClicked with mismatching passwords sets error state`() = runTest {
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("John"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("Doe"))
         viewModel.onEvent(RegisterEvent.EmailChanged("test@example.com"))
         viewModel.onEvent(RegisterEvent.PasswordChanged("Pass123"))
         viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged("Pass456"))
@@ -54,12 +56,44 @@ class RegisterViewModelTest {
     }
 
     @Test
+    fun `SignUpClicked with blank first name sets firstNameErrorResId`() = runTest {
+        viewModel.onEvent(RegisterEvent.FirstNameChanged(""))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("Doe"))
+        viewModel.onEvent(RegisterEvent.EmailChanged("test@example.com"))
+        viewModel.onEvent(RegisterEvent.PasswordChanged("Pass123"))
+        viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged("Pass123"))
+
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.firstNameErrorResId != null)
+    }
+
+    @Test
+    fun `SignUpClicked with blank last name sets lastNameErrorResId`() = runTest {
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("John"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged(""))
+        viewModel.onEvent(RegisterEvent.EmailChanged("test@example.com"))
+        viewModel.onEvent(RegisterEvent.PasswordChanged("Pass123"))
+        viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged("Pass123"))
+
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.lastNameErrorResId != null)
+    }
+
+    @Test
     fun `SignUpClicked emits Success alert and calls resendVerificationEmail`() = runTest {
         val email = "test@example.com"
         val password = "Password123"
-        coEvery { registerUseCase(email, password) } returns Result.success(Unit)
+        coEvery { registerUseCase("John", "Doe", email, password) } returns Result.success(Unit)
         coEvery { resendVerificationEmailUseCase(email) } returns Result.success(Unit)
 
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("John"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("Doe"))
         viewModel.onEvent(RegisterEvent.EmailChanged(email))
         viewModel.onEvent(RegisterEvent.PasswordChanged(password))
         viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(password))

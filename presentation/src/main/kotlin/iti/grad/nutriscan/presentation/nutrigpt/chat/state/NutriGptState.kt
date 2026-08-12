@@ -10,7 +10,8 @@ data class NutriGptState(
     val isLoading: Boolean = false,
     val areSourcesExpanded: Boolean = false,
     val chatLanguage: ChatLanguage = ChatLanguage.EN,
-    val isListening: Boolean = false
+    val isListening: Boolean = false,
+    val errorMessageResId: Int? = null
 )
 
 enum class ChatLanguage {

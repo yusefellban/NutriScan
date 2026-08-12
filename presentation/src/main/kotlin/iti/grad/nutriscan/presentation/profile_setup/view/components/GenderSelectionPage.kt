@@ -109,7 +109,7 @@ fun GenderSelectionPage(
                 gender = Gender.MALE,
                 isSelected = selectedGender == Gender.MALE,
                 label = stringResource(R.string.profile_setup_gender_male),
-                cardColor = AppTheme.colors.GenderMaleCardBackground,
+                cardColor = AppTheme.colors.Teal500,
                 labelColor = AppTheme.colors.GenderMaleCardText,
                 svgAssetPath = "ic_male.svg",
                 onClick = { onEvent(ProfileSetupPagerEvent.SelectGender(Gender.MALE)) },
@@ -242,3 +242,4 @@ private fun GenderCard(
         }
     }
 }
+

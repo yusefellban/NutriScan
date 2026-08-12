@@ -2,14 +2,19 @@ package iti.grad.nutriscan.presentation.home
 
 import app.cash.turbine.test
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
+import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.user.model.User
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.common.model.VerdictType
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
-import iti.grad.nutriscan.presentation.home.state.VerdictType
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.Dispatchers
@@ -34,15 +39,23 @@ class HomeViewModelTest {
 
     private lateinit var viewModel: HomeViewModel
     private val userData = MutableStateFlow<User?>(null)
+    private val accountPendingDeletionEvent = kotlinx.coroutines.flow.MutableSharedFlow<String>()
     private val userRepository: IUserRepository = mockk {
         coEvery { fetchAndSyncProfile() } returns Result.success(Unit)
         every { getUserData() } returns userData
+        every { this@mockk.accountPendingDeletionEvent } returns accountPendingDeletionEvent
     }
+    private val getRecentScansUseCase: GetRecentScansUseCase = mockk()
+    private val reconcileTodayUseCase: ReconcileTodayUseCase = mockk()
+    private val syncDailyStreakUseCase: iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase = mockk()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = HomeViewModel(userRepository)
+        coEvery { getRecentScansUseCase(page = 0, size = 3) } returns Result.success(emptyList())
+        coEvery { reconcileTodayUseCase() } returns Result.success(Unit)
+        coEvery { syncDailyStreakUseCase() } returns Result.success(Unit)
+        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase, syncDailyStreakUseCase)
     }
 
     @AfterEach
@@ -51,17 +64,34 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `initial state has correct dummy data`() = runTest(testDispatcher) {
+    fun `initial state before scans load has empty history and no user name`() = runTest(testDispatcher) {
         val state = viewModel.state.value
         assertEquals("", state.userName)
-        assertEquals(3, state.recentHistory.size)
+        assertTrue(state.recentHistory.isEmpty())
+    }
 
-        // Verify first history item details
-        val firstItem = state.recentHistory[0]
+    @Test
+    fun `when recent scans load, history is mapped with correct verdict info`() = runTest(testDispatcher) {
+        coEvery { getRecentScansUseCase(page = 0, size = 3) } returns Result.success(
+            listOf(
+                ScanHistoryEntry(
+                    scanId = "scan_001",
+                    imageUrl = null,
+                    verdict = null,
+                    scannedAt = null,
+                    productName = "Orange Juice",
+                    calories = null,
+                    status = ScanStatus.COMPLETED,
+                )
+            )
+        )
+        viewModel = HomeViewModel(userRepository, getRecentScansUseCase, reconcileTodayUseCase, syncDailyStreakUseCase)
+        testScheduler.advanceUntilIdle()
+
+        val firstItem = viewModel.state.value.recentHistory[0]
         assertEquals("scan_001", firstItem.id)
         assertEquals("Orange Juice", firstItem.productName)
-        assertEquals("Today, 9:24 AM", firstItem.scanDate)
-        assertEquals(R.string.verdict_healthy, firstItem.verdictLabelResId)
+        assertEquals(R.string.verdict_safe, firstItem.verdictLabelResId)
         assertEquals(VerdictType.CYAN, firstItem.verdictType)
     }
 
@@ -119,8 +149,6 @@ class HomeViewModelTest {
         }
     }
 
-
-
     @Test
     fun `when HealthNewsClicked, effect is NavigateToNews`() = runTest(testDispatcher) {
         viewModel.effect.test {
@@ -135,5 +163,27 @@ class HomeViewModelTest {
             viewModel.onEvent(HomeEvent.ChatWithAiClicked)
             assertEquals(HomeEffect.NavigateToChatWithAi, awaitItem())
         }
+    }
+
+    @Test
+    fun `Refreshed re-pulls the feed and clears isRefreshing when it finishes`() = runTest(testDispatcher) {
+        coEvery { getRecentScansUseCase(page = 0, size = 3) } returns Result.success(emptyList())
+
+        viewModel.onEvent(HomeEvent.Refreshed)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.isRefreshing)
+        coVerify { reconcileTodayUseCase() }
+    }
+
+    @Test
+    fun `Refreshed surfaces a failure as historyError instead of leaving the spinner up`() = runTest(testDispatcher) {
+        coEvery { getRecentScansUseCase(page = 0, size = 3) } returns Result.failure(RuntimeException("offline"))
+
+        viewModel.onEvent(HomeEvent.Refreshed)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.isRefreshing)
+        assertEquals("offline", viewModel.state.value.historyError)
     }
 }

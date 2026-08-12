@@ -175,23 +175,26 @@ class NewsViewModelTest {
     }
 
     @Nested
-    @DisplayName("One-shot effects")
+    @DisplayName("One-shot effects and preview state")
     inner class Effects {
 
         @Test
-        fun `ArticleClicked emits OpenArticle with the article's url`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(NewsEvent.ArticleClicked("https://example.com/x"))
-                Assertions.assertEquals(NewsEffect.OpenArticle("https://example.com/x"), awaitItem())
-            }
+        fun `ArticleClicked updates selectedArticle in state`() = runTest {
+            testScheduler.runCurrent()
+            val stateArticle = viewModel.state.value.articles.first()
+            viewModel.onEvent(NewsEvent.ArticleClicked(stateArticle))
+            Assertions.assertEquals(stateArticle, viewModel.state.value.selectedArticle)
         }
 
         @Test
-        fun `ShareClicked emits ShareArticle with the article's url and title`() = runTest {
-            viewModel.effect.test {
-                viewModel.onEvent(NewsEvent.ShareClicked("https://example.com/x", "Title"))
-                Assertions.assertEquals(NewsEffect.ShareArticle("https://example.com/x", "Title"), awaitItem())
-            }
+        fun `CloseArticleClicked clears selectedArticle in state`() = runTest {
+            testScheduler.runCurrent()
+            val stateArticle = viewModel.state.value.articles.first()
+            viewModel.onEvent(NewsEvent.ArticleClicked(stateArticle))
+            Assertions.assertEquals(stateArticle, viewModel.state.value.selectedArticle)
+
+            viewModel.onEvent(NewsEvent.CloseArticleClicked)
+            Assertions.assertNull(viewModel.state.value.selectedArticle)
         }
 
         @Test

@@ -10,7 +10,9 @@ sealed interface HomeEffect {
     data object NavigateToScan : HomeEffect
     data object NavigateToHistory : HomeEffect
     data object NavigateToNotifications : HomeEffect
+    data object NavigateToEditProfile : HomeEffect
     data class NavigateToScanResult(val scanId: String) : HomeEffect
     data object NavigateToNews : HomeEffect
     data object NavigateToChatWithAi : HomeEffect
+    data class NavigateToAccountPendingDeletion(val scheduledDeletionAt: String) : HomeEffect
 }

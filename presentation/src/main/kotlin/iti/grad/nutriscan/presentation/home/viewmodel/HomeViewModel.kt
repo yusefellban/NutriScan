@@ -8,7 +8,9 @@ import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.domain.user.model.AccountPendingDeletionException
 import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
@@ -23,6 +25,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -37,7 +40,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val userRepository: IUserRepository,
     private val getRecentScansUseCase: GetRecentScansUseCase,
-    private val reconcileTodayUseCase: ReconcileTodayUseCase
+    private val reconcileTodayUseCase: ReconcileTodayUseCase,
+    private val syncDailyStreakUseCase: SyncDailyStreakUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(createInitialState())
@@ -50,22 +54,29 @@ class HomeViewModel @Inject constructor(
         loadRecentScans()
 
         viewModelScope.launch {
-            // Trigger fetch from remote on load
-            userRepository.fetchAndSyncProfile()
-        }
-
-        viewModelScope.launch {
             reconcileTodayUseCase()
         }
 
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            syncDailyStreakUseCase()
+        }
+
+        viewModelScope.launch {
+            userRepository.accountPendingDeletionEvent.collectLatest { scheduledDeletionAt ->
+                emitEffect(HomeEffect.NavigateToAccountPendingDeletion(scheduledDeletionAt))
+            }
+        }
+
+        viewModelScope.launch {
+            userRepository.getUserData()
+                .collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(
                             firstName = user.firstName,
                             userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
-                            avatarUrl = user.avatarUrl
+                            avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt
                         )
                     }
                 }
@@ -78,6 +89,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ScanCardClicked -> emitEffect(HomeEffect.NavigateToScan)
             is HomeEvent.ViewAllHistoryClicked -> emitEffect(HomeEffect.NavigateToHistory)
             is HomeEvent.NotificationClicked -> emitEffect(HomeEffect.NavigateToNotifications)
+            is HomeEvent.AvatarClicked -> emitEffect(HomeEffect.NavigateToEditProfile)
             is HomeEvent.HistoryItemClicked -> emitEffect(
                 HomeEffect.NavigateToScanResult(event.itemId)
             )
@@ -85,6 +97,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ChatWithAiClicked -> emitEffect(HomeEffect.NavigateToChatWithAi)
             is HomeEvent.RetryLoadHistory -> loadRecentScans()
             is HomeEvent.RefreshHistorySilently -> refreshHistorySilently()
+            is HomeEvent.Refreshed -> refresh()
         }
     }
 
@@ -109,6 +122,24 @@ class HomeViewModel @Inject constructor(
                         ) 
                     }
                 }
+        }
+    }
+
+    /** Pull-to-refresh: re-pulls both halves of the feed — the scan list and today's tracking —
+     * since the profile header and greeting come from whatever the reconcile writes back. */
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            reconcileTodayUseCase()
+            getRecentScansUseCase(page = 0, size = 3)
+                .onSuccess { scans ->
+                    _state.update { it.copy(recentHistory = mapScansToUi(scans), historyError = null) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(historyError = error.message ?: "Failed to load recent scans") }
+                }
+            _state.update { it.copy(isRefreshing = false) }
         }
     }
 

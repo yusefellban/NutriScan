@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 /**
@@ -42,7 +43,7 @@ fun SettingsActionRow(
             .fillMaxWidth()
             .height(61.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.AppSettingsCardBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .then(
                 if (onClick != null) {
                     Modifier.clickable(
@@ -61,7 +62,7 @@ fun SettingsActionRow(
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.AppSettingsIconContainerBackground.copy(alpha = 0.55f)),
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -75,7 +76,7 @@ fun SettingsActionRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.AppSettingsRowLabel,
+            color = AppTheme.colors.MenuSectionLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
@@ -90,9 +91,10 @@ fun SettingsActionRow(
 @Composable
 private fun DefaultChevron() {
     Icon(
-        painter = painterResource(R.drawable.ic_arrow_right),
+        painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
         contentDescription = null,
         tint = AppTheme.colors.Gray500,
         modifier = Modifier.size(24.dp),
     )
 }
+

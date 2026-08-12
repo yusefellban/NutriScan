@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
-import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
+import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
@@ -39,6 +41,7 @@ import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.graphics.Color
@@ -92,7 +95,7 @@ fun ExercisesScreen(
             Text(
                 text = stringResource(id = R.string.exercises_title),
                 style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.ExerciseScreenTitle,
+                color = AppTheme.colors.TextPrimary,
                 modifier = Modifier.padding(start = 12.dp)
             )
         }
@@ -135,39 +138,44 @@ fun ExercisesScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 state.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = AppTheme.colors.Teal1000
-                    )
-                }
-                state.errorMessageRes != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(
-                            text = stringResource(state.errorMessageRes!!),
-                            style = AppTheme.typography.bodyMedium,
-                            color = AppTheme.colors.TextSecondary,
-                            textAlign = TextAlign.Center
-                        )
-                        Button(
-                            onClick = { viewModel.onEvent(ExercisesEvent.OnRetryClick) },
-                            colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
-                        ) {
-                            Text(text = stringResource(id = R.string.action_retry))
+                        items(6) {
+                            ExerciseListItemShimmerCard()
                         }
                     }
                 }
+                state.errorMessageRes != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        OfflineStateWidget(
+                            onRetry = { viewModel.onEvent(ExercisesEvent.OnRetryClick) }
+                        )
+                    }
+                }
                 state.visibleExercises.isEmpty() -> {
-                    EmptyStateWidget(
-                        message = stringResource(id = R.string.exercises_empty_state),
-                        iconResId = R.drawable.dumbell,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth()
-                    )
+                    Box(
+                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (state.searchQuery.isNotEmpty()) {
+                            SearchNotFoundEmptyStateWidget(
+                                showButton = false
+                            )
+                        } else {
+                            AppEmptyStateWidget(
+                                lightImageRes = R.drawable.search_reasult_not_found_light,
+                                darkImageRes = R.drawable.search_reasult_not_found_dark,
+                                title = stringResource(id = R.string.exercises_empty_state),
+                                subtitle = "",
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
+                            )
+                        }
+                    }
                 }
                 else -> {
                     LazyColumn(

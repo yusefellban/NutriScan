@@ -23,4 +23,7 @@ data class CaloriesState(
     val waterConsumed: Int = 0,
     val waterGoal: Int = 8,
     val isLoading: Boolean = false,
+    /** Drives the pull-to-refresh indicator while [CaloriesEvent.Refreshed]'s backend pull is in
+     * flight — see CaloriesViewModel.refresh. */
+    val isRefreshing: Boolean = false,
 )

@@ -90,25 +90,30 @@ class ProductDetailsViewModel @Inject constructor(
             is ProductDetailsEvent.DismissDeleteBookmark -> {
                 _state.update { it.copy(showDeleteDialog = false) }
             }
+            is ProductDetailsEvent.RetryLoad -> {
+                loadProductDetail()
+            }
         }
     }
 
     private fun loadProductDetail() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, errorMessageResId = null, isNotFound = false) }
             val savedScan = getSavedScanByIdUseCase(scanId).getOrNull()
             
-            if (savedScan != null) {
-                val detail = mapToProductDetail(savedScan).copy(isBookmarked = true)
+            val apiResult = getScanResultUseCase(scanId)
+            val source = apiResult.getOrNull() ?: savedScan
+            
+            val exception = apiResult.exceptionOrNull()
+            val isNotFoundException = exception?.message?.contains("404") == true || exception?.javaClass?.simpleName == "NotFoundException"
+
+            if (source != null) {
+                val detail = mapToProductDetail(source).copy(isBookmarked = savedScan != null)
                 _state.update { it.copy(isLoading = false, productDetail = detail) }
+            } else if (isNotFoundException) {
+                _state.update { it.copy(isLoading = false, isNotFound = true) }
             } else {
-                val apiResult = getScanResultUseCase(scanId).getOrNull()
-                if (apiResult != null) {
-                    val detail = mapToProductDetail(apiResult).copy(isBookmarked = false)
-                    _state.update { it.copy(isLoading = false, productDetail = detail) }
-                } else {
-                    _state.update { it.copy(isLoading = false, error = "Failed to load product details") }
-                }
+                _state.update { it.copy(isLoading = false, errorMessageResId = iti.grad.presentation.R.string.offline_state_title) }
             }
         }
     }
@@ -134,11 +139,23 @@ class ProductDetailsViewModel @Inject constructor(
             } ?: emptyList(),
             calories = scanResult.nutritionFacts?.calories?.toString() ?: "0",
             servingSize = "1",
-            sugar = scanResult.nutritionFacts?.sugarG?.toString() ?: "0",
-            fat = scanResult.nutritionFacts?.fatG?.toString() ?: "0",
-            saturatedFat = "0",
+            protein = scanResult.nutritionFacts?.proteinGrams.format(),
+            carbs = scanResult.nutritionFacts?.carbsGrams.format(),
+            fat = scanResult.nutritionFacts?.fatG.format(),
+            fiber = scanResult.nutritionFacts?.fiberGrams.format(),
+            sugar = scanResult.nutritionFacts?.sugarG.format(),
+            sodium = scanResult.nutritionFacts?.sodiumMg.format(),
             isBookmarked = true
         )
+    }
+
+    /** Backend sends these as decimals ("55.00"), so drop a redundant ".0" before it reaches a pill. */
+    private fun String?.toGrams(): Float =
+        this?.split(" ")?.firstOrNull()?.toFloatOrNull() ?: 0f
+
+    private fun Float?.format(): String {
+        val value = this ?: 0f
+        return if (value % 1f == 0f) value.toLong().toString() else value.toString()
     }
 
     private fun mapToScanResult(detail: ProductDetail): ScanResult {
@@ -162,9 +179,14 @@ class ProductDetailsViewModel @Inject constructor(
             ),
             nutritionFacts = NutritionFacts(
                 calories = detail.calories?.split(" ")?.firstOrNull()?.toLongOrNull() ?: 0L,
-                sugarG = detail.sugar?.split(" ")?.firstOrNull()?.toFloatOrNull() ?: 0f,
-                fatG = detail.fat?.split(" ")?.firstOrNull()?.toFloatOrNull() ?: 0f,
-                proteinGrams = 0f, carbsGrams = 0f, fiberGrams = 0f, sodiumMg = 0f
+                proteinGrams = detail.protein.toGrams(),
+                carbsGrams = detail.carbs.toGrams(),
+                fatG = detail.fat.toGrams(),
+                fiberGrams = detail.fiber.toGrams(),
+                sugarG = detail.sugar.toGrams(),
+                // Bookmarking used to zero every macro except sugar/fat, so a saved product
+                // came back from Room missing most of its nutrition.
+                sodiumMg = detail.sodium.toGrams(),
             )
         )
     }

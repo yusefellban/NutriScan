@@ -33,7 +33,7 @@ fun FlaggedIngredientCard(
                 shape = RoundedCornerShape(12.dp),
             )
             .background(
-                color = AppTheme.colors.ProductDetailIngredientCardBg,
+                color = AppTheme.colors.SurfaceVariant,
                 shape = RoundedCornerShape(12.dp),
             )
             .padding(12.dp),
@@ -42,7 +42,7 @@ fun FlaggedIngredientCard(
         Text(
             text = "- ${ingredient.name}",
             style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.ProductDetailIngredientName,
+            color = AppTheme.colors.Teal1000,
             maxLines = 2,
         )
 
@@ -71,3 +71,5 @@ fun FlaggedIngredientCard(
         )
     }
 }
+
+

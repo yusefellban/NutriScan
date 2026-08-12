@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -134,11 +136,86 @@ class PuffedShape(
     }
 }
 
+/**
+ * Overload that accepts a pre-resolved [text] string instead of a string resource ID.
+ * Useful when the label is already resolved (e.g. passed in from a composable that already
+ * called `stringResource`).
+ */
+@Composable
+fun AppButton(
+    text: String,
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    outlined: Boolean = false,
+) {
+    val puffedShape = remember { PuffedShape(puffHeight = 5.dp, cornerRadius = 14.dp) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 22.dp)
+    ) {
+        if (!outlined) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 17.dp)
+                    .height(7.dp)
+                    .align(Alignment.BottomCenter)
+                    .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(puffedShape)
+                .then(
+                    if (outlined) {
+                        Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary), puffedShape)
+                    } else {
+                        Modifier.background(MaterialTheme.colorScheme.primary)
+                    }
+                )
+                .height(62.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            val contentColor = if (outlined) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Text(
+                    text = text,
+                    fontFamily = LexendDeca,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = contentColor
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun AppButton(
     @StringRes textResId: Int,
     isLoading: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    outlined: Boolean = false,
 ) {
     val puffedShape = remember { PuffedShape(puffHeight = 5.dp, cornerRadius = 14.dp) }
 
@@ -148,25 +225,35 @@ fun AppButton(
             .padding(horizontal = 22.dp)
     ) {
         // Glow ellipse beneath the button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 17.dp)
-                .height(7.dp)
-                .align(Alignment.BottomCenter)
-                .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(50)
-                )
-        )
+        if (!outlined) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 17.dp)
+                    .height(7.dp)
+                    .align(Alignment.BottomCenter)
+                    .blur(15.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+        }
 
         // Puffed button
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(puffedShape)
-                .background(MaterialTheme.colorScheme.primary)
+                .then(
+                    if (outlined) {
+                        Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary), puffedShape)
+                    } else {
+                        Modifier.background(MaterialTheme.colorScheme.primary)
+                    }
+                )
                 .height(62.dp)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -175,9 +262,10 @@ fun AppButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
+            val contentColor = if (outlined) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
             if (isLoading) {
                 CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = contentColor,
                     modifier = Modifier.size(24.dp)
                 )
             } else {
@@ -186,7 +274,7 @@ fun AppButton(
                     fontFamily = LexendDeca,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = contentColor
                 )
             }
         }

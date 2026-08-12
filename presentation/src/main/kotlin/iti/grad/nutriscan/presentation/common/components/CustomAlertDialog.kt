@@ -107,7 +107,7 @@ fun CustomAlertDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(24.dp))
-                            .background(AppTheme.colors.AuthDialogBackground)
+                            .background(AppTheme.colors.Background)
                             .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -200,3 +200,4 @@ fun RowScope.AlertButton(
         )
     }
 }
+

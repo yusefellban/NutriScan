@@ -20,6 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -49,12 +50,15 @@ class UserProfileViewModel @Inject constructor(
     init {
         loadProfileData()
         viewModelScope.launch {
-            userRepository.getUserData().collectLatest { user ->
+            userRepository.getUserData()
+                .catch { /* Ignored */ }
+                .collectLatest { user ->
                 if (user != null) {
                     _state.update {
                         it.copy(
                             userName = "${user.firstName} ${user.lastName ?: ""}".trim(),
                             avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt,
                             bmi = user.bmi,
                             tdee = user.tdee,
                         )
@@ -64,7 +68,7 @@ class UserProfileViewModel @Inject constructor(
         }
         viewModelScope.launch {
             observeStreak().collectLatest { streak ->
-                _state.update { it.copy(streakDays = streak.currentStreak) }
+                _state.update { it.copy(streakDays = streak) }
             }
         }
         viewModelScope.launch {
@@ -72,7 +76,7 @@ class UserProfileViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         familyMembers = members.map { member ->
-                            FamilyMemberUiModel(id = member.id, name = member.name, avatarUrl = null)
+                            FamilyMemberUiModel(id = member.id, name = member.name, avatarUrl = member.imageUrl)
                         }.toPersistentList()
                     )
                 }
@@ -96,8 +100,9 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileEvent.ConfirmRemoveMemberClicked -> confirmMemberRemoval()
             is UserProfileEvent.CancelRemoveMemberClicked -> _state.update { it.copy(memberPendingDeletion = null) }
             is UserProfileEvent.ScanHistoryClicked -> emitEffect(UserProfileEffect.NavigateToScanHistory)
-            is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotifications)
+            is UserProfileEvent.NotificationsClicked -> emitEffect(UserProfileEffect.NavigateToNotificationSettings)
             is UserProfileEvent.SettingsClicked -> emitEffect(UserProfileEffect.NavigateToSettings)
+            is UserProfileEvent.CaloriesHistoryClicked -> emitEffect(UserProfileEffect.NavigateToCaloriesHistory)
             is UserProfileEvent.BottomNavTabClicked -> {
                 // Profile is the only tab rendered by this screen; every other
                 // tab is a separate destination pushed on top, so this retained
@@ -110,6 +115,16 @@ class UserProfileViewModel @Inject constructor(
             }
             UserProfileEvent.DismissAlert -> _state.update { it.copy(alertState = ProfileAlertState.None) }
             UserProfileEvent.RetryAction -> loadProfileData(isUserInitiated = true)
+            UserProfileEvent.Refreshed -> refresh()
+        }
+    }
+
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            userRepository.fetchAndSyncProfile()
+            _state.update { it.copy(isRefreshing = false) }
         }
     }
 

@@ -38,6 +38,7 @@ class ReconcileTodayUseCase @Inject constructor(
                         verdict = ProductVerdict.SAFE,
                         loggedDate = snapshot.date,
                         addedAt = Instant.now(),
+                        mealCnt = meal.mealCnt,
                     )
                 )
             }

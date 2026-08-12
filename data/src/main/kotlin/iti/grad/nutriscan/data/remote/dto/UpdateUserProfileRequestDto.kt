@@ -18,7 +18,6 @@ data class UpdateUserProfileRequestDto(
     val weightKg: Double? = null,
     val diseaseIds: List<Int>? = null,
     val allergyIds: List<Int>? = null,
-    val avatarUrl: String? = null,
     /** Full replace of the family members list — see family-members plan §2. */
     @SerialName("familyMembers") val familyMembers: List<FamilyMemberDto>? = null
 )

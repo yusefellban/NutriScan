@@ -27,8 +27,6 @@ import iti.grad.nutriscan.domain.foodlog.repository.IFoodLogRepository
 import iti.grad.nutriscan.data.repository.FoodLogRepositoryImpl
 import iti.grad.nutriscan.domain.news.repository.INewsRepository
 import iti.grad.nutriscan.data.repository.NewsRepositoryImpl
-import iti.grad.nutriscan.domain.water.repository.IWaterRepository
-import iti.grad.nutriscan.data.repository.WaterRepositoryImpl
 import iti.grad.nutriscan.domain.workout.repository.IWorkoutRepository
 import iti.grad.nutriscan.data.repository.WorkoutRepositoryImpl
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
@@ -49,6 +47,12 @@ import iti.grad.nutriscan.data.repository.SavedScanRepositoryImpl
 import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.data.repository.DailyTrackingRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRepository
+import iti.grad.nutriscan.data.repository.NotificationHistoryRepositoryImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationHistoryRecorder
+import iti.grad.nutriscan.data.repository.NotificationHistoryRecorderImpl
+import iti.grad.nutriscan.domain.notification.repository.INotificationScheduler
+import iti.grad.nutriscan.notification.NotificationSchedulerImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -119,11 +123,6 @@ abstract class RepositoryModule {
         impl: NewsRepositoryImpl
     ): INewsRepository
 
-    @Binds
-    @Singleton
-    abstract fun bindWaterRepository(
-        impl: WaterRepositoryImpl
-    ): IWaterRepository
 
     @Binds
     @Singleton
@@ -184,4 +183,28 @@ abstract class RepositoryModule {
     abstract fun bindDailyTrackingRepository(
         impl: DailyTrackingRepositoryImpl
     ): IDailyTrackingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStepHistoryRepository(
+        impl: iti.grad.nutriscan.data.repository.StepHistoryRepositoryImpl
+    ): iti.grad.nutriscan.domain.steps.history.repository.IStepHistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationHistoryRepository(
+        impl: NotificationHistoryRepositoryImpl
+    ): INotificationHistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationHistoryRecorder(
+        impl: NotificationHistoryRecorderImpl
+    ): INotificationHistoryRecorder
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationScheduler(
+        impl: NotificationSchedulerImpl
+    ): INotificationScheduler
 }

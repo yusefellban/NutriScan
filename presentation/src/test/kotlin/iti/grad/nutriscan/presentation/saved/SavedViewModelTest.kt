@@ -7,13 +7,12 @@ import io.mockk.mockk
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
+import iti.grad.nutriscan.domain.scan.usecase.RefreshSavedScansUseCase
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
-import iti.grad.nutriscan.presentation.common.model.ProductUiModel
-import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -31,6 +30,8 @@ import org.junit.jupiter.api.Test
 class SavedViewModelTest {
 
     private lateinit var addFoodEntryUseCase: AddFoodEntryUseCase
+    private lateinit var getSavedScansUseCase: iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
+    private lateinit var refreshSavedScansUseCase: RefreshSavedScansUseCase
     private lateinit var viewModel: SavedViewModel
     private val testDispatcher = StandardTestDispatcher()
 
@@ -38,7 +39,10 @@ class SavedViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         addFoodEntryUseCase = mockk()
-        viewModel = SavedViewModel(addFoodEntryUseCase)
+        getSavedScansUseCase = mockk()
+        refreshSavedScansUseCase = mockk()
+        coEvery { refreshSavedScansUseCase() } returns Result.success(Unit)
+        viewModel = SavedViewModel(addFoodEntryUseCase, getSavedScansUseCase, refreshSavedScansUseCase)
     }
 
     @AfterEach
@@ -159,5 +163,23 @@ class SavedViewModelTest {
             }
             coVerify(exactly = 0) { addFoodEntryUseCase(any()) }
         }
+    }
+
+    @Test
+    fun `Refreshed re-pulls the backend and clears isRefreshing when it finishes`() = runTest {
+        viewModel.onEvent(SavedEvent.Refreshed)
+        testScheduler.advanceUntilIdle()
+
+        Assertions.assertFalse(viewModel.state.value.isRefreshing)
+        coVerify(exactly = 1) { refreshSavedScansUseCase() }
+    }
+
+    @Test
+    fun `a second Refreshed while one is already running is ignored`() = runTest {
+        viewModel.onEvent(SavedEvent.Refreshed)
+        viewModel.onEvent(SavedEvent.Refreshed)
+        testScheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) { refreshSavedScansUseCase() }
     }
 }

@@ -107,6 +107,21 @@ object ExercisesRoute
 data class ExerciseWorkoutRoute(val exerciseId: String)
 
 @Serializable
+object NewsHomeRoute
+
+@Serializable
+data class NewsDetailRoute(
+    val title: String,
+    val description: String?,
+    val url: String,
+    val imageUrl: String?,
+    val sourceName: String,
+    val publishedAtLabel: String,
+    val author: String?,
+    val category: String,
+)
+
+@Serializable
 object NewsRoute
 
 @Serializable
@@ -114,3 +129,13 @@ object ChatWithAiRoute
 
 @Serializable
 object NutriGptVoiceRoute
+
+@Serializable
+object StepHistoryRoute
+@Serializable
+object NotificationHistoryRoute
+@Serializable
+object CaloriesHistoryRoute
+
+@Serializable
+data class AccountPendingDeletionRoute(val scheduledDeletionAt: String)

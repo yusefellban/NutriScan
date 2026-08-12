@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.Spacer
 import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ForgotPasswordHeader
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.components.ErrorAlert
@@ -60,7 +62,10 @@ fun ForgotPasswordScreen(
                     val message = effect.messageStr
                         ?: effect.messageResId?.let { context.getString(it) }
                         ?: ""
-                    snackbarHostState.showSnackbar(message = message)
+                    snackbarHostState.showAppSnackbar(
+                        message = message,
+                        type = SnackbarType.SUCCESS
+                    )
                 }
             }
         }
@@ -90,7 +95,7 @@ private fun ForgotPasswordScreenContent(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                AppSnackbar(message = data.visuals.message)
+                AppSnackbar(snackbarData = data)
             }
         },
         containerColor = MaterialTheme.colorScheme.background

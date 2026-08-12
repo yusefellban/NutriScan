@@ -15,6 +15,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.presentation.main.calories.stephistory.view.StepHistoryScreen
+import iti.grad.nutriscan.presentation.calories_history.view.CaloriesHistoryScreen
+import iti.grad.nutriscan.presentation.main.calories.view.CaloriesScreen
 import iti.grad.nutriscan.presentation.main.container.view.MainScreen
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 import iti.grad.nutriscan.presentation.auth.login.view.LoginScreen
@@ -30,13 +33,20 @@ import iti.grad.nutriscan.presentation.onboarding.splash.SplashScreen
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.EditProfileScreen
 import iti.grad.nutriscan.presentation.settings.app.view.AppSettingsScreen
+import iti.grad.nutriscan.presentation.settings.help.view.HelpScreen
+import iti.grad.nutriscan.presentation.settings.terms.view.TermsAndConditionsScreen
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
+import iti.grad.nutriscan.presentation.news.home.view.NewsHomeScreen
+import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
+import iti.grad.nutriscan.presentation.news.detail.view.NewsDetailScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.NutriGptVoiceScreen
 import iti.grad.nutriscan.presentation.scan.camera.view.CameraScanScreen
 import iti.grad.nutriscan.presentation.scan_history.view.ScanHistoryScreen
+import iti.grad.nutriscan.presentation.notification_history.view.NotificationHistoryScreen
+import iti.grad.nutriscan.presentation.account_deletion.view.AccountPendingDeletionScreen
 import iti.grad.nutriscan.presentation.exercises.view.ExercisesScreen
 import iti.grad.nutriscan.presentation.exercises.workout.view.ExerciseWorkoutScreen
 import iti.grad.presentation.R
@@ -70,6 +80,16 @@ fun AppNavGraph(
                     navController.navigate(MainRoute()) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
+                },
+                onNavigateToProfileSetup = {
+                    navController.navigate(ProfileSetupPagerRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
                 }
             )
         }
@@ -100,14 +120,13 @@ fun AppNavGraph(
             val route = backStackEntry.toRoute<LoginRoute>()
             LoginScreen(
                 onNavigateToHome = {
-                    if (route.isFromRegistration) {
-                        navController.navigate(ProfileSetupPagerRoute) {
-                            popUpTo(LoginRoute(isFromRegistration = true)) { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(MainRoute()) {
-                            popUpTo(LoginRoute(isFromRegistration = false)) { inclusive = true }
-                        }
+                    navController.navigate(MainRoute()) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
+                    }
+                },
+                onNavigateToProfileSetup = {
+                    navController.navigate(ProfileSetupPagerRoute) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
                     }
                 },
                 onNavigateToRegister = {
@@ -115,6 +134,11 @@ fun AppNavGraph(
                 },
                 onNavigateToForgotPassword = {
                     navController.navigate(ForgotPasswordRoute)
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
+                    }
                 }
             )
         }
@@ -192,14 +216,31 @@ fun AppNavGraph(
                 onNavigateToProductDetail = { scanId ->
                     navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
-                onNavigateToNews = { navController.navigate(NewsRoute) },
+                onNavigateToNews = { navController.navigate(NewsHomeRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
-                onNavigateToNotifications = { navController.navigate(NotificationSettingsRoute) },
+                onNavigateToNotifications = { navController.navigate(NotificationHistoryRoute) },
+                onNavigateToNotificationSettings = { navController.navigate(NotificationSettingsRoute) },
                 onNavigateToEditProfile = { navController.navigate(EditProfileRoute) },
                 onNavigateToFamilyMemberDetail = { _ -> },
                 onNavigateToSettings = { navController.navigate(AppSettingsRoute) },
                 onNavigateToExercises = { navController.navigate(ExercisesRoute) },
+                onNavigateToStepHistory = { navController.navigate(StepHistoryRoute) },
+                onNavigateToCaloriesHistory = { navController.navigate(CaloriesHistoryRoute) },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDeletionAt = scheduledDate)) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<AccountPendingDeletionRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<AccountPendingDeletionRoute>()
+            AccountPendingDeletionScreen(
+                scheduledDeletionAt = route.scheduledDeletionAt,
+                onNavigateToHome = { navController.navigate(MainRoute()) { popUpTo(0) { inclusive = true } } },
+                onNavigateToLogin = { navController.navigate(LoginRoute()) { popUpTo(0) { inclusive = true } } }
             )
         }
 
@@ -312,6 +353,13 @@ fun AppNavGraph(
             )
         }
 
+        composable<NotificationHistoryRoute> {
+            NotificationHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToSettings = { navController.navigate(NotificationSettingsRoute) }
+            )
+        }
+
         // 23. App Settings
         composable<AppSettingsRoute> {
             AppSettingsScreen(
@@ -329,24 +377,18 @@ fun AppNavGraph(
 
 
 
-        // 25. Terms and Conditions (Placeholder)
+        // 25. Terms and Conditions
         composable<TermsAndConditionsRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.app_settings_terms_and_conditions),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            TermsAndConditionsScreen(
+                onNavigateBack = { navController.navigateUp() },
+            )
         }
 
-        // 26. Help (Placeholder)
+        // 26. Help
         composable<HelpRoute> {
-            PlaceholderScreen(
-                title = stringResource(R.string.app_settings_help),
-                buttonText = stringResource(R.string.action_go_back),
-            ) {
-                navController.navigateUp()
-            }
+            HelpScreen(
+                onNavigateBack = { navController.navigateUp() },
+            )
         }
 
 
@@ -380,10 +422,65 @@ fun AppNavGraph(
             )
         }
         
-         // 30. News
+         // 30a. News Home (Landing)
+        composable<NewsHomeRoute> {
+            NewsHomeScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToDiscover = { navController.navigate(NewsRoute) },
+                onNavigateToDetail = { article ->
+                    navController.navigate(
+                        NewsDetailRoute(
+                            title = article.title,
+                            description = article.description,
+                            url = article.url,
+                            imageUrl = article.imageUrl,
+                            sourceName = article.sourceName,
+                            publishedAtLabel = article.publishedAtLabel,
+                            author = article.author,
+                            category = article.category
+                        )
+                    )
+                }
+            )
+        }
+
+         // 30b. News Discover (Search)
         composable<NewsRoute> {
             NewsScreen(
                 onNavigateBack = { navController.navigateUp() },
+                onNavigateToDetail = { article ->
+                    navController.navigate(
+                        NewsDetailRoute(
+                            title = article.title,
+                            description = article.description,
+                            url = article.url,
+                            imageUrl = article.imageUrl,
+                            sourceName = article.sourceName,
+                            publishedAtLabel = article.publishedAtLabel,
+                            author = article.author,
+                            category = article.category
+                        )
+                    )
+                }
+            )
+        }
+
+        // 30c. News Detail Screen
+        composable<NewsDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<NewsDetailRoute>()
+            val article = NewsUiArticle(
+                title = route.title,
+                description = route.description,
+                url = route.url,
+                imageUrl = route.imageUrl,
+                sourceName = route.sourceName,
+                publishedAtLabel = route.publishedAtLabel,
+                author = route.author,
+                category = route.category
+            )
+            NewsDetailScreen(
+                article = article,
+                onNavigateBack = { navController.navigateUp() }
             )
         }
 
@@ -402,8 +499,24 @@ fun AppNavGraph(
             )
         }
 
+        // 33. Step History
+        composable<StepHistoryRoute> {
+            StepHistoryScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
+        }
 
-
+        // 34. Calories History
+        composable<CaloriesHistoryRoute> {
+            CaloriesHistoryScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToAddMeals = {
+                    navController.navigate(MainRoute(initialTab = BottomNavTab.SCAN)) {
+                        popUpTo(MainRoute()) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
 

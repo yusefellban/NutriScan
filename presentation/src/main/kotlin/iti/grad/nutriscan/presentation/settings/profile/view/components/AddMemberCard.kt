@@ -48,7 +48,7 @@ fun AddMemberCard(
             .height(95.dp)
             // No border mentioned in the new specs, so removing it
             .clip(RoundedCornerShape(outerBorderRadius))
-            .background(AppTheme.colors.ProfileAddCardBackground)
+            .background(AppTheme.colors.ScreenSurfaceBackground)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -61,7 +61,7 @@ fun AddMemberCard(
         Icon(
             painter = painterResource(R.drawable.ic_plus),
             contentDescription = null,
-            tint = AppTheme.colors.ProfileAddIconTint,
+            tint = AppTheme.colors.Teal1000,
             modifier = Modifier
 
                 .size(32.dp) // Reduced size
@@ -79,3 +79,5 @@ fun AddMemberCard(
         )
     }
 }
+
+

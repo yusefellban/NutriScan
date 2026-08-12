@@ -13,4 +13,5 @@ data class FoodLogEntry(
     val verdict: ProductVerdict,
     val loggedDate: LocalDate,
     val addedAt: Instant,
+    val mealCnt: Int = 1,
 )

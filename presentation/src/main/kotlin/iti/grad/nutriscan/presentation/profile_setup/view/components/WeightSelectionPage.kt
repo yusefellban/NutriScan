@@ -145,7 +145,7 @@ fun WeightSelectionPage(
         Icon(
             painter = painterResource(R.drawable.ic_selected_arrow),
             contentDescription = null,
-            tint = AppTheme.colors.HeightSelectedCardBackground,
+            tint = AppTheme.colors.Teal500,
             modifier = Modifier.size(width = 16.dp, height = 12.dp)
         )
 
@@ -197,3 +197,4 @@ fun WeightSelectionPage(
         )
     }
 }
+

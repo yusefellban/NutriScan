@@ -12,7 +12,9 @@ import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.family.usecase.AddFamilyMemberUseCase
 import iti.grad.nutriscan.domain.family.usecase.GetFamilyMembersUseCase
+import iti.grad.nutriscan.domain.family.usecase.UploadFamilyMemberImageUseCase
 import iti.grad.nutriscan.domain.family.usecase.UpdateFamilyMemberUseCase
+import iti.grad.nutriscan.domain.family.model.FamilyMember
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEvent
 import kotlinx.collections.immutable.persistentListOf
@@ -45,6 +47,7 @@ class AddFamilyMemberViewModelTest {
     private val syncAllergiesUseCase: SyncAllergiesUseCase = mockk()
     private val addFamilyMemberUseCase: AddFamilyMemberUseCase = mockk()
     private val updateFamilyMemberUseCase: UpdateFamilyMemberUseCase = mockk()
+    private val uploadFamilyMemberImageUseCase: UploadFamilyMemberImageUseCase = mockk()
     private val getFamilyMembersUseCase: GetFamilyMembersUseCase = mockk()
 
     private val diseasesFlow = MutableStateFlow<List<Disease>>(emptyList())
@@ -69,6 +72,7 @@ class AddFamilyMemberViewModelTest {
             syncAllergiesUseCase = syncAllergiesUseCase,
             addFamilyMemberUseCase = addFamilyMemberUseCase,
             updateFamilyMemberUseCase = updateFamilyMemberUseCase,
+            uploadFamilyMemberImageUseCase = uploadFamilyMemberImageUseCase,
             getFamilyMembersUseCase = getFamilyMembersUseCase
         )
     }
@@ -216,5 +220,44 @@ class AddFamilyMemberViewModelTest {
         val state = viewModel.state.value
         assertEquals("Timeout error", state.allergiesErrorMessage)
         assertFalse(state.isAllergiesLoading)
+    }
+
+    @Test
+    fun `when ImageSelected event, selected image path is stored in state`() = runTest(testDispatcher) {
+        val imagePath = "C:/tmp/member_image.jpg"
+
+        viewModel.onEvent(AddFamilyMemberEvent.ImageSelected(imagePath))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(imagePath, viewModel.state.value.selectedImagePath)
+    }
+
+    @Test
+    fun `when editing member and saving with selected image, upload use case is invoked`() = runTest(testDispatcher) {
+        val membersFlow = MutableStateFlow(
+            listOf(
+                FamilyMember(
+                    id = "member-1",
+                    name = "Ahmed",
+                    relation = "Brother",
+                    allergyIds = emptyList(),
+                    diseaseIds = emptyList(),
+                )
+            )
+        )
+        coEvery { getFamilyMembersUseCase() } returns membersFlow
+        coEvery { updateFamilyMemberUseCase(any(), any(), any(), any(), any()) } returns Result.success(Unit)
+        coEvery { uploadFamilyMemberImageUseCase(any(), any()) } returns Result.success(Unit)
+
+        viewModel.onEvent(AddFamilyMemberEvent.Initialize("member-1"))
+        testScheduler.advanceUntilIdle()
+        viewModel.onEvent(AddFamilyMemberEvent.NameChanged("Ahmed"))
+        viewModel.onEvent(AddFamilyMemberEvent.RelationChanged("Brother"))
+        viewModel.onEvent(AddFamilyMemberEvent.ImageSelected("C:/tmp/member_image.jpg"))
+
+        viewModel.onEvent(AddFamilyMemberEvent.SaveClicked)
+        testScheduler.advanceUntilIdle()
+
+        coVerify { uploadFamilyMemberImageUseCase("member-1", any()) }
     }
 }

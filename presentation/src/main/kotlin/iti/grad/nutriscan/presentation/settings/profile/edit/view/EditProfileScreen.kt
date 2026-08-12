@@ -27,9 +27,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.clickable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import iti.grad.nutriscan.presentation.common.components.customShadow
+import iti.grad.nutriscan.presentation.common.components.rememberAvatarImageRequest
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.AvatarUploadState
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Success
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.shape.CircleShape
@@ -60,7 +60,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.Image
 import iti.grad.nutriscan.presentation.common.components.InternetAlert
@@ -106,7 +105,7 @@ fun EditProfileScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
-                viewModel.onEvent(EditProfileEvent.SelectAvatar(uri.toString()))
+                viewModel.onEvent(EditProfileEvent.SelectAvatar(uri))
             }
         }
     )
@@ -212,12 +211,13 @@ private fun EditProfileContent(
                                 .background(AppTheme.colors.ProfileHeaderAccent),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (state.avatarUrl != null) {
+                            val avatarRequest = rememberAvatarImageRequest(
+                                avatarUrl = state.avatarUrl,
+                                avatarUpdatedAt = state.avatarUpdatedAt
+                            )
+                            if (avatarRequest != null) {
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(state.avatarUrl)
-                                        .crossfade(true)
-                                        .build(),
+                                    model = avatarRequest,
                                     contentDescription = stringResource(R.string.user_profile_avatar_description),
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
@@ -230,18 +230,35 @@ private fun EditProfileContent(
                                     modifier = Modifier.size(36.dp)
                                 )
                             }
+
+                            // Uploading overlay — shown while a newly picked photo is being sent to the server.
+                            if (state.avatarUploadState is AvatarUploadState.Uploading) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Black.copy(alpha = 0.35f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(28.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            }
                         }
 
                         // Circular Pencil Button Overlay at Top-Right with White Border
                         if (state.isEditMode) {
+                            val isUploading = state.avatarUploadState is AvatarUploadState.Uploading
                             Box(
                                 modifier = Modifier
                                     .size(28.dp)
                                     .border(width = 2.dp, color = Color.White, shape = CircleShape)
                                     .clip(CircleShape)
-                                    .background(AppTheme.colors.Teal1000)
+                                    .background(if (isUploading) AppTheme.colors.Teal1000.copy(alpha = 0.5f) else AppTheme.colors.Teal1000)
                                     .align(Alignment.TopEnd)
-                                    .clickable { onSelectAvatarClick() }
+                                    .clickable(enabled = !isUploading) { onSelectAvatarClick() }
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_pen),
@@ -346,7 +363,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_chronic_conditions),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -403,7 +420,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_allergies),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -527,6 +544,17 @@ private fun EditProfileContent(
             )
         }
         is None -> Unit
+    }
+
+    // Avatar upload failure — kept separate from the alertState above since it can
+    // surface independently of the Save flow (upload starts as soon as a photo is picked).
+    if (state.avatarUploadState is AvatarUploadState.Error) {
+        InternetAlert(
+            title = stringResource(id = R.string.alert_error_title),
+            message = stringResource(id = R.string.edit_profile_avatar_upload_error),
+            onRetry = { onEvent(EditProfileEvent.RetryAvatarUpload) },
+            onDismiss = { onEvent(EditProfileEvent.DismissAvatarUploadError) }
+        )
     }
 }
 

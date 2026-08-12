@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
+import iti.grad.nutriscan.domain.scan.usecase.RefreshSavedScansUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class SavedViewModel @Inject constructor(
     private val addFoodEntryUseCase: AddFoodEntryUseCase,
     private val getSavedScansUseCase: GetSavedScansUseCase,
+    private val refreshSavedScansUseCase: RefreshSavedScansUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SavedState())
@@ -67,6 +69,10 @@ class SavedViewModel @Inject constructor(
                     addToFoodLog(product)
                 }
             }
+            is SavedEvent.RetryLoad -> {
+                loadSavedScans()
+            }
+            is SavedEvent.Refreshed -> refresh()
         }
     }
 
@@ -88,6 +94,17 @@ class SavedViewModel @Inject constructor(
         }
     }
 
+    /** Re-collecting the Room flow would leak a second collector, so refresh only re-pulls the
+     * backend — Room's own flow pushes whatever changed straight into the list. */
+    private fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            refreshSavedScansUseCase()
+            _state.update { it.copy(isRefreshing = false) }
+        }
+    }
+
     private fun emitEffect(effect: SavedEffect) {
         viewModelScope.launch {
             _effect.send(effect)
@@ -95,6 +112,7 @@ class SavedViewModel @Inject constructor(
     }
 
     private fun loadSavedScans() {
+        _state.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
             getSavedScansUseCase().collect { scans ->
                 val uiModels = scans.map { scan ->
@@ -117,7 +135,9 @@ class SavedViewModel @Inject constructor(
                     }
                     currentState.copy(
                         products = uiModels,
-                        filteredProducts = filtered
+                        filteredProducts = filtered,
+                        isLoading = false,
+                        error = null
                     )
                 }
             }

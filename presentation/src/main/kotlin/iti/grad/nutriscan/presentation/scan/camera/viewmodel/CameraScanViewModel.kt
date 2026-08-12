@@ -6,14 +6,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
+import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
+import iti.grad.nutriscan.domain.scan.usecase.SubmitBarcodeScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SubmitScanImageUseCase
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
+import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.presentation.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -31,10 +35,11 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class CameraScanViewModel @Inject constructor(
     private val submitScanImageUseCase: SubmitScanImageUseCase,
+    private val submitBarcodeScanUseCase: SubmitBarcodeScanUseCase,
     private val getScanResultUseCase: GetScanResultUseCase,
     private val saveScanUseCase: SaveScanUseCase,
     private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
-    private val getSavedScansUseCase: iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
+    private val getSavedScansUseCase: GetSavedScansUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CameraScanState())
@@ -44,6 +49,34 @@ class CameraScanViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     private var currentScanJob: Job? = null
+
+    /** Debounce job for the 1.5 s barcode stability timer. */
+    private var barcodeLockJob: Job? = null
+
+    /**
+     * The barcode value for which a lock timer is currently running.
+     * Used to detect when a different barcode enters the frame mid-timer so we can reset.
+     */
+    private var lastLockedBarcode: String? = null
+
+    /** 
+     * Debounce job for clearing the barcode state. ML Kit often drops detection for a few 
+     * frames. Instead of instantly hiding the AR overlay (causing flashing/trembling), 
+     * we wait 500ms before clearing. 
+     */
+    private var barcodeLossJob: Job? = null
+
+    /** 
+     * Fixed dimensions to prevent the AR overlay from trembling/breathing in size. 
+     * Once caught, the size remains constant but the center follows the barcode. 
+     */
+    private var lockedBoundsWidth: Float? = null
+    private var lockedBoundsHeight: Float? = null
+    private var lastTrackedBarcodeForSize: String? = null
+
+    /** Used by the dead-band filter to prevent micro-jitter in the center point. */
+    private var lastEmittedCenterX: Float? = null
+    private var lastEmittedCenterY: Float? = null
 
     init {
         viewModelScope.launch {
@@ -66,17 +99,55 @@ class CameraScanViewModel @Inject constructor(
 
     fun onEvent(event: CameraScanEvent) {
         when (event) {
-            is CameraScanEvent.PermissionResult -> handlePermissionResult(event.granted)
+            is CameraScanEvent.ModeSelected         -> handleModeSelected(event.mode)
+            is CameraScanEvent.PermissionResult     -> handlePermissionResult(event.granted)
             is CameraScanEvent.RequestPermissionClicked -> requestPermission()
-            is CameraScanEvent.CaptureClicked -> handleCaptureClicked()
-            is CameraScanEvent.ImageCaptured -> handleImageCaptured(event.file)
-            is CameraScanEvent.ImageCaptureFailed -> handleImageCaptureFailed(event.error)
-            is CameraScanEvent.BookmarkClicked -> handleBookmarkClicked()
-            is CameraScanEvent.RetryClicked -> handleRetryClicked()
-            is CameraScanEvent.DismissScanClicked -> handleDismissScanClicked()
-            is CameraScanEvent.CardClicked -> handleCardClicked()
+            is CameraScanEvent.CenterActionClicked  -> handleCenterActionClicked()
+            is CameraScanEvent.GalleryImageSelected -> handleGalleryImageSelected(event.file)
+            is CameraScanEvent.ImageCaptured        -> handleImageCaptured(event.file)
+            is CameraScanEvent.ImageCaptureFailed   -> handleImageCaptureFailed(event.error)
+            is CameraScanEvent.GalleryPickCancelled -> handleGalleryPickCancelled()
+            is CameraScanEvent.GalleryPickFailed    -> handleGalleryPickFailed()
+            is CameraScanEvent.BookmarkClicked      -> handleBookmarkClicked()
+            is CameraScanEvent.RetryClicked         -> handleRetryClicked()
+            is CameraScanEvent.DismissScanClicked   -> handleDismissScanClicked()
+            is CameraScanEvent.CardClicked          -> handleCardClicked()
             is CameraScanEvent.ConfirmDeleteBookmark -> handleConfirmDeleteBookmark()
             is CameraScanEvent.DismissDeleteBookmark -> handleDismissDeleteBookmark()
+            is CameraScanEvent.BarcodeDetected      -> handleBarcodeDetected(event.barcode, event.normalizedBounds)
+            is CameraScanEvent.BarcodeLocked        -> handleBarcodeLocked(event.barcode)
+        }
+    }
+
+    private fun handleModeSelected(mode: ScanInputMode) {
+        val currentMode = _state.value.selectedMode
+        if (currentMode == mode) {
+            if (mode == ScanInputMode.GALLERY) {
+                openGalleryPicker()
+            }
+            return
+        }
+
+        // Cancel any in-flight image scan or barcode lock when switching modes.
+        if (mode == ScanInputMode.GALLERY || mode == ScanInputMode.PHOTO) {
+            currentScanJob?.cancel()
+        }
+        if (mode != ScanInputMode.BARCODE) {
+            clearBarcodeState()
+        }
+
+        _state.update {
+            it.copy(
+                selectedMode = mode,
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = if (mode == ScanInputMode.GALLERY) it.pendingGalleryImagePath else null,
+                detectedBarcodeBounds = null,
+                trackedBarcodeValue = null,
+            )
+        }
+
+        if (mode == ScanInputMode.GALLERY && _state.value.pendingGalleryImagePath == null) {
+            openGalleryPicker()
         }
     }
 
@@ -95,10 +166,29 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
+    private fun handleCenterActionClicked() {
+        val selectedMode = _state.value.selectedMode
+        when (selectedMode) {
+            ScanInputMode.BARCODE,
+            ScanInputMode.PHOTO,
+            -> handleCaptureClicked()
+
+            ScanInputMode.GALLERY -> {
+                val pendingPath = _state.value.pendingGalleryImagePath
+                if (pendingPath.isNullOrBlank()) {
+                    openGalleryPicker()
+                } else {
+                    submitImageFile(File(pendingPath))
+                }
+            }
+        }
+    }
+
     private fun handleCaptureClicked() {
         _state.update {
             it.copy(
                 isScanning = true,
+                isProcessingCenterAction = true,
                 activeScan = ActiveScanUiModel(
                     scanId = "",
                     thumbnailUrl = null,
@@ -111,23 +201,69 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
+    private fun openGalleryPicker() {
+        _state.update { it.copy(isProcessingCenterAction = true) }
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.OpenGalleryPicker)
+        }
+    }
+
     private fun handleImageCaptured(file: File) {
+        submitImageFile(file)
+    }
+
+    private fun handleGalleryImageSelected(file: File) {
         currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isScanning = true,
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = file.absolutePath,
+                // Keep only gallery preview state; do not show scan card until upload is pressed.
+                activeScan = null,
+            )
+        }
+    }
+
+    private fun submitImageFile(file: File) {
+        currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isScanning = true,
+                isProcessingCenterAction = true,
+                activeScan = (state.activeScan ?: ActiveScanUiModel(
+                    scanId = "",
+                    thumbnailUrl = file.absolutePath,
+                    isProcessing = true,
+                )).copy(
+                    thumbnailUrl = file.absolutePath,
+                    isProcessing = true,
+                    isFailed = false,
+                    fullResult = null,
+                ),
+            )
+        }
         currentScanJob = viewModelScope.launch {
             val submitResult = submitScanImageUseCase(file)
             submitResult.onSuccess { scanResult ->
                 val scanId = scanResult.scanId
                 _state.update { state ->
-                    state.copy(activeScan = state.activeScan?.copy(scanId = scanId))
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        // Keep the local gallery path so user can re-upload the same image.
+                        pendingGalleryImagePath = state.pendingGalleryImagePath,
+                        activeScan = state.activeScan?.copy(scanId = scanId),
+                    )
                 }
                 pollScanResult(scanId)
-            }.onFailure { error ->
+            }.onFailure {
                 _state.update { state ->
                     state.copy(
+                        isProcessingCenterAction = false,
                         activeScan = state.activeScan?.copy(
                             isProcessing = false,
-                            isFailed = true
-                        )
+                            isFailed = true,
+                        ),
                     )
                 }
             }
@@ -138,11 +274,55 @@ class CameraScanViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isScanning = false,
-                activeScan = null
+                isProcessingCenterAction = false,
+                activeScan = null,
             )
         }
         viewModelScope.launch {
-            _effect.send(CameraScanEffect.ShowSnackBar("Image capture failed: ${error.message}"))
+            _effect.send(
+                CameraScanEffect.ShowSnackBarRes(
+                    messageResId = R.string.scan_capture_failed_generic,
+                ),
+            )
+        }
+    }
+
+    private fun handleGalleryPickCancelled() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
+        _state.update {
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
+        }
+    }
+
+    private fun handleGalleryPickFailed() {
+        val hasExistingGalleryImage = !_state.value.pendingGalleryImagePath.isNullOrBlank()
+        _state.update {
+            if (hasExistingGalleryImage) {
+                it.copy(
+                    selectedMode = ScanInputMode.GALLERY,
+                    isProcessingCenterAction = false,
+                )
+            } else {
+                it.copy(
+                    selectedMode = ScanInputMode.PHOTO,
+                    isProcessingCenterAction = false,
+                    pendingGalleryImagePath = null,
+                )
+            }
+        }
+        viewModelScope.launch {
+            _effect.send(CameraScanEffect.ShowSnackBarRes(R.string.scan_gallery_pick_failed))
         }
     }
 
@@ -152,31 +332,36 @@ class CameraScanViewModel @Inject constructor(
             result.onSuccess { scanResult ->
                 when (scanResult.status) {
                     ScanStatus.COMPLETED -> {
-                        _state.update { state ->
-                            state.copy(
-                                activeScan = state.activeScan?.copy(
-                                    isProcessing = false,
-                                    thumbnailUrl = scanResult.imageUrl,
-                                    healthTagResId = scanResult.foodSafetyResponse?.verdict?.let {
-                                        when (it) {
-                                           ProductVerdict.SAFE -> R.string.verdict_safe
-                                            ProductVerdict.CAUTION -> R.string.verdict_caution
-                                            ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                                        }
-                                    },
-                                    fullResult = scanResult
-                                )
+                        val finalScan = _state.value.activeScan?.copy(
+                            isProcessing = false,
+                            thumbnailUrl = scanResult.imageUrl,
+                            healthTagResId = scanResult.foodSafetyResponse?.verdict?.let {
+                                when (it) {
+                                    ProductVerdict.SAFE -> R.string.verdict_safe
+                                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                                }
+                            },
+                            fullResult = scanResult
+                        )
+                        _state.update {
+                            it.copy(
+                                activeScan = finalScan,
+                                isProcessingCenterAction = false,
+                                isScanning = false
                             )
                         }
                         return
                     }
                     ScanStatus.FAILED -> {
-                        _state.update { state ->
-                            state.copy(
-                                activeScan = state.activeScan?.copy(
-                                    isProcessing = false,
-                                    isFailed = true
-                                )
+                        val finalScan = _state.value.activeScan?.copy(
+                            isProcessing = false,
+                            isFailed = true
+                        )
+                        _state.update {
+                            it.copy(
+                                activeScan = finalScan,
+                                isProcessingCenterAction = false,
                             )
                         }
                         return
@@ -205,9 +390,12 @@ class CameraScanViewModel @Inject constructor(
                             activeScan = state.activeScan?.copy(isSaved = true)
                         )
                     }
-                    _effect.send(CameraScanEffect.ShowSnackBar("Scan saved to Bookmarks"))
                 } else {
-                    _effect.send(CameraScanEffect.ShowSnackBar("Failed to save scan"))
+                    _effect.send(
+                        CameraScanEffect.ShowSnackBarRes(
+                            messageResId = R.string.scan_save_failed,
+                        ),
+                    )
                 }
             }
         }
@@ -251,18 +439,204 @@ class CameraScanViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isScanning = true,
-                activeScan = null
+                isProcessingCenterAction = false,
+                activeScan = null,
             )
         }
     }
 
     private fun handleDismissScanClicked() {
         currentScanJob?.cancel()
+        clearBarcodeState()
         _state.update {
+            val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
+            val previewToKeep = if (shouldKeepGalleryPreview) {
+                // Keep only local file path; remote thumbnail URL cannot be uploaded as File.
+                it.pendingGalleryImagePath
+            } else {
+                null
+            }
             it.copy(
                 isScanning = true,
-                activeScan = null
+                isProcessingCenterAction = false,
+                pendingGalleryImagePath = previewToKeep,
+                activeScan = null,
+                detectedBarcodeBounds = null,
+                trackedBarcodeValue = null,
             )
         }
+    }
+
+    // ── Barcode scan helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Called on every analysis frame by [BarcodeScanAnalyzer] via [CameraScanEvent.BarcodeDetected].
+     *
+     * Resolves AR trembling/flashing via three strategies:
+     * 1. **Frame-drop tolerance**: ML Kit often misses a frame. We wait 500ms before clearing.
+     * 2. **Fixed size**: We lock the width/height on first detection so it doesn't breathe.
+     * 3. **Dead-band filter**: The center only updates if it moves > 1.5% of the screen.
+     */
+    private fun handleBarcodeDetected(
+        barcode: String?,
+        normalizedBounds: android.graphics.RectF?,
+    ) {
+        if (barcode == null || normalizedBounds == null) {
+            // ML Kit missed a frame. Don't clear instantly to avoid flickering.
+            if (barcodeLossJob == null && _state.value.detectedBarcodeBounds != null) {
+                barcodeLossJob = viewModelScope.launch {
+                    delay(500.milliseconds)
+                    clearBarcodeState()
+                }
+            }
+            return
+        }
+
+        // Barcode detected! Cancel any pending loss job.
+        barcodeLossJob?.cancel()
+        barcodeLossJob = null
+
+        // Reset the cached size if tracking a new/different barcode
+        if (barcode != lastTrackedBarcodeForSize) {
+            lockedBoundsWidth = null
+            lockedBoundsHeight = null
+            lastEmittedCenterX = null
+            lastEmittedCenterY = null
+            lastTrackedBarcodeForSize = barcode
+        }
+
+        // Lock the width and height to the first detected bounds
+        val w = lockedBoundsWidth ?: normalizedBounds.width().also { lockedBoundsWidth = it }
+        val h = lockedBoundsHeight ?: normalizedBounds.height().also { lockedBoundsHeight = it }
+        
+        val cx = normalizedBounds.centerX()
+        val cy = normalizedBounds.centerY()
+        val prevCx = lastEmittedCenterX
+        val prevCy = lastEmittedCenterY
+
+        // Dead-band filter: Only update the center if it moved more than 5% (0.05f)
+        // This makes the AR overlay rock-solid and extremely stable, ignoring all minor shifts.
+        val shouldUpdateCenter = prevCx == null || prevCy == null ||
+            kotlin.math.abs(cx - prevCx) > 0.05f ||
+            kotlin.math.abs(cy - prevCy) > 0.05f
+
+        if (shouldUpdateCenter) {
+            lastEmittedCenterX = cx
+            lastEmittedCenterY = cy
+
+            val stableBounds = android.graphics.RectF(
+                cx - w / 2f,
+                cy - h / 2f,
+                cx + w / 2f,
+                cy + h / 2f,
+            )
+
+            _state.update {
+                it.copy(
+                    detectedBarcodeBounds = stableBounds,
+                    trackedBarcodeValue   = barcode,
+                )
+            }
+        }
+
+        // If a submission is already in-flight, do not start a new lock timer.
+        if (_state.value.isProcessingCenterAction) return
+
+        // Same barcode — let the existing timer finish.
+        if (barcode == lastLockedBarcode && barcodeLockJob?.isActive == true) return
+
+        // New (or changed) barcode — reset the stability timer (1.5s delay).
+        cancelBarcodeLock()
+        lastLockedBarcode = barcode
+        barcodeLockJob = viewModelScope.launch {
+            delay(BARCODE_LOCK_DELAY_MS.milliseconds)
+            onEvent(CameraScanEvent.BarcodeLocked(barcode))
+        }
+    }
+
+    /**
+     * Called after [BARCODE_LOCK_DELAY_MS] of stable detection.
+     * Guards against double-submission if the barcode lock fires while a scan is already running.
+     */
+    private fun handleBarcodeLocked(barcode: String) {
+        if (_state.value.isProcessingCenterAction) return
+        submitBarcode(barcode)
+    }
+
+    /**
+     * Submits [barcode] to the backend via [SubmitBarcodeScanUseCase], then polls for the result.
+     * Mirrors [submitImageFile] in structure — identical state transitions and error handling.
+     */
+    private fun submitBarcode(barcode: String) {
+        currentScanJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                isScanning = false, // FREEZE the camera and AR overlay immediately
+                isProcessingCenterAction = true,
+                trackedBarcodeValue = barcode,
+                activeScan = ActiveScanUiModel(
+                    scanId = "",
+                    thumbnailUrl = null,
+                    isProcessing = true,
+                ),
+            )
+        }
+        currentScanJob = viewModelScope.launch {
+            val result = submitBarcodeScanUseCase(barcode)
+            result.onSuccess { scanResult ->
+                val scanId = scanResult.scanId
+                _state.update { state ->
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        activeScan = state.activeScan?.copy(scanId = scanId),
+                    )
+                }
+                pollScanResult(scanId)
+            }.onFailure {
+                _state.update { state ->
+                    state.copy(
+                        isProcessingCenterAction = false,
+                        activeScan = state.activeScan?.copy(
+                            isProcessing = false,
+                            isFailed = true,
+                        ),
+                    )
+                }
+                _effect.send(
+                    CameraScanEffect.ShowSnackBarRes(
+                        messageResId = R.string.scan_capture_failed_generic,
+                    ),
+                )
+            }
+        }
+    }
+
+    /** Cancels the submission timer, but leaves the visual tracking state intact. */
+    private fun cancelBarcodeLock() {
+        barcodeLockJob?.cancel()
+        barcodeLockJob = null
+        lastLockedBarcode = null
+    }
+
+    /** Fully clears all barcode tracking state, instantly hiding the AR overlay. */
+    private fun clearBarcodeState() {
+        cancelBarcodeLock()
+        barcodeLossJob?.cancel()
+        barcodeLossJob = null
+        lockedBoundsWidth = null
+        lockedBoundsHeight = null
+        lastTrackedBarcodeForSize = null
+        lastEmittedCenterX = null
+        lastEmittedCenterY = null
+        _state.update { it.copy(detectedBarcodeBounds = null, trackedBarcodeValue = null) }
+    }
+
+    companion object {
+        /**
+         * Duration in milliseconds that the same barcode must be continuously detected before
+         * we auto-submit it to the backend. 1 500 ms balances responsiveness with accuracy —
+         * long enough to avoid accidental triggers during a camera sweep.
+         */
+        const val BARCODE_LOCK_DELAY_MS = 1_500L
     }
 }

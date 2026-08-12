@@ -1,22 +1,24 @@
 package iti.grad.nutriscan.presentation.news.view.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,110 +29,121 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import iti.grad.nutriscan.presentation.common.components.customShadow
+import iti.grad.nutriscan.presentation.common.components.shimmerEffect
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
 import iti.grad.presentation.R
 import java.time.Duration
 import java.time.Instant
 
-/**
- * Fixed-size image + flexible text column: the text side is never height-capped, so it
- * grows with the card instead of clipping when the user bumps up system font scale
- * (image stays pinned to its own fixed size at the top).
- */
+private val cardShape = RoundedCornerShape(16.dp)
+
 @Composable
 fun NewsArticleCard(
     article: NewsUiArticle,
     onClick: () -> Unit,
-    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cardShape = RoundedCornerShape(16.dp)
-    val isDark = AppTheme.isDark
-    val titleColor = if (isDark) AppTheme.colors.Teal300 else AppTheme.colors.Gray1600
-    val bylineColor = if (isDark) AppTheme.colors.Teal1200 else AppTheme.colors.Gray600
-    val metaColor = if (isDark) AppTheme.colors.Teal1200 else AppTheme.colors.Gray600
-    val dotsColor = if (isDark) AppTheme.colors.Teal400 else AppTheme.colors.Gray1600
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .customShadow(shape = cardShape, color = AppTheme.colors.Teal1000.copy(alpha = 0.2f), blurRadius = 30f, offsetY = 15f)
             .clip(cardShape)
-            .background(AppTheme.colors.Surface)
+            .border(width = 1.dp, color = AppTheme.colors.NewsCardBorder, shape = cardShape)
+            .background(AppTheme.colors.NewsCardBg)
             .clickable(onClick = onClick)
-            .padding(8.dp),
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        AsyncImage(
-            model = article.imageUrl,
-            contentDescription = article.title,
+        // Thumbnail image — 96dp square, rounded
+        Box(
             modifier = Modifier
-                .size(width = 137.dp, height = 140.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop,
-            error = painterResource(id = R.drawable.ic_scanner),
-            placeholder = painterResource(id = R.drawable.ic_scanner),
-        )
+                .size(96.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(AppTheme.colors.NewsSourceAvatarBg),
+            contentAlignment = Alignment.Center
+        ) {
+            if (!article.imageUrl.isNullOrBlank()) {
+                AsyncImage(
+                    model = article.imageUrl,
+                    contentDescription = article.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_image_placeholder),
+                    contentDescription = null,
+                    tint = AppTheme.colors.NewsCategoryLabel,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        // Right side content
         Column(
             modifier = Modifier
-                .padding(start = 10.dp)
-                .fillMaxWidth()
-                .heightIn(min = 140.dp),
+                .weight(1f)
+                .height(96.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
+            // Category + Title
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = article.title,
-                    style = AppTheme.typography.bodySmall,
-                    color = titleColor,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = article.sourceName,
-                    style = AppTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                    color = AppTheme.colors.Teal600,
+                    text = article.category,
+                    style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = AppTheme.colors.NewsCategoryLabel,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                val author = article.author?.takeIf { it.isNotBlank() }
-                if (author != null) {
-                    Text(
-                        text = stringResource(R.string.news_card_byline, author),
-                        style = AppTheme.typography.bodySmall,
-                        color = bylineColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Text(
+                    text = article.title,
+                    style = AppTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    color = AppTheme.colors.NewsCardTitle,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
 
+            // Source row: person avatar circle + source name + dot + time
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
+                // Teal circle with person icon
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .background(AppTheme.colors.NewsSourceAvatarBg, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_person_solid),
+                        contentDescription = stringResource(id = R.string.news_source_avatar_content_description),
+                        tint = AppTheme.colors.NewsCategoryLabel,
+                        modifier = Modifier.size(10.dp),
+                    )
+                }
+
+                Text(
+                    text = article.sourceName,
+                    style = AppTheme.typography.bodySmall,
+                    color = AppTheme.colors.NewsSourceText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+
+                Text(
+                    text = stringResource(id = R.string.news_source_time_separator),
+                    style = AppTheme.typography.bodySmall,
+                    color = AppTheme.colors.NewsSourceText,
+                )
+
                 Text(
                     text = formatPublishedAt(article.publishedAtLabel),
                     style = AppTheme.typography.bodySmall,
-                    color = metaColor,
+                    color = AppTheme.colors.NewsSourceText,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                Icon(
-                    imageVector = Icons.Filled.MoreHoriz,
-                    contentDescription = stringResource(R.string.news_card_menu_content_description),
-                    tint = dotsColor,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onShareClick,
-                        )
-                        .padding(4.dp),
                 )
             }
         }
@@ -149,5 +162,75 @@ private fun formatPublishedAt(iso: String): String {
         minutesAgo < 60 -> stringResource(R.string.news_time_minutes_ago, minutesAgo.toInt())
         minutesAgo < 24 * 60 -> stringResource(R.string.news_time_hours_ago, (minutesAgo / 60).toInt())
         else -> stringResource(R.string.news_time_days_ago, (minutesAgo / (24 * 60)).toInt())
+    }
+}
+
+@Composable
+fun NewsArticleShimmerCard(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(cardShape)
+            .border(width = 1.dp, color = AppTheme.colors.NewsCardBorder, shape = cardShape)
+            .background(AppTheme.colors.NewsCardBg)
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .shimmerEffect()
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .height(96.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(
+                    modifier = Modifier
+                        .width(50.dp)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .shimmerEffect()
+                )
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
+                )
+            }
+        }
     }
 }

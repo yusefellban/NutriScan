@@ -51,7 +51,7 @@ fun FamilyMembersSection(
         Text(
             text = stringResource(R.string.user_profile_family_members),
             style = AppTheme.typography.titleLarge.copy(fontFamily = PlusJakartaSans),
-            color = AppTheme.colors.Teal1000,
+            color = AppTheme.colors.SectionSubtitle,
             modifier = Modifier.padding(end = 20.dp),
         )
         Spacer(modifier = Modifier.height(12.dp))

@@ -11,4 +11,7 @@ data class AppSettingsState(
     val selectedThemeMode: ThemeMode = ThemeMode.SYSTEM,
     val selectedLanguage: AppLanguage = AppLanguage.EN,
     val showLogoutConfirmDialog: Boolean = false,
+    val showDeleteAccountConfirmDialog: Boolean = false,
+    val isDeletingAccount: Boolean = false,
+    val deleteAccountError: String? = null,
 )

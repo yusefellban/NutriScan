@@ -1,7 +1,7 @@
 package iti.grad.nutriscan.presentation.product_details.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppTopHeader
@@ -34,6 +35,8 @@ import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
+import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
@@ -93,15 +96,24 @@ private fun ProductDetailsContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // ── Top Bar ──
-                AppTopHeader(
-                    title = stringResource(R.string.product_details_title),
-                    onBackClick = { onEvent(ProductDetailsEvent.BackClicked) },
-                    actionIconResId = if (state.productDetail?.isBookmarked == true) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark_outline,
-                    actionIconContentDescription = stringResource(
-                        if (state.productDetail?.isBookmarked == true) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
-                    ),
-                    onActionClick = { onEvent(ProductDetailsEvent.BookmarkToggled) }
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    // Decorative semicircle, same as Home/Profile/Calories/Saved headers.
+                    Image(
+                        painter = painterResource(R.drawable.profile_edge),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
+                        modifier = Modifier.align(Alignment.TopEnd),
+                    )
+                    AppTopHeader(
+                        title = stringResource(R.string.product_details_title),
+                        onBackClick = { onEvent(ProductDetailsEvent.BackClicked) },
+                        actionIconResId = if (state.productDetail?.isBookmarked == true) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark_outline,
+                        actionIconContentDescription = stringResource(
+                            if (state.productDetail?.isBookmarked == true) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
+                        ),
+                        onActionClick = { onEvent(ProductDetailsEvent.BookmarkToggled) }
+                    )
+                }
 
                 // ── White Body Container ──
                 Box(
@@ -124,19 +136,18 @@ private fun ProductDetailsContent(
                             }
                         }
 
-                        state.error != null -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(400.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = state.error,
-                                    color = AppTheme.colors.Error,
-                                    modifier = Modifier.padding(16.dp),
-                                )
-                            }
+                        state.isNotFound -> {
+                            NotFoundStateWidget(
+                                onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
+                                modifier = Modifier.padding(vertical = 48.dp),
+                            )
+                        }
+
+                        state.errorMessageResId != null -> {
+                            OfflineStateWidget(
+                                onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
+                                modifier = Modifier.padding(vertical = 48.dp),
+                            )
                         }
 
                         state.productDetail != null -> {
@@ -174,9 +185,12 @@ private fun ProductDetailsContent(
                                 NutritionFactsRow(
                                     calories = product.calories,
                                     servingSize = product.servingSize,
-                                    sugar = product.sugar,
+                                    protein = product.protein,
+                                    carbs = product.carbs,
                                     fat = product.fat,
-                                    saturatedFat = product.saturatedFat,
+                                    fiber = product.fiber,
+                                    sugar = product.sugar,
+                                    sodium = product.sodium,
                                 )
                                 Spacer(modifier = Modifier.height(32.dp))
                             }

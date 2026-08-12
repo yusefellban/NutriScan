@@ -6,13 +6,11 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
-import androidx.compose.foundation.layout.WindowInsetsSides
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
 import androidx.compose.runtime.LaunchedEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesState
@@ -35,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.WindowInsets
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.presentation.R
@@ -48,21 +44,28 @@ import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
 import androidx.activity.result.contract.ActivityResultContracts
 import iti.grad.nutriscan.presentation.common.components.ConfirmationDialog
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import androidx.compose.ui.platform.LocalContext
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import androidx.compose.foundation.lazy.LazyColumn
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.CaloriesScreenShimmer
 import iti.grad.nutriscan.presentation.common.components.ExerciseCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
 import iti.grad.nutriscan.presentation.common.components.CalorieGoalsPager
-import iti.grad.nutriscan.presentation.common.components.CustomAlertDialog
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import androidx.compose.ui.Modifier
-import iti.grad.nutriscan.presentation.common.components.AlertButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.Text
 
@@ -81,6 +84,7 @@ fun CaloriesScreen(
     onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
     onNavigateToSavedProducts: () -> Unit = {},
     onNavigateToExercises: () -> Unit = {},
+    onNavigateToStepHistory: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarScope = rememberCoroutineScope()
@@ -104,7 +108,10 @@ fun CaloriesScreen(
                 is CaloriesEffect.NavigateToProductDetail -> onNavigateToProductDetail(effect.product)
                 is CaloriesEffect.ShowSnackbar -> {
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(message = context.getString(effect.messageResId))
+                        snackbarHostState.showAppSnackbar(
+                            message = context.getString(effect.messageResId),
+                            type = SnackbarType.ERROR
+                        )
                     }
                 }
 
@@ -119,6 +126,7 @@ fun CaloriesScreen(
         state = state,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
+        onNavigateToStepHistory = onNavigateToStepHistory,
     )
 }
 
@@ -127,14 +135,37 @@ private fun CaloriesContent(
     state: CaloriesState,
     onEvent: (CaloriesEvent) -> Unit,
     bottomPadding: Dp,
+    onNavigateToStepHistory: () -> Unit,
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppTheme.colors.ProfileHeaderBackground),
+    ) {
+        SectionHeroHeader {
+            CaloriesHeroContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 56.dp, bottom = 24.dp),
+            )
+        }
+
+        PullToRefreshShimmerBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onEvent(CaloriesEvent.Refreshed) },
+            shimmer = { CaloriesScreenShimmer(contentPadding = PaddingValues(top = 20.dp, bottom = bottomPadding + 24.dp)) },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(AppTheme.colors.Background),
+        ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(AppTheme.colors.Background)
-                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
+                .fillMaxSize()
                 .padding(horizontal = 22.dp),
-            contentPadding = PaddingValues(bottom = bottomPadding + 24.dp),
+            contentPadding = PaddingValues(top = 20.dp, bottom = bottomPadding + 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {
@@ -211,7 +242,7 @@ private fun CaloriesContent(
                     StepsGaugeCard(
                         steps = state.steps,
                         stepsGoal = state.stepsGoal,
-                        onClick = { onEvent(CaloriesEvent.StepsCardClicked) },
+                        onClick = onNavigateToStepHistory,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
@@ -241,44 +272,33 @@ private fun CaloriesContent(
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
+        }
+    }
 
         if (state.pendingRemoveFoodId != null) {
-            CustomAlertDialog(
+            DeleteWarningAlert(
                 title = stringResource(R.string.food_log_remove_confirm_title),
                 message = stringResource(R.string.food_log_remove_confirm_message),
-                icon = androidx.compose.ui.res.painterResource(id = R.drawable.ic_trash),
-                iconBackgroundColor = AppTheme.colors.ErrorBackground,
-                iconContentColor = AppTheme.colors.Error,
+                confirmText = stringResource(R.string.action_remove),
+                cancelText = stringResource(R.string.action_cancel),
+                onConfirm = { onEvent(CaloriesEvent.RemoveFoodConfirmed) },
                 onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
-            ) {
-                AlertButton(
-                    text = stringResource(R.string.action_cancel),
-                    backgroundColor = AppTheme.colors.SurfaceVariant,
-                    textColor = AppTheme.colors.TextPrimary,
-                    onClick = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
-                )
-                AlertButton(
-                    text = stringResource(R.string.action_remove),
-                    backgroundColor = AppTheme.colors.Error,
-                    textColor = Color.White,
-                    onClick = { onEvent(CaloriesEvent.RemoveFoodConfirmed) }
-                )
-            }
+            )
         }
 }
 
 @SuppressLint("NonObservableLocale")
 @Composable
-private fun CaloriesHeader(caloriesGained: Int) {
+private fun CaloriesHeader(caloriesGained: Int, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(R.string.daily_products),
             style = CaloriesTypography.headerTitle,
-            color = AppTheme.colors.CaloriesAccentTeal1200,
+            color = AppTheme.colors.SectionSubtitle,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
@@ -297,6 +317,33 @@ private fun CaloriesHeader(caloriesGained: Int) {
                 text = stringResource(R.string.calorie_badge),
                 style = CaloriesTypography.badgeText,
                 color = AppTheme.colors.Teal1000,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CaloriesHeroContent(modifier: Modifier = Modifier) {
+    val today = remember {
+        java.time.LocalDate.now().format(
+            java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d"),
+        )
+    }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        HeroHeaderTitle(text = stringResource(R.string.calories_tracking_title))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(AppTheme.colors.ProfileStreakBadgeBackground)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+        ) {
+            Text(
+                text = today,
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.Teal400,
             )
         }
     }

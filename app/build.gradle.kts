@@ -7,11 +7,54 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
+}
+
+
+val makeDummyGoogleServicesJson = run {
+    val googleServicesJson = file("google-services.json")
+    if (!googleServicesJson.exists()) {
+        googleServicesJson.writeText(
+            """
+            {
+              "project_info": {
+                "project_number": "1234567890",
+                "project_id": "dummy-id",
+                "storage_bucket": "dummy.appspot.com"
+              },
+              "client": [
+                {
+                  "client_info": {
+                    "mobilesdk_app_id": "1:1234567890:android:abcdef",
+                    "android_client_info": {
+                      "package_name": "iti.grad.nutriscan"
+                    }
+                  },
+                  "oauth_client": [],
+                  "api_key": [
+                    {
+                      "current_key": "dummy_key"
+                    }
+                  ],
+                  "services": {}
+                }
+              ],
+              "configuration_version": "1"
+            }
+            """.trimIndent()
+        )
+    }
 }
 
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) load(FileInputStream(file))
+}
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) {
+        load(FileInputStream(file))
+    }
 }
 
 android {
@@ -27,7 +70,7 @@ android {
         minSdk = 30
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = libs.versions.appVersionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
@@ -73,6 +116,35 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    signingConfigs {
+        val storeFilePath = keystoreProperties["storeFile"] as? String
+        val storePass = keystoreProperties["storePassword"] as? String
+        val alias = keystoreProperties["keyAlias"] as? String
+        val keyPass = keystoreProperties["keyPassword"] as? String
+
+        if (!storeFilePath.isNullOrEmpty() &&
+            !storePass.isNullOrEmpty() &&
+            !alias.isNullOrEmpty() &&
+            !keyPass.isNullOrEmpty()
+        ) {
+            create("release") {
+                storeFile = file(storeFilePath)
+                storePassword = storePass
+                keyAlias = alias
+                keyPassword = keyPass
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.findByName("release")
+            optimization {
+                enable = false
+            }
+        }
     }
 }
 
@@ -139,6 +211,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.appdistribution.api)
 }
 
 tasks.withType<Test> {

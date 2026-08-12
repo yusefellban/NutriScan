@@ -11,11 +11,16 @@ class ShouldNotifyStreakUseCase @Inject constructor(
     operator fun invoke(
         prefs: NotificationPrefs,
         loggedFoodToday: Boolean,
+        hasStreak: Boolean,
         now: LocalTime,
     ): Boolean {
         if (!prefs.isEnabled(NotificationType.STREAK)) return false
         if (isWithinQuietHours(prefs, now)) return false
         if (loggedFoodToday) return false
+        // The Food reminder at 19:30 already covers "you have logged nothing today". This one
+        // only earns its place when there is an actual streak on the line — and its copy reads
+        // as nonsense at zero.
+        if (!hasStreak) return false
         return now >= EVENING_WARNING_START
     }
 

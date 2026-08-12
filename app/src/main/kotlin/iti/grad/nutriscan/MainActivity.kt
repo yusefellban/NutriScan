@@ -40,6 +40,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.appdistribution.InterruptionLevel
+import com.google.firebase.appdistribution.appDistribution
+import iti.grad.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
 
 import iti.grad.nutriscan.domain.settings.model.AppLanguage
@@ -61,22 +65,11 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
+        Firebase.appDistribution.showFeedbackNotification(
+            R.string.additionalFormText,
+            InterruptionLevel.HIGH)
         setContent {
-            val notificationPermissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission(),
-            ) { /* no-op: workers simply won't be able to post if denied */ }
 
-            LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    val granted = ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS,
-                    ) == PackageManager.PERMISSION_GRANTED
-                    if (!granted) {
-                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-            }
 
             val themeMode by mainActivityViewModel.themeMode.collectAsStateWithLifecycle()
             val darkTheme = when (themeMode) {

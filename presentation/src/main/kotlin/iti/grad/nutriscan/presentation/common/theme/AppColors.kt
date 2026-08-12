@@ -21,18 +21,13 @@ internal data class AppColorsExtension(
     val ProfileHeaderAccent: Color,
     val ProfileSheetBackground: Color,
     val ProfileFamilyBoxBackground: Color,
-    val ProfileMenuRowBackground: Color,
-    val ProfileMenuIconBackground: Color,
     val ProfileMemberCardBackground: Color,
     val ProfileMemberCardBorder: Color,
-    val ProfileAddCardBackground: Color,
     val ProfileAddIconBackground: Color,
-    val ProfileAddIconTint: Color,
     val ProfileAddText: Color,
     val ProfileStreakBadgeBackground: Color,
     val ProfileHeaderEdge: Color,
     val ProfileShowDetailsBackground: Color,
-    val ProfileMenuLabel: Color,
     val ProfileMenuChevron: Color,
     val ProfileAddMemberAvatarBackground: Color,
 
@@ -43,15 +38,12 @@ internal data class AppColorsExtension(
     // --- Gender Selection ---
     val GenderFemaleCardBackground: Color,
     val GenderFemaleCardText: Color,
-    val GenderMaleCardBackground: Color,
     val GenderMaleCardText: Color,
 
     // --- Page Indicator ---
-    val PageIndicatorCurrent: Color,
     val PageIndicatorTotal: Color,
 
     // --- Date of Birth ---
-    val DobCardBackground: Color,
     val DobAgeBadgeBackground: Color,
     val DobAgeBadgeText: Color,
     val DobCardText: Color,
@@ -60,7 +52,6 @@ internal data class AppColorsExtension(
     val DobCalendarIcon: Color,
 
     // --- Height Selection ---
-    val HeightSelectedCardBackground: Color,
     val HeightSelectedCardText: Color,
     val HeightSelectedCardUnitText: Color,
     val HeightUnselectedCardBackground: Color,
@@ -72,7 +63,6 @@ internal data class AppColorsExtension(
 
     // --- Progress Button ---
     val ProgressTrackColor: Color,
-    val ProgressFillColor: Color,
 
     // --- Shadow Colors ---
     val ShadowSelected: Color,
@@ -84,24 +74,15 @@ internal data class AppColorsExtension(
     // --- Product Card ---
     val ProductCardBackground: Color,
     val SavedSearchBarBorder: Color,
-    val SavedSearchIconBackground: Color,
-    val SavedSearchIconTint: Color,
     val ProductCardNameText: Color,
-    val ProductCardVerdictBackground: Color,
-    val ProductCardVerdictText: Color,
     val ProductCardCautionText: Color,
     val ProductCardCaloriesBackground: Color,
     val ProductCardCaloriesText: Color,
-    val ProductCardSwipeIconBackground: Color,
     val ProductCardSwipeContainerBackground: Color,
     val ProductCardSwipeText: Color,
     val ProductCardShadow: Color,
     
     // --- App Settings ---
-    val SaveAlertButtonBackground: Color,
-    val AppSettingsCardBackground: Color,
-    val AppSettingsIconContainerBackground: Color,
-    val AppSettingsRowLabel: Color,
     val AppSettingsToggleContainerBackground: Color,
     val AppSettingsToggleChipSelectedBackground: Color,
     val AppSettingsToggleTextUnselected: Color,
@@ -115,6 +96,7 @@ internal data class AppColorsExtension(
     // they can't be reused where the Figma spec pins an exact literal swatch
     // in both themes. These three are fixed (same value in light and dark).
     val CaloriesAccentTeal1200: Color,
+    val SectionSubtitle: Color,
     val CaloriesMutedTeal: Color,
     val CaloriesIconOnAccent: Color,
     val ExerciseSecondaryText: Color,
@@ -146,8 +128,6 @@ internal data class AppColorsExtension2(
     val ExerciseWorkoutHeaderTitle: Color,
     val ExerciseWorkoutImageBackground: Color,
     val ExerciseWorkoutTimerText: Color,
-    val ExerciseWorkoutSecondaryButton: Color,
-    val ExerciseWorkoutPrimaryButtonBg: Color,
     val ExerciseWorkoutPrimaryButtonText: Color,
     val ExerciseWorkoutTotalTimeLabel: Color,
     val ExerciseSetsRepsCardBg: Color,
@@ -155,11 +135,9 @@ internal data class AppColorsExtension2(
     val ExerciseSetsRepsBtnBg: Color,
     val ExerciseSetsRepsLabelColor: Color,
     val ExerciseSetsRepsValueColor: Color,
-    val ExerciseSetsRepsIconTint: Color,
     val ExerciseReadMoreColor: Color,
 
     // --- Product Details ---
-    val ProductDetailImageCardBg: Color,
     val ProductDetailScanDate: Color,
     val ProductDetailScanDateBadgeBg: Color,
     val ProductDetailScanDateBadgeText: Color,
@@ -167,18 +145,13 @@ internal data class AppColorsExtension2(
     val ProductDetailTitleText: Color,
     val ProductDetailSafetyReasonText: Color,
     val ProductDetailWhyNotSafeText: Color,
-    val ProductDetailIngredientCardBg: Color,
     val ProductDetailIngredientCardBorder: Color,
-    val ProductDetailIngredientName: Color,
     val ProductDetailIngredientReasonText: Color,
-    val ProductDetailFlaggedContainerBg: Color,
     val ProductDetailMatchTag: Color,
     val ProductDetailMatchTagText: Color,
     val ProductDetailNutritionCardBg: Color,
     val ProductDetailNutritionLabelText: Color,
-    val ProductDetailNutritionPill: Color,
     val ProductDetailNutritionText: Color,
-    val ProductDetailBookmarkTint: Color,
 
     // --- Overlays ---
     /** Modal bottom sheet / dialog scrim. Replaces ad-hoc `Color(0x66...)` literals. */
@@ -194,13 +167,67 @@ internal data class AppColorsExtension2(
     val ChatSourceCardBackground: Color,
     val ChatSourceScoreBadge: Color,
     val ChatInputBackground: Color,
-    val ChatInputText: Color,
     val ChatInputPlaceholder: Color,
     val ChatSendButtonBackground: Color,
     val ChatSendButtonIcon: Color,
     val ChatDisclaimerBackground: Color,
     val ChatDisclaimerText: Color,
     val ChatDisclaimerIcon: Color,
+)
+
+@Immutable
+internal data class AppColorsExtension3(
+    // Top Bar & Header
+    val StepHistoryTopBarIconBg: Color,
+    val StepHistoryTitle: Color,
+
+    // Gauge Card
+    val StepHistoryGaugeTrack: Color,
+    val StepHistoryGaugeFill: Color,
+    val StepHistoryGaugeLabelText: Color,
+
+    // Period Chips
+    val StepHistoryChipContainerBg: Color,
+    val StepHistoryChipBgSelected: Color,
+    val StepHistoryChipBgUnselected: Color,
+    val StepHistoryChipTextUnselected: Color,
+
+    // Bar Chart
+    val StepHistoryChartBarBg: Color,
+    val StepHistoryChartBarFill: Color,
+
+    // Summary Cards
+    val StepHistorySummaryIconBg: Color,
+
+    // News Screen Redesign
+    val NewsChipSelectedBg: Color,
+    val NewsChipSelectedText: Color,
+    val NewsChipUnselectedBg: Color,
+    val NewsChipUnselectedBorder: Color,
+    val NewsChipUnselectedText: Color,
+    val NewsCategoryLabel: Color,
+    val NewsCardTitle: Color,
+    val NewsSourceText: Color,
+    val NewsSourceAvatarBg: Color,
+    val NewsSearchBarBorder: Color,
+    val NewsSearchIconTint: Color,
+    val NewsDivider: Color,
+    val NewsScreenTitle: Color,
+    val NewsCardBg: Color,
+    val NewsCardBorder: Color,
+
+    // --- Calories History ---
+    val CaloriesHistoryTopBarIconBg: Color,
+    val CaloriesHistoryTitle: Color,
+    val CaloriesHistoryDateText: Color,
+    val CaloriesHistoryCardBorder: Color,
+    val CaloriesHistoryStatLabel: Color,
+    val CaloriesHistoryStatValue: Color,
+    val CaloriesHistoryStatSecondary: Color,
+    val CaloriesHistoryCalendarIconBg: Color,
+    val CaloriesHistoryCalendarIconTint: Color,
+    val CaloriesHistoryOuterCardBg: Color,
+    val CaloriesHistoryDateChipBg: Color,
 )
 
 @Immutable
@@ -251,6 +278,9 @@ data class AppColors internal constructor(
     val TextPrimary: Color,
     val TextSecondary: Color,
     val Divider: Color,
+    val ScreenSurfaceBackground: Color,
+    val MenuSectionLabel: Color,
+    val MenuIconContainerBackground: Color,
 
     // --- Health Verdicts & Alerts ---
     val VerdictGreen: Color,
@@ -289,10 +319,8 @@ data class AppColors internal constructor(
     val VerdictRedWarningIconTint: Color,
     val HistoryItemDateColor: Color,
     // --- Forgot Password / Auth ---
-    val MethodCardBackground: Color,
     val MethodCardIconBgUnselected: Color,
     val MethodCardIconTintUnselected: Color,
-    val AuthDialogBackground: Color,
     val AuthDialogSubtitle: Color,
 
     // --- Profile Setup ---
@@ -316,15 +344,12 @@ data class AppColors internal constructor(
     // --- Gender Selection ---
     val GenderFemaleCardBackground: Color,
     val GenderFemaleCardText: Color,
-    val GenderMaleCardBackground: Color,
     val GenderMaleCardText: Color,
 
     // --- Page Indicator ---
-    val PageIndicatorCurrent: Color,
     val PageIndicatorTotal: Color,
 
     // --- Date of Birth ---
-    val DobCardBackground: Color,
     val DobAgeBadgeBackground: Color,
     val DobAgeBadgeText: Color,
     val DobCardText: Color,
@@ -333,7 +358,6 @@ data class AppColors internal constructor(
     val DobCalendarIcon: Color,
 
     // --- Height Selection ---
-    val HeightSelectedCardBackground: Color,
     val HeightSelectedCardText: Color,
     val HeightSelectedCardUnitText: Color,
     val HeightUnselectedCardBackground: Color,
@@ -345,7 +369,6 @@ data class AppColors internal constructor(
 
     // --- Progress Button ---
     val ProgressTrackColor: Color,
-    val ProgressFillColor: Color,
 
     // --- Shadow Colors ---
     val ShadowSelected: Color,
@@ -359,23 +382,19 @@ data class AppColors internal constructor(
     // a D8 VerifyError crash from having too many constructor parameters.
     private val extension: AppColorsExtension,
     private val extension2: AppColorsExtension2,
+    private val extension3: AppColorsExtension3,
 ) {
     val ProfileHeaderBackground: Color get() = extension.ProfileHeaderBackground
     val ProfileHeaderAccent: Color get() = extension.ProfileHeaderAccent
     val ProfileSheetBackground: Color get() = extension.ProfileSheetBackground
     val ProfileFamilyBoxBackground: Color get() = extension.ProfileFamilyBoxBackground
-    val ProfileMenuRowBackground: Color get() = extension.ProfileMenuRowBackground
-    val ProfileMenuIconBackground: Color get() = extension.ProfileMenuIconBackground
     val ProfileMemberCardBackground: Color get() = extension.ProfileMemberCardBackground
     val ProfileMemberCardBorder: Color get() = extension.ProfileMemberCardBorder
-    val ProfileAddCardBackground: Color get() = extension.ProfileAddCardBackground
     val ProfileAddIconBackground: Color get() = extension.ProfileAddIconBackground
-    val ProfileAddIconTint: Color get() = extension.ProfileAddIconTint
     val ProfileAddText: Color get() = extension.ProfileAddText
     val ProfileStreakBadgeBackground: Color get() = extension.ProfileStreakBadgeBackground
     val ProfileHeaderEdge: Color get() = extension.ProfileHeaderEdge
     val ProfileShowDetailsBackground: Color get() = extension.ProfileShowDetailsBackground
-    val ProfileMenuLabel: Color get() = extension.ProfileMenuLabel
     val ProfileMenuChevron: Color get() = extension.ProfileMenuChevron
     val ProfileAddMemberAvatarBackground: Color get() = extension.ProfileAddMemberAvatarBackground
     val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
@@ -383,23 +402,14 @@ data class AppColors internal constructor(
 
     val ProductCardBackground: Color get() = extension.ProductCardBackground
     val SavedSearchBarBorder: Color get() = extension.SavedSearchBarBorder
-    val SavedSearchIconBackground: Color get() = extension.SavedSearchIconBackground
-    val SavedSearchIconTint: Color get() = extension.SavedSearchIconTint
     val ProductCardNameText: Color get() = extension.ProductCardNameText
-    val ProductCardVerdictBackground: Color get() = extension.ProductCardVerdictBackground
-    val ProductCardVerdictText: Color get() = extension.ProductCardVerdictText
     val ProductCardCautionText: Color get() = extension.ProductCardCautionText
     val ProductCardCaloriesBackground: Color get() = extension.ProductCardCaloriesBackground
     val ProductCardCaloriesText: Color get() = extension.ProductCardCaloriesText
-    val ProductCardSwipeIconBackground: Color get() = extension.ProductCardSwipeIconBackground
     val ProductCardSwipeContainerBackground: Color get() = extension.ProductCardSwipeContainerBackground
     val ProductCardSwipeText: Color get() = extension.ProductCardSwipeText
     val ProductCardShadow: Color get() = extension.ProductCardShadow
 
-    val AppSettingsCardBackground: Color get() = extension.AppSettingsCardBackground
-    val SaveAlertButtonBackground: Color get() = extension.SaveAlertButtonBackground
-    val AppSettingsIconContainerBackground: Color get() = extension.AppSettingsIconContainerBackground
-    val AppSettingsRowLabel: Color get() = extension.AppSettingsRowLabel
     val AppSettingsToggleContainerBackground: Color get() = extension.AppSettingsToggleContainerBackground
     val AppSettingsToggleChipSelectedBackground: Color get() = extension.AppSettingsToggleChipSelectedBackground
     val AppSettingsToggleTextUnselected: Color get() = extension.AppSettingsToggleTextUnselected
@@ -408,6 +418,7 @@ data class AppColors internal constructor(
     val AppSettingsLogoutIconBackground: Color get() = extension.AppSettingsLogoutIconBackground
 
     val CaloriesAccentTeal1200: Color get() = extension.CaloriesAccentTeal1200
+    val SectionSubtitle: Color get() = extension.SectionSubtitle
     val CaloriesMutedTeal: Color get() = extension.CaloriesMutedTeal
     val CaloriesIconOnAccent: Color get() = extension.CaloriesIconOnAccent
     val ExerciseSecondaryText: Color get() = extension.ExerciseSecondaryText
@@ -433,8 +444,6 @@ data class AppColors internal constructor(
     val ExerciseWorkoutHeaderTitle: Color get() = extension2.ExerciseWorkoutHeaderTitle
     val ExerciseWorkoutImageBackground: Color get() = extension2.ExerciseWorkoutImageBackground
     val ExerciseWorkoutTimerText: Color get() = extension2.ExerciseWorkoutTimerText
-    val ExerciseWorkoutSecondaryButton: Color get() = extension2.ExerciseWorkoutSecondaryButton
-    val ExerciseWorkoutPrimaryButtonBg: Color get() = extension2.ExerciseWorkoutPrimaryButtonBg
     val ExerciseWorkoutPrimaryButtonText: Color get() = extension2.ExerciseWorkoutPrimaryButtonText
     val ExerciseWorkoutTotalTimeLabel: Color get() = extension2.ExerciseWorkoutTotalTimeLabel
     val ExerciseSetsRepsCardBg: Color get() = extension2.ExerciseSetsRepsCardBg
@@ -442,12 +451,10 @@ data class AppColors internal constructor(
     val ExerciseSetsRepsBtnBg: Color get() = extension2.ExerciseSetsRepsBtnBg
     val ExerciseSetsRepsLabelColor: Color get() = extension2.ExerciseSetsRepsLabelColor
     val ExerciseSetsRepsValueColor: Color get() = extension2.ExerciseSetsRepsValueColor
-    val ExerciseSetsRepsIconTint: Color get() = extension2.ExerciseSetsRepsIconTint
     val ExerciseReadMoreColor: Color get() = extension2.ExerciseReadMoreColor
 
 
 
-    val ProductDetailImageCardBg: Color get() = extension2.ProductDetailImageCardBg
     val ProductDetailScanDate: Color get() = extension2.ProductDetailScanDate
     val ProductDetailScanDateBadgeBg: Color get() = extension2.ProductDetailScanDateBadgeBg
     val ProductDetailScanDateBadgeText: Color get() = extension2.ProductDetailScanDateBadgeText
@@ -455,18 +462,13 @@ data class AppColors internal constructor(
     val ProductDetailTitleText: Color get() = extension2.ProductDetailTitleText
     val ProductDetailSafetyReasonText: Color get() = extension2.ProductDetailSafetyReasonText
     val ProductDetailWhyNotSafeText: Color get() = extension2.ProductDetailWhyNotSafeText
-    val ProductDetailIngredientCardBg: Color get() = extension2.ProductDetailIngredientCardBg
     val ProductDetailIngredientCardBorder: Color get() = extension2.ProductDetailIngredientCardBorder
-    val ProductDetailIngredientName: Color get() = extension2.ProductDetailIngredientName
     val ProductDetailIngredientReasonText: Color get() = extension2.ProductDetailIngredientReasonText
-    val ProductDetailFlaggedContainerBg: Color get() = extension2.ProductDetailFlaggedContainerBg
     val ProductDetailMatchTag: Color get() = extension2.ProductDetailMatchTag
     val ProductDetailMatchTagText: Color get() = extension2.ProductDetailMatchTagText
     val ProductDetailNutritionCardBg: Color get() = extension2.ProductDetailNutritionCardBg
     val ProductDetailNutritionLabelText: Color get() = extension2.ProductDetailNutritionLabelText
-    val ProductDetailNutritionPill: Color get() = extension2.ProductDetailNutritionPill
     val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
-    val ProductDetailBookmarkTint: Color get() = extension2.ProductDetailBookmarkTint
     val ScrimOverlay: Color get() = extension2.ScrimOverlay
 
     val ChatScreenBackground: Color get() = extension2.ChatScreenBackground
@@ -478,13 +480,55 @@ data class AppColors internal constructor(
     val ChatSourceCardBackground: Color get() = extension2.ChatSourceCardBackground
     val ChatSourceScoreBadge: Color get() = extension2.ChatSourceScoreBadge
     val ChatInputBackground: Color get() = extension2.ChatInputBackground
-    val ChatInputText: Color get() = extension2.ChatInputText
     val ChatInputPlaceholder: Color get() = extension2.ChatInputPlaceholder
     val ChatSendButtonBackground: Color get() = extension2.ChatSendButtonBackground
     val ChatSendButtonIcon: Color get() = extension2.ChatSendButtonIcon
     val ChatDisclaimerBackground: Color get() = extension2.ChatDisclaimerBackground
     val ChatDisclaimerText: Color get() = extension2.ChatDisclaimerText
     val ChatDisclaimerIcon: Color get() = extension2.ChatDisclaimerIcon
+
+    val StepHistoryTopBarIconBg: Color get() = extension3.StepHistoryTopBarIconBg
+    val StepHistoryTitle: Color get() = extension3.StepHistoryTitle
+    val StepHistoryGaugeTrack: Color get() = extension3.StepHistoryGaugeTrack
+    val StepHistoryGaugeFill: Color get() = extension3.StepHistoryGaugeFill
+    val StepHistoryGaugeLabelText: Color get() = extension3.StepHistoryGaugeLabelText
+    val StepHistoryChipContainerBg: Color get() = extension3.StepHistoryChipContainerBg
+    val StepHistoryChipBgSelected: Color get() = extension3.StepHistoryChipBgSelected
+    val StepHistoryChipBgUnselected: Color get() = extension3.StepHistoryChipBgUnselected
+    val StepHistoryChipTextUnselected: Color get() = extension3.StepHistoryChipTextUnselected
+    val StepHistoryChartBarBg: Color get() = extension3.StepHistoryChartBarBg
+    val StepHistoryChartBarFill: Color get() = extension3.StepHistoryChartBarFill
+    val StepHistorySummaryIconBg: Color get() = extension3.StepHistorySummaryIconBg
+
+    // News Screen Redesign
+    val NewsChipSelectedBg: Color get() = extension3.NewsChipSelectedBg
+    val NewsChipSelectedText: Color get() = extension3.NewsChipSelectedText
+    val NewsChipUnselectedBg: Color get() = extension3.NewsChipUnselectedBg
+    val NewsChipUnselectedBorder: Color get() = extension3.NewsChipUnselectedBorder
+    val NewsChipUnselectedText: Color get() = extension3.NewsChipUnselectedText
+    val NewsCategoryLabel: Color get() = extension3.NewsCategoryLabel
+    val NewsCardTitle: Color get() = extension3.NewsCardTitle
+    val NewsSourceText: Color get() = extension3.NewsSourceText
+    val NewsSourceAvatarBg: Color get() = extension3.NewsSourceAvatarBg
+    val NewsSearchBarBorder: Color get() = extension3.NewsSearchBarBorder
+    val NewsSearchIconTint: Color get() = extension3.NewsSearchIconTint
+    val NewsDivider: Color get() = extension3.NewsDivider
+    val NewsScreenTitle: Color get() = extension3.NewsScreenTitle
+    val NewsCardBg: Color get() = extension3.NewsCardBg
+    val NewsCardBorder: Color get() = extension3.NewsCardBorder
+
+    // Calories History
+    val CaloriesHistoryTopBarIconBg: Color get() = extension3.CaloriesHistoryTopBarIconBg
+    val CaloriesHistoryTitle: Color get() = extension3.CaloriesHistoryTitle
+    val CaloriesHistoryDateText: Color get() = extension3.CaloriesHistoryDateText
+    val CaloriesHistoryCardBorder: Color get() = extension3.CaloriesHistoryCardBorder
+    val CaloriesHistoryStatLabel: Color get() = extension3.CaloriesHistoryStatLabel
+    val CaloriesHistoryStatValue: Color get() = extension3.CaloriesHistoryStatValue
+    val CaloriesHistoryStatSecondary: Color get() = extension3.CaloriesHistoryStatSecondary
+    val CaloriesHistoryCalendarIconBg: Color get() = extension3.CaloriesHistoryCalendarIconBg
+    val CaloriesHistoryCalendarIconTint: Color get() = extension3.CaloriesHistoryCalendarIconTint
+    val CaloriesHistoryOuterCardBg: Color get() = extension3.CaloriesHistoryOuterCardBg
+    val CaloriesHistoryDateChipBg: Color get() = extension3.CaloriesHistoryDateChipBg
 }
 
 /** Light theme color palette. All teal values kept identical to original. */
@@ -532,6 +576,9 @@ fun lightColors() = AppColors(
     TextPrimary = Color(0xFF393C3C),
     TextSecondary = Color(0xFF777777),
     Divider = Color(0xFFE5E5E4),
+    ScreenSurfaceBackground = Color(0xFFF8F8F9), // Gray100
+    MenuSectionLabel = Color(0xFFC0C0C0), // Gray500
+    MenuIconContainerBackground = Color(0xFFD4F1F2), // Teal200
     // Verdicts
     VerdictGreen = Color(0xFF388E3C),
     VerdictYellow = Color(0xFFF9A825),
@@ -561,10 +608,8 @@ fun lightColors() = AppColors(
     VerdictRedWarningIconTint = Color(0xFFF9A825), // VerdictYellow
     HistoryItemDateColor = Color(0xFF898989), // Gray700
     // Forgot Password / Auth
-    MethodCardBackground = Color(0xFFFFFFFF), // White
     MethodCardIconBgUnselected = Color(0xFFE8FAFA), // Teal100
     MethodCardIconTintUnselected = Color(0xFF6A6A6A), // Gray1000
-    AuthDialogBackground = Color(0xFFFFFFFF), // Surface
     AuthDialogSubtitle = Color(0xFF777777), // Gray800
 
     // Profile Setup
@@ -588,15 +633,12 @@ fun lightColors() = AppColors(
     // Gender Selection
     GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
     GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
-    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
     GenderMaleCardText = Color(0xFF0F474A), // Teal1600
 
     // Page Indicator
-    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
     PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
 
     // Date of Birth
-    DobCardBackground = Color(0xFF75DEE3), // Teal500
     DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
     DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
     DobCardText = Color(0xFF0F474A), // Teal1600
@@ -605,7 +647,6 @@ fun lightColors() = AppColors(
     DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
 
     // Height Selection
-    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
     HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
     HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
     HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
@@ -617,7 +658,6 @@ fun lightColors() = AppColors(
 
     // Progress Button
     ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
-    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 
     // Shadows
     ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
@@ -632,18 +672,13 @@ fun lightColors() = AppColors(
         ProfileHeaderAccent = Color(0xFF11939A), // Teal1200 — avatar ring
         ProfileSheetBackground = Color(0xFFFFFFFF), // White — main sheet
         ProfileFamilyBoxBackground = Color(0xFFFFFFFF), // White — dashed container fill
-        ProfileMenuRowBackground = Color(0xFFF8F8F9), // Gray100
-        ProfileMenuIconBackground = Color(0xFFD4F1F2), // Teal200 — icon circle (0.55 alpha in code)
         ProfileMemberCardBackground = Color(0xFFE8FAFA), // Teal100
         ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-        ProfileAddCardBackground = Color(0xFFF8F8F9), // Gray100 — light grey/off-white
         ProfileAddIconBackground = Color(0xFFFFFFFF), // White
-        ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000 — teal "+" icon
         ProfileAddText = Color(0xFF0F474A), // Teal1600
         ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
         ProfileHeaderEdge = Color(0xFF11939A), // Teal1200 — decorative edge shape
         ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
-        ProfileMenuLabel = Color(0xFFC0C0C0), // Gray500
         ProfileMenuChevron = Color(0xFFC0C0C0), // Gray500
         ProfileAddMemberAvatarBackground = Color(0xFF11939A), // Teal1200 - matches settings avatar in light theme
 
@@ -654,15 +689,12 @@ fun lightColors() = AppColors(
         // Gender Selection
         GenderFemaleCardBackground = Color(0xFFFFF1F3), // Red100 equivalent
         GenderFemaleCardText = Color(0xFFFA4D5E), // #FA4D5E
-        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
         GenderMaleCardText = Color(0xFF0F474A), // Teal1600
 
         // Page Indicator
-        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
         PageIndicatorTotal = Color(0xFFA6A5A5), // Gray600
 
         // Date of Birth
-        DobCardBackground = Color(0xFF75DEE3), // Teal500
         DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
         DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
         DobCardText = Color(0xFF0F474A), // Teal1600
@@ -671,7 +703,6 @@ fun lightColors() = AppColors(
         DobCalendarIcon = Color(0xFFE5E5E4), // Gray300
 
         // Height Selection
-        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
         HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
         HeightSelectedCardUnitText = Color(0xFF108188), // Teal1300
         HeightUnselectedCardBackground = Color(0xFFE5E5E4), // Gray300 (Light Gray)
@@ -683,7 +714,6 @@ fun lightColors() = AppColors(
 
         // Progress Button
         ProgressTrackColor = Color(0xFFD4F1F2), // Teal200
-        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 
         // Shadows
         ShadowSelected = Color(0x6613A4AB), // Teal1000/Primary 40% alpha
@@ -695,24 +725,15 @@ fun lightColors() = AppColors(
         // Product Card
         ProductCardBackground = Color(0xFFFFFFFF), // White
         SavedSearchBarBorder = Color(0xFFC0C0C0), // Gray500
-        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
-        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
         ProductCardNameText = Color(0xFF13A4AB), // Teal1000
-        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
-        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
         ProductCardCautionText = Color(0xFF0B5F65), // Teal1400 (matches dark mode surface)
         ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
         ProductCardCaloriesText = Color(0xFF2FC5CC), // Teal700
-        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
         ProductCardSwipeContainerBackground = Color(0xFFF1F1F1), // Gray200
         ProductCardSwipeText = Color(0xFFC0C0C0), // Gray500
         ProductCardShadow = Color(0x3313A4AB), // Teal1000 20% alpha
 
         // App Settings
-        SaveAlertButtonBackground = Color(0xFF13A4AB), // Teal1000
-        AppSettingsCardBackground = Color(0xFFF8F8F9), // Gray100
-        AppSettingsIconContainerBackground = Color(0xFFD4F1F2), // Teal200 (light)
-        AppSettingsRowLabel = Color(0xFFC0C0C0), // Gray500
         AppSettingsToggleContainerBackground = Color(0xFFE5E5E4), // Gray300
         AppSettingsToggleChipSelectedBackground = Color(0xFFFFFFFF), // White
         AppSettingsToggleTextUnselected = Color(0xFF777777), // Gray800
@@ -722,6 +743,7 @@ fun lightColors() = AppColors(
 
         // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
         CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        SectionSubtitle = Color(0xFF11939A), // Teal/1200 — unified title/sub-title color; fixed, identical in both themes (see docs/plans/2026-08-08-unify-section-subtitle-color-v2.md)
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF3E4949), // literal from Figma, light mode only
@@ -750,8 +772,6 @@ fun lightColors() = AppColors(
         ExerciseWorkoutHeaderTitle = Color(0xFF393C3C), // TextPrimary in light mode
         ExerciseWorkoutImageBackground = Color(0x66D4F1F2), // Teal200 with 0.4 alpha
         ExerciseWorkoutTimerText = Color(0xFF393C3C), // TextPrimary
-        ExerciseWorkoutSecondaryButton = Color(0xFF13A4AB), // Primary
-        ExerciseWorkoutPrimaryButtonBg = Color(0xFF13A4AB), // Primary
         ExerciseWorkoutPrimaryButtonText = Color(0xFFFFFFFF), // OnPrimary
         ExerciseWorkoutTotalTimeLabel = Color(0xFF777777), // TextSecondary
         ExerciseSetsRepsCardBg = Color(0x99D4F1F2), // Teal200 with 0.6 alpha
@@ -759,13 +779,11 @@ fun lightColors() = AppColors(
         ExerciseSetsRepsBtnBg = Color(0xFFD4F1F2), // Teal200
         ExerciseSetsRepsLabelColor = Color(0xFF393C3C), // TextPrimary
         ExerciseSetsRepsValueColor = Color(0xFF393C3C), // TextPrimary
-        ExerciseSetsRepsIconTint = Color(0xFF13A4AB), // Primary
         ExerciseReadMoreColor = Color(0xFF13A4AB), // Primary
 
 
 
         // Product Details
-        ProductDetailImageCardBg = Color(0xFFF8F8F9), // Gray100
         ProductDetailScanDate = Color(0xFF898989), // Gray700
         ProductDetailScanDateBadgeBg = Color(0xFFE8FAFA), // Teal100
         ProductDetailScanDateBadgeText = Color(0xFF13A4AB), // Primary (Teal1000)
@@ -775,21 +793,16 @@ fun lightColors() = AppColors(
         ProductDetailSafetyReasonText = Color(0xFF777777), // Gray800
         ProductDetailWhyNotSafeText = Color(0xFF393C3C), // Gray1600
 
-        ProductDetailIngredientCardBg = Color(0xFFF8F8F9), // Gray100
         ProductDetailIngredientCardBorder = Color(0xFFE5E5E5), // Lighter border? or transparent
-        ProductDetailIngredientName = Color(0xFF13A4AB), // Teal1000
         ProductDetailIngredientReasonText = Color(0xFF757575), // Gray600
-        ProductDetailFlaggedContainerBg = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailMatchTag = Color(0xFFC0C0C0), // Gray500
         ProductDetailMatchTagText = Color(0xFFF8F8F9), // Gray100
 
         ProductDetailNutritionCardBg = Color(0xFFF8F8F9), // Gray100
         ProductDetailNutritionLabelText = Color(0xFF777777), // Gray800
-        ProductDetailNutritionPill = Color(0xFF13A4AB), // Teal1000
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
-        ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
 
         ScrimOverlay = Color(0x660F474A), // Teal1600 40% alpha — light mode scrim
         
@@ -803,13 +816,60 @@ fun lightColors() = AppColors(
         ChatSourceCardBackground = Color(0xFFE8FAFA), // Teal100
         ChatSourceScoreBadge = Color.Transparent, // No background in light mode
         ChatInputBackground = Color(0xFFFFFFFF), // White
-        ChatInputText = Color(0xFF393C3C), // Gray1600
         ChatInputPlaceholder = Color(0xFFA6A5A5), // Gray600
         ChatSendButtonBackground = Color(0xFFD6D6D5), // Gray400
         ChatSendButtonIcon = Color(0xFFFFFFFF), // White
         ChatDisclaimerBackground = Color(0xFFF8F8F9), // Gray100
         ChatDisclaimerText = Color(0xFF777777), // Gray800
         ChatDisclaimerIcon = Color(0xFF13A4AB), // Teal1000
+    ),
+    extension3 = AppColorsExtension3(
+        StepHistoryTopBarIconBg = Color(0xFFD4F1F2),
+        StepHistoryTitle = Color(0xFF0A545A),
+
+        StepHistoryGaugeTrack = Color(0xFFD4F1F2),
+        StepHistoryGaugeFill = Color(0xFF13A4AB),
+        StepHistoryGaugeLabelText = Color(0xFF393C3C),
+
+        StepHistoryChipContainerBg = Color(0xFFE5E5E4),
+        StepHistoryChipBgSelected = Color(0xFFFFFFFF),
+        StepHistoryChipBgUnselected = Color.Transparent,
+        StepHistoryChipTextUnselected = Color(0xFF777777),
+
+        StepHistoryChartBarBg = Color(0xFFE8FAFA),
+        StepHistoryChartBarFill = Color(0xFF13A4AB),
+
+        StepHistorySummaryIconBg = Color(0xFFE8FAFA),
+
+        // News Screen Redesign (Light Mode)
+        NewsChipSelectedBg = Color(0xFF17B8BE), // Teal800
+        NewsChipSelectedText = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBg = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBorder = Color(0xFFD6D6D5), // Gray400
+        NewsChipUnselectedText = Color(0xFF898989), // Gray700
+        NewsCategoryLabel = Color(0xFF17B8BE), // Teal800
+        NewsCardTitle = Color(0xFF393C3C), // Gray1600
+        NewsSourceText = Color(0xFF898989), // Gray700
+        NewsSourceAvatarBg = Color(0xFFD4F1F2), // Teal200 (light bg for icon)
+        NewsSearchBarBorder = Color(0xFFD6D6D5), // Gray400
+        NewsSearchIconTint = Color(0xFF898989), // Gray700
+        NewsDivider = Color(0xFFE5E5E4), // Gray300
+        NewsScreenTitle = Color(0xFF393C3C), // Gray1600
+        NewsCardBg = Color(0xFFFFFFFF), // White
+        NewsCardBorder = Color(0xFFE5E5E4), // Gray300
+
+        // Calories History (Light Mode)
+        CaloriesHistoryTopBarIconBg = Color(0xFFD4F1F2),    // Teal200
+        CaloriesHistoryTitle = Color(0xFF000000),           // Black
+        CaloriesHistoryDateText = Color(0xFF11939A),        // Teal1200
+        CaloriesHistoryCardBorder = Color(0xFFE5E5E4),      // Gray300
+        CaloriesHistoryStatLabel = Color(0xFF11939A),       // Teal1200
+        CaloriesHistoryStatValue = Color(0xFF000000),       // Black
+        CaloriesHistoryStatSecondary = Color(0xFF898989),   // Gray700
+        CaloriesHistoryCalendarIconBg = Color(0xFFCAF2F4),  // Teal300
+        CaloriesHistoryCalendarIconTint = Color(0xFF75DEE3),// Teal500
+        CaloriesHistoryOuterCardBg = Color(0xFFF1F1F1),     // Gray200
+        CaloriesHistoryDateChipBg = Color(0xFFFFFFFF),      // White date chip
     ),
 )
 
@@ -858,6 +918,9 @@ fun darkColors() = AppColors(
     TextPrimary = Color(0xFFE8FAFA),        // Teal100 — very light text
     TextSecondary = Color(0xFFA6A5A5),      // Gray600
     Divider = Color(0xFF0F474A),
+    ScreenSurfaceBackground = Color(0xFF0F474A), // Background / Teal1600
+    MenuSectionLabel = Color(0xFF11939A), // Teal1200
+    MenuIconContainerBackground = Color(0xFF0F474A), // Background / Teal1600
     // Verdicts — slightly lighter for dark backgrounds
     VerdictGreen = Color(0xFF81C784),
     VerdictYellow = Color(0xFFFFCA28),
@@ -887,10 +950,8 @@ fun darkColors() = AppColors(
     VerdictRedWarningIconTint = Color(0xFFFFCA28), // VerdictYellow in dark mode
     HistoryItemDateColor = Color(0xFFA3E9EC), // Teal400
     // Forgot Password / Auth
-    MethodCardBackground = Color(0xFF0B5F65), // Teal1400
     MethodCardIconBgUnselected = Color(0xFF108188), // Teal1300
     MethodCardIconTintUnselected = Color(0xFFC0C0C0), // Gray500
-    AuthDialogBackground = Color(0xFF0F474A), // Teal1600
     AuthDialogSubtitle = Color(0xFFE5E5E4), // Gray300
 
     // Profile Setup
@@ -914,15 +975,12 @@ fun darkColors() = AppColors(
     // Gender Selection
     GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
     GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
-    GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
     GenderMaleCardText = Color(0xFF0F474A), // Teal1600
 
     // Page Indicator
-    PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
     PageIndicatorTotal = Color(0xFF108188), // Teal1300
 
     // Date of Birth
-    DobCardBackground = Color(0xFF75DEE3), // Teal500
     DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
     DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
     DobCardText = Color(0xFF0F474A), // Teal1600
@@ -931,7 +989,6 @@ fun darkColors() = AppColors(
     DobCalendarIcon = Color(0xFF169098), // Teal1200
 
     // Height Selection
-    HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
     HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
     HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
     HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
@@ -943,7 +1000,6 @@ fun darkColors() = AppColors(
 
     // Progress Button
     ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
-    ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 
     // Shadows
     ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
@@ -958,18 +1014,13 @@ fun darkColors() = AppColors(
         ProfileHeaderAccent = Color(0xFF0B5F65), // Teal1400 — avatar ring
         ProfileSheetBackground = Color(0xFF0F474A), // Teal1600 — main sheet
         ProfileFamilyBoxBackground = Color(0xFF0A545A), // Teal1500 — dashed container fill
-        ProfileMenuRowBackground = Color(0xFF0A545A), // Teal1500
-        ProfileMenuIconBackground = Color(0xFF0F474A), // Teal1600 — icon circle (0.55 alpha in code)
         ProfileMemberCardBackground = Color(0xFF0F474A), // Teal1600 — elevated deep teal
         ProfileMemberCardBorder = Color(0xFF11939A), // Teal1200 — solid teal border
-        ProfileAddCardBackground = Color(0xFF0F474A), // Teal1600
         ProfileAddIconBackground = Color(0xFFE8FAFA), // Teal100
-        ProfileAddIconTint = Color(0xFF13A4AB), // Teal1000
         ProfileAddText = Color(0xFFE8FAFA), // Teal100
         ProfileStreakBadgeBackground = Color(0xFF11939A), // Teal1200 — fixed both themes
         ProfileHeaderEdge = Color(0xFF0B5F65), // Teal1400 — decorative edge shape
         ProfileShowDetailsBackground = Color(0xFF17B8BE), // Teal800 — fixed both themes
-        ProfileMenuLabel = Color(0xFF11939A), // Teal1200
         ProfileMenuChevron = Color(0xFF13A4AB), // Teal1000
         ProfileAddMemberAvatarBackground = Color(0xFF0F474A), // Teal1600 - darker background in dark theme
 
@@ -980,15 +1031,12 @@ fun darkColors() = AppColors(
         // Gender Selection
         GenderFemaleCardBackground = Color(0xFF0B5F65), // Teal1400
         GenderFemaleCardText = Color(0xFFFDE8E8), // Red100
-        GenderMaleCardBackground = Color(0xFF75DEE3), // Teal500
         GenderMaleCardText = Color(0xFF0F474A), // Teal1600
 
         // Page Indicator
-        PageIndicatorCurrent = Color(0xFF13A4AB), // Teal1000
         PageIndicatorTotal = Color(0xFF108188), // Teal1300
 
         // Date of Birth
-        DobCardBackground = Color(0xFF75DEE3), // Teal500
         DobAgeBadgeBackground = Color(0xFF2FC5CC), // Teal700
         DobAgeBadgeText = Color(0xFF0F474A), // Teal1600
         DobCardText = Color(0xFF0F474A), // Teal1600
@@ -997,7 +1045,6 @@ fun darkColors() = AppColors(
         DobCalendarIcon = Color(0xFF169098), // Teal1200
 
         // Height Selection
-        HeightSelectedCardBackground = Color(0xFF75DEE3), // Teal500
         HeightSelectedCardText = Color(0xFF0F474A), // Teal1600
         HeightSelectedCardUnitText = Color(0xFF0F474A), // Teal1600
         HeightUnselectedCardBackground = Color(0xFF0B5F65), // Teal1400
@@ -1009,7 +1056,6 @@ fun darkColors() = AppColors(
 
         // Progress Button
         ProgressTrackColor = Color(0xFF0B5F65), // Teal1400
-        ProgressFillColor = Color(0xFF13A4AB), // Teal1000
 
         // Shadows
         ShadowSelected = Color(0x9975DEE3), // Teal500/Accent 60% alpha (bright cyan)
@@ -1021,26 +1067,17 @@ fun darkColors() = AppColors(
         // Product Card
         ProductCardBackground = Color(0xFF0A545A), // Teal1500
         SavedSearchBarBorder = Color(0xFF0F8389), // Teal1200
-        SavedSearchIconBackground = Color(0xFF13A4AB), // Teal1000
-        SavedSearchIconTint = Color(0xFFE8FAFA), // Teal100
         ProductCardNameText = Color(0xFF75DEE3), // Teal500
-        ProductCardVerdictBackground = Color(0xFF13A4AB), // Teal1000
-        ProductCardVerdictText = Color(0xFFE8FAFA), // Teal100
         ProductCardCautionText = Color(0xFF0B5F65), // Teal1400
         ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
         ProductCardCaloriesText = Color(0xFF0F474A), // Teal1600
-        ProductCardSwipeIconBackground = Color(0xFF13A4AB), // Teal1000
         ProductCardSwipeContainerBackground = Color(0xFF0F474A), // Teal1600
         ProductCardSwipeText = Color(0xFF108188), // Teal1300
         ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
 
         // App Settings
-        SaveAlertButtonBackground = Color(0xFF13A4AB), // Teal1000
-        AppSettingsCardBackground = Color(0xFF0A545A), // Teal1500
         // Teal200 is remapped to 0xFF2FC5CC in this palette for glowing shadows/badges — cannot reuse for this
-        AppSettingsIconContainerBackground = Color(0xFF0F474A), // Teal1600
         // Teal1200 is remapped to 0xFFA3E9EC in this palette for secondary text — cannot reuse for this
-        AppSettingsRowLabel = Color(0xFF11939A), // Teal1200 (light) literal
         AppSettingsToggleContainerBackground = Color(0xFF0F474A), // Teal1600
         AppSettingsToggleChipSelectedBackground = Color(0xFF13A4AB), // Teal1000
         AppSettingsToggleTextUnselected = Color(0xFFA3E9EC), // Teal400
@@ -1051,6 +1088,7 @@ fun darkColors() = AppColors(
 
         // Calories Dashboard — fixed literals, identical in both themes (see AppColorsExtension kdoc)
         CaloriesAccentTeal1200 = Color(0xFF11939A), // Teal/1200 swatch literal
+        SectionSubtitle = Color(0xFF11939A), // Teal/1200 — intentionally identical to light mode
         CaloriesMutedTeal = Color(0xFFD4F1F2), // Teal/200 swatch literal
         CaloriesIconOnAccent = Color(0xFFFFFFFF),
         ExerciseSecondaryText = Color(0xFF11939A), // Teal/1200 literal, matches dark mode's own Figma value
@@ -1079,8 +1117,6 @@ fun darkColors() = AppColors(
         ExerciseWorkoutHeaderTitle = Color(0xFF11939A), // Workout header & name above image (#11939A)
         ExerciseWorkoutImageBackground = Color(0xFF0B5F65), // Image circular bg (#0B5F65)
         ExerciseWorkoutTimerText = Color(0xFFA3E9EC), // Timer text (#A3E9EC)
-        ExerciseWorkoutSecondaryButton = Color(0xFF13A4AB), // Start/Restart outlined button (#13A4AB)
-        ExerciseWorkoutPrimaryButtonBg = Color(0xFF13A4AB), // Pause filled button bg (#13A4AB)
         ExerciseWorkoutPrimaryButtonText = Color(0xFFFFFFFF), // Pause text color (White)
         ExerciseWorkoutTotalTimeLabel = Color(0xFF108188), // Total Time label (#108188)
         ExerciseSetsRepsCardBg = Color(0xFF0B5F65), // Card bg (#0B5F65)
@@ -1088,13 +1124,11 @@ fun darkColors() = AppColors(
         ExerciseSetsRepsBtnBg = Color(0xFF0F474A), // Plus/Minus button bg (#0F474A)
         ExerciseSetsRepsLabelColor = Color(0xFF13A4AB), // Label text (#13A4AB)
         ExerciseSetsRepsValueColor = Color(0xFF13A4AB), // Value text (#13A4AB)
-        ExerciseSetsRepsIconTint = Color(0xFF13A4AB), // Icon tint (#13A4AB)
         ExerciseReadMoreColor = Color(0xFF11939A), // Read more text color (#11939A)
 
 
 
         // Product Details
-        ProductDetailImageCardBg = Color(0xFF0F474A), // Teal1600
         ProductDetailScanDate = Color(0xFFA3E9EC), // Teal400
         ProductDetailScanDateBadgeBg = Color(0xFFD4F1F2), // Teal200
         ProductDetailScanDateBadgeText = Color(0xFF17B8BE), // Teal800
@@ -1104,21 +1138,16 @@ fun darkColors() = AppColors(
         ProductDetailSafetyReasonText = Color(0xFF11939A), // Teal1200
         ProductDetailWhyNotSafeText = Color(0xFF13A4AB), // Teal1000
 
-        ProductDetailIngredientCardBg = Color(0xFF0A545A), // Teal1500
         ProductDetailIngredientCardBorder = Color(0xFF11939A), // Teal1200
-        ProductDetailIngredientName = Color(0xFF13A4AB), // Teal1000
         ProductDetailIngredientReasonText = Color(0xFF108188), // Teal1300
-        ProductDetailFlaggedContainerBg = Color(0xFF0A545A), // Teal1500
 
         ProductDetailMatchTag = Color(0xFF0F474A), // Teal1600
         ProductDetailMatchTagText = Color(0xFF11939A), // Teal1200
 
         ProductDetailNutritionCardBg = Color(0xFF0B5F65), // Teal1400
         ProductDetailNutritionLabelText = Color(0xFF11939A), // Teal1200
-        ProductDetailNutritionPill = Color(0xFF13A4AB), // Teal1000
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
-        ProductDetailBookmarkTint = Color(0xFF13A4AB), // Teal1000
 
         ScrimOverlay = Color(0x99000000), // Black 60% alpha — dark mode scrim
         
@@ -1132,12 +1161,59 @@ fun darkColors() = AppColors(
         ChatSourceCardBackground = Color(0x4D0F474A), // Teal1600 at 30%
         ChatSourceScoreBadge = Color(0xFF75DEE3), // Teal500
         ChatInputBackground = Color(0x330F474A), // Teal1600 at 20%
-        ChatInputText = Color(0xFFE8FAFA), // Teal100
         ChatInputPlaceholder = Color(0xFF108188), // Teal1300
         ChatSendButtonBackground = Color(0xFF11939A), // Teal1200
         ChatSendButtonIcon = Color(0xFFE8FAFA), // Teal100
         ChatDisclaimerBackground = Color(0x4D0F474A), // Teal1600 at 30%
         ChatDisclaimerText = Color(0xFFE8FAFA), // Teal100
         ChatDisclaimerIcon = Color(0xFF75DEE3), // Teal500
+    ),
+    extension3 = AppColorsExtension3(
+        StepHistoryTopBarIconBg = Color(0xFF0B5F65),
+        StepHistoryTitle = Color(0xFFE8FAFA),
+
+        StepHistoryGaugeTrack = Color(0xFF0F474A),
+        StepHistoryGaugeFill = Color(0xFF75DEE3),
+        StepHistoryGaugeLabelText = Color(0xFFA6A5A5),
+
+        StepHistoryChipContainerBg = Color(0xFF0A545A),
+        StepHistoryChipBgSelected = Color(0xFF13A4AB),
+        StepHistoryChipBgUnselected = Color.Transparent,
+        StepHistoryChipTextUnselected = Color(0xFFA3E9EC),
+
+        StepHistoryChartBarBg = Color(0xFF0F474A),
+        StepHistoryChartBarFill = Color(0xFF75DEE3),
+
+        StepHistorySummaryIconBg = Color(0xFF0F474A),
+
+        // News Screen Redesign (Dark Mode)
+        NewsChipSelectedBg = Color(0xFF17B8BE), // Teal800
+        NewsChipSelectedText = Color(0xFFFFFFFF), // White
+        NewsChipUnselectedBg = Color(0xFF0F474A), // Teal1600
+        NewsChipUnselectedBorder = Color(0xFF0B5F65), // Teal1400
+        NewsChipUnselectedText = Color(0xFFA3E9EC), // Teal400
+        NewsCategoryLabel = Color(0xFF17B8BE), // Teal800
+        NewsCardTitle = Color(0xFFCAF2F4), // Teal300
+        NewsSourceText = Color(0xFF2FC5CC), // Teal700
+        NewsSourceAvatarBg = Color(0xFF0B5F65), // Teal1400
+        NewsSearchBarBorder = Color(0xFF0B5F65), // Teal1400
+        NewsSearchIconTint = Color(0xFFA3E9EC), // Teal400
+        NewsDivider = Color(0xFF0B5F65), // Teal1400
+        NewsScreenTitle = Color(0xFFCAF2F4), // Teal300
+        NewsCardBg = Color(0xFF0A545A), // Teal1500
+        NewsCardBorder = Color(0xFF0B5F65), // Teal1400
+
+        // Calories History (Dark Mode)
+        CaloriesHistoryTopBarIconBg = Color(0xFF0B5F65),     // Teal1400
+        CaloriesHistoryTitle = Color(0xFF13A4AB),            // Teal1000
+        CaloriesHistoryDateText = Color(0xFF13A4AB),         // Teal1000
+        CaloriesHistoryCardBorder = Color(0xFF11939A),       // Teal1200
+        CaloriesHistoryStatLabel = Color(0xFF13A4AB),        // Teal1000
+        CaloriesHistoryStatValue = Color(0xFF2FC5CC),        // Teal700
+        CaloriesHistoryStatSecondary = Color(0xFF108188),    // Teal1300
+        CaloriesHistoryCalendarIconBg = Color(0xFF0A545A),   // Teal1500
+        CaloriesHistoryCalendarIconTint = Color(0xFF11939A), // Teal1200
+        CaloriesHistoryOuterCardBg = Color(0xFF0A545A),      // Teal1500
+        CaloriesHistoryDateChipBg = Color(0xFF0A545A),       // Teal1500
     ),
 )

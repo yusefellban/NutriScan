@@ -4,205 +4,217 @@ import iti.grad.nutriscan.data.db.dao.SavedScanDao
 import iti.grad.nutriscan.data.db.entity.FlaggedIngredientLocalModel
 import iti.grad.nutriscan.data.db.entity.NutritionFactsLocalModel
 import iti.grad.nutriscan.data.db.entity.SavedScanEntity
+import iti.grad.nutriscan.data.di.IoDispatcher
+import iti.grad.nutriscan.data.remote.api.ScanApiService
+import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
+import iti.grad.nutriscan.data.remote.dto.UpdateScanDto
+import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.common.runCatchingCancellable
+import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
+import iti.grad.nutriscan.domain.scan.model.NutritionFacts
+import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
-import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
-import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
-import iti.grad.nutriscan.domain.scan.model.NutritionFacts
-import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import iti.grad.nutriscan.data.di.IoDispatcher
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class SavedScanRepositoryImpl @Inject constructor(
     private val savedScanDao: SavedScanDao,
+    private val scanApiService: ScanApiService,
+    private val authRepository: IAuthRepository,
     private val json: Json,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ISavedScanRepository {
 
-    override suspend fun saveScan(scanResult: ScanResult): Result<Unit> {
-        return withContext(ioDispatcher) {
-            try {
-                val entity = SavedScanEntity(
-                    scanId = scanResult.scanId,
-                    scannedAt = scanResult.scannedAt,
-                    imageUrl = scanResult.imageUrl,
-                    verdict = scanResult.foodSafetyResponse?.verdict?.name,
-                    summary = scanResult.foodSafetyResponse?.summary,
-                    productName = scanResult.productName,
-                    flaggedIngredientsJson = scanResult.foodSafetyResponse?.flaggedIngredients?.let { ingredients ->
-                        val mapped = ingredients.map { ing ->
-                            FlaggedIngredientLocalModel(
-                                ingredient = ing.ingredient,
-                                reason = ing.reason,
-                                type = ing.type,
-                                name = ing.name
-                            )
-                        }
-                        json.encodeToString(mapped)
-                    },
-                    nutritionFactsJson = scanResult.nutritionFacts?.let { nutrition ->
-                        val mapped = NutritionFactsLocalModel(
-                            calories = nutrition.calories,
-                            proteinGrams = nutrition.proteinGrams,
-                            carbsGrams = nutrition.carbsGrams,
-                            fatG = nutrition.fatG,
-                            fiberGrams = nutrition.fiberGrams,
-                            sugarG = nutrition.sugarG,
-                            sodiumMg = nutrition.sodiumMg
-                        )
-                        json.encodeToString(mapped)
-                    }
-                )
-                savedScanDao.insertScan(entity)
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
+    private val repositoryScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+    override suspend fun saveScan(scanResult: ScanResult): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val userId = resolveUserId()
+            savedScanDao.insertScan(scanResult.toEntity(userId, pendingSync = true))
+            val pushed = runCatching { scanApiService.updateScan(scanResult.scanId, UpdateScanDto(favorite = true)) }
+            pushed.exceptionOrNull()?.let {
+                android.util.Log.e("SavedScanSync", "PATCH favorite=true failed for ${scanResult.scanId}", it)
+            }
+            if (pushed.isSuccess) savedScanDao.clearPendingSync(scanResult.scanId)
+        }
+    }
+
+    /** Polls the backend every [RECONCILE_INTERVAL_MS] for as long as at least one collector is
+     * subscribed (i.e. a screen showing saved scans is open), so a favorite added/removed on
+     * another device shows up here without needing an app restart — this backend is plain REST,
+     * no push/WebSocket to listen on instead. Each reconcile writes into Room, and Room's own flow
+     * (collected concurrently below) emits the update immediately. [shareIn] multicasts this single
+     * poll loop to every collector — [SavedScanRepositoryImpl] is a singleton, so without it, two
+     * screens observing saved scans at once would each spin up their own independent poller. */
+    private val savedScansFlow: Flow<List<ScanResult>> = channelFlow {
+        val userId = resolveUserId()
+        reconcileFromBackend(userId)
+        launch {
+            while (isActive) {
+                delay(RECONCILE_INTERVAL_MS)
+                reconcileFromBackend(userId)
+            }
+        }
+        savedScanDao.getAllSavedScans(userId)
+            .map { entities -> entities.map { it.toDomain() } }
+            .collect { send(it) }
+    }.flowOn(ioDispatcher).shareIn(repositoryScope, SharingStarted.WhileSubscribed(SHARE_STOP_TIMEOUT_MS), replay = 1)
+
+    override fun getSavedScans(): Flow<List<ScanResult>> = savedScansFlow
+
+    override suspend fun deleteScan(scanId: String): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val userId = resolveUserId()
+            savedScanDao.markDeletedForUser(scanId, userId)
+            val pushed = runCatching { scanApiService.updateScan(scanId, UpdateScanDto(favorite = false)) }
+            if (pushed.isSuccess) savedScanDao.hardDelete(scanId)
+        }
+    }
+
+    override suspend fun getSavedScanById(scanId: String): Result<ScanResult?> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            savedScanDao.getSavedScanById(scanId, resolveUserId())?.toDomain()
+        }
+    }
+
+    override suspend fun retryPendingSync(): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val userId = resolveUserId()
+            for (entity in savedScanDao.getPendingSyncEntries(userId)) {
+                val result = runCatching {
+                    scanApiService.updateScan(entity.scanId, UpdateScanDto(favorite = !entity.deleted))
+                }
+                if (result.isSuccess) {
+                    if (entity.deleted) savedScanDao.hardDelete(entity.scanId) else savedScanDao.clearPendingSync(entity.scanId)
+                }
             }
         }
     }
 
-    override fun getSavedScans(): Flow<List<ScanResult>> {
-        return savedScanDao.getAllSavedScans().map { entities ->
-            entities.map { entity ->
-                val ingredientsList = entity.flaggedIngredientsJson?.let { jsonStr ->
-                    try {
-                        val list = json.decodeFromString<List<FlaggedIngredientLocalModel>>(jsonStr)
-                        list.map { model ->
-                            ScanFlaggedIngredient(
-                                ingredient = model.ingredient,
-                                reason = model.reason,
-                                type = model.type,
-                                name = model.name
-                            )
-                        }
-                    } catch (e: Exception) {
-                        emptyList()
-                    }
-                } ?: emptyList()
-
-                val nutritionFacts = entity.nutritionFactsJson?.let { jsonStr ->
-                    try {
-                        val model = json.decodeFromString<NutritionFactsLocalModel>(jsonStr)
-                        NutritionFacts(
-                            calories = model.calories,
-                            proteinGrams = model.proteinGrams,
-                            carbsGrams = model.carbsGrams,
-                            fatG = model.fatG,
-                            fiberGrams = model.fiberGrams,
-                            sugarG = model.sugarG,
-                            sodiumMg = model.sodiumMg
-                        )
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-                
-                val verdict = try {
-                    entity.verdict?.let { ProductVerdict.valueOf(it) }
-                } catch (e: Exception) {
-                    null
-                }
-
-                ScanResult(
-                    scanId = entity.scanId,
-                    status = ScanStatus.COMPLETED,
-                    scannedAt = entity.scannedAt,
-                    imageUrl = entity.imageUrl,
-                    productName = entity.productName,
-                    foodSafetyResponse = if (verdict != null) {
-                        FoodSafetyResponse(
-                            verdict = verdict,
-                            flaggedIngredients = ingredientsList,
-                            summary = entity.summary
-                        )
-                    } else null,
-                    nutritionFacts = nutritionFacts
-                )
-            }
+    override suspend fun refresh(): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            retryPendingSync()
+            reconcileFromBackend(resolveUserId())
         }
     }
 
-    override suspend fun deleteScan(scanId: String): Result<Unit> {
-        return withContext(ioDispatcher) {
-            try {
-                savedScanDao.deleteScanById(scanId)
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+    /** Seeds Room from the backend's favorites list (needed after reinstall, when Room is empty)
+     * and drops local rows the backend no longer lists as favorited — mirrors the un-favorite
+     * happening from another device. Best-effort: failures (offline) just fall back to whatever
+     * is already in Room. */
+    private suspend fun reconcileFromBackend(userId: String) {
+        runCatching {
+            val response = scanApiService.getFavoriteScans(page = 0, size = FAVORITES_PAGE_SIZE)
+            val remoteScanIds = response.content.map { it.scanId }
+            response.content.forEach { savedScanDao.insertScan(it.toEntity(userId)) }
+            savedScanDao.deleteStaleSynced(userId, remoteScanIds)
+        }.onFailure {
+            android.util.Log.e("SavedScanSync", "GET /scans/favorites reconcile failed for $userId", it)
         }
     }
 
-    override suspend fun getSavedScanById(scanId: String): Result<ScanResult?> {
-        return withContext(ioDispatcher) {
-            try {
-                val entity = savedScanDao.getSavedScanById(scanId) ?: return@withContext Result.success(null)
-                
-                val ingredientsList = entity.flaggedIngredientsJson?.let { jsonStr ->
-                    try {
-                        val list = json.decodeFromString<List<FlaggedIngredientLocalModel>>(jsonStr)
-                        list.map { model ->
-                            ScanFlaggedIngredient(
-                                ingredient = model.ingredient,
-                                reason = model.reason,
-                                type = model.type,
-                                name = model.name
-                            )
-                        }
-                    } catch (e: Exception) {
-                        emptyList()
-                    }
-                } ?: emptyList()
+    private suspend fun resolveUserId(): String = authRepository.getCurrentUserId()
+        ?: error("No authenticated user - per-user data is unavailable until sign-in completes")
 
-                val nutritionFacts = entity.nutritionFactsJson?.let { jsonStr ->
-                    try {
-                        val model = json.decodeFromString<NutritionFactsLocalModel>(jsonStr)
-                        NutritionFacts(
-                            calories = model.calories,
-                            proteinGrams = model.proteinGrams,
-                            carbsGrams = model.carbsGrams,
-                            fatG = model.fatG,
-                            fiberGrams = model.fiberGrams,
-                            sugarG = model.sugarG,
-                            sodiumMg = model.sodiumMg
-                        )
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-                
-                val verdict = try {
-                    entity.verdict?.let { ProductVerdict.valueOf(it) }
-                } catch (e: Exception) {
-                    null
-                }
+    private fun ScanResult.toEntity(userId: String, pendingSync: Boolean = false) = SavedScanEntity(
+        scanId = scanId,
+        userId = userId,
+        scannedAt = scannedAt,
+        imageUrl = imageUrl,
+        verdict = foodSafetyResponse?.verdict?.name,
+        summary = foodSafetyResponse?.summary,
+        productName = productName,
+        flaggedIngredientsJson = foodSafetyResponse?.flaggedIngredients?.let { ingredients ->
+            json.encodeToString(ingredients.map {
+                FlaggedIngredientLocalModel(ingredient = it.ingredient, reason = it.reason, type = it.type, name = it.name)
+            })
+        },
+        nutritionFactsJson = nutritionFacts?.let { json.encodeToString(it.toLocalModel()) },
+        pendingSync = pendingSync,
+    )
 
-                val scanResult = ScanResult(
-                    scanId = entity.scanId,
-                    status = ScanStatus.COMPLETED,
-                    scannedAt = entity.scannedAt,
-                    imageUrl = entity.imageUrl,
-                    productName = entity.productName,
-                    foodSafetyResponse = if (verdict != null) {
-                        FoodSafetyResponse(
-                            verdict = verdict,
-                            flaggedIngredients = ingredientsList,
-                            summary = entity.summary
-                        )
-                    } else null,
-                    nutritionFacts = nutritionFacts
-                )
-                Result.success(scanResult)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+    /** Reconciled rows only carry the summary shape the backend's favorites list returns (no
+     * flagged-ingredients/full nutrition breakdown) — the Saved screen only reads
+     * productName/imageUrl/verdict/calories, so a minimal nutrition model with just calories set
+     * is enough; product-detail navigation re-fetches the full [ScanResult] by id separately. */
+    private fun ScanHistoryItemDto.toEntity(userId: String) = SavedScanEntity(
+        scanId = scanId,
+        userId = userId,
+        scannedAt = scannedAt,
+        imageUrl = imageUrl,
+        verdict = verdict?.name,
+        summary = null,
+        productName = productName,
+        flaggedIngredientsJson = null,
+        nutritionFactsJson = json.encodeToString(
+            NutritionFactsLocalModel(
+                calories = calories ?: 0L,
+                proteinGrams = 0f,
+                carbsGrams = 0f,
+                fatG = 0f,
+                fiberGrams = 0f,
+                sugarG = 0f,
+                sodiumMg = 0f,
+            )
+        ),
+        pendingSync = false,
+    )
+
+    private fun NutritionFacts.toLocalModel() = NutritionFactsLocalModel(
+        calories = calories,
+        proteinGrams = proteinGrams,
+        carbsGrams = carbsGrams,
+        fatG = fatG,
+        fiberGrams = fiberGrams,
+        sugarG = sugarG,
+        sodiumMg = sodiumMg,
+    )
+
+    private fun SavedScanEntity.toDomain(): ScanResult {
+        val ingredients = flaggedIngredientsJson?.let { jsonStr ->
+            runCatching { json.decodeFromString<List<FlaggedIngredientLocalModel>>(jsonStr) }.getOrNull()
+        }.orEmpty().map { ScanFlaggedIngredient(it.ingredient, it.reason, it.type, it.name) }
+
+        val nutritionFacts = nutritionFactsJson?.let { jsonStr ->
+            runCatching { json.decodeFromString<NutritionFactsLocalModel>(jsonStr) }.getOrNull()
+        }?.let {
+            NutritionFacts(it.calories, it.proteinGrams, it.carbsGrams, it.fatG, it.fiberGrams, it.sugarG, it.sodiumMg)
         }
+
+        val parsedVerdict = verdict?.let { runCatching { ProductVerdict.valueOf(it) }.getOrNull() }
+
+        return ScanResult(
+            scanId = scanId,
+            status = ScanStatus.COMPLETED,
+            scannedAt = scannedAt,
+            imageUrl = imageUrl,
+            productName = productName,
+            foodSafetyResponse = parsedVerdict?.let { FoodSafetyResponse(it, ingredients, summary) },
+            nutritionFacts = nutritionFacts,
+            favorite = true,
+        )
+    }
+
+    private companion object {
+        const val FAVORITES_PAGE_SIZE = 100
+        const val RECONCILE_INTERVAL_MS = 15_000L
+        const val SHARE_STOP_TIMEOUT_MS = 5_000L
     }
 }

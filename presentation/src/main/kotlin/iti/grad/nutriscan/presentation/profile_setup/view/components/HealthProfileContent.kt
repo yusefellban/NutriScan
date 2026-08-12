@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -47,7 +46,7 @@ fun HealthProfileContent(
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .absolutePadding(left = 22.dp, top = 21.dp)
+                .padding(start = 22.dp, top = 21.dp)
                 .size(width = 150.dp, height = 228.dp)
         )
 

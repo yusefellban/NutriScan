@@ -65,6 +65,7 @@ private val TabBarSpring = spring<Float>(dampingRatio = 0.65f, stiffness = 110f)
 @Composable
 fun AppBottomNavBar(
     selectedTab: BottomNavTab,
+    isScanUploadMode: Boolean = false,
     onTabClick: (BottomNavTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -170,6 +171,7 @@ fun AppBottomNavBar(
 
         FloatingScanButton(
             isSelected = selectedTab == BottomNavTab.SCAN,
+            isUploadMode = isScanUploadMode,
             onClick = { onTabClick(BottomNavTab.SCAN) },
             modifier = Modifier.offset(y = FabOffsetY),
         )

@@ -19,13 +19,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 /**
  * A single row in the Home screen's "Explore" section: a leading icon in a soft circle,
  * a label, and a trailing chevron. Reuses the same centralized row/icon/label/chevron
  * color tokens as [iti.grad.nutriscan.presentation.settings.profile.view.components.ProfileMenuRow]
- * (`ProfileMenuRowBackground` / `ProfileMenuIconBackground` / `ProfileMenuLabel` /
+ * (`SurfaceVariant` / `MenuIconContainerBackground` / `MenuSectionLabel` /
  * `ProfileMenuChevron`) rather than introducing new, duplicate theme colors for the same
  * light-gray-row-with-teal-icon-circle look.
  */
@@ -40,7 +41,7 @@ fun ExploreItemRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(AppTheme.shapes.Medium)
-            .background(AppTheme.colors.ProfileMenuRowBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -53,7 +54,7 @@ fun ExploreItemRow(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.ProfileMenuIconBackground.copy(alpha = 0.55f)),
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -67,17 +68,18 @@ fun ExploreItemRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.ProfileMenuLabel,
+            color = AppTheme.colors.MenuSectionLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp),
         )
 
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_right),
+            painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
             contentDescription = null,
             tint = AppTheme.colors.ProfileMenuChevron,
             modifier = Modifier.size(20.dp),
         )
     }
 }
+

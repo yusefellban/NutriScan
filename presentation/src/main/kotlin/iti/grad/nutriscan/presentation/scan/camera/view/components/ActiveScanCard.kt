@@ -47,6 +47,7 @@ fun ActiveScanCard(
     scan: ActiveScanUiModel,
     onBookmarkClick: () -> Unit,
     onCardClick: () -> Unit = {},
+    onRetryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(22.dp)
@@ -97,25 +98,69 @@ fun ActiveScanCard(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (!scan.isProcessing && !scan.isFailed && scan.fullResult != null) {
+        if (scan.isFailed) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(AppTheme.colors.Teal800)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(AppTheme.colors.Error.copy(alpha = 0.3f))
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = onBookmarkClick,
-                    ),
+                        onClick = onRetryClick,
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
-                    contentDescription = "Save scan",
-                    tint = AppTheme.colors.PrimaryVariant,
-                    modifier = Modifier.size(22.dp),
+                Text(
+                    text = "Scan Again", // In a real app this would be in strings.xml
+                    style = AppTheme.typography.labelMedium,
+                    color = AppTheme.colors.Error,
+                    fontWeight = FontWeight.Bold
                 )
+            }
+        } else if (!scan.isProcessing && scan.fullResult != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(AppTheme.colors.Error.copy(alpha = 0.3f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onRetryClick,
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Scan Again", // In a real app this would be in strings.xml
+                        style = AppTheme.typography.labelMedium,
+                        color = AppTheme.colors.VerdictGreen,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(AppTheme.colors.Teal800)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onBookmarkClick,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
+                        contentDescription = stringResource(R.string.scan_saved_content_description),
+                        tint = AppTheme.colors.PrimaryVariant,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
             }
         }
     }

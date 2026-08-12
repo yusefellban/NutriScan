@@ -7,6 +7,7 @@ import iti.grad.nutriscan.domain.dailytracking.model.DailyTracking
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingRemoteSnapshot
 import iti.grad.nutriscan.domain.dailytracking.model.DailyTrackingSummary
 import iti.grad.nutriscan.domain.dailytracking.model.RemoteMealSnapshot
+import iti.grad.nutriscan.domain.common.CairoDateProvider
 import java.time.LocalDate
 
 fun DailyTrackingEntity.toDomain(): DailyTracking = DailyTracking(
@@ -33,24 +34,45 @@ fun DailyTracking.toEntity(userId: String): DailyTrackingEntity = DailyTrackingE
 )
 
 fun DailyTrackingResponseDto.toRemoteSnapshot(): DailyTrackingRemoteSnapshot = DailyTrackingRemoteSnapshot(
-    date = LocalDate.parse(date),
+    date = date?.let { LocalDate.parse(it) } ?: CairoDateProvider.today(),
     targetWaterCnt = targetWaterCnt ?: 0,
     waterCnt = waterCnt ?: 0,
     stepsCnt = stepsCnt ?: 0,
-    meals = meals.map {
+    stepsKcal = stepsKcal?.toInt() ?: 0,
+    exerciseKcal = exerciseKcal?.toInt() ?: 0,
+    exerciseMinutes = exerciseMin?.toInt() ?: 0,
+    meals = meals.mapNotNull { meal ->
+        val scanId = meal.scanId ?: return@mapNotNull null
         RemoteMealSnapshot(
-            scanId = it.scanId,
-            productName = it.productName,
-            imageUrl = it.imageUrl,
-            calories = it.nutritionFacts?.calories?.toInt() ?: 0,
+            scanId = scanId,
+            productName = meal.productName,
+            imageUrl = meal.imageUrl,
+            calories = meal.nutritionFacts?.calories?.toInt() ?: 0,
+            mealCnt = meal.mealCnt ?: 1,
         )
     },
 )
 
 fun DailyTrackingSummaryResponseDto.toDomain(): DailyTrackingSummary = DailyTrackingSummary(
-    date = LocalDate.parse(date),
+    date = date?.let { LocalDate.parse(it) } ?: CairoDateProvider.today(),
     targetWaterCnt = targetWaterCnt ?: 0,
     waterCnt = waterCnt ?: 0,
     stepsCnt = stepsCnt ?: 0,
-    mealCount = mealCount,
+    stepsKcal = stepsKcal?.toInt() ?: 0,
+    exerciseKcal = exerciseKcal?.toInt() ?: 0,
+    exerciseMinutes = exerciseMin?.toInt() ?: 0,
+    totalMealKcal = totalMealKcal?.toInt() ?: 0,
+    mealCount = mealCount ?: 0,
+)
+
+fun DailyTrackingResponseDto.toDaySummary(): DailyTrackingSummary = DailyTrackingSummary(
+    date = date?.let { LocalDate.parse(it) } ?: CairoDateProvider.today(),
+    targetWaterCnt = targetWaterCnt ?: 0,
+    waterCnt = waterCnt ?: 0,
+    stepsCnt = stepsCnt ?: 0,
+    stepsKcal = stepsKcal?.toInt() ?: 0,
+    exerciseKcal = exerciseKcal?.toInt() ?: 0,
+    exerciseMinutes = exerciseMin?.toInt() ?: 0,
+    totalMealKcal = totalMealKcal?.toInt() ?: 0,
+    mealCount = meals.size,
 )

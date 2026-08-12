@@ -13,6 +13,7 @@ import iti.grad.nutriscan.data.remote.dto.ForgotPasswordRequestDto
 import iti.grad.nutriscan.domain.auth.model.AuthTokens
 import iti.grad.nutriscan.domain.auth.model.OidcAuthConfig
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.domain.common.model.DomainException
 import kotlinx.serialization.json.Json
 
 import timber.log.Timber
@@ -31,14 +32,14 @@ class AuthRepositoryImpl @Inject constructor(
     private val database: NutriScanDatabase
 ) : IAuthRepository {
 
-    override suspend fun register(email: String, password: String): Result<Unit> {
+    override suspend fun register(firstName: String, lastName: String, email: String, password: String): Result<Unit> {
         return try {
-            val emailPrefix = email.substringBefore("@")
+            val username = email.substringBefore("@")
             val request = RegisterRequestDto(
-                firstName = emailPrefix,
-                lastName = "",
+                firstName = firstName,
+                lastName = lastName,
                 email = email,
-                username = email,
+                username = username,
                 password = password,
                 dateOfBirth = "2000-01-01",
                 gender = "MALE",
@@ -48,7 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
                 diseases = emptyList()
             )
 
-            Timber.d("Registration attempt for email: $email, username: $email")
+            Timber.d("Registration attempt for email: $email, username: $username")
             val response = remoteDataSource.register(request)
 
             if (response.isSuccessful) {
@@ -58,11 +59,11 @@ class AuthRepositoryImpl @Inject constructor(
                 val rawError = response.errorBody()?.string()
                 Timber.e("Registration failed with code: ${response.code()}, errorBody: $rawError")
                 val errorMessage = parseErrorMessage(rawError)
-                Result.failure(Exception(errorMessage))
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception during registration")
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -74,11 +75,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -96,11 +98,12 @@ class AuthRepositoryImpl @Inject constructor(
                 )
                 saveTokens(authTokens)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -120,7 +123,7 @@ class AuthRepositoryImpl @Inject constructor(
             tokenManager.saveTokens(access, refresh, authTokens.idToken)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -132,11 +135,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                val errorMessage = parseErrorMessage(response.errorBody()?.string())
-                Result.failure(Exception(errorMessage))
+                val rawError = response.errorBody()?.string()
+                val errorMessage = parseErrorMessage(rawError)
+                Result.failure(mapToDomainException(response.code(), rawError, errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(mapExceptionToDomain(e))
         }
     }
 
@@ -155,6 +159,22 @@ class AuthRepositoryImpl @Inject constructor(
             apiError.message + detailSuffix
         } catch (_: Exception) {
             "An unexpected error occurred."
+        }
+    }
+
+    private fun mapToDomainException(code: Int, rawError: String?, parsedMessage: String): DomainException {
+        return when {
+            code == 401 || rawError?.contains("invalid_grant") == true -> DomainException.UnauthorizedException(parsedMessage)
+            code >= 500 -> DomainException.ServerException(parsedMessage)
+            else -> DomainException.UnknownException(parsedMessage)
+        }
+    }
+
+    private fun mapExceptionToDomain(e: Exception): DomainException {
+        return if (e is java.io.IOException) {
+            DomainException.NetworkException(cause = e)
+        } else {
+            DomainException.UnknownException(cause = e)
         }
     }
 
@@ -182,6 +202,18 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUserId(): String? = JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+    /**
+     * The `sub` claim identifies the signed-in account and scopes every per-user Room table.
+     *
+     * Falls back to the access token because the login request sends no `scope=openid`, so
+     * Keycloak never issues an id_token and [TokenManager.getIdToken] is always null. That made
+     * this return null for every signed-in user, and each caller then fell back to a shared
+     * device-local id — so every account on the device read and wrote the *same* rows. Both tokens
+     * are JWTs carrying the same `sub`, so reading it from the access token needs no realm or
+     * client change.
+     */
+    override suspend fun getCurrentUserId(): String? =
+        JwtDecoder.extractSubjectClaim(tokenManager.getIdToken())
+            ?: JwtDecoder.extractSubjectClaim(tokenManager.getAccessToken())
     override suspend fun getAccessToken(): String? = tokenManager.getAccessToken()
 }

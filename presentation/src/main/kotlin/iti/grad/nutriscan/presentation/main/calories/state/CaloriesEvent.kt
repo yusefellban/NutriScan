@@ -26,4 +26,8 @@ sealed interface CaloriesEvent {
     data object RemoveFoodConfirmed : CaloriesEvent
     data object RemoveFoodDismissed : CaloriesEvent
     data class FoodItemClicked(val product: ProductUiModel) : CaloriesEvent
+
+    /** Pull-to-refresh: re-pulls today's water/steps and meals from the backend, so data logged on
+     * another device (or lost to a reinstall) shows up without waiting for the next app start. */
+    data object Refreshed : CaloriesEvent
 }

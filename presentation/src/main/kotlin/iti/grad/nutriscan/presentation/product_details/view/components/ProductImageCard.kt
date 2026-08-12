@@ -27,7 +27,7 @@ fun ProductImageCard(
             .fillMaxWidth()
             .padding(start = 22.dp, end = 22.dp, top = 24.dp),
         shape = RoundedCornerShape(16.dp),
-        color = AppTheme.colors.ProductDetailImageCardBg,
+        color = AppTheme.colors.ScreenSurfaceBackground,
         shadowElevation = 4.dp,
         border = BorderStroke(3.dp, AppTheme.colors.Teal1000),
     ) {

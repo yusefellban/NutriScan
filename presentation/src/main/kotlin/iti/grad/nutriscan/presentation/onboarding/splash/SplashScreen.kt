@@ -65,6 +65,8 @@ fun SplashScreen(
     onNavigateToOnboarding: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToHome: () -> Unit,
+    onNavigateToProfileSetup: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit = {},
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -183,6 +185,10 @@ fun SplashScreen(
                 SplashEffect.NavigateToOnboarding -> onNavigateToOnboarding()
                 SplashEffect.NavigateToLogin -> onNavigateToLogin()
                 SplashEffect.NavigateToHome -> onNavigateToHome()
+                SplashEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
+                is SplashEffect.NavigateToAccountPendingDeletion -> {
+                    onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
+                }
             }
         }
     }
@@ -258,7 +264,7 @@ private fun LogoImage(tint: Color) {
 @Composable
 private fun SplashLightPreview() {
     AppTheme(darkTheme = false) {
-        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {}, onNavigateToProfileSetup = {})
     }
 }
 
@@ -266,6 +272,6 @@ private fun SplashLightPreview() {
 @Composable
 private fun SplashDarkPreview() {
     AppTheme(darkTheme = true) {
-        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {})
+        SplashScreen(onNavigateToOnboarding = {}, onNavigateToLogin = {}, onNavigateToHome = {}, onNavigateToProfileSetup = {})
     }
 }

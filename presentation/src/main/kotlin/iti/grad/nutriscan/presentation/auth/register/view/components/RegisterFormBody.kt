@@ -59,6 +59,34 @@ fun RegisterFormBody(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // ── First Name ─────────────────────────────────────────────────────
+        FigmaInputField(
+            value = state.firstName,
+            onValueChange = { onEvent(RegisterEvent.FirstNameChanged(it)) },
+            label = stringResource(R.string.first_name_label),
+            hint = stringResource(R.string.first_name_hint),
+            leadingIconRes = R.drawable.ic_gender_male,
+            hasError = state.firstNameErrorResId != null,
+            errorResId = state.firstNameErrorResId,
+            inputContainerBg = inputContainerBg,
+            inputLabelColor = inputLabelColor,
+            inputTextColor = inputTextColor
+        )
+
+        // ── Last Name ──────────────────────────────────────────────────────
+        FigmaInputField(
+            value = state.lastName,
+            onValueChange = { onEvent(RegisterEvent.LastNameChanged(it)) },
+            label = stringResource(R.string.last_name_label),
+            hint = stringResource(R.string.last_name_hint),
+            leadingIconRes = R.drawable.ic_gender_male,
+            hasError = state.lastNameErrorResId != null,
+            errorResId = state.lastNameErrorResId,
+            inputContainerBg = inputContainerBg,
+            inputLabelColor = inputLabelColor,
+            inputTextColor = inputTextColor
+        )
+
         // ── Email ──────────────────────────────────────────────────────────
         FigmaInputField(
             value = state.email,

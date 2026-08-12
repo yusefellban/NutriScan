@@ -10,6 +10,7 @@ data class FamilyMemberDto(
     val id: String? = null,
     val name: String,
     val relation: String? = null,
+    @SerialName("imageUrl") val imageUrl: String? = null,
     @SerialName("allergyIds") val allergyIds: List<Int> = emptyList(),
     @SerialName("diseaseIds") val diseaseIds: List<Int> = emptyList(),
     val allergies: List<AllergyDto>? = null,
@@ -21,6 +22,7 @@ fun FamilyMemberDto.toEntity(): FamilyMemberEntity {
         id = id ?: UUID.randomUUID().toString(),
         name = name,
         relation = relation ?: "",
+        imageUrl = imageUrl,
         allergyIds = if (allergyIds.isNotEmpty()) allergyIds else (allergies?.map { it.id } ?: emptyList()),
         diseaseIds = if (diseaseIds.isNotEmpty()) diseaseIds else (diseases?.map { it.id } ?: emptyList()),
     )

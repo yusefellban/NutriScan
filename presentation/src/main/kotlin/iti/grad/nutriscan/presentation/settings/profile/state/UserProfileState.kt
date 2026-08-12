@@ -12,7 +12,11 @@ import kotlinx.collections.immutable.persistentListOf
 data class UserProfileState(
     val userName: String = "",
     val avatarUrl: String? = null,
+    /** Cache-busting token for the avatar image — see [iti.grad.nutriscan.presentation.common.components.rememberAvatarImageRequest]. */
+    val avatarUpdatedAt: String? = null,
     val streakDays: Int = 0,
+    /** Drives the pull-to-refresh indicator. */
+    val isRefreshing: Boolean = false,
     val familyMembers: ImmutableList<FamilyMemberUiModel> = persistentListOf(),
     /** Non-null while the remove-family-member confirmation dialog is showing. */
     val memberPendingDeletion: FamilyMemberUiModel? = null,

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 /**
@@ -38,7 +39,7 @@ fun ProfileMenuRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.ProfileMenuRowBackground)
+            .background(AppTheme.colors.SurfaceVariant)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -51,7 +52,7 @@ fun ProfileMenuRow(
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(AppTheme.colors.ProfileMenuIconBackground.copy(alpha = 0.55f)),
+                .background(AppTheme.colors.MenuIconContainerBackground.copy(alpha = 0.55f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -65,17 +66,18 @@ fun ProfileMenuRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.ProfileMenuLabel,
+            color = AppTheme.colors.MenuSectionLabel,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
         )
 
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_right),
+            painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
             contentDescription = null,
             tint = AppTheme.colors.ProfileMenuChevron,
             modifier = Modifier.size(24.dp),
         )
     }
 }
+

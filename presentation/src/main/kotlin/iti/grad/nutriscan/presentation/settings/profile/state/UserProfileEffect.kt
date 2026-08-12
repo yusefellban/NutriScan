@@ -11,8 +11,9 @@ import iti.grad.nutriscan.presentation.common.model.BottomNavTab
 sealed interface UserProfileEffect {
     data object NavigateToEditProfile : UserProfileEffect
     data object NavigateToScanHistory : UserProfileEffect
-    data object NavigateToNotifications : UserProfileEffect
+    data object NavigateToNotificationSettings : UserProfileEffect
     data object NavigateToSettings : UserProfileEffect
+    data object NavigateToCaloriesHistory : UserProfileEffect
     data class ShowError(val message: String) : UserProfileEffect
     data class NavigateToTab(val tab: BottomNavTab) : UserProfileEffect
 }

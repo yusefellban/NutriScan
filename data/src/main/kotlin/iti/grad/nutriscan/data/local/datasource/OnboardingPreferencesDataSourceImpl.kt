@@ -14,6 +14,7 @@ class OnboardingPreferencesDataSourceImpl @Inject constructor(
 
     private object PreferencesKeys {
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        val PROFILE_SETUP_COMPLETED = booleanPreferencesKey("profile_setup_completed")
     }
 
     override suspend fun isOnboardingCompleted(): Boolean {
@@ -25,6 +26,18 @@ class OnboardingPreferencesDataSourceImpl @Inject constructor(
     override suspend fun setOnboardingCompleted() {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.ONBOARDING_COMPLETED] = true
+        }
+    }
+
+    override suspend fun isProfileSetupCompleted(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.PROFILE_SETUP_COMPLETED] ?: false
+        }.first()
+    }
+
+    override suspend fun setProfileSetupCompleted() {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.PROFILE_SETUP_COMPLETED] = true
         }
     }
 }

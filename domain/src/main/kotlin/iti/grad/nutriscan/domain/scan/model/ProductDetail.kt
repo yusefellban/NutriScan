@@ -21,8 +21,11 @@ data class ProductDetail(
     val flaggedIngredients: List<FlaggedIngredient>,
     val calories: String?,
     val servingSize: String?,
-    val sugar: String?,
+    val protein: String?,
+    val carbs: String?,
     val fat: String?,
-    val saturatedFat: String?,
+    val fiber: String?,
+    val sugar: String?,
+    val sodium: String?,
     val isBookmarked: Boolean,
 )

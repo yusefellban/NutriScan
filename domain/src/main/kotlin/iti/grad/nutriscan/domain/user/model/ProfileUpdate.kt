@@ -8,6 +8,5 @@ data class ProfileUpdate(
     val heightCm: Double? = null,
     val weightKg: Double? = null,
     val diseaseIds: List<Int>? = null,
-    val allergyIds: List<Int>? = null,
-    val avatarUrl: String? = null
+    val allergyIds: List<Int>? = null
 )

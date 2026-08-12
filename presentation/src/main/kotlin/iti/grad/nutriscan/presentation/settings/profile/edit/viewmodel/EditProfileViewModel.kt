@@ -15,6 +15,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 
 import android.content.Context
+import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 
@@ -26,9 +27,11 @@ import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.None
 import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
+import iti.grad.nutriscan.presentation.settings.profile.edit.state.AvatarUploadState
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileState
 import iti.grad.nutriscan.domain.user.usecase.GetUserProfileUseCase
 import iti.grad.nutriscan.domain.user.usecase.UpdateUserProfileUseCase
+import iti.grad.nutriscan.domain.user.usecase.UploadAvatarUseCase
 import iti.grad.nutriscan.domain.allergy.usecase.GetAllergiesUseCase
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEffect
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
@@ -46,6 +49,7 @@ import timber.log.Timber
 class EditProfileViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private val uploadAvatarUseCase: UploadAvatarUseCase,
     private val getDiseasesUseCase: GetDiseasesUseCase,
     private val getAllergiesUseCase: GetAllergiesUseCase,
     private val syncDiseasesUseCase: SyncDiseasesUseCase,
@@ -60,6 +64,9 @@ class EditProfileViewModel @Inject constructor(
 
     private val _effect = Channel<EditProfileEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    /** Remembers the last picked photo Uri purely so [EditProfileEvent.RetryAvatarUpload] can re-run it. */
+    private var lastPickedAvatarUri: Uri? = null
 
     init {
         loadDiseasesOffline()
@@ -76,6 +83,7 @@ class EditProfileViewModel @Inject constructor(
                             heightCm = user.heightCm,
                             weightKg = user.weightKg,
                             avatarUrl = user.avatarUrl,
+                            avatarUpdatedAt = user.updatedAt,
                             selectedDiseaseIds = user.diseaseIds.toPersistentList(),
                             selectedAllergyIds = user.allergyIds.toPersistentList()
                         )
@@ -102,7 +110,13 @@ class EditProfileViewModel @Inject constructor(
             EditProfileEvent.ConfirmSave -> saveProfileData()
             EditProfileEvent.DismissSaveConfirmation -> _state.update { it.copy(showSaveConfirmation = false) }
             EditProfileEvent.BackClicked -> emitEffect(EditProfileEffect.NavigateBack)
-            is EditProfileEvent.SelectAvatar -> _state.update { it.copy(avatarUrl = event.avatarUrl) }
+            is EditProfileEvent.SelectAvatar -> {
+                lastPickedAvatarUri = event.uri
+                uploadAvatar(event.uri)
+            }
+            EditProfileEvent.RetryAvatarUpload -> lastPickedAvatarUri?.let { uploadAvatar(it) }
+            EditProfileEvent.DismissAvatarUploadError ->
+                _state.update { it.copy(avatarUploadState = AvatarUploadState.Idle) }
             is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
             is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
             EditProfileEvent.DismissAlert -> {
@@ -190,32 +204,54 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Uploads a freshly picked photo immediately (independent of the rest of the
+     * profile form / the Save button). The picked [uri] is first copied into
+     * [Context.getCacheDir] because content:// picker Uris are only guaranteed to be
+     * readable for the lifetime of this call, not for the duration of a background
+     * upload. The new avatar URL is not written into state directly — it arrives
+     * through the existing [getUserProfileUseCase] Flow once [uploadAvatarUseCase]
+     * persists the backend's response, exactly like every other profile field.
+     */
+    private fun uploadAvatar(uri: Uri) {
+        _state.update { it.copy(avatarUploadState = AvatarUploadState.Uploading) }
+        viewModelScope.launch {
+            val tempFile = try {
+                copyToCacheFile(uri)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to read picked avatar image")
+                _state.update { it.copy(avatarUploadState = AvatarUploadState.Error) }
+                return@launch
+            }
+
+            uploadAvatarUseCase(tempFile)
+                .onSuccess {
+                    tempFile.delete()
+                    _state.update { it.copy(avatarUploadState = AvatarUploadState.Idle) }
+                }
+                .onFailure { error ->
+                    tempFile.delete()
+                    Timber.w(error, "Avatar upload failed")
+                    _state.update { it.copy(avatarUploadState = AvatarUploadState.Error) }
+                }
+        }
+    }
+
+    private fun copyToCacheFile(uri: Uri): File {
+        val file = File(context.cacheDir, "avatar_upload_${System.currentTimeMillis()}.jpg")
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output -> input.copyTo(output) }
+        } ?: throw java.io.IOException("Unable to open picked image")
+        return file
+    }
+
     private fun saveProfileData() {
         _state.update { it.copy(isSaving = true, showSaveConfirmation = false) }
         viewModelScope.launch {
             val currentState = _state.value
-            var finalAvatarUrl = currentState.avatarUrl
-            
-            // If the user selected a new image from the PhotoPicker, it will be a content:// URI.
-            // These URIs lose permission after app restart, so we must copy the file to internal storage.
-            if (finalAvatarUrl != null && finalAvatarUrl.startsWith("content://")) {
-                try {
-                    val uri = android.net.Uri.parse(finalAvatarUrl)
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    // Save to a static filename so we don't leak space with multiple edits
-                    val file = File(context.filesDir, "profile_avatar.jpg")
-                    inputStream?.use { input ->
-                        file.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    // Coil and standard URI parsers handle file:// schemes perfectly
-                    finalAvatarUrl = "file://" + file.absolutePath
-                } catch (e: Exception) {
-                    // If copy fails, fallback to what we had (or ignore)
-                }
-            }
-            
+
+            // The avatar picture is uploaded separately via uploadAvatar() as soon as it's
+            // picked — it is never part of this text-field PATCH request.
             updateUserProfileUseCase(
                 firstName = currentState.firstName,
                 lastName = currentState.lastName.takeIf { it.isNotBlank() },
@@ -224,8 +260,7 @@ class EditProfileViewModel @Inject constructor(
                 heightCm = currentState.heightCm,
                 weightKg = currentState.weightKg,
                 diseaseIds = currentState.selectedDiseaseIds,
-                allergyIds = currentState.selectedAllergyIds,
-                avatarUrl = finalAvatarUrl
+                allergyIds = currentState.selectedAllergyIds
             ).onSuccess {
                 // Re-fetch the profile so the backend can return the newly
                 // re-computed BMI and TDEE (which depend on heightCm / weightKg).

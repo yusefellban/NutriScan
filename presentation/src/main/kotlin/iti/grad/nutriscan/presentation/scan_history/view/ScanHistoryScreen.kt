@@ -31,9 +31,13 @@ import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
+import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
+import iti.grad.nutriscan.presentation.scan_history.state.*
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 @Composable
 fun ScanHistoryScreen(
@@ -111,40 +115,32 @@ private fun ScanHistoryContent(
                 )
 
                 if (state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = AppTheme.colors.Primary)
-                    }
-                } else if (state.error != null && state.allHistoryItems.isEmpty()) {
-                    Box(
+                    LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = state.error,
-                                color = AppTheme.colors.TextSecondary,
-                                style = AppTheme.typography.bodyLarge
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = { onEvent(ScanHistoryEvent.RetryLoad) },
-                                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.Primary)
-                            ) {
-                                Text(stringResource(R.string.action_retry), color = Color.White)
-                            }
+                        items(8) {
+                            HistoryItemShimmerCard(modifier = Modifier.padding(vertical = 6.dp))
                         }
                     }
+                } else if (state.error != null && state.allHistoryItems.isEmpty()) {
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_network_connection_light,
+                        darkImageRes = R.drawable.no_network_connection_dark,
+                        title = stringResource(R.string.offline_state_title),
+                        subtitle = stringResource(R.string.offline_state_subtitle),
+                        buttonText = stringResource(R.string.offline_state_retry),
+                        onButtonClick = { onEvent(ScanHistoryEvent.RetryLoad) },
+                    )
                 } else if (state.displayedHistoryItems.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.scan_history_empty),
-                            color = AppTheme.colors.TextSecondary,
-                            style = AppTheme.typography.bodyLarge
-                        )
-                    }
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_scans_yet_light,
+                        darkImageRes = R.drawable.no_scans_yet_dark,
+                        title = stringResource(R.string.scan_history_empty_title),
+                        subtitle = stringResource(R.string.scan_history_empty_subtitle),
+                        buttonText = stringResource(R.string.scan_history_empty_button),
+                        onButtonClick = { onEvent(ScanHistoryEvent.BackClicked) },
+                    )
                 } else {
                     LazyColumn(
                         state = listState,

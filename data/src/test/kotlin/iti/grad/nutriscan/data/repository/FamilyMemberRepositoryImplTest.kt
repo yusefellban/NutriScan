@@ -13,9 +13,11 @@ import iti.grad.nutriscan.data.remote.dto.toEntity
 import iti.grad.nutriscan.data.remote.dto.UpdateUserProfileRequestDto
 import iti.grad.nutriscan.data.remote.dto.UserDto
 import iti.grad.nutriscan.domain.family.model.FamilyMemberInput
+import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
@@ -33,7 +35,9 @@ class FamilyMemberRepositoryImplTest {
     private lateinit var remoteDataSource: IUserRemoteDataSource
     private lateinit var tokenManager: TokenManager
     private lateinit var json: Json
+    private lateinit var userRepository: IUserRepository
     private lateinit var repository: FamilyMemberRepositoryImpl
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private var currentUserEntity = UserEntity(
         id = userId,
@@ -66,6 +70,8 @@ class FamilyMemberRepositoryImplTest {
         remoteDataSource = mockk()
         tokenManager = mockk(relaxed = true)
         json = Json { ignoreUnknownKeys = true }
+        userRepository = mockk()
+        coEvery { userRepository.fetchAndSyncProfile() } returns Result.success(Unit)
 
         currentUserEntity = userEntity()
         coEvery { userDao.getUserFlow() } answers { MutableStateFlow(currentUserEntity) }
@@ -79,11 +85,13 @@ class FamilyMemberRepositoryImplTest {
             remoteDataSource = remoteDataSource,
             json = json,
             tokenManager = tokenManager,
+            userRepository = userRepository,
+            ioDispatcher = testDispatcher,
         )
     }
 
     @Test
-    fun `addFamilyMember success path persists optimistic entity then reconciles with server ids`() = runTest {
+    fun `addFamilyMember success path persists optimistic entity then reconciles with server ids`() = runTest(testDispatcher) {
         coEvery { remoteDataSource.updateProfile(any()) } returns successResponse()
         coEvery { remoteDataSource.getProfile() } returns userDto(
             familyMembers = listOf(
@@ -103,7 +111,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `addFamilyMember sends the full existing list plus the new member to the backend`() = runTest {
+    fun `addFamilyMember sends the full existing list plus the new member to the backend`() = runTest(testDispatcher) {
         currentUserEntity = currentUserEntity.copy(
             familyMembers = listOf(
                 FamilyMemberEntity(id = "existing-1", name = "Father", allergyIds = emptyList(), diseaseIds = emptyList())
@@ -132,7 +140,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `addFamilyMember failure path rolls back Room to the pre-add list`() = runTest {
+    fun `addFamilyMember failure path rolls back Room to the pre-add list`() = runTest(testDispatcher) {
         currentUserEntity = currentUserEntity.copy(
             familyMembers = listOf(
                 FamilyMemberEntity(id = "existing-1", name = "Father", allergyIds = emptyList(), diseaseIds = emptyList())
@@ -149,7 +157,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `removeFamilyMember success path deletes the member and reconciles with server response`() = runTest {
+    fun `removeFamilyMember success path deletes the member and reconciles with server response`() = runTest(testDispatcher) {
         currentUserEntity = currentUserEntity.copy(
             familyMembers = listOf(
                 FamilyMemberEntity(id = "existing-1", name = "Father", allergyIds = emptyList(), diseaseIds = emptyList())
@@ -165,7 +173,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `removeFamilyMember failure path rolls back Room so the member reappears`() = runTest {
+    fun `removeFamilyMember failure path rolls back Room so the member reappears`() = runTest(testDispatcher) {
         currentUserEntity = currentUserEntity.copy(
             familyMembers = listOf(
                 FamilyMemberEntity(id = "existing-1", name = "Father", allergyIds = emptyList(), diseaseIds = emptyList())
@@ -182,7 +190,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `getFamilyMembers reflects the current Room-backed list for the active user`() = runTest {
+    fun `getFamilyMembers reflects the current Room-backed list for the active user`() = runTest(testDispatcher) {
         currentUserEntity = currentUserEntity.copy(
             familyMembers = listOf(
                 FamilyMemberEntity(id = "existing-1", name = "Father", allergyIds = listOf(1), diseaseIds = listOf(2))
@@ -195,7 +203,7 @@ class FamilyMemberRepositoryImplTest {
     }
 
     @Test
-    fun `addFamilyMember when database has no user fallback retrieves from tokenManager and seeds placeholder user`() = runTest {
+    fun `addFamilyMember when database has no user fallback retrieves from tokenManager and seeds placeholder user`() = runTest(testDispatcher) {
         val userFlow = MutableStateFlow<UserEntity?>(null)
         coEvery { userDao.getUserFlow() } returns userFlow
 
@@ -204,7 +212,13 @@ class FamilyMemberRepositoryImplTest {
         coEvery { tokenManager.getAccessToken() } returns null
 
         val insertedUser = io.mockk.slot<UserEntity>()
-        coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } returns Unit
+        // The real DAO writes through to the flow the repository re-reads straight afterwards
+        // (getActiveUserId seeds the placeholder, then addFamilyMember reads the user back). A
+        // stub that only captures leaves that second read null, so the repository correctly
+        // reports "no local user" and the test fails for a reason that can't happen against Room.
+        coEvery { userDao.insertOrUpdateUser(capture(insertedUser)) } answers {
+            userFlow.value = insertedUser.captured
+        }
         coEvery { remoteDataSource.updateProfile(any()) } returns successResponse()
         coEvery { remoteDataSource.getProfile() } returns userDto(emptyList())
 

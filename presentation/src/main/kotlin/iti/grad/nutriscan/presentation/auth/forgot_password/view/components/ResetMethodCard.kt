@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ fun ResetMethodCard(
     modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(16.dp)
-    val cardBg = AppTheme.colors.MethodCardBackground
+    val cardBg = AppTheme.colors.Surface
     val borderColor = if (isSelected) {
         MaterialTheme.colorScheme.primary
     } else {
@@ -121,10 +122,11 @@ fun ResetMethodCard(
 
         // ── Trailing chevron ─────────────────────────────────────────────
         Icon(
-            painter = painterResource(R.drawable.ic_arrow_right),
+            painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
             contentDescription = null,
             tint = if (isSelected) MaterialTheme.colorScheme.primary else AppTheme.colors.Gray600,
             modifier = Modifier.size(24.dp)
         )
     }
 }
+

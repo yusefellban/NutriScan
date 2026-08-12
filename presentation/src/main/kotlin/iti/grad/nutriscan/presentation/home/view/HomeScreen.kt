@@ -12,11 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -43,6 +40,10 @@ import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.nutriscan.presentation.home.view.components.DailyHealthTipCard
 import iti.grad.nutriscan.presentation.home.view.components.ExploreItemRow
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.HomeScreenShimmer
+import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
 import iti.grad.nutriscan.presentation.home.viewmodel.HomeViewModel
@@ -67,6 +68,8 @@ fun HomeScreen(
     onNavigateToNews: () -> Unit = {},
     onNavigateToChatWithAi: () -> Unit = {},
     onNavigateToScan: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToAccountPendingDeletion: (String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -79,6 +82,8 @@ fun HomeScreen(
                 is HomeEffect.NavigateToChatWithAi -> onNavigateToChatWithAi()
                 is HomeEffect.NavigateToScan -> onNavigateToScan()
                 is HomeEffect.NavigateToHistory -> onNavigateToHistory()
+                is HomeEffect.NavigateToEditProfile -> onNavigateToEditProfile()
+                is HomeEffect.NavigateToAccountPendingDeletion -> onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
             }
         }
     }
@@ -109,26 +114,40 @@ private fun HomeFeedContent(
     onEvent: (HomeEvent) -> Unit,
     bottomPadding: Dp
 ) {
-        LazyColumn(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            // Must contrast with ProfileSheetBackground, or the sheet's
+            // rounded top corners have nothing to show through and render
+            // as sharp — same reasoning as UserProfileScreen.
+            .background(AppTheme.colors.ProfileHeaderBackground),
+    ) {
+        HomeGreetingHeader(
+            firstName = state.firstName,
+            avatarUrl = state.avatarUrl,
+            avatarUpdatedAt = state.avatarUpdatedAt,
+            onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
+            onAvatarClick = { onEvent(HomeEvent.AvatarClicked) },
+        )
+
+        PullToRefreshShimmerBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onEvent(HomeEvent.Refreshed) },
+            shimmer = { HomeScreenShimmer(contentPadding = PaddingValues(top = 16.dp, bottom = bottomPadding)) },
             modifier = Modifier
-                .fillMaxSize()
-                .background(AppTheme.colors.Background)
-                .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding()),
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(AppTheme.colors.Background),
+        ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
+                top = 16.dp,
                 bottom = bottomPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // ── Greeting Header ──
-            item {
-                HomeGreetingHeader(
-                    userName = state.userName,
-                    avatarUrl = state.avatarUrl,
-                    onNotificationClick = { onEvent(HomeEvent.NotificationClicked) },
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-            }
-
             // ── Daily Health Tip ──
             item {
                 DailyHealthTipCard()
@@ -148,7 +167,7 @@ private fun HomeFeedContent(
                 Text(
                     text = stringResource(R.string.home_explore),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.PrimaryVariant,
+                    color = AppTheme.colors.SectionSubtitle,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -182,7 +201,7 @@ private fun HomeFeedContent(
                     Text(
                         text = stringResource(R.string.home_recent_history),
                         style = AppTheme.typography.headlineMedium,
-                        color = AppTheme.colors.PrimaryVariant,
+                        color = AppTheme.colors.SectionSubtitle,
                     )
                     Text(
                         text = stringResource(R.string.home_view_all),
@@ -201,29 +220,16 @@ private fun HomeFeedContent(
             // ── History Items ──
             when {
                 state.isHistoryLoading -> {
-                    item {
-                        androidx.compose.foundation.layout.Box(
-                            modifier = Modifier.fillMaxWidth().padding(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = AppTheme.colors.Primary)
-                        }
+                    items(3) {
+                        HistoryItemShimmerCard(modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
                 state.historyError != null -> {
                     item {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = state.historyError, color = AppTheme.colors.VerdictRedText)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            AppButton(
-                                textResId = R.string.common_retry,
-                                isLoading = false,
-                                onClick = { onEvent(HomeEvent.RetryLoadHistory) }
-                            )
-                        }
+                        OfflineStateWidget(
+                            onRetry = { onEvent(HomeEvent.RetryLoadHistory) },
+                            modifier = Modifier.padding(vertical = 24.dp)
+                        )
                     }
                 }
                 state.recentHistory.isEmpty() -> {
@@ -252,4 +258,6 @@ private fun HomeFeedContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+        }
     }
+}

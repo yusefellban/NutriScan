@@ -1,49 +1,54 @@
 package iti.grad.nutriscan.presentation.saved.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.unit.Dp
 import iti.grad.presentation.R
-import iti.grad.nutriscan.presentation.common.components.EmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
+import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
+import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.saved.state.SavedEffect
 import iti.grad.nutriscan.presentation.saved.state.SavedEvent
 import iti.grad.nutriscan.presentation.saved.state.SavedState
 import iti.grad.nutriscan.presentation.saved.view.components.SavedProductGrid
+import iti.grad.nutriscan.presentation.saved.view.components.SavedProductShimmerGrid
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.nutriscan.presentation.saved.viewmodel.SavedViewModel
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun SavedScreen(
     viewModel: SavedViewModel = hiltViewModel(),
     bottomPadding: Dp = 0.dp,
     snackbarHostState: SnackbarHostState,
-    onNavigateToProductDetail: (ProductUiModel) -> Unit = {}
+    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
+    onNavigateToScan: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val addedTemplate = stringResource(id = R.string.food_log_added_snackbar)
@@ -59,16 +64,18 @@ fun SavedScreen(
                     // dismissed) never stalls this loop from handling the next effect — e.g. a
                     // bottom-nav tap right after a swipe must navigate immediately, not wait.
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(
+                        snackbarHostState.showAppSnackbar(
                             message = String.format(addedTemplate, effect.productName),
+                            type = SnackbarType.SUCCESS,
                             duration = SnackbarDuration.Short
                         )
                     }
                 }
                 is SavedEffect.ShowAddErrorSnackbar -> {
                     snackbarScope.launch {
-                        snackbarHostState.showSnackbar(
+                        snackbarHostState.showAppSnackbar(
                             message = addErrorMessage,
+                            type = SnackbarType.ERROR,
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -81,9 +88,8 @@ fun SavedScreen(
         state = state,
         onEvent = viewModel::onEvent,
         bottomPadding = bottomPadding,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding())
+        onNavigateToScan = onNavigateToScan,
+        modifier = Modifier.fillMaxSize(),
     )
 }
 
@@ -92,43 +98,99 @@ private fun SavedScreenContent(
     state: SavedState,
     onEvent: (SavedEvent) -> Unit,
     bottomPadding: Dp = 0.dp,
+    onNavigateToScan: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    if (state.filteredProducts.isEmpty()) {
-        Column(modifier = modifier.padding(bottom = bottomPadding)) {
-            SavedSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
+    Column(
+        modifier = modifier.background(AppTheme.colors.ProfileHeaderBackground),
+    ) {
+        SectionHeroHeader {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-            
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 56.dp, bottom = 16.dp),
             ) {
-                EmptyStateWidget(
-                    message = stringResource(id = R.string.saved_empty_state)
-                )
-            }
-        }
-    } else {
-        SavedProductGrid(
-            products = state.filteredProducts,
-            onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
-            onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = bottomPadding + 4.dp),
-            header = {
+                HeroHeaderTitle(text = stringResource(R.string.saved_screen_title))
+                // Pushes the search bar down to sit just above the item list below.
+                Spacer(modifier = Modifier.weight(1f))
                 SavedSearchBar(
                     query = state.searchQuery,
                     onQueryChange = { onEvent(SavedEvent.SearchQueryChanged(it)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp, vertical = 12.dp)
+                    textColor = Color.White,
+                    placeholderColor = Color.White.copy(alpha = 0.7f),
+                    borderColor = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
                 )
-            },
-            modifier = modifier
-        )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(AppTheme.colors.Background),
+        ) {
+            val shimmerGrid: @Composable () -> Unit = {
+                SavedProductShimmerGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
+                )
+            }
+
+            PullToRefreshShimmerBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(SavedEvent.Refreshed) },
+                shimmer = shimmerGrid,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+            when {
+                state.isLoading -> shimmerGrid()
+                state.error != null && state.products.isEmpty() -> {
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_network_connection_light,
+                        darkImageRes = R.drawable.no_network_connection_dark,
+                        title = stringResource(R.string.offline_state_title),
+                        subtitle = stringResource(R.string.offline_state_subtitle),
+                        buttonText = stringResource(R.string.offline_state_retry),
+                        onButtonClick = { onEvent(SavedEvent.RetryLoad) },
+                        modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                    )
+                }
+                state.filteredProducts.isEmpty() -> {
+                    if (state.searchQuery.isNotEmpty()) {
+                        AppEmptyStateWidget(
+                            lightImageRes = R.drawable.search_reasult_not_found_light,
+                            darkImageRes = R.drawable.search_reasult_not_found_dark,
+                            title = stringResource(R.string.search_not_found_title),
+                            subtitle = stringResource(R.string.search_not_found_subtitle),
+                            buttonText = stringResource(R.string.search_not_found_button),
+                            onButtonClick = onNavigateToScan,
+                            modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                        )
+                    } else {
+                        AppEmptyStateWidget(
+                            lightImageRes = R.drawable.saved_not_found_light,
+                            darkImageRes = R.drawable.saved_not_found_dark,
+                            title = stringResource(R.string.saved_empty_title),
+                            subtitle = stringResource(R.string.saved_empty_subtitle),
+                            buttonText = stringResource(R.string.saved_empty_button),
+                            onButtonClick = onNavigateToScan,
+                            modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
+                        )
+                    }
+                }
+                else -> {
+                    SavedProductGrid(
+                        products = state.filteredProducts,
+                        onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
+                        onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
+                    )
+                }
+            }
+            }
+        }
     }
 }

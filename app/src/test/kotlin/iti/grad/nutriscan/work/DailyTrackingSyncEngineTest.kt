@@ -8,6 +8,7 @@ import iti.grad.nutriscan.data.db.entity.FoodLogEntity
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingRepository
 import iti.grad.nutriscan.domain.dailytracking.usecase.SyncPendingDailyTrackingUseCase
+import iti.grad.nutriscan.domain.scan.repository.ISavedScanRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -23,26 +24,30 @@ import java.time.LocalDate
  */
 class DailyTrackingSyncEngineTest {
 
-    private fun pendingEntry(id: String, deleted: Boolean) = FoodLogEntity(
-        id = id,
-        userId = "user-1",
-        productId = id,
-        name = "Test food",
-        calories = 100,
-        imageUrl = null,
-        verdict = "SAFE",
-        loggedDate = "2026-07-26",
-        addedAtEpochMillis = 0L,
-        pendingSync = true,
-        deleted = deleted,
-    )
+    private fun pendingEntry(id: String, deleted: Boolean, backendCreated: Boolean = false, mealCnt: Int = 1) =
+        FoodLogEntity(
+            id = id,
+            userId = "user-1",
+            productId = id,
+            name = "Test food",
+            calories = 100,
+            imageUrl = null,
+            verdict = "SAFE",
+            loggedDate = "2026-07-26",
+            addedAtEpochMillis = 0L,
+            pendingSync = true,
+            deleted = deleted,
+            backendCreated = backendCreated,
+            mealCnt = mealCnt,
+        )
 
     @Test
-    fun `syncs yesterday and retries pending meal pushes and deletes`() = runTest {
+    fun `syncs today and retries pending meal and saved-scan pushes and deletes`() = runTest {
         val syncPendingDailyTracking = mockk<SyncPendingDailyTrackingUseCase>()
         val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
         val foodLogDao = mockk<FoodLogDao>()
         val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
         val yesterday = LocalDate.of(2026, 7, 26)
 
         coEvery { syncPendingDailyTracking(yesterday) } returns Result.success(Unit)
@@ -54,17 +59,55 @@ class DailyTrackingSyncEngineTest {
         coEvery { dailyTrackingRepository.pushMeal(any(), "push-me", any()) } returns Result.success(Unit)
         coEvery { dailyTrackingRepository.deleteMeal(any(), "delete-me") } returns Result.success(Unit)
         coEvery { foodLogDao.clearPendingSync("push-me") } returns Unit
+        coEvery { foodLogDao.markBackendCreated("push-me") } returns Unit
         coEvery { foodLogDao.hardDelete("delete-me") } returns Unit
+        coEvery { dailyTrackingRepository.syncAllPendingDays() } returns Result.success(Unit)
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.success(Unit)
 
-        val engine = DailyTrackingSyncEngine(syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository)
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
         val succeeded = engine.sync(yesterday)
 
         assertTrue(succeeded)
         coVerify { syncPendingDailyTracking(yesterday) }
+        coVerify { savedScanRepository.retryPendingSync() }
         coVerify { dailyTrackingRepository.pushMeal(LocalDate.of(2026, 7, 26), "push-me", 1) }
         coVerify { dailyTrackingRepository.deleteMeal(LocalDate.of(2026, 7, 26), "delete-me") }
         coVerify { foodLogDao.clearPendingSync("push-me") }
+        coVerify { foodLogDao.markBackendCreated("push-me") }
         coVerify { foodLogDao.hardDelete("delete-me") }
+    }
+
+    @Test
+    fun `a pending entry that already exists backend-side retries as PUT, not POST`() = runTest {
+        val syncPendingDailyTracking = mockk<SyncPendingDailyTrackingUseCase>()
+        val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
+        val foodLogDao = mockk<FoodLogDao>()
+        val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
+        val yesterday = LocalDate.of(2026, 7, 26)
+
+        coEvery { syncPendingDailyTracking(yesterday) } returns Result.success(Unit)
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        coEvery { foodLogDao.getPendingSyncEntries("user-1") } returns listOf(
+            pendingEntry("update-me", deleted = false, backendCreated = true, mealCnt = 3),
+        )
+        coEvery { dailyTrackingRepository.updateMeal(any(), "update-me", 3) } returns Result.success(Unit)
+        coEvery { foodLogDao.clearPendingSync("update-me") } returns Unit
+        coEvery { dailyTrackingRepository.syncAllPendingDays() } returns Result.success(Unit)
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.success(Unit)
+
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
+        val succeeded = engine.sync(yesterday)
+
+        assertTrue(succeeded)
+        coVerify(exactly = 0) { dailyTrackingRepository.pushMeal(any(), any(), any()) }
+        coVerify { dailyTrackingRepository.updateMeal(LocalDate.of(2026, 7, 26), "update-me", 3) }
+        coVerify { foodLogDao.clearPendingSync("update-me") }
+        coVerify(exactly = 0) { foodLogDao.markBackendCreated(any()) }
     }
 
     @Test
@@ -73,6 +116,7 @@ class DailyTrackingSyncEngineTest {
         val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
         val foodLogDao = mockk<FoodLogDao>()
         val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
         val yesterday = LocalDate.of(2026, 7, 26)
 
         coEvery { syncPendingDailyTracking(yesterday) } returns Result.success(Unit)
@@ -81,8 +125,12 @@ class DailyTrackingSyncEngineTest {
         coEvery {
             dailyTrackingRepository.pushMeal(any(), "push-me", any())
         } returns Result.failure(RuntimeException("network down"))
+        coEvery { dailyTrackingRepository.syncAllPendingDays() } returns Result.success(Unit)
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.success(Unit)
 
-        val engine = DailyTrackingSyncEngine(syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository)
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
         val succeeded = engine.sync(yesterday)
 
         assertFalse(succeeded)
@@ -96,14 +144,69 @@ class DailyTrackingSyncEngineTest {
         val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
         val foodLogDao = mockk<FoodLogDao>()
         val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
         val yesterday = LocalDate.of(2026, 7, 26)
 
         coEvery { syncPendingDailyTracking(yesterday) } returns Result.failure(RuntimeException("network down"))
         coEvery { authRepository.getCurrentUserId() } returns "user-1"
         coEvery { foodLogDao.getPendingSyncEntries("user-1") } returns emptyList()
+        coEvery { dailyTrackingRepository.syncAllPendingDays() } returns Result.success(Unit)
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.success(Unit)
 
-        val engine = DailyTrackingSyncEngine(syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository)
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
         val succeeded = engine.sync(yesterday)
+
+        assertFalse(succeeded)
+    }
+
+    @Test
+    fun `a failed backlog flush makes the overall result unsuccessful`() = runTest {
+        val syncPendingDailyTracking = mockk<SyncPendingDailyTrackingUseCase>()
+        val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
+        val foodLogDao = mockk<FoodLogDao>()
+        val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
+        val today = LocalDate.of(2026, 7, 27)
+
+        coEvery { syncPendingDailyTracking(today) } returns Result.success(Unit)
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        coEvery { foodLogDao.getPendingSyncEntries("user-1") } returns emptyList()
+        // An older day still owing a push failed to flush — the worker must retry rather than
+        // leaving a permanent gap in the backend's history.
+        coEvery {
+            dailyTrackingRepository.syncAllPendingDays()
+        } returns Result.failure(RuntimeException("network down"))
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.success(Unit)
+
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
+
+        assertFalse(engine.sync(today))
+        coVerify { dailyTrackingRepository.syncAllPendingDays() }
+    }
+
+    @Test
+    fun `failed saved-scan retry makes overall result unsuccessful`() = runTest {
+        val syncPendingDailyTracking = mockk<SyncPendingDailyTrackingUseCase>()
+        val dailyTrackingRepository = mockk<IDailyTrackingRepository>()
+        val foodLogDao = mockk<FoodLogDao>()
+        val authRepository = mockk<IAuthRepository>()
+        val savedScanRepository = mockk<ISavedScanRepository>()
+        val today = LocalDate.of(2026, 7, 27)
+
+        coEvery { syncPendingDailyTracking(today) } returns Result.success(Unit)
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        coEvery { foodLogDao.getPendingSyncEntries("user-1") } returns emptyList()
+        coEvery { dailyTrackingRepository.syncAllPendingDays() } returns Result.success(Unit)
+        coEvery { savedScanRepository.retryPendingSync() } returns Result.failure(RuntimeException("network down"))
+
+        val engine = DailyTrackingSyncEngine(
+            syncPendingDailyTracking, dailyTrackingRepository, foodLogDao, authRepository, savedScanRepository
+        )
+        val succeeded = engine.sync(today)
 
         assertFalse(succeeded)
     }

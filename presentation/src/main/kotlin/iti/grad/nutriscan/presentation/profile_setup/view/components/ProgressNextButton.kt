@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.directionalDrawable
 import iti.grad.presentation.R
 
 /**
@@ -44,7 +45,7 @@ fun ProgressNextButton(
     )
 
     val trackColor = AppTheme.colors.ProgressTrackColor
-    val progressColor = AppTheme.colors.ProgressFillColor
+    val progressColor = AppTheme.colors.Teal1000
 
     Box(
         modifier = modifier.size(80.dp),
@@ -93,10 +94,11 @@ fun ProgressNextButton(
                 )
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
+                painter = painterResource(directionalDrawable(R.drawable.ic_arrow_right, R.drawable.ic_arrow_left)),
                 contentDescription = stringResource(R.string.onboarding_next),
                 modifier = Modifier.size(16.dp)
             )
         }
     }
 }
+

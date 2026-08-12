@@ -7,6 +7,7 @@ import iti.grad.nutriscan.domain.scan.model.ProductDetail
 data class ProductDetailsState(
     val isLoading: Boolean = true,
     val productDetail: ProductDetail? = null,
-    val error: String? = null,
+    val errorMessageResId: Int? = null,
+    val isNotFound: Boolean = false,
     val showDeleteDialog: Boolean = false,
 )

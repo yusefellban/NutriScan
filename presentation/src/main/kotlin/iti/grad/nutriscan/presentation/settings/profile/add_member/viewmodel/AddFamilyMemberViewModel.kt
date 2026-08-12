@@ -9,6 +9,7 @@ import iti.grad.nutriscan.domain.disease.usecase.GetDiseasesUseCase
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.family.usecase.AddFamilyMemberUseCase
 import iti.grad.nutriscan.domain.family.usecase.GetFamilyMembersUseCase
+import iti.grad.nutriscan.domain.family.usecase.UploadFamilyMemberImageUseCase
 import iti.grad.nutriscan.domain.family.usecase.UpdateFamilyMemberUseCase
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEffect
 import iti.grad.nutriscan.presentation.settings.profile.add_member.state.AddFamilyMemberEvent
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -45,6 +47,7 @@ class AddFamilyMemberViewModel @Inject constructor(
     private val syncAllergiesUseCase: SyncAllergiesUseCase,
     private val addFamilyMemberUseCase: AddFamilyMemberUseCase,
     private val updateFamilyMemberUseCase: UpdateFamilyMemberUseCase,
+    private val uploadFamilyMemberImageUseCase: UploadFamilyMemberImageUseCase,
     private val getFamilyMembersUseCase: GetFamilyMembersUseCase,
 ) : ViewModel() {
 
@@ -77,6 +80,19 @@ class AddFamilyMemberViewModel @Inject constructor(
                 it.copy(selectedAllergyIds = it.selectedAllergyIds.toggle(event.id).toImmutableList())
             }
 
+            is AddFamilyMemberEvent.ImageSelected -> _state.update {
+                it.copy(
+                    selectedImagePath = event.imageFilePath,
+                    imageUploadErrorMessage = null
+                )
+            }
+
+            AddFamilyMemberEvent.RemoveSelectedImage -> _state.update {
+                it.copy(selectedImagePath = null, imageUploadErrorMessage = null)
+            }
+
+            AddFamilyMemberEvent.RetryImageUpload -> retryImageUpload()
+
             AddFamilyMemberEvent.RetryLoadDiseases -> loadDiseases()
             AddFamilyMemberEvent.RetryLoadAllergies -> loadAllergies()
             AddFamilyMemberEvent.SaveClicked -> save()
@@ -94,6 +110,11 @@ class AddFamilyMemberViewModel @Inject constructor(
                     relationError = null,
                     selectedDiseaseIds = persistentListOf(),
                     selectedAllergyIds = persistentListOf(),
+                    selectedImagePath = null,
+                    currentImageUrl = null,
+                    pendingImageUploadMemberId = null,
+                    isImageUploading = false,
+                    imageUploadErrorMessage = null,
                     editingMemberId = null
                 )
             }
@@ -111,6 +132,11 @@ class AddFamilyMemberViewModel @Inject constructor(
                                 relationError = null,
                                 selectedDiseaseIds = member.diseaseIds.toImmutableList(),
                                 selectedAllergyIds = member.allergyIds.toImmutableList(),
+                                selectedImagePath = null,
+                                currentImageUrl = member.imageUrl,
+                                pendingImageUploadMemberId = null,
+                                isImageUploading = false,
+                                imageUploadErrorMessage = null,
                                 editingMemberId = member.id
                             )
                         }
@@ -188,6 +214,8 @@ class AddFamilyMemberViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
             val editingId = _state.value.editingMemberId
+            val existingMemberIds = getFamilyMembersUseCase().first().map { it.id }.toSet()
+            val selectedImagePath = _state.value.selectedImagePath
             val result = if (editingId != null) {
                 updateFamilyMemberUseCase(
                     memberId = editingId,
@@ -204,11 +232,113 @@ class AddFamilyMemberViewModel @Inject constructor(
                     diseaseIds = _state.value.selectedDiseaseIds,
                 )
             }
-            _state.update { it.copy(isSaving = false) }
+
             result
-                .onSuccess { emitEffect(AddFamilyMemberEffect.Dismiss) }
-                .onFailure { emitEffect(AddFamilyMemberEffect.ShowError(it.message ?: "")) }
+                .onSuccess {
+                    _state.update { it.copy(isSaving = false) }
+
+                    if (selectedImagePath.isNullOrBlank()) {
+                        emitEffect(AddFamilyMemberEffect.Dismiss)
+                        return@onSuccess
+                    }
+
+                    val targetMemberId = editingId ?: resolveCreatedMemberId(
+                        existingIds = existingMemberIds,
+                        name = name,
+                        relation = relation,
+                    )
+
+                    if (targetMemberId.isNullOrBlank()) {
+                        _state.update {
+                            it.copy(
+                                imageUploadErrorMessage = null,
+                                pendingImageUploadMemberId = null,
+                            )
+                        }
+                        emitEffect(AddFamilyMemberEffect.ShowErrorRes(R.string.edit_profile_avatar_upload_error))
+                        return@onSuccess
+                    }
+
+                    _state.update { it.copy(pendingImageUploadMemberId = targetMemberId) }
+                    uploadImageForMember(memberId = targetMemberId, dismissOnSuccess = true)
+                }
+                .onFailure {
+                    _state.update { state -> state.copy(isSaving = false) }
+                    emitEffect(AddFamilyMemberEffect.ShowError(it.message ?: ""))
+                }
         }
+    }
+
+    private fun retryImageUpload() {
+        val memberId = _state.value.pendingImageUploadMemberId ?: _state.value.editingMemberId
+        if (memberId.isNullOrBlank()) {
+            emitEffect(AddFamilyMemberEffect.ShowErrorRes(R.string.edit_profile_avatar_upload_error))
+            return
+        }
+        uploadImageForMember(memberId = memberId, dismissOnSuccess = true)
+    }
+
+    private fun uploadImageForMember(memberId: String, dismissOnSuccess: Boolean) {
+        val imagePath = _state.value.selectedImagePath
+        if (imagePath.isNullOrBlank()) {
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isImageUploading = true,
+                    imageUploadErrorMessage = null,
+                    pendingImageUploadMemberId = memberId,
+                )
+            }
+
+            val uploadResult = uploadFamilyMemberImageUseCase(memberId, File(imagePath))
+
+            uploadResult
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isImageUploading = false,
+                            imageUploadErrorMessage = null,
+                            pendingImageUploadMemberId = null,
+                            currentImageUrl = null,
+                            selectedImagePath = null,
+                        )
+                    }
+                    if (dismissOnSuccess) {
+                        emitEffect(AddFamilyMemberEffect.Dismiss)
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            isImageUploading = false,
+                            imageUploadErrorMessage = error.message,
+                            pendingImageUploadMemberId = memberId,
+                        )
+                    }
+                    emitEffect(AddFamilyMemberEffect.ShowErrorRes(R.string.edit_profile_avatar_upload_error))
+                }
+        }
+    }
+
+    private suspend fun resolveCreatedMemberId(
+        existingIds: Set<String>,
+        name: String,
+        relation: String,
+    ): String? {
+        val members = getFamilyMembersUseCase().first()
+
+        val newMembers = members.filterNot { existingIds.contains(it.id) }
+        if (newMembers.size == 1) {
+            return newMembers.first().id
+        }
+
+        return members.firstOrNull { member ->
+            member.name.equals(name, ignoreCase = true) &&
+                member.relation.equals(relation, ignoreCase = true)
+        }?.id
     }
 
     private fun List<Int>.toggle(id: Int) = if (contains(id)) this - id else this + id

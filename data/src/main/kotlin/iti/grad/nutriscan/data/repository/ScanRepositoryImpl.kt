@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
+import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
 import iti.grad.nutriscan.domain.scan.model.ProductResult
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
@@ -12,6 +13,7 @@ import iti.grad.nutriscan.data.repository.mapper.toDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import iti.grad.nutriscan.data.di.IoDispatcher
+import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -24,10 +26,17 @@ import iti.grad.nutriscan.domain.scan.model.ScanStatus
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
     private val scanApiService: ScanApiService,
+    private val authRepository: IAuthRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IScanRepository {
 
     private var localRecentScans: MutableList<ScanHistoryEntry>? = null
+
+    /** Account [localRecentScans] was fetched for. This repository is a singleton and the cache is
+     * a plain field, so `database.clearAllTables()` on logout does not touch it: without this the
+     * next account to sign in was served the previous account's scans straight from memory, with
+     * no request made at all, until the process died. */
+    private var cachedScansUserId: String? = null
 
     override suspend fun getProductByBarcode(barcode: String): Result<ProductResult> {
         return withContext(ioDispatcher) {
@@ -110,13 +119,37 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Submit a barcode value for AI nutritional analysis.
+     *
+     * Hits POST /v1/scans/barcode with { "barcode": "<value>" }.
+     * Returns a [ScanResult] in PROCESSING status. The caller is responsible for polling
+     * [getScanResult] until the status transitions to COMPLETED or FAILED before
+     * surfacing any verdict — see [IScanRepository.submitBarcodeScan] KDoc.
+     */
+    override suspend fun submitBarcodeScan(barcode: String): Result<ScanResult> {
+        return withContext(ioDispatcher) {
+            try {
+                val response = scanApiService.submitBarcodeScan(BarcodeScanRequestDto(barcode))
+                Result.success(response.toDomain())
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
     override suspend fun getScanResult(scanId: String): Result<ScanResult> {
         return withContext(ioDispatcher) {
             try {
                 val response = scanApiService.getScanResult(scanId)
                 val domainResult = response.toDomain()
                 
-                if (domainResult.status == ScanStatus.COMPLETED) {
+                // Only extend the cache when it belongs to the account asking — otherwise a scan
+                // completed right after an account switch would be appended to the previous
+                // account's still-cached list.
+                if (domainResult.status == ScanStatus.COMPLETED &&
+                    authRepository.getCurrentUserId() == cachedScansUserId
+                ) {
                     localRecentScans?.let { cache ->
                         val newEntry = ScanHistoryEntry(
                             scanId = domainResult.scanId,
@@ -158,6 +191,7 @@ class ScanRepositoryImpl @Inject constructor(
                 val domainScans = response.content.map { it.toDomain() }
                 if (!isFiltered && page == 0) {
                     localRecentScans = domainScans.toMutableList()
+                    cachedScansUserId = userId
                 }
                 Result.success(domainScans)
             } catch (e: Exception) {

@@ -39,6 +39,8 @@ class NewsViewModel @Inject constructor(
     private val _effect = Channel<NewsEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private var allArticles = emptyList<NewsUiArticle>()
+
     init {
         viewModelScope.launch {
             buildNewsTopicChipsUseCase().collectLatest { chips ->
@@ -51,8 +53,20 @@ class NewsViewModel @Inject constructor(
     fun onEvent(event: NewsEvent) {
         when (event) {
             is NewsEvent.ChipClicked -> onChipClicked(event.chipId)
-            is NewsEvent.ArticleClicked -> emitEffect(NewsEffect.OpenArticle(event.url))
-            is NewsEvent.ShareClicked -> emitEffect(NewsEffect.ShareArticle(event.url, event.title))
+            is NewsEvent.ArticleClicked -> emitEffect(NewsEffect.NavigateToDetail(event.article))
+            is NewsEvent.CloseArticleClicked -> {
+                _state.update { it.copy(selectedArticle = null) }
+            }
+            is NewsEvent.OpenArticleInWeb -> {
+                // No longer directly used here, but kept for interface safety
+            }
+            is NewsEvent.SearchQueryChanged -> {
+                _state.update { it.copy(searchQuery = event.query) }
+                filterArticles()
+            }
+            is NewsEvent.FilterClicked -> {
+                // Filter click handler (future/no-op)
+            }
             is NewsEvent.BackClicked -> emitEffect(NewsEffect.NavigateBack)
             is NewsEvent.RetryClicked -> fetchArticles()
         }
@@ -69,6 +83,19 @@ class NewsViewModel @Inject constructor(
         fetchArticles()
     }
 
+    private fun filterArticles() {
+        val query = _state.value.searchQuery.trim()
+        val filtered = if (query.isEmpty()) {
+            allArticles
+        } else {
+            allArticles.filter {
+                it.title.contains(query, ignoreCase = true) ||
+                        (it.description?.contains(query, ignoreCase = true) == true)
+            }
+        }
+        _state.update { it.copy(articles = filtered.toPersistentList()) }
+    }
+
     private fun fetchArticles() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessageResId = null) }
@@ -83,12 +110,26 @@ class NewsViewModel @Inject constructor(
             }
             result
                 .onSuccess { articles ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            articles = articles.map { article -> article.toUiModel() }.toPersistentList(),
-                        )
+                    val chips = _state.value.chips
+                    val categoryLabel = chips.firstOrNull { it.id in selected && it.id != NewsTopicChip.ALL_CHIP_ID }?.label
+                    
+                    allArticles = articles.map { article ->
+                        val inferredCategory = categoryLabel ?: if (
+                            article.sourceName.contains("health", ignoreCase = true) || 
+                            article.sourceName.contains("science", ignoreCase = true) ||
+                            article.sourceName.contains("medical", ignoreCase = true) ||
+                            article.title.contains("collagen", ignoreCase = true) ||
+                            article.title.contains("disease", ignoreCase = true) ||
+                            article.title.contains("virus", ignoreCase = true)
+                        ) {
+                            "Health"
+                        } else {
+                            "News"
+                        }
+                        article.toUiModel(inferredCategory)
                     }
+                    filterArticles()
+                    _state.update { it.copy(isLoading = false) }
                 }
                 .onFailure {
                     _state.update {
@@ -102,7 +143,7 @@ class NewsViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private fun NewsArticle.toUiModel(): NewsUiArticle = NewsUiArticle(
+    private fun NewsArticle.toUiModel(category: String): NewsUiArticle = NewsUiArticle(
         title = title,
         description = description,
         url = url,
@@ -110,5 +151,6 @@ class NewsViewModel @Inject constructor(
         sourceName = sourceName,
         publishedAtLabel = publishedAt.orEmpty(),
         author = author,
+        category = category,
     )
 }

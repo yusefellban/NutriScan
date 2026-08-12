@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.data.repository
 
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.entity.FoodLogEntity
@@ -10,11 +11,13 @@ import iti.grad.nutriscan.domain.dailytracking.repository.IDailyTrackingReposito
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.streak.repository.IStreakRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,6 +36,23 @@ private class FakeFoodLogDao : FoodLogDao {
 
     override suspend fun getByIdForUser(id: String, userId: String): FoodLogEntity? =
         entries.value.find { it.id == id && it.userId == userId }
+
+    override suspend fun getByUserProductAndDate(userId: String, productId: String, date: String): FoodLogEntity? =
+        entries.value.find {
+            it.userId == userId && it.productId == productId && it.loggedDate == date && !it.deleted
+        }
+
+    override suspend fun updateMealCnt(id: String, mealCnt: Int) {
+        entries.value = entries.value.map {
+            if (it.id == id) it.copy(mealCnt = mealCnt, pendingSync = true) else it
+        }
+    }
+
+    override suspend fun markBackendCreated(id: String) {
+        entries.value = entries.value.map {
+            if (it.id == id) it.copy(backendCreated = true) else it
+        }
+    }
 
     override suspend fun markDeletedForUser(id: String, userId: String) {
         entries.value = entries.value.map {
@@ -75,12 +95,14 @@ class FoodLogRepositoryImplTest {
 
     @BeforeEach
     fun setup() {
+        stubAndroidLog()
         dao = FakeFoodLogDao()
         authRepository = mockk()
         streakRepository = mockk(relaxed = true)
         dailyTrackingRepository = mockk()
         coEvery { dailyTrackingRepository.pushMeal(any(), any(), any()) } returns Result.success(Unit)
         coEvery { dailyTrackingRepository.deleteMeal(any(), any()) } returns Result.success(Unit)
+        coEvery { dailyTrackingRepository.updateMeal(any(), any(), any()) } returns Result.success(Unit)
         repository = FoodLogRepositoryImpl(
             dao,
             authRepository,
@@ -90,34 +112,37 @@ class FoodLogRepositoryImplTest {
         )
     }
 
+    // These three used to assert the opposite — that a logged-out caller silently fell through to a
+    // shared "local_device_user" bucket. That bucket was visible to every account on the device, so
+    // the old behaviour was the cross-account data leak, not a feature worth preserving.
+
     @Test
-    fun `addFoodEntry falls back to the local device user when logged out`() = runTest {
+    fun `addFoodEntry fails instead of writing to a shared bucket when logged out`() = runTest {
         coEvery { authRepository.getCurrentUserId() } returns null
 
         val result = repository.addFoodEntry(entry())
 
-        assertTrue(result.isSuccess)
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { dailyTrackingRepository.pushMeal(any(), any(), any()) }
     }
 
     @Test
-    fun `observeTodayFoodLog returns entries added while logged out via the local device user`() = runTest {
+    fun `observeTodayFoodLog exposes no rows when logged out`() = runTest {
         coEvery { authRepository.getCurrentUserId() } returns null
-        repository.addFoodEntry(entry())
 
-        val entries = repository.observeTodayFoodLog().first()
-
-        assertEquals(1, entries.size)
+        assertThrows(IllegalStateException::class.java) {
+            runBlocking { repository.observeTodayFoodLog().first() }
+        }
     }
 
     @Test
-    fun `removeFoodEntry succeeds when logged out via the local device user`() = runTest {
+    fun `removeFoodEntry fails instead of touching a shared bucket when logged out`() = runTest {
         coEvery { authRepository.getCurrentUserId() } returns null
-        repository.addFoodEntry(entry())
 
         val result = repository.removeFoodEntry("entry-1")
 
-        assertTrue(result.isSuccess)
-        assertTrue(repository.observeTodayFoodLog().first().isEmpty())
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { dailyTrackingRepository.deleteMeal(any(), any()) }
     }
 
     @Test
@@ -154,5 +179,47 @@ class FoodLogRepositoryImplTest {
         repository.addFoodEntry(entry())
 
         assertEquals(1, dao.getPendingSyncEntries("user-1").size)
+    }
+
+    @Test
+    fun `adding the same product twice increments mealCnt and calls updateMeal, not pushMeal again`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+
+        repository.addFoodEntry(entry(id = "entry-1"))
+        repository.addFoodEntry(entry(id = "entry-2"))
+
+        val entries = repository.observeTodayFoodLog().first()
+        assertEquals(1, entries.size)
+        assertEquals(2, entries.first().mealCnt)
+        coVerify(exactly = 1) { dailyTrackingRepository.pushMeal(any(), "product-1", 1) }
+        coVerify(exactly = 1) { dailyTrackingRepository.updateMeal(any(), "product-1", 2) }
+    }
+
+    @Test
+    fun `removeFoodEntry decrements mealCnt via updateMeal when the count stays above zero`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        repository.addFoodEntry(entry(id = "entry-1"))
+        repository.addFoodEntry(entry(id = "entry-2"))
+
+        val result = repository.removeFoodEntry("entry-1")
+
+        assertTrue(result.isSuccess)
+        val entries = repository.observeTodayFoodLog().first()
+        assertEquals(1, entries.size)
+        assertEquals(1, entries.first().mealCnt)
+        coVerify(exactly = 1) { dailyTrackingRepository.updateMeal(any(), "product-1", 1) }
+        coVerify(exactly = 0) { dailyTrackingRepository.deleteMeal(any(), any()) }
+    }
+
+    @Test
+    fun `removeFoodEntry deletes and calls deleteMeal only once mealCnt reaches zero`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user-1"
+        repository.addFoodEntry(entry(id = "entry-1"))
+
+        val result = repository.removeFoodEntry("entry-1")
+
+        assertTrue(result.isSuccess)
+        assertTrue(repository.observeTodayFoodLog().first().isEmpty())
+        coVerify(exactly = 1) { dailyTrackingRepository.deleteMeal(any(), "product-1") }
     }
 }
