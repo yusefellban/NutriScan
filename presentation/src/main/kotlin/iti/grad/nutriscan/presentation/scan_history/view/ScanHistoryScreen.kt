@@ -195,7 +195,20 @@ private fun ScanHistoryContent(
     }
 
     if (state.showDatePicker) {
+        val initialMillis = remember(state.selectedDate) {
+            state.selectedDate?.let {
+                try {
+                    java.time.LocalDate.parse(it, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        .atStartOfDay(java.time.ZoneOffset.UTC)
+                        .toInstant()
+                        .toEpochMilli()
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
         ScanDatePickerDialog(
+            initialDateMillis = initialMillis,
             onDateSelected = { dateMillis -> onEvent(ScanHistoryEvent.DateSelected(dateMillis)) },
             onDismiss = { onEvent(ScanHistoryEvent.ShowDatePicker(false)) }
         )
@@ -258,10 +271,12 @@ private fun FilterRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanDatePickerDialog(
+    initialDateMillis: Long?,
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDateMillis,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis <= System.currentTimeMillis()
@@ -277,8 +292,16 @@ fun ScanDatePickerDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
+            Row {
+                TextButton(
+                    onClick = { onDateSelected(null) },
+                    enabled = datePickerState.selectedDateMillis != null
+                ) {
+                    Text("Reset")
+                }
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             }
         }
     ) {

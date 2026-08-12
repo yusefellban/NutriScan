@@ -132,7 +132,7 @@ class HomeViewModel @Inject constructor(
         _state.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
             reconcileTodayUseCase()
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { it.copy(recentHistory = mapScansToUi(scans), historyError = null) }
                 }
@@ -145,7 +145,7 @@ class HomeViewModel @Inject constructor(
 
     private fun refreshHistorySilently() {
         viewModelScope.launch {
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { state ->
                         state.copy(

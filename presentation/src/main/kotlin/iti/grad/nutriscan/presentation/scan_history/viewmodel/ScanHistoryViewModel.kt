@@ -155,14 +155,20 @@ class ScanHistoryViewModel @Inject constructor(
     // ──────────────────────────────────────────────────────────────
 
     private fun handleDateSelected(dateMillis: Long?) {
-        _state.update { it.copy(showDatePicker = false) }
-        if (dateMillis != null) {
-            val date = Instant.ofEpochMilli(dateMillis)
+        val newDate = if (dateMillis != null) {
+            Instant.ofEpochMilli(dateMillis)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            _state.update { it.copy(selectedDate = date) }
+        } else {
+            null
+        }
+        
+        if (_state.value.selectedDate != newDate) {
+            _state.update { it.copy(showDatePicker = false, selectedDate = newDate) }
             loadInitial()
+        } else {
+            _state.update { it.copy(showDatePicker = false) }
         }
     }
 
