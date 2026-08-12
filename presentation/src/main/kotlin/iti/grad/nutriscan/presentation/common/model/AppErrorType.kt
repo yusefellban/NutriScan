@@ -12,7 +12,9 @@ enum class AppErrorType {
     NETWORK,
     /** HTTP 5xx response — server is up but returned an error. */
     SERVER,
-    /** Anything else (4xx business errors, parsing errors, etc.). */
+    /** HTTP 404 response — resource not found. */
+    NOT_FOUND,
+    /** Anything else (other 4xx business errors, parsing errors, etc.). */
     UNKNOWN,
 }
 
@@ -25,6 +27,7 @@ enum class AppErrorType {
  */
 fun throwableToAppErrorType(error: Throwable): AppErrorType = when {
     error.message?.startsWith("5xx") == true -> AppErrorType.SERVER
+    error.message?.startsWith("404") == true || error.message?.contains("NOT_FOUND") == true -> AppErrorType.NOT_FOUND
     error is java.net.UnknownHostException
         || error is java.net.ConnectException
         || error is java.net.SocketTimeoutException

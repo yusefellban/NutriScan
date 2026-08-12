@@ -24,6 +24,7 @@ fun AppErrorWidget(
 ) {
     when (errorType) {
         AppErrorType.SERVER -> ServerProblemWidget(onRetry = onRetry, modifier = modifier)
+        AppErrorType.NOT_FOUND -> NotFoundStateWidget(onRetry = onRetry, modifier = modifier)
         else               -> OfflineStateWidget(onRetry = onRetry, modifier = modifier)
     }
 }

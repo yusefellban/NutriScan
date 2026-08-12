@@ -16,7 +16,7 @@ fun ServerProblemWidget(
 ) {
     AppEmptyStateWidget(
         lightImageRes = R.drawable.server_problem_ic,
-        darkImageRes = R.drawable.server_problem_ic,
+        darkImageRes = R.drawable.server_problem_ic_dark,
         title = stringResource(R.string.server_problem_title),
         subtitle = stringResource(R.string.server_problem_subtitle),
         buttonText = stringResource(R.string.server_problem_retry),
