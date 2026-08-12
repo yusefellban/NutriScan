@@ -2,6 +2,7 @@ package iti.grad.nutriscan.presentation.auth.forgot_password.view
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -103,6 +104,8 @@ private fun ForgotPasswordScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
             // ── Teal header with back button ─────────────────────────────
