@@ -36,6 +36,9 @@ import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
 import iti.grad.nutriscan.presentation.common.components.AppSearchBar
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -56,15 +59,15 @@ fun ScanHistoryScreen(
                 is ScanHistoryEffect.NavigateBack -> onNavigateBack()
                 is ScanHistoryEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.scanId)
                 is ScanHistoryEffect.ShowSuccessMessage -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarHostState.showAppSnackbar(
                         message = context.getString(effect.messageRes),
-                        withDismissAction = true
+                        type = SnackbarType.SUCCESS
                     )
                 }
                 is ScanHistoryEffect.ShowErrorMessage -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarHostState.showAppSnackbar(
                         message = context.getString(effect.messageRes),
-                        withDismissAction = true
+                        type = SnackbarType.ERROR
                     )
                 }
             }
@@ -105,7 +108,14 @@ private fun ScanHistoryContent(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 32.dp)
+            ) { data -> 
+                AppSnackbar(data) 
+            } 
+        },
         containerColor = AppTheme.colors.Background
     ) { paddingValues ->
         Column(
