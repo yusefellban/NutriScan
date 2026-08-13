@@ -99,6 +99,11 @@ private fun ScanHistoryContent(
             }
     }
 
+    // Scroll to top on filter/search change
+    LaunchedEffect(state.selectedFilter, state.selectedDate, state.committedQuery) {
+        listState.scrollToItem(0)
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = AppTheme.colors.Background
