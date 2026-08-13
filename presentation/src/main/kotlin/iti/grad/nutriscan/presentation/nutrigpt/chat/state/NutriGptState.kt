@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.nutrigpt.chat.state
 
 import iti.grad.nutriscan.domain.nutrigpt.model.NutriGptMessage
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -11,7 +12,8 @@ data class NutriGptState(
     val areSourcesExpanded: Boolean = false,
     val chatLanguage: ChatLanguage = ChatLanguage.EN,
     val isListening: Boolean = false,
-    val errorMessageResId: Int? = null
+    val errorMessageResId: Int? = null,
+    val errorType: AppErrorType = AppErrorType.UNKNOWN,
 )
 
 enum class ChatLanguage {

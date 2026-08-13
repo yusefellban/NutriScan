@@ -1,7 +1,8 @@
 package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +37,12 @@ import iti.grad.presentation.R
  * A single card in the Recent History list showing product name, scan date,
  * and a color-coded verdict badge.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HistoryItemCard(
     item: HistoryItemUiModel,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -54,10 +57,11 @@ fun HistoryItemCard(
             )
             .clip(RoundedCornerShape(22.dp))
             .background(AppTheme.colors.Surface)
-            .clickable(
+            .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,
+                indication = androidx.compose.foundation.LocalIndication.current,
                 onClick = onClick,
+                onLongClick = onLongClick,
             )
             .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -112,11 +116,12 @@ private fun VerdictBadge(
     item: HistoryItemUiModel,
     modifier: Modifier = Modifier,
 ) {
-    val (badgeColor, iconResId) = when (item.verdictType) {
-        VerdictType.GREEN -> AppTheme.colors.VerdictGreenBadgeColor to R.drawable.ic_verified
-        VerdictType.CYAN -> AppTheme.colors.VerdictCyanBadgeColor to R.drawable.ic_verified
-        VerdictType.YELLOW -> AppTheme.colors.VerdictYellow to R.drawable.ic_solid_warning
-        VerdictType.RED -> AppTheme.colors.VerdictRed to R.drawable.ic_solid_warning
+    val (badgeColor, iconResId, isDangerStyle) = when (item.verdictType) {
+        VerdictType.GREEN -> Triple(AppTheme.colors.VerdictGreenBadgeColor, R.drawable.ic_verified, false)
+        VerdictType.CYAN -> Triple(AppTheme.colors.VerdictCyanBadgeColor, R.drawable.ic_verified, false)
+        VerdictType.YELLOW -> Triple(AppTheme.colors.VerdictYellow, R.drawable.ic_solid_warning, false)
+        VerdictType.RED -> Triple(AppTheme.colors.VerdictRed, R.drawable.ic_solid_warning, true)
+        VerdictType.FAILED -> Triple(AppTheme.colors.TextSecondary, R.drawable.ic_close, false)
     }
 
     Row(
@@ -126,7 +131,7 @@ private fun VerdictBadge(
         Icon(
             painter = painterResource(iconResId),
             contentDescription = null,
-            tint = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedWarningIconTint else badgeColor,
+            tint = if (isDangerStyle) AppTheme.colors.VerdictRedWarningIconTint else badgeColor,
             modifier = Modifier.size(22.dp),
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -134,7 +139,7 @@ private fun VerdictBadge(
             modifier = Modifier
                 .clip(CircleShape)
                 .background(
-                    if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedBackground 
+                    if (isDangerStyle) AppTheme.colors.VerdictRedBackground 
                     else badgeColor.copy(alpha = 0.15f)
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -143,7 +148,7 @@ private fun VerdictBadge(
             Text(
                 text = stringResource(item.verdictLabelResId),
                 style = HomeTypography.verdictBadge,
-                color = if (item.verdictType == VerdictType.RED) AppTheme.colors.VerdictRedText else badgeColor,
+                color = if (isDangerStyle) AppTheme.colors.VerdictRedText else badgeColor,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }

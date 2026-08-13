@@ -61,6 +61,7 @@ fun ProductCard(
     calories: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isFailed: Boolean = false,
     swipeAction: ProductCardSwipeAction? = null,
     /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
     caloriesOverlayOnImage: Boolean = false,
@@ -149,9 +150,10 @@ fun ProductCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (verdict != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        VerdictBadge(verdict = verdict)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    when {
+                        isFailed -> FailedBadge()
+                        verdict != null -> VerdictBadge(verdict = verdict)
                     }
                 } else {
                     // Original layout: name+verdict on the left, kcal stacked badge on the right
@@ -172,9 +174,10 @@ fun ProductCard(
                                 overflow = TextOverflow.Ellipsis
                             )
 
-                            if (verdict != null) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                VerdictBadge(verdict = verdict)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            when {
+                                isFailed -> FailedBadge()
+                                verdict != null -> VerdictBadge(verdict = verdict)
                             }
                         }
 

@@ -76,7 +76,7 @@ fun CaloriesHistoryDayCard(
 
             CaloriesHistoryStatItem(
                 modifier = itemModifier,
-                icon = painterResource(R.drawable.ic_calorie_outlined),
+                icon = painterResource(R.drawable.ic_flame_apple),
                 label = stringResource(R.string.calories_history_total_meals),
                 primaryValue = "${entry.totalMealsKcal}",
                 primaryUnit = kcalUnit,

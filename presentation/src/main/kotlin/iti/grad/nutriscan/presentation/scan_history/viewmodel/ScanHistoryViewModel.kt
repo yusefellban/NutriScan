@@ -5,7 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
+import iti.grad.nutriscan.domain.scan.usecase.GetScanSuggestionsUseCase
+import iti.grad.nutriscan.domain.scan.usecase.DeleteScanUseCase
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
 import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.common.model.VerdictType
@@ -14,23 +18,32 @@ import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.presentation.R
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class ScanHistoryViewModel @Inject constructor(
-    private val getRecentScansUseCase: GetRecentScansUseCase
+    private val getRecentScansUseCase: GetRecentScansUseCase,
+    private val getScanSuggestionsUseCase: GetScanSuggestionsUseCase,
+    private val deleteScanUseCase: DeleteScanUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScanHistoryState())
@@ -41,8 +54,12 @@ class ScanHistoryViewModel @Inject constructor(
 
     private val pageSize = 8
 
+    /** Raw query string emitted on every keystroke — debounced before hitting the API. */
+    private val _searchQueryFlow = MutableStateFlow("")
+
     init {
         loadInitial()
+        observeSearchQueryForSuggestions()
     }
 
     fun onEvent(event: ScanHistoryEvent) {
@@ -52,32 +69,195 @@ class ScanHistoryViewModel @Inject constructor(
             is ScanHistoryEvent.ItemClicked -> emitEffect(ScanHistoryEffect.NavigateToProductDetails(event.scanId))
             is ScanHistoryEvent.BackClicked -> emitEffect(ScanHistoryEffect.NavigateBack)
             is ScanHistoryEvent.RetryLoad -> loadInitial()
+            is ScanHistoryEvent.DateSelected -> handleDateSelected(event.dateMillis)
+            is ScanHistoryEvent.ShowDatePicker -> _state.update { it.copy(showDatePicker = event.show) }
+            is ScanHistoryEvent.ResetFilters -> handleResetFilters()
+            // Deletion
+            is ScanHistoryEvent.OnHoldItem -> {
+                _state.update { it.copy(itemToDelete = event.item) }
+            }
+            is ScanHistoryEvent.DismissDeleteDialog -> {
+                _state.update { it.copy(itemToDelete = null) }
+            }
+            is ScanHistoryEvent.ConfirmDelete -> deleteScan()
+            // ── Search ──
+            is ScanHistoryEvent.SearchQueryChanged -> handleSearchQueryChanged(event.query)
+            is ScanHistoryEvent.SuggestionSelected -> handleSuggestionSelected(event.suggestion)
+            is ScanHistoryEvent.SearchSubmitted -> handleSearchSubmitted()
+            is ScanHistoryEvent.SearchCleared -> handleSearchCleared()
         }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Search handlers
+    // ──────────────────────────────────────────────────────────────
+
+    private fun handleSearchQueryChanged(query: String) {
+        _state.update { it.copy(searchQuery = query, isSearchActive = query.isNotBlank()) }
+        _searchQueryFlow.value = query
+    }
+
+    private fun handleSuggestionSelected(suggestion: String) {
+        _state.update {
+            it.copy(
+                searchQuery = suggestion,
+                committedQuery = suggestion,
+                suggestions = persistentListOf(),
+                isSearchActive = false,
+                selectedFilter = HistoryFilter.ALL,
+                selectedDate = null,
+            )
+        }
+        loadInitial()
+    }
+
+    private fun handleSearchSubmitted() {
+        _state.update {
+            it.copy(
+                committedQuery = it.searchQuery,
+                suggestions = persistentListOf(),
+                isSearchActive = false,
+            )
+        }
+        loadInitial()
+    }
+
+    private fun handleSearchCleared() {
+        val wasCommitted = _state.value.committedQuery.isNotBlank()
+        _state.update {
+            it.copy(
+                searchQuery = "",
+                committedQuery = "",
+                suggestions = persistentListOf(),
+                isSearchActive = false,
+                isSuggestionsLoading = false,
+            )
+        }
+        _searchQueryFlow.value = ""
+        // Only re-fetch if a real search was previously committed;
+        // otherwise the user just typed without selecting — no need to reload.
+        if (wasCommitted) loadInitial()
+    }
+
+    /** Watches the raw query flow, debounces 300 ms, then fetches suggestions. */
+    private fun observeSearchQueryForSuggestions() {
+        viewModelScope.launch {
+            _searchQueryFlow
+                .debounce(300L)
+                .distinctUntilChanged()
+                .filter { it.isNotBlank() }
+                .collect { query ->
+                    _state.update { it.copy(isSuggestionsLoading = true) }
+                    getScanSuggestionsUseCase(query)
+                        .onSuccess { suggestions ->
+                            _state.update {
+                                it.copy(
+                                    suggestions = suggestions.toImmutableList(),
+                                    isSuggestionsLoading = false,
+                                )
+                            }
+                        }
+                        .onFailure {
+                            // Degrade gracefully — no dropdown on network error
+                            _state.update {
+                                it.copy(
+                                    suggestions = persistentListOf(),
+                                    isSuggestionsLoading = false,
+                                )
+                            }
+                        }
+                }
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Existing handlers
+    // ──────────────────────────────────────────────────────────────
+
+    private fun handleDateSelected(dateMillis: Long?) {
+        val newDate = if (dateMillis != null) {
+            Instant.ofEpochMilli(dateMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        } else {
+            null
+        }
+        
+        if (_state.value.selectedDate != newDate) {
+            _state.update { it.copy(showDatePicker = false, selectedDate = newDate) }
+            loadInitial()
+        } else {
+            _state.update { it.copy(showDatePicker = false) }
+        }
+    }
+
+    private fun handleResetFilters() {
+        _state.update {
+            it.copy(
+                selectedFilter = HistoryFilter.ALL,
+                selectedDate = null,
+                searchQuery = "",
+                committedQuery = "",
+                suggestions = persistentListOf(),
+                isSearchActive = false,
+            )
+        }
+        _searchQueryFlow.value = ""
+        loadInitial()
+    }
+
+    private fun getVerdictParam(filter: HistoryFilter): String? = when (filter) {
+        HistoryFilter.ALL -> null
+        HistoryFilter.SAFE -> "SAFE"
+        HistoryFilter.CAUTION -> "CAUTION"
+        HistoryFilter.UNSAFE -> "UNSAFE"
     }
 
     private fun loadInitial() {
         if (_state.value.isLoading) return
-        _state.update { it.copy(isLoading = true, error = null, page = 0, isLastPage = false, allHistoryItems = emptyList()) }
-        
+        _state.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                page = 0,
+                isLastPage = false,
+                allHistoryItems = emptyList(),
+                displayedHistoryItems = emptyList<HistoryItemUiModel>().toImmutableList(),
+            )
+        }
+
         viewModelScope.launch {
-            getRecentScansUseCase(page = 0, size = pageSize)
+            val currentState = _state.value
+            val verdictParam = getVerdictParam(currentState.selectedFilter)
+            val queryParam = currentState.searchQuery.takeIf { it.isNotBlank() }
+
+            getRecentScansUseCase(
+                page = 0,
+                size = pageSize,
+                date = currentState.selectedDate,
+                verdict = verdictParam,
+                query = queryParam,
+            )
                 .onSuccess { scans ->
                     val uiItems = mapScansToUi(scans)
                     _state.update { state ->
                         state.copy(
                             isLoading = false,
                             allHistoryItems = uiItems,
+                            displayedHistoryItems = uiItems.toImmutableList(),
                             isLastPage = scans.size < pageSize,
                         )
                     }
-                    updateDisplayedItems()
                 }
                 .onFailure { error ->
-                    _state.update { 
+                    val errorType = throwableToAppErrorType(error)
+                    _state.update {
                         it.copy(
-                            isLoading = false, 
-                            error = error.message ?: "Failed to load history"
-                        ) 
+                            isLoading = false,
+                            error = error.message ?: "Failed to load history",
+                            errorType = errorType,
+                        )
                     }
                 }
         }
@@ -93,24 +273,33 @@ class ScanHistoryViewModel @Inject constructor(
         _state.update { it.copy(isPaginationLoading = true, page = nextPage) }
 
         viewModelScope.launch {
-            getRecentScansUseCase(page = nextPage, size = pageSize)
+            val verdictParam = getVerdictParam(currentState.selectedFilter)
+            val queryParam = currentState.searchQuery.takeIf { it.isNotBlank() }
+
+            getRecentScansUseCase(
+                page = nextPage,
+                size = pageSize,
+                date = currentState.selectedDate,
+                verdict = verdictParam,
+                query = queryParam,
+            )
                 .onSuccess { scans ->
                     val newUiItems = mapScansToUi(scans)
                     _state.update { state ->
+                        val combined = state.allHistoryItems + newUiItems
                         state.copy(
                             isPaginationLoading = false,
-                            allHistoryItems = state.allHistoryItems + newUiItems,
-                            isLastPage = scans.size < pageSize
+                            allHistoryItems = combined,
+                            displayedHistoryItems = combined.toImmutableList(),
+                            isLastPage = scans.size < pageSize,
                         )
                     }
-                    updateDisplayedItems()
                 }
                 .onFailure {
-                    // Revert page increment on failure
-                    _state.update { state -> 
+                    _state.update { state ->
                         state.copy(
                             isPaginationLoading = false,
-                            page = state.page - 1
+                            page = state.page - 1,
                         )
                     }
                 }
@@ -119,38 +308,35 @@ class ScanHistoryViewModel @Inject constructor(
 
     private fun applyFilter(filter: HistoryFilter) {
         _state.update { it.copy(selectedFilter = filter) }
-        updateDisplayedItems()
-    }
-
-    private fun updateDisplayedItems() {
-        val currentState = _state.value
-        val filtered = when (currentState.selectedFilter) {
-            HistoryFilter.ALL -> currentState.allHistoryItems
-            HistoryFilter.SAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.GREEN || it.verdictType == VerdictType.CYAN }
-            HistoryFilter.CAUTION -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.YELLOW }
-            HistoryFilter.UNSAFE -> currentState.allHistoryItems.filter { it.verdictType == VerdictType.RED }
-        }
-        _state.update { it.copy(displayedHistoryItems = filtered.toImmutableList()) }
+        loadInitial()
     }
 
     private fun mapScansToUi(scans: List<ScanHistoryEntry>): List<HistoryItemUiModel> {
         return scans.map { entry ->
-            val verdictType = when (entry.verdict) {
-                ProductVerdict.SAFE -> VerdictType.GREEN
-                ProductVerdict.CAUTION -> VerdictType.YELLOW
-                ProductVerdict.UNSAFE -> VerdictType.RED
-                null -> VerdictType.CYAN
+            val verdictType = if (entry.status == ScanStatus.FAILED) {
+                VerdictType.FAILED
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> VerdictType.GREEN
+                    ProductVerdict.CAUTION -> VerdictType.YELLOW
+                    ProductVerdict.UNSAFE -> VerdictType.RED
+                    null -> VerdictType.CYAN
+                }
             }
-            val verdictLabelResId = when (entry.verdict) {
-                ProductVerdict.SAFE -> R.string.verdict_safe
-                ProductVerdict.CAUTION -> R.string.verdict_caution
-                ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                null -> R.string.verdict_safe
+            val verdictLabelResId = if (entry.status == ScanStatus.FAILED) {
+                R.string.scan_status_failed
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> R.string.verdict_safe
+                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                    null -> R.string.verdict_unknown
+                }
             }
-            
+
             val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")
             val productName = entry.productName?.takeIf { it.isNotBlank() && it.lowercase() != "unknown" }
-                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } 
+                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                 ?: "Unknown Product"
 
             HistoryItemUiModel(
@@ -159,7 +345,7 @@ class ScanHistoryViewModel @Inject constructor(
                 scanDate = scanDate,
                 verdictLabelResId = verdictLabelResId,
                 verdictType = verdictType,
-                imageUrl = entry.imageUrl
+                imageUrl = entry.imageUrl,
             )
         }
     }
@@ -171,7 +357,7 @@ class ScanHistoryViewModel @Inject constructor(
             val today = LocalDate.now()
             val datePart = localDateTime.toLocalDate()
             val timeString = localDateTime.format(DateTimeFormatter.ofPattern("h:mm a"))
-            
+
             when (datePart) {
                 today -> UiText.StringResource(R.string.date_today, timeString)
                 today.minusDays(1) -> UiText.StringResource(R.string.date_yesterday, timeString)
@@ -184,5 +370,32 @@ class ScanHistoryViewModel @Inject constructor(
 
     private fun emitEffect(effect: ScanHistoryEffect) {
         viewModelScope.launch { _effect.send(effect) }
+    }
+
+    private fun deleteScan() {
+        val itemToDelete = _state.value.itemToDelete ?: return
+        
+        viewModelScope.launch {
+            _state.update { it.copy(itemToDelete = null) }
+            
+            deleteScanUseCase(itemToDelete.id)
+                .onSuccess {
+                    // Update the list locally without reloading everything
+                    _state.update { currentState ->
+                        val updatedList = currentState.allHistoryItems
+                            .filter { it.id != itemToDelete.id }
+                            .toImmutableList()
+                            
+                        currentState.copy(
+                            allHistoryItems = updatedList,
+                            displayedHistoryItems = updatedList
+                        )
+                    }
+                    _effect.send(ScanHistoryEffect.ShowSuccessMessage(R.string.alert_delete_success))
+                }
+                .onFailure {
+                    _effect.send(ScanHistoryEffect.ShowErrorMessage(R.string.server_problem_title))
+                }
+        }
     }
 }

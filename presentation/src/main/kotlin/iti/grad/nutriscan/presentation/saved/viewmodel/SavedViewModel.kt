@@ -7,6 +7,7 @@ import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.RefreshSavedScansUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
@@ -121,7 +122,8 @@ class SavedViewModel @Inject constructor(
                         productName = scan.productName ?: "",
                         imageUrl = scan.imageUrl,
                         verdict = scan.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
-                        calories = scan.nutritionFacts?.calories?.toString() ?: "0"
+                        calories = scan.nutritionFacts?.calories?.toString() ?: "0",
+                        isFailed = scan.status == ScanStatus.FAILED,
                     )
                 }.toImmutableList()
 

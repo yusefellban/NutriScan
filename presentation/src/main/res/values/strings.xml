@@ -447,6 +447,7 @@
     <string name="verdict_safe">Safe</string>
     <string name="verdict_caution">Caution</string>
     <string name="verdict_unsafe">Unsafe</string>
+    <string name="verdict_unknown">Unknown</string>
 
     <!-- Product Details -->
     <string name="product_details_title">Product Details</string>
@@ -536,6 +537,9 @@
     <string name="offline_state_title">No connection</string>
     <string name="offline_state_subtitle">Oops! It seems you\'re currently offline.</string>
     <string name="offline_state_retry">Try again</string>
+    <string name="server_problem_title">Server Problem</string>
+    <string name="server_problem_subtitle">We\'re having trouble loading your data. Please try again in a moment.</string>
+    <string name="server_problem_retry">Try Again</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">Login Failed</string>
@@ -561,6 +565,8 @@
     <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
     <string name="scan_history_empty_button">Start Scanning</string>
     <string name="scan_history_error_load">Failed to load history</string>
+    <string name="scan_history_search_hint">Search by product name…</string>
+    <string name="scan_history_search_clear">Clear search</string>
     <!-- Step History -->
     <string name="step_history_title">Step history</string>
     <string name="step_history_daily_average">Daily average</string>
@@ -662,4 +668,7 @@
         <item>Good nutrition is a form of self-respect. Treat yourself right today!</item>
         <item>Success is the sum of small habits repeated day in and day out.</item>
     </string-array>
+    <string name="delete_scan_title">Delete Scan?</string>
+    <string name="delete_scan_message">Are you sure you want to remove this scan from your history? This action cannot be undone.</string>
+    <string name="alert_delete_success">Scan deleted successfully</string>
 </resources>

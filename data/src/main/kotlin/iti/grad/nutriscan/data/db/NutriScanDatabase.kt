@@ -52,7 +52,7 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
     // water_log now that water lives in daily_tracking) relies on
     // fallbackToDestructiveMigration() in DatabaseModule — this clears all local tables on
     // upgrade. Bump the version when schema changes without a matching migration path.
-    version = 16,
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(IntListConverter::class, FamilyMemberListConverter::class, JsonTypeConverters::class)

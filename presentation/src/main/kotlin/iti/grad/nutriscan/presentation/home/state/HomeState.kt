@@ -2,6 +2,7 @@ package iti.grad.nutriscan.presentation.home.state
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
 
 /**
@@ -20,5 +21,6 @@ data class HomeState(
     /** Drives the pull-to-refresh indicator; [isHistoryLoading] covers the first load only. */
     val isRefreshing: Boolean = false,
     val historyError: String? = null,
+    val historyErrorType: AppErrorType = AppErrorType.UNKNOWN,
     val recentHistory: ImmutableList<HistoryItemUiModel> = persistentListOf(),
 )

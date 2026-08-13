@@ -22,6 +22,7 @@ import javax.inject.Inject
 import androidx.core.graphics.scale
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
+import iti.grad.nutriscan.domain.common.runCatchingCancellable
 
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
@@ -173,28 +174,30 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
+    override suspend fun getRecentScans(
+        page: Int,
+        size: Int,
+        date: String?,
+        verdict: String?,
+        query: String?,
+        scanStatus: String?,
+    ): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
             val userId = authRepository.getCurrentUserId()
-            // Drop another account's cached scans before they can be read or extended.
-            if (userId != cachedScansUserId) {
-                localRecentScans = null
-                cachedScansUserId = userId
-            }
-
-            if (page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
+            val isFiltered = date != null || verdict != null || query != null || scanStatus != null
+            if (!isFiltered && page == 0 && localRecentScans != null && localRecentScans!!.size >= size && cachedScansUserId == userId) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
             try {
-                val response = scanApiService.getRecentScans(page, size)
+                val response = scanApiService.getRecentScans(page, size, query, date, verdict, scanStatus)
                 val domainScans = response.content.map { it.toDomain() }
-                if (page == 0) {
+                if (!isFiltered && page == 0) {
                     localRecentScans = domainScans.toMutableList()
                     cachedScansUserId = userId
                 }
                 Result.success(domainScans)
             } catch (e: Exception) {
-                if (page == 0 && localRecentScans != null) {
+                if (!isFiltered && page == 0 && localRecentScans != null) {
                     Result.success(localRecentScans!!.take(size))
                 } else {
                     Result.failure(e)
@@ -205,4 +208,25 @@ class ScanRepositoryImpl @Inject constructor(
 
     // ponytail: returns null until scan history is persisted (no scan-history storage exists yet)
     override suspend fun getLastScanDate(): LocalDate? = null
+
+    override suspend fun getScanSuggestions(query: String): Result<List<String>> {
+        return withContext(ioDispatcher) {
+            try {
+                Result.success(scanApiService.getScanSuggestions(query))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun deleteScan(scanId: String): Result<Unit> {
+        return withContext(ioDispatcher) {
+            runCatchingCancellable {
+                scanApiService.deleteScan(scanId)
+                // Invalidate local cache
+                localRecentScans?.removeAll { it.scanId == scanId }
+                Unit
+            }
+        }
+    }
 }

@@ -36,6 +36,7 @@ import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
 import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
@@ -144,7 +145,8 @@ private fun ProductDetailsContent(
                         }
 
                         state.errorMessageResId != null -> {
-                            OfflineStateWidget(
+                            AppErrorWidget(
+                                errorType = state.errorType,
                                 onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
                                 modifier = Modifier.padding(vertical = 48.dp),
                             )
@@ -165,6 +167,7 @@ private fun ProductDetailsContent(
                                 // ── Name + Verdict + Safety Text ──
                                 ProductInfoHeader(
                                     productName = product.productName,
+                                    status = product.status,
                                     verdict = product.verdict,
                                     scanDate = product.scanDate,
                                     safetyReasonText = product.safetyReasonText,
