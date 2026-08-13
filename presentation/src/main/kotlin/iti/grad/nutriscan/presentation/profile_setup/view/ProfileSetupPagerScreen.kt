@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.profile_setup.view
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -99,6 +100,8 @@ fun ProfileSetupPagerScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
+                .imePadding()
         ) {
             // Pager fills the ENTIRE screen
             HorizontalPager(
