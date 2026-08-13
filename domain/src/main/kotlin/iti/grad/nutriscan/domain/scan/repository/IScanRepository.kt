@@ -48,4 +48,9 @@ interface IScanRepository {
      * Used in the Scan History search bar with debouncing.
      */
     suspend fun getScanSuggestions(query: String): Result<List<String>>
+
+    /**
+     * Delete a scan from history.
+     */
+    suspend fun deleteScan(scanId: String): Result<Unit>
 }

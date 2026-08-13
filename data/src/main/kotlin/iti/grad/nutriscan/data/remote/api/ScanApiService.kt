@@ -8,6 +8,7 @@ import iti.grad.nutriscan.data.remote.dto.ScanSubmissionResponseDto
 import iti.grad.nutriscan.data.remote.dto.UpdateScanDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -57,6 +58,9 @@ interface ScanApiService {
         @Path("scanId") scanId: String,
         @Body body: UpdateScanDto,
     ): ScanResultResponseDto
+
+    @DELETE("v1/scans/{scanId}")
+    suspend fun deleteScan(@Path("scanId") scanId: String)
 
     @GET("v1/scans/favorites")
     suspend fun getFavoriteScans(

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +35,7 @@ import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
 import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
 import iti.grad.nutriscan.presentation.common.components.AppSearchBar
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -45,26 +47,42 @@ fun ScanHistoryScreen(
     viewModel: ScanHistoryViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is ScanHistoryEffect.NavigateBack -> onNavigateBack()
                 is ScanHistoryEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.scanId)
+                is ScanHistoryEffect.ShowSuccessMessage -> {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(effect.messageRes),
+                        withDismissAction = true
+                    )
+                }
+                is ScanHistoryEffect.ShowErrorMessage -> {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(effect.messageRes),
+                        withDismissAction = true
+                    )
+                }
             }
         }
     }
 
     ScanHistoryContent(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        snackbarHostState = snackbarHostState,
     )
 }
 
 @Composable
 private fun ScanHistoryContent(
     state: ScanHistoryState,
-    onEvent: (ScanHistoryEvent) -> Unit
+    onEvent: (ScanHistoryEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     val listState = rememberLazyListState()
 
@@ -81,11 +99,15 @@ private fun ScanHistoryContent(
             }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppTheme.colors.Background)
-    ) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = AppTheme.colors.Background
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
         // ── Top Header ──────────────────────────────────────────
         Box(
             modifier = Modifier
@@ -166,6 +188,7 @@ private fun ScanHistoryContent(
                             HistoryItemCard(
                                 item = item,
                                 onClick = { onEvent(ScanHistoryEvent.ItemClicked(item.id)) },
+                                onLongClick = { onEvent(ScanHistoryEvent.OnHoldItem(item)) },
                                 modifier = Modifier.padding(vertical = 6.dp)
                             )
                         }
@@ -189,6 +212,7 @@ private fun ScanHistoryContent(
                 }
             }
         }
+        }
     }
 
     if (state.showDatePicker) {
@@ -208,6 +232,14 @@ private fun ScanHistoryContent(
             initialDateMillis = initialMillis,
             onDateSelected = { dateMillis -> onEvent(ScanHistoryEvent.DateSelected(dateMillis)) },
             onDismiss = { onEvent(ScanHistoryEvent.ShowDatePicker(false)) }
+        )
+    }
+    if (state.itemToDelete != null) {
+        DeleteWarningAlert(
+            title = stringResource(id = R.string.delete_scan_title),
+            message = stringResource(id = R.string.delete_scan_message),
+            onConfirm = { onEvent(ScanHistoryEvent.ConfirmDelete) },
+            onDismiss = { onEvent(ScanHistoryEvent.DismissDeleteDialog) },
         )
     }
 }

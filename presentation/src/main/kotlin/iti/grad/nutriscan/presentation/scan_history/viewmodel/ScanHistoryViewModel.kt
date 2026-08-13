@@ -8,6 +8,7 @@ import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetScanSuggestionsUseCase
+import iti.grad.nutriscan.domain.scan.usecase.DeleteScanUseCase
 import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
 import iti.grad.nutriscan.presentation.common.model.UiText
@@ -42,6 +43,7 @@ import javax.inject.Inject
 class ScanHistoryViewModel @Inject constructor(
     private val getRecentScansUseCase: GetRecentScansUseCase,
     private val getScanSuggestionsUseCase: GetScanSuggestionsUseCase,
+    private val deleteScanUseCase: DeleteScanUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScanHistoryState())
@@ -70,6 +72,14 @@ class ScanHistoryViewModel @Inject constructor(
             is ScanHistoryEvent.DateSelected -> handleDateSelected(event.dateMillis)
             is ScanHistoryEvent.ShowDatePicker -> _state.update { it.copy(showDatePicker = event.show) }
             is ScanHistoryEvent.ResetFilters -> handleResetFilters()
+            // Deletion
+            is ScanHistoryEvent.OnHoldItem -> {
+                _state.update { it.copy(itemToDelete = event.item) }
+            }
+            is ScanHistoryEvent.DismissDeleteDialog -> {
+                _state.update { it.copy(itemToDelete = null) }
+            }
+            is ScanHistoryEvent.ConfirmDelete -> deleteScan()
             // ── Search ──
             is ScanHistoryEvent.SearchQueryChanged -> handleSearchQueryChanged(event.query)
             is ScanHistoryEvent.SuggestionSelected -> handleSuggestionSelected(event.suggestion)
@@ -360,5 +370,32 @@ class ScanHistoryViewModel @Inject constructor(
 
     private fun emitEffect(effect: ScanHistoryEffect) {
         viewModelScope.launch { _effect.send(effect) }
+    }
+
+    private fun deleteScan() {
+        val itemToDelete = _state.value.itemToDelete ?: return
+        
+        viewModelScope.launch {
+            _state.update { it.copy(itemToDelete = null) }
+            
+            deleteScanUseCase(itemToDelete.id)
+                .onSuccess {
+                    // Update the list locally without reloading everything
+                    _state.update { currentState ->
+                        val updatedList = currentState.allHistoryItems
+                            .filter { it.id != itemToDelete.id }
+                            .toImmutableList()
+                            
+                        currentState.copy(
+                            allHistoryItems = updatedList,
+                            displayedHistoryItems = updatedList
+                        )
+                    }
+                    _effect.send(ScanHistoryEffect.ShowSuccessMessage(R.string.alert_delete_success))
+                }
+                .onFailure {
+                    _effect.send(ScanHistoryEffect.ShowErrorMessage(R.string.server_problem_title))
+                }
+        }
     }
 }

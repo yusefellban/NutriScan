@@ -1,7 +1,8 @@
 package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +37,12 @@ import iti.grad.presentation.R
  * A single card in the Recent History list showing product name, scan date,
  * and a color-coded verdict badge.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HistoryItemCard(
     item: HistoryItemUiModel,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -54,10 +57,11 @@ fun HistoryItemCard(
             )
             .clip(RoundedCornerShape(22.dp))
             .background(AppTheme.colors.Surface)
-            .clickable(
+            .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null,
+                indication = androidx.compose.foundation.LocalIndication.current,
                 onClick = onClick,
+                onLongClick = onLongClick,
             )
             .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -668,4 +668,7 @@
         <item>Good nutrition is a form of self-respect. Treat yourself right today!</item>
         <item>Success is the sum of small habits repeated day in and day out.</item>
     </string-array>
+    <string name="delete_scan_title">Delete Scan?</string>
+    <string name="delete_scan_message">Are you sure you want to remove this scan from your history? This action cannot be undone.</string>
+    <string name="alert_delete_success">Scan deleted successfully</string>
 </resources>

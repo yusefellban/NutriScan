@@ -22,6 +22,7 @@ import javax.inject.Inject
 import androidx.core.graphics.scale
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
+import iti.grad.nutriscan.domain.common.runCatchingCancellable
 
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
@@ -214,6 +215,17 @@ class ScanRepositoryImpl @Inject constructor(
                 Result.success(scanApiService.getScanSuggestions(query))
             } catch (e: Exception) {
                 Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun deleteScan(scanId: String): Result<Unit> {
+        return withContext(ioDispatcher) {
+            runCatchingCancellable {
+                scanApiService.deleteScan(scanId)
+                // Invalidate local cache
+                localRecentScans?.removeAll { it.scanId == scanId }
+                Unit
             }
         }
     }

@@ -30,4 +30,7 @@ data class ScanHistoryState(
     val suggestions: ImmutableList<String> = persistentListOf(),
     val isSuggestionsLoading: Boolean = false,
     val isSearchActive: Boolean = false,
+
+    // Dialog state for deletion
+    val itemToDelete: HistoryItemUiModel? = null,
 )
