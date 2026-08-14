@@ -9,10 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.AdaptiveAsyncImage
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
@@ -31,14 +30,13 @@ fun ProductImageCard(
         shadowElevation = 4.dp,
         border = BorderStroke(3.dp, AppTheme.colors.Teal1000),
     ) {
-        AsyncImage(
+        AdaptiveAsyncImage(
             model = imageUrl,
             contentDescription = productName,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)
                 .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop,
             error = painterResource(id = R.drawable.ic_scanner),
             placeholder = painterResource(id = R.drawable.ic_scanner),
         )
