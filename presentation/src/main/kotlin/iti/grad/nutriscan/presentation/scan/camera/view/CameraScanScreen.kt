@@ -293,6 +293,15 @@ private fun CameraScanContent(
         },
     )
 
+    // Reset the swipe state every time a NEW scan card appears so it's always fully visible.
+    // Without this, the dismiss animation leaves the box in a "settled-dismissed" offset
+    // and the next card renders partially off-screen or invisible.
+    LaunchedEffect(state.activeScan) {
+        if (state.activeScan != null) {
+            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+        }
+    }
+
     if (state.showDeleteDialog) {
         DeleteWarningAlert(
             title = stringResource(id = R.string.alert_remove_saved_title),
@@ -372,6 +381,14 @@ private fun CameraScanContent(
             }
         }
 
+        // Scan beam overlay — shown only in camera (PHOTO) mode
+        if (!state.permissionDenied && !isGalleryMode) {
+            ScanFrameOverlay(
+                selectedMode = state.selectedMode,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -394,6 +411,7 @@ private fun CameraScanContent(
                 backgroundContent = {},
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
                     .padding(bottom = activeScanBottomOffset),
             ) {
                 ActiveScanCard(
@@ -416,6 +434,7 @@ private fun CameraScanContent(
                     ),
             )
         }
+
 
         ScanModeSelector(
             selectedMode = state.selectedMode,
