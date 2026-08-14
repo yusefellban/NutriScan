@@ -551,6 +551,8 @@
     <string name="scan_history_empty_title">لا توجد عمليات مسح حتى الآن</string>
     <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
     <string name="scan_history_empty_button">ابدأ المسح</string>
+    <string name="scan_history_no_results_title">لم يُعثر على منتجات</string>
+    <string name="scan_history_no_results_subtitle">لا توجد نتائج لـ "%1$s". جرّب اسمًا مختلفًا.</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
     <string name="scan_history_search_hint">ابحث باسم المنتج…</string>
     <string name="scan_history_search_clear">مسح البحث</string>

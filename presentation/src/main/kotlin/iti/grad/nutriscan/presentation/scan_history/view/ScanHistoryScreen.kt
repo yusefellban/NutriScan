@@ -173,6 +173,15 @@ private fun ScanHistoryContent(
                         errorType = state.errorType,
                         onRetry = { onEvent(ScanHistoryEvent.RetryLoad) },
                     )
+                } else if (state.displayedHistoryItems.isEmpty() && state.committedQuery.isNotBlank()) {
+                    AppEmptyStateWidget(
+                        lightImageRes = R.drawable.no_scans_yet_light,
+                        darkImageRes = R.drawable.no_scans_yet_dark,
+                        title = stringResource(R.string.scan_history_no_results_title),
+                        subtitle = stringResource(R.string.scan_history_no_results_subtitle, state.committedQuery),
+                        buttonText = null,
+                        onButtonClick = {},
+                    )
                 } else if (state.displayedHistoryItems.isEmpty()) {
                     AppEmptyStateWidget(
                         lightImageRes = R.drawable.no_scans_yet_light,
