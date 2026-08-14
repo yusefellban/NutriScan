@@ -52,15 +52,40 @@ fun FlaggedIngredientsRow(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Horizontally scrollable ingredient cards
+        // Staggered grid ingredient cards (2 columns)
+        val leftColumn = ingredients.filterIndexed { index, _ -> index % 2 == 0 }
+        val rightColumn = ingredients.filterIndexed { index, _ -> index % 2 == 1 }
+
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            ingredients.forEach { ingredient ->
-                FlaggedIngredientCard(ingredient = ingredient)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                leftColumn.forEach { ingredient ->
+                    FlaggedIngredientCard(
+                        ingredient = ingredient,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            if (rightColumn.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    rightColumn.forEach { ingredient ->
+                        FlaggedIngredientCard(
+                            ingredient = ingredient,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

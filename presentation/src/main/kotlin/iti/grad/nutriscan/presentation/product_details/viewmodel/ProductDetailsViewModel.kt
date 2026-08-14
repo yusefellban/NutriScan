@@ -133,7 +133,7 @@ class ProductDetailsViewModel @Inject constructor(
             flaggedIngredients = scanResult.foodSafetyResponse?.flaggedIngredients?.map {
                 FlaggedIngredient(
                     name = it.ingredient,
-                    matchTag = it.type,
+                    matchTag = it.name.takeIf { list -> list.isNotEmpty() }?.joinToString(", ") ?: it.type,
                     reason = it.reason
                 )
             } ?: emptyList(),
