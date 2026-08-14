@@ -41,6 +41,7 @@ composeMarkdown = "0.5.4"
 googleServices = "4.5.0"
 firebaseBom = "33.7.0"
 firebaseAppDistributionApi = "16.0.0-beta20"
+imageCropper = "4.6.0"
 
 [libraries]
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
@@ -101,6 +102,7 @@ compose-markdown = { group = "com.github.jeziellago", name = "compose-markdown",
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-appdistribution-api = { group = "com.google.firebase", name = "firebase-appdistribution-api", version.ref = "firebaseAppDistributionApi" }
+image-cropper = { group = "com.vanniktech", name = "android-image-cropper", version.ref = "imageCropper" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

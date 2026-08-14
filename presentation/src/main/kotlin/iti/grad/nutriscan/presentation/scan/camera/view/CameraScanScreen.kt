@@ -66,6 +66,9 @@ import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOver
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanModeSelector
 import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
 import iti.grad.presentation.R
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import java.io.File
 import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.collectLatest
@@ -106,6 +109,27 @@ fun CameraScanScreen(
         viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
     }
 
+    val cropLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract(),
+    ) { result ->
+        if (result.isSuccessful) {
+            val uriContent = result.uriContent
+            if (uriContent == null) {
+                viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
+                return@rememberLauncherForActivityResult
+            }
+            val galleryFile = runCatching { copyUriToCacheFile(uriContent, context) }.getOrNull()
+            if (galleryFile == null) {
+                viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
+            } else {
+                viewModel.onEvent(CameraScanEvent.GalleryImageSelected(galleryFile))
+            }
+        } else {
+            // User cancelled cropping, we treat it as if they cancelled picking
+            viewModel.onEvent(CameraScanEvent.GalleryPickCancelled)
+        }
+    }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { uri: Uri? ->
@@ -114,12 +138,17 @@ fun CameraScanScreen(
             return@rememberLauncherForActivityResult
         }
 
-        val galleryFile = runCatching { copyUriToCacheFile(uri, context) }.getOrNull()
-        if (galleryFile == null) {
-            viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
-        } else {
-            viewModel.onEvent(CameraScanEvent.GalleryImageSelected(galleryFile))
-        }
+        cropLauncher.launch(
+            CropImageContractOptions(
+                uri = uri,
+                cropImageOptions = CropImageOptions(
+                    imageSourceIncludeGallery = false,
+                    imageSourceIncludeCamera = false,
+                    guidelines = com.canhub.cropper.CropImageView.Guidelines.ON,
+                    showIntentChooser = false,
+                )
+            )
+        )
     }
 
     LaunchedEffect(state.selectedMode) {
