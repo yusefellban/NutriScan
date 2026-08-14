@@ -67,7 +67,7 @@ android {
 
     defaultConfig {
         applicationId = "iti.grad.nutriscan"
-        minSdk = 30
+        minSdk = 31
         targetSdk = 36
         versionCode = 1
         versionName = libs.versions.appVersionName.get()
