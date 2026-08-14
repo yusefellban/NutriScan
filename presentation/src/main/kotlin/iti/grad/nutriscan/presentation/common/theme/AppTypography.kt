@@ -21,7 +21,7 @@ val KOSans = FontFamily(
 )
 
 private val isArabic: Boolean
-    get() = Locale.current.language == "ar"
+    get() = java.util.Locale.getDefault().language == "ar"
 
 fun getAppFontFamily(defaultFont: FontFamily): FontFamily {
     return if (isArabic) KOSans else defaultFont
