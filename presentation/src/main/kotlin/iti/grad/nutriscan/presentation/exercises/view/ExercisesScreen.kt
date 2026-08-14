@@ -31,13 +31,14 @@ import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import iti.grad.nutriscan.presentation.exercises.view.components.ExerciseInstructionsBottomSheet
 import iti.grad.nutriscan.presentation.exercises.viewmodel.ExercisesViewModel
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
@@ -152,7 +153,8 @@ fun ExercisesScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        OfflineStateWidget(
+                        AppErrorWidget(
+                            errorType = state.errorType,
                             onRetry = { viewModel.onEvent(ExercisesEvent.OnRetryClick) }
                         )
                     }

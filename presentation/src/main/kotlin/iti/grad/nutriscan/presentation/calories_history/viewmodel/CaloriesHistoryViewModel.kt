@@ -10,6 +10,7 @@ import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryDay
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEffect
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEvent
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryState
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
@@ -75,7 +76,7 @@ class CaloriesHistoryViewModel @Inject constructor(
 
     private fun loadFirstPage() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null, selectedDate = null) }
+            _state.update { it.copy(isLoading = true, errorType = null, selectedDate = null) }
             getCaloriesHistory(page = 0, size = PAGE_SIZE)
                 .onSuccess { page ->
                     _state.update {
@@ -84,7 +85,7 @@ class CaloriesHistoryViewModel @Inject constructor(
                             entries = page.entries.map { s -> s.toUiModel() }.toImmutableList(),
                             currentPage = page.currentPage,
                             isLastPage = page.isLastPage,
-                            errorMessage = null,
+                            errorType = null,
                         )
                     }
                 }
@@ -92,7 +93,7 @@ class CaloriesHistoryViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Unknown error",
+                            errorType = throwableToAppErrorType(error),
                         )
                     }
                 }
@@ -130,7 +131,7 @@ class CaloriesHistoryViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isLoading = true,
-                    errorMessage = null,
+                    errorType = null,
                     selectedDate = date,
                     isLastPage = true,
                 )
@@ -141,7 +142,7 @@ class CaloriesHistoryViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             entries = persistentListOf(summary.toUiModel()),
-                            errorMessage = null,
+                            errorType = null,
                         )
                     }
                 }
@@ -150,7 +151,7 @@ class CaloriesHistoryViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             entries = persistentListOf(),
-                            errorMessage = error.message ?: "Unknown error",
+                            errorType = throwableToAppErrorType(error),
                         )
                     }
                 }

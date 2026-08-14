@@ -5,6 +5,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
+
 @Immutable
 data class CaloriesHistoryState(
     val isLoading: Boolean = false,
@@ -12,7 +14,7 @@ data class CaloriesHistoryState(
     val currentPage: Int = 0,
     val isLastPage: Boolean = false,
     val isLoadingMore: Boolean = false,
-    val errorMessage: String? = null,
+    val errorType: AppErrorType? = null,
     val showDatePicker: Boolean = false,
     val selectedDate: LocalDate? = null,
 )

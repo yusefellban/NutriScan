@@ -34,5 +34,23 @@ interface IScanRepository {
     /**
      * Get a paginated list of recent scans.
      */
-    suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>>
+    suspend fun getRecentScans(
+        page: Int,
+        size: Int,
+        date: String? = null,
+        verdict: String? = null,
+        query: String? = null,
+        scanStatus: String? = null,
+    ): Result<List<ScanHistoryEntry>>
+
+    /**
+     * Fetch autocomplete suggestions for product name search.
+     * Used in the Scan History search bar with debouncing.
+     */
+    suspend fun getScanSuggestions(query: String): Result<List<String>>
+
+    /**
+     * Delete a scan from history.
+     */
+    suspend fun deleteScan(scanId: String): Result<Unit>
 }

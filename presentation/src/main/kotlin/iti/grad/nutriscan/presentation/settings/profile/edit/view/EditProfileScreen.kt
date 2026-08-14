@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,7 +42,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEf
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning
 import androidx.compose.material3.DatePicker
 import androidx.compose.foundation.layout.FlowRow
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
 import iti.grad.presentation.R
@@ -78,6 +79,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.Edi
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
 import iti.grad.nutriscan.presentation.common.components.WarningAlert
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
@@ -131,7 +133,16 @@ private fun EditProfileContent(
     onSelectAvatarClick: () -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+            override fun isSelectableYear(year: Int): Boolean {
+                return year <= java.time.LocalDate.now().year
+            }
+        }
+    )
 
     Scaffold(
         containerColor = AppTheme.colors.Background,
@@ -155,7 +166,8 @@ private fun EditProfileContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(innerPadding)
+                .imePadding()
         ) {
             // Scrollable fields container
             Column(

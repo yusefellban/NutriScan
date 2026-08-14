@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,16 +23,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppTopHeader
-
-import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
-import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppTopHeader
+import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
+import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
+import iti.grad.nutriscan.presentation.scan_history.state.HistoryFilter
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEffect
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryEvent
+import iti.grad.nutriscan.presentation.scan_history.state.ScanHistoryState
+import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.AppSearchBar
+import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
+import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
-import iti.grad.nutriscan.presentation.scan_history.state.*
-import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
 @Composable
 fun ScanHistoryScreen(
@@ -40,26 +50,42 @@ fun ScanHistoryScreen(
     viewModel: ScanHistoryViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is ScanHistoryEffect.NavigateBack -> onNavigateBack()
                 is ScanHistoryEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.scanId)
+                is ScanHistoryEffect.ShowSuccessMessage -> {
+                    snackbarHostState.showAppSnackbar(
+                        message = context.getString(effect.messageRes),
+                        type = SnackbarType.SUCCESS
+                    )
+                }
+                is ScanHistoryEffect.ShowErrorMessage -> {
+                    snackbarHostState.showAppSnackbar(
+                        message = context.getString(effect.messageRes),
+                        type = SnackbarType.ERROR
+                    )
+                }
             }
         }
     }
 
     ScanHistoryContent(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        snackbarHostState = snackbarHostState,
     )
 }
 
 @Composable
 private fun ScanHistoryContent(
     state: ScanHistoryState,
-    onEvent: (ScanHistoryEvent) -> Unit
+    onEvent: (ScanHistoryEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     val listState = rememberLazyListState()
 
@@ -76,12 +102,28 @@ private fun ScanHistoryContent(
             }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppTheme.colors.Background)
-    ) {
-        // ── Custom Top Header (like ProductDetails) ──
+    // Scroll to top on filter/search change
+    LaunchedEffect(state.selectedFilter, state.selectedDate, state.committedQuery) {
+        listState.scrollToItem(0)
+    }
+
+    Scaffold(
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 32.dp)
+            ) { data -> 
+                AppSnackbar(data) 
+            } 
+        },
+        containerColor = AppTheme.colors.Background
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+        // ── Top Header ──────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,20 +131,42 @@ private fun ScanHistoryContent(
         ) {
             AppTopHeader(
                 title = stringResource(R.string.scan_history_title),
-                onBackClick = { onEvent(ScanHistoryEvent.BackClicked) }
+                onBackClick = { onEvent(ScanHistoryEvent.BackClicked) },
+                actionIconResId = R.drawable.ic_date,
+                actionIconContentDescription = "Filter by date",
+                onActionClick = { onEvent(ScanHistoryEvent.ShowDatePicker(true)) }
             )
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Filters
-                FilterRow(
-                    selectedFilter = state.selectedFilter,
-                    onFilterSelected = { onEvent(ScanHistoryEvent.FilterSelected(it)) }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // ── Search Bar ──────────────────────────────────
+                AppSearchBar(
+                    query = state.searchQuery,
+                    hint = stringResource(R.string.scan_history_search_hint),
+                    suggestions = state.suggestions,
+                    showSuggestions = state.isSearchActive,
+                    isSuggestionsLoading = state.isSuggestionsLoading,
+                    onQueryChange = { onEvent(ScanHistoryEvent.SearchQueryChanged(it)) },
+                    onSuggestionSelected = { onEvent(ScanHistoryEvent.SuggestionSelected(it)) },
+                    onSearchSubmitted = { onEvent(ScanHistoryEvent.SearchSubmitted) },
+                    onClearClicked = { onEvent(ScanHistoryEvent.SearchCleared) },
+                    borderColor = AppTheme.colors.SavedSearchBarBorder,
+                    modifier = Modifier.padding(horizontal = 20.dp),
                 )
 
+                // ── Filter Chips ────────────────────────────────
+                FilterRow(
+                    selectedFilter = state.selectedFilter,
+                    selectedDate = state.selectedDate,
+                    onFilterSelected = { onEvent(ScanHistoryEvent.FilterSelected(it)) },
+                    onReset = { onEvent(ScanHistoryEvent.ResetFilters) }
+                )
+
+                // ── Content ─────────────────────────────────────
                 if (state.isLoading) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -113,13 +177,9 @@ private fun ScanHistoryContent(
                         }
                     }
                 } else if (state.error != null && state.allHistoryItems.isEmpty()) {
-                    AppEmptyStateWidget(
-                        lightImageRes = R.drawable.no_network_connection_light,
-                        darkImageRes = R.drawable.no_network_connection_dark,
-                        title = stringResource(R.string.offline_state_title),
-                        subtitle = stringResource(R.string.offline_state_subtitle),
-                        buttonText = stringResource(R.string.offline_state_retry),
-                        onButtonClick = { onEvent(ScanHistoryEvent.RetryLoad) },
+                    AppErrorWidget(
+                        errorType = state.errorType,
+                        onRetry = { onEvent(ScanHistoryEvent.RetryLoad) },
                     )
                 } else if (state.displayedHistoryItems.isEmpty()) {
                     AppEmptyStateWidget(
@@ -134,7 +194,7 @@ private fun ScanHistoryContent(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp) // padding for pagination loader
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(
                             items = state.displayedHistoryItems,
@@ -143,10 +203,11 @@ private fun ScanHistoryContent(
                             HistoryItemCard(
                                 item = item,
                                 onClick = { onEvent(ScanHistoryEvent.ItemClicked(item.id)) },
+                                onLongClick = { onEvent(ScanHistoryEvent.OnHoldItem(item)) },
                                 modifier = Modifier.padding(vertical = 6.dp)
                             )
                         }
-                        
+
                         if (state.isPaginationLoading) {
                             item {
                                 Box(
@@ -166,13 +227,44 @@ private fun ScanHistoryContent(
                 }
             }
         }
+        }
+    }
+
+    if (state.showDatePicker) {
+        val initialMillis = remember(state.selectedDate) {
+            state.selectedDate?.let {
+                try {
+                    java.time.LocalDate.parse(it, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        .atStartOfDay(java.time.ZoneOffset.UTC)
+                        .toInstant()
+                        .toEpochMilli()
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+        ScanDatePickerDialog(
+            initialDateMillis = initialMillis,
+            onDateSelected = { dateMillis -> onEvent(ScanHistoryEvent.DateSelected(dateMillis)) },
+            onDismiss = { onEvent(ScanHistoryEvent.ShowDatePicker(false)) }
+        )
+    }
+    if (state.itemToDelete != null) {
+        DeleteWarningAlert(
+            title = stringResource(id = R.string.delete_scan_title),
+            message = stringResource(id = R.string.delete_scan_message),
+            onConfirm = { onEvent(ScanHistoryEvent.ConfirmDelete) },
+            onDismiss = { onEvent(ScanHistoryEvent.DismissDeleteDialog) },
+        )
     }
 }
 
 @Composable
 private fun FilterRow(
     selectedFilter: HistoryFilter,
-    onFilterSelected: (HistoryFilter) -> Unit
+    selectedDate: String?,
+    onFilterSelected: (HistoryFilter) -> Unit,
+    onReset: () -> Unit
 ) {
     val filters = listOf(
         HistoryFilter.ALL to stringResource(R.string.filter_all),
@@ -185,29 +277,78 @@ private fun FilterRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        items(filters) { (filter, label) ->
-            val isSelected = selectedFilter == filter
-            val backgroundColor = if (isSelected) AppTheme.colors.Primary else AppTheme.colors.Surface
-            val textColor = if (isSelected) Color.White else AppTheme.colors.TextSecondary
-            
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(backgroundColor)
-                    .clickable { onFilterSelected(filter) }
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = label,
-                    color = textColor,
-                    style = AppTheme.typography.labelLarge.copy(
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                    )
+        if (selectedFilter != HistoryFilter.ALL || selectedDate != null) {
+            item {
+                SelectableChip(
+                    text = "Reset",
+                    isSelected = false,
+                    onClick = onReset,
+                    selectedBgColor = Color.Transparent,
+                    unselectedBgColor = Color.Transparent,
+                    selectedBorderColor = Color.Red,
+                    unselectedBorderColor = Color.Red,
+                    selectedTextColor = Color.Red,
+                    unselectedTextColor = Color.Red
                 )
             }
         }
+
+        items(filters) { (filter, label) ->
+            SelectableChip(
+                text = label,
+                isSelected = selectedFilter == filter,
+                onClick = { onFilterSelected(filter) },
+                selectedBgColor = AppTheme.colors.ExerciseChipSelectedBg,
+                unselectedBgColor = AppTheme.colors.ExerciseChipUnselectedBg,
+                selectedBorderColor = AppTheme.colors.ExerciseChipSelectedBorder,
+                unselectedBorderColor = AppTheme.colors.ExerciseChipUnselectedBorder,
+                selectedTextColor = AppTheme.colors.ExerciseChipSelectedText,
+                unselectedTextColor = AppTheme.colors.ExerciseChipUnselectedText
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScanDatePickerDialog(
+    initialDateMillis: Long?,
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDateMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+        }
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(
+                    onClick = { onDateSelected(null) },
+                    enabled = datePickerState.selectedDateMillis != null
+                ) {
+                    Text("Reset")
+                }
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }

@@ -168,7 +168,7 @@ private fun UserProfileContent(
                         onClick = { onEvent(UserProfileEvent.ScanHistoryClicked) },
                     )
                     ProfileMenuRow(
-                        iconResId = R.drawable.ic_history,
+                        iconResId = R.drawable.ic_flame_apple,
                         label = stringResource(R.string.calories_history_title),
                         onClick = { onEvent(UserProfileEvent.CaloriesHistoryClicked) },
                     )

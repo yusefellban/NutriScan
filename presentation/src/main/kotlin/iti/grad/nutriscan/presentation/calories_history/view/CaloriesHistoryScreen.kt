@@ -45,6 +45,7 @@ import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEff
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEvent
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryDayCard
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryTopBar
 import iti.grad.nutriscan.presentation.calories_history.viewmodel.CaloriesHistoryViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
@@ -180,7 +181,7 @@ fun CaloriesHistoryScreen(
                     }
 
                     // Empty state (no errors, no entries, not loading)
-                    !state.isLoading && state.errorMessage == null && state.entries.isEmpty() -> {
+                    !state.isLoading && state.errorType == null && state.entries.isEmpty() -> {
                         AppEmptyStateWidget(
                             lightImageRes = R.drawable.ic_no_calories_history_light,
                             darkImageRes = R.drawable.ic_no_calories_history_dark,
@@ -192,25 +193,11 @@ fun CaloriesHistoryScreen(
                     }
 
                     // Full-screen error with retry (only when list is empty)
-                    state.errorMessage != null && state.entries.isEmpty() -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.calories_history_error),
-                                style = AppTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                color = AppTheme.colors.CaloriesHistoryStatLabel,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            AppButton(
-                                textResId = R.string.calories_history_retry,
-                                isLoading = false,
-                                onClick = { viewModel.onEvent(CaloriesHistoryEvent.Retry) },
+                    state.errorType != null && state.entries.isEmpty() -> {
+                        state.errorType?.let { errorType ->
+                            AppErrorWidget(
+                                errorType = errorType,
+                                onRetry = { viewModel.onEvent(CaloriesHistoryEvent.Retry) },
                             )
                         }
                     }

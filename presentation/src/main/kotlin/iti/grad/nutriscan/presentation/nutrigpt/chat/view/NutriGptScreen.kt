@@ -43,6 +43,7 @@ import androidx.compose.material3.SnackbarHostState
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
@@ -196,7 +197,8 @@ fun NutriGptScreen(
                     
                     if (state.errorMessageResId != null) {
                         item(key = "error_widget") {
-                            OfflineStateWidget(
+                            AppErrorWidget(
+                                errorType = state.errorType,
                                 modifier = Modifier.padding(top = 16.dp),
                                 onRetry = { viewModel.onEvent(NutriGptEvent.RetryLastMessage) }
                             )

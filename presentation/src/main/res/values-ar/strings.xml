@@ -445,6 +445,7 @@
     <string name="verdict_safe">آمن</string>
     <string name="verdict_caution">حذر</string>
     <string name="verdict_unsafe">غير آمن</string>
+    <string name="verdict_unknown">غير معروف</string>
 
     <!-- Product Details -->
     <string name="product_details_title">تفاصيل المنتج</string>
@@ -548,6 +549,8 @@
     <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
     <string name="scan_history_empty_button">ابدأ المسح</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
+    <string name="scan_history_search_hint">ابحث باسم المنتج…</string>
+    <string name="scan_history_search_clear">مسح البحث</string>
     <!-- Step History -->
     <string name="step_history_title">سجل الخطوات</string>
     <string name="step_history_daily_average">المتوسط اليومي</string>

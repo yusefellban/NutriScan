@@ -10,6 +10,7 @@ enum class VerdictType {
     CYAN,
     YELLOW,
     RED,
+    FAILED,
 }
 
 /**
