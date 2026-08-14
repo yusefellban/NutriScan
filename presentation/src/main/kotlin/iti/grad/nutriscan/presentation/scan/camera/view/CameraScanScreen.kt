@@ -293,14 +293,7 @@ private fun CameraScanContent(
         },
     )
 
-    // Reset the swipe state every time a NEW scan card appears so it's always fully visible.
-    // Without this, the dismiss animation leaves the box in a "settled-dismissed" offset
-    // and the next card renders partially off-screen or invisible.
-    LaunchedEffect(state.activeScan) {
-        if (state.activeScan != null) {
-            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-        }
-    }
+    // dismissState is keyed per-scan via key(scan.scanId) below — no manual reset needed.
 
     if (state.showDeleteDialog) {
         DeleteWarningAlert(
@@ -406,20 +399,25 @@ private fun CameraScanContent(
         }
 
         state.activeScan?.let { scan ->
-            SwipeToDismissBox(
-                state = dismissState,
-                backgroundContent = {},
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(bottom = activeScanBottomOffset),
-            ) {
-                ActiveScanCard(
-                    scan = scan,
-                    onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
-                    onCardClick = { onEvent(CameraScanEvent.CardClicked) },
-                    onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
-                )
+            // key(scanId) forces a full recomposition — and a brand-new SwipeToDismissBoxState —
+            // every time a different scan arrives, so the box never carries over a stale
+            // dismissed offset from the previous swipe.
+            key(scan.scanId) {
+                SwipeToDismissBox(
+                    state = dismissState,
+                    backgroundContent = {},
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(bottom = activeScanBottomOffset),
+                ) {
+                    ActiveScanCard(
+                        scan = scan,
+                        onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
+                        onCardClick = { onEvent(CameraScanEvent.CardClicked) },
+                        onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
+                    )
+                }
             }
 
             Box(
