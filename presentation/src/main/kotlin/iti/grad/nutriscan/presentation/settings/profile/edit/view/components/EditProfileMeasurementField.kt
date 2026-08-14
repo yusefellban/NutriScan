@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.settings.profile.edit.view.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,16 +38,18 @@ fun EditProfileMeasurementField(
     onValueChange: (String) -> Unit,
     unit: String,
     isReadOnly: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    errorMessage: String? = null
 ) {
     val containerBg = AppTheme.colors.EditProfileInputBackground
-    val borderColor = AppTheme.colors.EditProfileInputBorder
+    val borderColor = if (errorMessage != null) AppTheme.colors.Error else AppTheme.colors.EditProfileInputBorder
     val baseTextColor = AppTheme.colors.TextPrimary
     val hintColor = AppTheme.colors.ProfileSetupSubtitle
     val textColor = if (isReadOnly) hintColor else baseTextColor
 
+    Column(modifier = modifier) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .height(56.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(containerBg)
@@ -98,6 +101,17 @@ fun EditProfileMeasurementField(
                 lineHeight = 20.sp,
                 letterSpacing = (-0.16).sp,
                 color = hintColor
+            )
+        }
+    }
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+                color = AppTheme.colors.Error,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
             )
         }
     }
