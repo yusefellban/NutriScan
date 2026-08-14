@@ -41,17 +41,14 @@ fun ScanFrameOverlay(
 ) {
     val frameDescription = stringResource(R.string.scan_frame_content_description)
     val cornerAlpha = when (selectedMode) {
-        ScanInputMode.BARCODE -> 1f
         ScanInputMode.PHOTO   -> 0.9f
         ScanInputMode.GALLERY -> 0.6f
     }
     val lineAlpha = when (selectedMode) {
-        ScanInputMode.BARCODE -> 0.66f
         ScanInputMode.PHOTO   -> 0.5f
         ScanInputMode.GALLERY -> 0.24f
     }
     val durationMillis = when (selectedMode) {
-        ScanInputMode.BARCODE -> 1200
         ScanInputMode.PHOTO   -> 2100
         ScanInputMode.GALLERY -> 2800
     }

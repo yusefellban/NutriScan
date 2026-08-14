@@ -301,13 +301,14 @@
     <string name="scan_center_action_upload">Upload</string>
     <string name="scan_gallery_selected_image_content_description">Selected image preview</string>
     <string name="scan_mode_barcode_hint">Point at a product barcode to scan</string>
-    <string name="scan_mode_photo_hint">Align product and capture clearly</string>
+    <string name="scan_mode_photo_hint">Capture a label or point at a barcode</string>
     <string name="scan_mode_gallery_hint">Upload a product image from gallery</string>
     <string name="scan_mode_selector_content_desc">Scan mode selector</string>
     <string name="scan_gallery_pick_prompt">Choose an image to scan</string>
     <string name="scan_gallery_pick_failed">Could not read selected image</string>
     <string name="scan_gallery_pick_cancelled">No image selected</string>
     <string name="scan_capture_failed_generic">Image capture failed. Please try again.</string>
+    <string name="scan_barcode_chip_tap_hint">Tap to scan barcode</string>
     <string name="scan_saved_content_description">Save scan</string>
     <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
     <string name="scan_saved_to_bookmarks">Scan saved to Bookmarks</string>

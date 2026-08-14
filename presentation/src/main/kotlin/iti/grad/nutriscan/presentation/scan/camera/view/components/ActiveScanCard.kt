@@ -99,48 +99,9 @@ fun ActiveScanCard(
         Spacer(modifier = Modifier.width(8.dp))
 
         if (scan.isFailed) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(AppTheme.colors.Error.copy(alpha = 0.3f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onRetryClick,
-                    )
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "Scan Again", // In a real app this would be in strings.xml
-                    style = AppTheme.typography.labelMedium,
-                    color = AppTheme.colors.Error,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // No retry button requested
         } else if (!scan.isProcessing && scan.fullResult != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(AppTheme.colors.Error.copy(alpha = 0.3f))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onRetryClick,
-                        )
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "Scan Again", // In a real app this would be in strings.xml
-                        style = AppTheme.typography.labelMedium,
-                        color = AppTheme.colors.VerdictGreen,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
 
                 Box(
                     modifier = Modifier

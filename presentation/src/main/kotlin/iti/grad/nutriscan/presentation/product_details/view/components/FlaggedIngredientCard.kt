@@ -48,21 +48,6 @@ fun FlaggedIngredientCard(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // Allergy / condition tag pill
-        Text(
-            text = ingredient.matchTag,
-            style = CaloriesTypography.badgeText,
-            color = AppTheme.colors.ProductDetailMatchTagText,
-            modifier = Modifier
-                .background(
-                    color = AppTheme.colors.ProductDetailMatchTag,
-                    shape = RoundedCornerShape(percent = 50),
-                )
-                .padding(horizontal = 8.dp, vertical = 2.dp),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Reason text
         Text(
             text = ingredient.reason,

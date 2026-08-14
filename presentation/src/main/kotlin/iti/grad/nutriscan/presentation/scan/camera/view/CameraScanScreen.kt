@@ -3,9 +3,11 @@ package iti.grad.nutriscan.presentation.scan.camera.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaActionSound
 import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
@@ -36,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -50,6 +53,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
@@ -96,10 +102,10 @@ fun CameraScanScreen(
     val flashAlpha = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Create the ML Kit barcode analyzer only while in BARCODE mode.
+    // Create the ML Kit barcode analyzer and run it alongside ImageCapture in PHOTO mode.
     // Keyed on selectedMode so it is re-created (and the old one discarded) on mode switches.
     val barcodeAnalyzer: ImageAnalysis.Analyzer? = remember(state.selectedMode) {
-        if (state.selectedMode == ScanInputMode.BARCODE) {
+        if (state.selectedMode == ScanInputMode.PHOTO) {
             BarcodeScanAnalyzer { barcode, bounds ->
                 viewModel.onEvent(CameraScanEvent.BarcodeDetected(barcode, bounds))
             }
@@ -115,10 +121,43 @@ fun CameraScanScreen(
         }
     }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val granted = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+                if (granted) {
+                    viewModel.onEvent(CameraScanEvent.PermissionResult(true))
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    var permissionRequestedFromButton by remember { mutableStateOf(false) }
+    var permissionRequestedAt by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
+        if (!granted && permissionRequestedFromButton) {
+            val timeElapsed = System.currentTimeMillis() - permissionRequestedAt
+            if (timeElapsed < 350) {
+                val intent = Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.packageName, null)
+                )
+                context.startActivity(intent)
+            }
+        }
+        permissionRequestedFromButton = false
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -212,11 +251,21 @@ fun CameraScanScreen(
         }
     }
 
+    val handleEvent: (CameraScanEvent) -> Unit = { event ->
+        if (event == CameraScanEvent.RequestPermissionClicked) {
+            permissionRequestedFromButton = true
+            permissionRequestedAt = System.currentTimeMillis()
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            viewModel.onEvent(event)
+        }
+    }
+
     CameraScanContent(
         state = state,
         imageCapture = imageCapture,
         barcodeAnalyzer = barcodeAnalyzer,
-        onEvent = viewModel::onEvent,
+        onEvent = handleEvent,
         bottomPadding = bottomPadding,
         flashAlpha = flashAlpha.value,
     )
@@ -232,6 +281,7 @@ private fun CameraScanContent(
     bottomPadding: Dp,
     flashAlpha: Float,
 ) {
+    val context = LocalContext.current
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
@@ -277,13 +327,14 @@ private fun CameraScanContent(
                             .background(Color.White.copy(alpha = flashAlpha)),
                     )
                 }
-                // AR overlay replaces the static ScanFrameOverlay in BARCODE mode.
-                if (state.selectedMode == ScanInputMode.BARCODE) {
+                // AR overlay renders in PHOTO mode whenever a barcode is detected in-frame.
+                if (state.selectedMode == ScanInputMode.PHOTO) {
                     BarcodeArOverlay(
-                        normalizedBounds = state.detectedBarcodeBounds,
-                        barcodeValue     = state.trackedBarcodeValue,
-                        isLocked         = state.isProcessingCenterAction,
-                        modifier         = Modifier.fillMaxSize(),
+                        normalizedBounds      = state.detectedBarcodeBounds,
+                        barcodeValue          = state.trackedBarcodeValue,
+                        isLocked              = state.isProcessingCenterAction,
+                        onBarcodeChipClicked  = { onEvent(CameraScanEvent.BarcodeChipClicked) },
+                        modifier              = Modifier.fillMaxSize(),
                     )
                 }
             }
@@ -296,7 +347,9 @@ private fun CameraScanContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     CameraPermissionDeniedContent(
-                        onRetry = { onEvent(CameraScanEvent.RequestPermissionClicked) },
+                        onRetry = {
+                            onEvent(CameraScanEvent.RequestPermissionClicked)
+                        },
                     )
                 }
             }
