@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -86,7 +87,14 @@ fun NutriGptVoiceScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppTheme.colors.Background)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        AppTheme.colors.ChatScreenBackground,
+                        AppTheme.colors.ChatScreenBackgroundEnd
+                    )
+                )
+            )
             .padding(
                 top = WindowInsets.safeDrawing.only(WindowInsetsSides.Top).asPaddingValues().calculateTopPadding(),
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -128,7 +136,7 @@ fun NutriGptVoiceScreen(
             // Official Sources Header
             Text(
                 text = stringResource(id = R.string.nutrigpt_voice_official_sources),
-                color = AppTheme.colors.Primary,
+                color = AppTheme.colors.PrimaryVariant,
                 style = AppTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
