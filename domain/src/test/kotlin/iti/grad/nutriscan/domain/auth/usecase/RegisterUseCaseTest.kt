@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.domain.auth.usecase
 
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
+import iti.grad.nutriscan.domain.onboarding.repository.IOnboardingRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -13,16 +14,18 @@ import org.junit.jupiter.api.Test
 class RegisterUseCaseTest {
 
     private lateinit var authRepository: IAuthRepository
+    private lateinit var onboardingRepository: IOnboardingRepository
     private lateinit var useCase: RegisterUseCase
 
     @BeforeEach
     fun setup() {
         authRepository = mockk()
-        useCase = RegisterUseCase(authRepository)
+        onboardingRepository = mockk(relaxed = true)
+        useCase = RegisterUseCase(authRepository, onboardingRepository)
     }
 
     @Test
-    fun `invoke with valid details should return success`() = runTest {
+    fun `invoke with valid details should return success and clear preferences`() = runTest {
         val firstName = "Test"
         val lastName = "User"
         val email = "test@example.com"
@@ -33,10 +36,11 @@ class RegisterUseCaseTest {
 
         assertTrue(result.isSuccess)
         coVerify(exactly = 1) { authRepository.register(firstName, lastName, email, password) }
+        coVerify(exactly = 1) { onboardingRepository.clearUserSpecificPreferences() }
     }
 
     @Test
-    fun `invoke with failure from repository should return failure`() = runTest {
+    fun `invoke with failure from repository should return failure and not clear preferences`() = runTest {
         val firstName = "Test"
         val lastName = "User"
         val email = "test@example.com"
@@ -49,5 +53,6 @@ class RegisterUseCaseTest {
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
         coVerify(exactly = 1) { authRepository.register(firstName, lastName, email, password) }
+        coVerify(exactly = 0) { onboardingRepository.clearUserSpecificPreferences() }
     }
 }

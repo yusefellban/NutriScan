@@ -23,4 +23,8 @@ class OnboardingRepositoryImpl @Inject constructor(
     override suspend fun completeProfileSetup() {
         onboardingDataSource.setProfileSetupCompleted()
     }
+
+    override suspend fun clearUserSpecificPreferences() {
+        onboardingDataSource.clearUserSpecificPreferences()
+    }
 }

@@ -5,4 +5,5 @@ interface IOnboardingPreferencesDataSource {
     suspend fun setOnboardingCompleted()
     suspend fun isProfileSetupCompleted(): Boolean
     suspend fun setProfileSetupCompleted()
+    suspend fun clearUserSpecificPreferences()
 }

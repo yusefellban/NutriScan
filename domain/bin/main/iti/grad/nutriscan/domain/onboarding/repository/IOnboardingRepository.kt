@@ -5,4 +5,5 @@ interface IOnboardingRepository {
     suspend fun completeOnboarding()
     suspend fun isProfileSetupCompleted(): Boolean
     suspend fun completeProfileSetup()
+    suspend fun clearUserSpecificPreferences()
 }

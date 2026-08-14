@@ -40,4 +40,10 @@ class OnboardingPreferencesDataSourceImpl @Inject constructor(
             preferences[PreferencesKeys.PROFILE_SETUP_COMPLETED] = true
         }
     }
+
+    override suspend fun clearUserSpecificPreferences() {
+        dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.PROFILE_SETUP_COMPLETED)
+        }
+    }
 }
