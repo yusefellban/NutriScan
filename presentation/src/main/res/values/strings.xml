@@ -14,6 +14,7 @@
     <string name="error_password_mismatch">ERROR: Passwords do not match!</string>
     <string name="error_invalid_email">ERROR: Invalid email format.</string>
     <string name="error_empty_field">ERROR: Field cannot be empty.</string>
+    <string name="error_invalid_name">Only letters, spaces, hyphens and apostrophes are allowed.</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="prompt_have_account">Already have an account? Sign In.</string>
     <string name="name_label">Name</string>
@@ -130,6 +131,12 @@
     <string name="edit_profile_dob_hint">Date of birth</string>
     <string name="edit_profile_height_label">Hight</string> <!-- Intentional typo to match image -->
     <string name="edit_profile_weight_label">Weight</string>
+    <string name="edit_profile_error_name_required">This field cannot be empty</string>
+    <string name="edit_profile_error_name_invalid">Only letters, spaces, hyphens and apostrophes are allowed</string>
+    <string name="edit_profile_error_height_required">Please enter your height</string>
+    <string name="edit_profile_error_height_range">Height must be between 50 and 250 cm</string>
+    <string name="edit_profile_error_weight_required">Please enter your weight</string>
+    <string name="edit_profile_error_weight_range">Weight must be between 2 and 300 kg</string>
 
     <!-- Permissions -->
     <string name="action_cancel">Cancel</string>
