@@ -70,11 +70,13 @@ class RegisterViewModel @Inject constructor(
 
         val firstNameError = when {
             currentState.firstName.isBlank() -> R.string.error_empty_field
+            currentState.firstName.trim().length !in 3..100 -> R.string.error_invalid_name_length
             !namePattern.matches(currentState.firstName.trim()) -> R.string.error_invalid_name
             else -> null
         }
         val lastNameError = when {
             currentState.lastName.isBlank() -> R.string.error_empty_field
+            currentState.lastName.trim().length !in 3..100 -> R.string.error_invalid_name_length
             !namePattern.matches(currentState.lastName.trim()) -> R.string.error_invalid_name
             else -> null
         }

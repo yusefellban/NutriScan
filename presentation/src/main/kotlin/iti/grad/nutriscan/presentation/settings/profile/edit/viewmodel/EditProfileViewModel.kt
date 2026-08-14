@@ -271,6 +271,7 @@ class EditProfileViewModel @Inject constructor(
 
     private fun validateName(name: String, isRequired: Boolean): Int? = when {
         name.isBlank() -> if (isRequired) R.string.edit_profile_error_name_required else null
+        name.trim().length !in 3..100 -> R.string.error_invalid_name_length
         !namePattern.matches(name.trim()) -> R.string.edit_profile_error_name_invalid
         else -> null
     }

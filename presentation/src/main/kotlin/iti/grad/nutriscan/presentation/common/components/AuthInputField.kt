@@ -43,7 +43,7 @@ import iti.grad.presentation.R
 // Custom input field matching Figma: label + clean container row + error banner
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun FigmaInputField(
+fun AuthInputField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -56,6 +56,7 @@ fun FigmaInputField(
     inputTextColor: Color,
     isPassword: Boolean = false,
     isPasswordVisible: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
     onVisibilityToggle: (() -> Unit)? = null
 ) {
     val errorColor = MaterialTheme.colorScheme.error
@@ -116,7 +117,7 @@ fun FigmaInputField(
                     visualTransformation = if (isPassword && !isPasswordVisible)
                         PasswordVisualTransformation() else VisualTransformation.None,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Email
+                        keyboardType = if (isPassword) KeyboardType.Password else keyboardType
                     ),
                     textStyle = TextStyle(
                         fontFamily = PlusJakartaSans,

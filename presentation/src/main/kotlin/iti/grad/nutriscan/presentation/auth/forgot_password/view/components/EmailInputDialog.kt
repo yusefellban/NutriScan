@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import iti.grad.nutriscan.presentation.common.components.AppButton
-import iti.grad.nutriscan.presentation.common.components.FigmaInputField
+import iti.grad.nutriscan.presentation.common.components.AuthInputField
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -93,7 +93,7 @@ fun EmailInputDialog(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    FigmaInputField(
+                    AuthInputField(
                         value = email,
                         onValueChange = onEmailChange,
                         label = stringResource(R.string.email_label),
@@ -103,7 +103,8 @@ fun EmailInputDialog(
                         errorResId = errorResId,
                         inputContainerBg = Color.White.copy(alpha = 0.05f),
                         inputLabelColor = AppTheme.colors.TextPrimary,
-                        inputTextColor = AppTheme.colors.TextPrimary
+                        inputTextColor = AppTheme.colors.TextPrimary,
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Email
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
