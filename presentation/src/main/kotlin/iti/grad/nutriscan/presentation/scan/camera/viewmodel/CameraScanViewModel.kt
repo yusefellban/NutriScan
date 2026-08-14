@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID.randomUUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -177,7 +178,7 @@ class CameraScanViewModel @Inject constructor(
                 isScanning = true,
                 isProcessingCenterAction = true,
                 activeScan = ActiveScanUiModel(
-                    scanId = "",
+                    scanId = randomUUID().toString(),
                     thumbnailUrl = null,
                     isProcessing = true,
                 ),
@@ -219,7 +220,7 @@ class CameraScanViewModel @Inject constructor(
                 isScanning = true,
                 isProcessingCenterAction = true,
                 activeScan = (state.activeScan ?: ActiveScanUiModel(
-                    scanId = "",
+                    scanId = randomUUID().toString(),
                     thumbnailUrl = file.absolutePath,
                     isProcessing = true,
                 )).copy(
@@ -559,7 +560,7 @@ class CameraScanViewModel @Inject constructor(
                 isProcessingCenterAction = true,
                 trackedBarcodeValue = barcode,
                 activeScan = ActiveScanUiModel(
-                    scanId = "",
+                    scanId = randomUUID().toString(),
                     thumbnailUrl = null,
                     isProcessing = true,
                 ),

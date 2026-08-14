@@ -283,18 +283,6 @@ private fun CameraScanContent(
     flashAlpha: Float,
 ) {
     val context = LocalContext.current
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { dismissValue ->
-            if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
-                onEvent(CameraScanEvent.DismissScanClicked)
-                true
-            } else {
-                false
-            }
-        },
-    )
-
-    // dismissState is keyed per-scan via key(scan.scanId) below — no manual reset needed.
 
     if (state.showDeleteDialog) {
         DeleteWarningAlert(
@@ -404,6 +392,17 @@ private fun CameraScanContent(
             // every time a different scan arrives, so the box never carries over a stale
             // dismissed offset from the previous swipe.
             key(scan.scanId) {
+                val dismissState = rememberSwipeToDismissBoxState(
+                    confirmValueChange = { dismissValue ->
+                        if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
+                            onEvent(CameraScanEvent.DismissScanClicked)
+                            true
+                        } else {
+                            false
+                        }
+                    },
+                )
+                
                 SwipeToDismissBox(
                     state = dismissState,
                     backgroundContent = {},
