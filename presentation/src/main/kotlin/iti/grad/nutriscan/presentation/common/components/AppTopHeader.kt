@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -36,13 +37,13 @@ fun AppTopHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 71.dp, bottom = 32.dp),
+            .statusBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AppBackButton(
             onClick = onBackClick,
-            iconTint = Color.White,
-            borderColor = Color.White
+            surface = BackButtonSurface.OnAccent,
         )
 
         Text(
