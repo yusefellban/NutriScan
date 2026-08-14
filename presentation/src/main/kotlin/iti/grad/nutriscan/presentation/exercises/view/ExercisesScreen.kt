@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
@@ -90,8 +91,7 @@ fun ExercisesScreen(
         ) {
             AppBackButton(
                 onClick = { viewModel.onEvent(ExercisesEvent.OnBackClick) },
-                iconTint = AppTheme.colors.ExerciseBackButtonTint,
-                borderColor = AppTheme.colors.ExerciseBackButtonTint
+                surface = BackButtonSurface.OnLight,
             )
             Text(
                 text = stringResource(id = R.string.exercises_title),

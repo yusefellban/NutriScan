@@ -53,6 +53,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileSt
 import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.SuccessAlert
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import androidx.activity.result.contract.ActivityResultContracts
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error
@@ -185,8 +186,7 @@ private fun EditProfileContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(EditProfileEvent.BackClicked) },
-                        iconTint = AppTheme.colors.Teal1000,
-                        borderColor = AppTheme.colors.Teal1000
+                        surface = BackButtonSurface.OnLight,
                     )
                 }
 

@@ -6,13 +6,10 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,6 +26,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.voice.state.NutriGptVoiceEffect
@@ -106,20 +105,10 @@ fun NutriGptVoiceScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Back Button
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .border(1.dp, AppTheme.colors.Primary.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { viewModel.onNavigateBack() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
-                        contentDescription = "Back",
-                        tint = AppTheme.colors.Primary
-                    )
-                }
+                AppBackButton(
+                    onClick = { viewModel.onNavigateBack() },
+                    surface = BackButtonSurface.OnLight,
+                )
 
                 // AR / EN Toggle
                 SettingsSegmentedToggle(

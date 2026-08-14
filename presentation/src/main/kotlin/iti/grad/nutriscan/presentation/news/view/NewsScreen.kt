@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -107,8 +108,7 @@ private fun NewsContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(NewsEvent.BackClicked) },
-                        iconTint = AppTheme.colors.NewsCategoryLabel,
-                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                        surface = BackButtonSurface.OnLight,
                     )
                 }
                 Box(
@@ -136,8 +136,7 @@ private fun NewsContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(NewsEvent.BackClicked) },
-                        iconTint = AppTheme.colors.NewsCategoryLabel,
-                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                        surface = BackButtonSurface.OnLight,
                     )
                     Column(modifier = Modifier.padding(top = 16.dp)) {
                         Text(

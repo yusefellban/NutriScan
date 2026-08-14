@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -66,8 +66,7 @@ fun ForgotPasswordHeader(
             // ── Back button ──────────────────────────────────────────────
             AppBackButton(
                 onClick = onBackClick,
-                iconTint = Color.White,
-                borderColor = Color.White.copy(alpha = 0.2f),
+                surface = BackButtonSurface.OnAccent,
                 modifier = Modifier
                     .padding(start = 24.dp, top = 4.dp)
                     .align(Alignment.TopStart)
