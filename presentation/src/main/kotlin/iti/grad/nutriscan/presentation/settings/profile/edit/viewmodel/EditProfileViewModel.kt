@@ -75,18 +75,35 @@ class EditProfileViewModel @Inject constructor(
             getUserProfileUseCase().collectLatest { user ->
                 if (user != null) {
                     _state.update {
-                        it.copy(
-                            firstName = user.firstName,
-                            lastName = user.lastName ?: "",
-                            dateOfBirth = user.dateOfBirth ?: "",
-                            email = user.email ?: "",
-                            heightCm = user.heightCm,
-                            weightKg = user.weightKg,
-                            avatarUrl = user.avatarUrl,
-                            avatarUpdatedAt = user.updatedAt,
-                            selectedDiseaseIds = user.diseaseIds.toPersistentList(),
-                            selectedAllergyIds = user.allergyIds.toPersistentList()
-                        )
+                        // Bug-09 fix: this Flow re-emits on ANY write to the user's DB row —
+                        // including unrelated ones like the avatar upload persisting a new
+                        // URL — not just when the user's own edits are saved. While the user
+                        // is actively editing, applying a stale snapshot here would silently
+                        // wipe out in-progress changes (e.g. newly toggled diseases/allergies)
+                        // seconds before they hit Save. Once in edit mode, only the avatar
+                        // fields (which have their own independent upload flow) are still
+                        // allowed to update live; every other editable field is frozen until
+                        // the user leaves edit mode (cancel/save) and this Flow can safely
+                        // re-sync from the source of truth again.
+                        if (it.isEditMode) {
+                            it.copy(
+                                avatarUrl = user.avatarUrl,
+                                avatarUpdatedAt = user.updatedAt
+                            )
+                        } else {
+                            it.copy(
+                                firstName = user.firstName,
+                                lastName = user.lastName ?: "",
+                                dateOfBirth = user.dateOfBirth ?: "",
+                                email = user.email ?: "",
+                                heightCm = user.heightCm,
+                                weightKg = user.weightKg,
+                                avatarUrl = user.avatarUrl,
+                                avatarUpdatedAt = user.updatedAt,
+                                selectedDiseaseIds = user.diseaseIds.toPersistentList(),
+                                selectedAllergyIds = user.allergyIds.toPersistentList()
+                            )
+                        }
                     }
                 }
             }
@@ -99,14 +116,16 @@ class EditProfileViewModel @Inject constructor(
                 _state.update { it.copy(isEditMode = true) }
                 syncData()
             }
-            is EditProfileEvent.UpdateFirstName -> _state.update { it.copy(firstName = event.firstName) }
-            is EditProfileEvent.UpdateLastName -> _state.update { it.copy(lastName = event.lastName) }
+            is EditProfileEvent.UpdateFirstName ->
+                _state.update { it.copy(firstName = event.firstName, firstNameErrorResId = null) }
+            is EditProfileEvent.UpdateLastName ->
+                _state.update { it.copy(lastName = event.lastName, lastNameErrorResId = null) }
             is EditProfileEvent.UpdateDateOfBirth -> _state.update { it.copy(dateOfBirth = event.dateOfBirth) }
             is EditProfileEvent.ToggleDisease -> toggleDisease(event.diseaseId)
             is EditProfileEvent.ToggleAllergy -> toggleAllergy(event.allergyId)
             EditProfileEvent.RetryLoadDiseases -> syncData() // now retry syncs data
             EditProfileEvent.RetryLoadAllergies -> syncData()
-            EditProfileEvent.SaveClicked -> _state.update { it.copy(showSaveConfirmation = true) }
+            EditProfileEvent.SaveClicked -> onSaveClicked()
             EditProfileEvent.ConfirmSave -> saveProfileData()
             EditProfileEvent.DismissSaveConfirmation -> _state.update { it.copy(showSaveConfirmation = false) }
             EditProfileEvent.BackClicked -> emitEffect(EditProfileEffect.NavigateBack)
@@ -117,8 +136,10 @@ class EditProfileViewModel @Inject constructor(
             EditProfileEvent.RetryAvatarUpload -> lastPickedAvatarUri?.let { uploadAvatar(it) }
             EditProfileEvent.DismissAvatarUploadError ->
                 _state.update { it.copy(avatarUploadState = AvatarUploadState.Idle) }
-            is EditProfileEvent.UpdateHeight -> _state.update { it.copy(heightCm = event.heightCm) }
-            is EditProfileEvent.UpdateWeight -> _state.update { it.copy(weightKg = event.weightKg) }
+            is EditProfileEvent.UpdateHeight ->
+                _state.update { it.copy(heightCm = event.heightCm, heightErrorResId = null) }
+            is EditProfileEvent.UpdateWeight ->
+                _state.update { it.copy(weightKg = event.weightKg, weightErrorResId = null) }
             EditProfileEvent.DismissAlert -> {
                 val wasSuccess = _state.value.alertState is Success
                 _state.update { it.copy(alertState = None) }
@@ -243,6 +264,55 @@ class EditProfileViewModel @Inject constructor(
             file.outputStream().use { output -> input.copyTo(output) }
         } ?: throw java.io.IOException("Unable to open picked image")
         return file
+    }
+
+    /** Only letters (any language), spaces, hyphens and apostrophes — no digits or symbols like #$@%. */
+    private val namePattern = Regex("^[\\p{L}][\\p{L} '-]*$")
+
+    private fun validateName(name: String, isRequired: Boolean): Int? = when {
+        name.isBlank() -> if (isRequired) R.string.edit_profile_error_name_required else null
+        !namePattern.matches(name.trim()) -> R.string.edit_profile_error_name_invalid
+        else -> null
+    }
+
+    private fun validateHeight(heightCm: Double?): Int? = when {
+        heightCm == null -> R.string.edit_profile_error_height_required
+        heightCm < 50.0 || heightCm > 250.0 -> R.string.edit_profile_error_height_range
+        else -> null
+    }
+
+    private fun validateWeight(weightKg: Double?): Int? = when {
+        weightKg == null -> R.string.edit_profile_error_weight_required
+        weightKg < 2.0 || weightKg > 300.0 -> R.string.edit_profile_error_weight_range
+        else -> null
+    }
+
+    /**
+     * Validates all editable fields before showing the save confirmation dialog.
+     * Fixes bugs where invalid characters, numbers-as-names, and out-of-range or
+     * negative/zero height & weight values were silently accepted or sent to the
+     * server (surfacing as a confusing "No internet" error).
+     */
+    private fun onSaveClicked() {
+        val current = _state.value
+        val firstNameError = validateName(current.firstName, isRequired = true)
+        val lastNameError = validateName(current.lastName, isRequired = false)
+        val heightError = validateHeight(current.heightCm)
+        val weightError = validateWeight(current.weightKg)
+
+        _state.update {
+            it.copy(
+                firstNameErrorResId = firstNameError,
+                lastNameErrorResId = lastNameError,
+                heightErrorResId = heightError,
+                weightErrorResId = weightError
+            )
+        }
+
+        val hasErrors = listOf(firstNameError, lastNameError, heightError, weightError).any { it != null }
+        if (!hasErrors) {
+            _state.update { it.copy(showSaveConfirmation = true) }
+        }
     }
 
     private fun saveProfileData() {

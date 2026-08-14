@@ -35,6 +35,11 @@ class RegisterViewModel @Inject constructor(
     // Pure Kotlin Regex to adhere to "No Android Imports in ViewModel" rule
     private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
 
+    // Only letters (any language), spaces, hyphens and apostrophes — no digits or
+    // symbols like #$@%. Mirrors the same rule enforced on Edit Profile so bad names
+    // can never enter the system in the first place, at registration time.
+    private val namePattern = Regex("^[\\p{L}][\\p{L} '-]*$")
+
     fun onEvent(event: RegisterEvent) {
         when (event) {
             is RegisterEvent.FirstNameChanged -> _state.update { it.copy(firstName = event.value, firstNameErrorResId = null, alertState = AuthAlertState.None) }
@@ -63,8 +68,16 @@ class RegisterViewModel @Inject constructor(
     private fun handleSignUp() {
         val currentState = _state.value
 
-        val firstNameError = if (currentState.firstName.isBlank()) R.string.error_empty_field else null
-        val lastNameError  = if (currentState.lastName.isBlank())  R.string.error_empty_field else null
+        val firstNameError = when {
+            currentState.firstName.isBlank() -> R.string.error_empty_field
+            !namePattern.matches(currentState.firstName.trim()) -> R.string.error_invalid_name
+            else -> null
+        }
+        val lastNameError = when {
+            currentState.lastName.isBlank() -> R.string.error_empty_field
+            !namePattern.matches(currentState.lastName.trim()) -> R.string.error_invalid_name
+            else -> null
+        }
 
         val emailError = when {
             currentState.email.isBlank() -> R.string.error_empty_field
