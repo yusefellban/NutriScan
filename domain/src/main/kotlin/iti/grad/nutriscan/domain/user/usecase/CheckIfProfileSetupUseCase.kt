@@ -15,18 +15,8 @@ class CheckIfProfileSetupUseCase @Inject constructor(
     suspend operator fun invoke(): Boolean {
         val user = userRepository.getUserData().firstOrNull()
         
-        val isPlaceholderData = user?.gender == "MALE" &&
-                user.dateOfBirth == "2000-01-01" &&
-                user.heightCm == 170.0 &&
-                user.weightKg == 170.0
-
-        val hasRealServerData = user != null &&
-                user.gender != null &&
-                user.dateOfBirth != null &&
-                user.heightCm != null &&
-                user.weightKg != null &&
-                !isPlaceholderData
-
-        return hasRealServerData
+        // If the gender is UNKNOWN, they haven't completed profile setup.
+        // Once they complete it, gender will be MALE or FEMALE.
+        return user != null && user.gender != "UNKNOWN"
     }
 }

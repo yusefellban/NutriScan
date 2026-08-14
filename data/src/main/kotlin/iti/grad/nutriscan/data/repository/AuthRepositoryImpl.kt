@@ -42,9 +42,9 @@ class AuthRepositoryImpl @Inject constructor(
                 username = username,
                 password = password,
                 dateOfBirth = "2000-01-01",
-                gender = "MALE",
+                gender = "UNKNOWN",
                 heightCm = 170.0,
-                weightKg = 170.0,
+                weightKg = 70.0,
                 allergies = emptyList(),
                 diseases = emptyList()
             )
