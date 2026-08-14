@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,8 +31,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
@@ -54,11 +58,10 @@ fun WaterTrackerCard(
     onCupLongPressed: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = AppTheme.isDark
     val filledGlassTint = AppTheme.colors.Teal700
-    val emptyGlassTint = if (isDark) AppTheme.colors.Teal1300 else AppTheme.colors.Gray400
-    val addButtonBackground = if (isDark) AppTheme.colors.Teal1600 else AppTheme.colors.Gray200
-    val addButtonIconTint = if (isDark) AppTheme.colors.Teal1000 else AppTheme.colors.Gray1000
+    val emptyGlassTint = AppTheme.colors.WaterEmptyGlassTint
+    val addButtonBackground = AppTheme.colors.WaterAddButtonBackground
+    val addButtonIconTint = AppTheme.colors.WaterAddButtonIconTint
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -74,11 +77,27 @@ fun WaterTrackerCard(
                 style = CaloriesTypography.sectionTitle,
                 color = AppTheme.colors.SectionSubtitle,
             )
-            Text(
-                text = "$waterConsumed/$waterGoal",
-                style = AppTheme.typography.bodyLarge,
-                color = AppTheme.colors.Teal1000,
-            )
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = waterConsumed.toString(),
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.Teal1000,
+                    )
+                    Text(
+                        text = " / ",
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.Teal1000,
+                    )
+                    Text(
+                        text = waterGoal.toString(),
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.Teal1000,
+                    )
+                }
+            }
         }
 
         Row(

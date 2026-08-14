@@ -110,7 +110,7 @@ class ForgotPasswordViewModel @Inject constructor(
                 .onSuccess {
                     _state.update { it.copy(isLoading = false) }
                     _effect.send(
-                        ForgotPasswordEffect.ShowSnackbar(messageStr = "Code resent successfully")
+                        ForgotPasswordEffect.ShowSnackbar(messageResId = R.string.auth_code_resent_success)
                     )
                 }
                 .onFailure { throwable ->

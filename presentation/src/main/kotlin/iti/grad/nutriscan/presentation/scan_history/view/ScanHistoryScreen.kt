@@ -342,7 +342,7 @@ fun ScanDatePickerDialog(
                     onClick = { onDateSelected(null) },
                     enabled = datePickerState.selectedDateMillis != null
                 ) {
-                    Text("Reset")
+                    Text(stringResource(R.string.date_picker_reset))
                 }
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(android.R.string.cancel))

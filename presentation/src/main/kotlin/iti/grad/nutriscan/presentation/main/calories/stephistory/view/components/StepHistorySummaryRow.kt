@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.domain.steps.history.model.StepHistorySummary
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.stepHistoryCardShadow
+import java.util.Locale
 
 @Composable
 fun StepHistorySummaryRow(
@@ -36,24 +38,26 @@ fun StepHistorySummaryRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        val distanceStr = String.format(Locale.getDefault(), "%.1f", summary?.totalDistanceKm ?: 0.0)
+        
         SummaryCard(
             modifier = Modifier.weight(1f),
-            title = "Distance",
-            value = "${summary?.totalDistanceKm ?: 0.0} km",
+            title = stringResource(id = R.string.step_history_distance),
+            value = "$distanceStr ${stringResource(id = R.string.step_unit_km)}",
             iconRes = R.drawable.ic_map_pin
         )
         
         SummaryCard(
             modifier = Modifier.weight(1f),
-            title = "Calories",
-            value = "${summary?.totalCaloriesBurned ?: 0} kcal",
+            title = stringResource(id = R.string.step_history_calories),
+            value = "${summary?.totalCaloriesBurned ?: 0} ${stringResource(id = R.string.step_unit_kcal)}",
             iconRes = R.drawable.ic_flame
         )
         
         SummaryCard(
             modifier = Modifier.weight(1f),
-            title = "Time",
-            value = "${summary?.totalActiveMinutes ?: 0} min",
+            title = stringResource(id = R.string.step_history_time),
+            value = "${summary?.totalActiveMinutes ?: 0} ${stringResource(id = R.string.step_unit_min)}",
             iconRes = R.drawable.ic_stopwatch
         )
     }

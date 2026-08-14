@@ -683,7 +683,14 @@
     <string name="server_problem_title">مشكلة في الخادم</string>
     <string name="server_problem_subtitle">نواجه مشكلة في تحميل بياناتك. يرجى المحاولة مرة أخرى بعد قليل.</string>
     <string name="server_problem_retry">حاول مرة أخرى</string>
-    <string name="delete_scan_title">حذف الفحص؟</string>
-    <string name="delete_scan_message">هل أنت متأكد من رغبتك في إزالة هذا الفحص من السجل؟ لا يمكن التراجع عن هذا الإجراء.</string>
-    <string name="alert_delete_success">تم حذف الفحص بنجاح</string>
+    <string name="delete_scan_title">حذف المسح</string>
+    <string name="delete_scan_message">هل أنت متأكد أنك تريد إزالة هذا المسح من السجل؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_delete_success">تم حذف المسح بنجاح</string>
+    <string name="date_picker_reset">إعادة ضبط</string>
+    <string name="step_history_distance">المسافة</string>
+    <string name="step_history_calories">السعرات</string>
+    <string name="step_history_time">الوقت</string>
+    <string name="step_unit_km">كم</string>
+    <string name="step_unit_kcal">سعرة</string>
+    <string name="step_unit_min">دقيقة</string>
 </resources>
