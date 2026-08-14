@@ -363,8 +363,8 @@ private fun CameraScanContent(
             }
         }
 
-        // Scan beam overlay — shown only in camera (PHOTO) mode
-        if (!state.permissionDenied && !isGalleryMode) {
+        // Scan beam overlay — shown only in camera (PHOTO) mode while actively scanning
+        if (!state.permissionDenied && !isGalleryMode && state.isScanning) {
             ScanFrameOverlay(
                 selectedMode = state.selectedMode,
                 modifier = Modifier.fillMaxSize(),
