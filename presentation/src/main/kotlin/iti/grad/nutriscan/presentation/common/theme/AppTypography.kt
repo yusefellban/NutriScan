@@ -8,112 +8,138 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import iti.grad.presentation.R
 
-val PlusJakartaSans = FontFamily(
+import androidx.compose.ui.text.intl.Locale
+
+val KOSans = FontFamily(
+    Font(R.font.kosans_thin, FontWeight.Thin),
+    Font(R.font.kosans_extralight, FontWeight.ExtraLight),
+    Font(R.font.kosans_light, FontWeight.Light),
+    Font(R.font.kosans_regular, FontWeight.Normal),
+    Font(R.font.kosans_medium, FontWeight.Medium),
+    Font(R.font.kosans_semibold, FontWeight.SemiBold),
+    Font(R.font.kosans_bold, FontWeight.Bold)
+)
+
+private val isArabic: Boolean
+    get() = java.util.Locale.getDefault().language == "ar"
+
+fun getAppFontFamily(defaultFont: FontFamily): FontFamily {
+    return if (isArabic) KOSans else defaultFont
+}
+
+private val PlusJakartaSansDefault = FontFamily(
     Font(R.font.plus_jakarta_sans_medium, FontWeight.Medium),
     Font(R.font.plus_jakarta_sans_semibold, FontWeight.SemiBold),
     Font(R.font.plus_jakarta_sans_bold, FontWeight.Bold),
     Font(R.font.plus_jakarta_sans_extrabold, FontWeight.ExtraBold)
 )
 
-val LexendDeca = FontFamily(
+val PlusJakartaSans: FontFamily
+    get() = if (isArabic) KOSans else PlusJakartaSansDefault
+
+private val LexendDecaDefault = FontFamily(
     Font(R.font.lexend_deca_light, FontWeight.Light),
     Font(R.font.lexend_deca_regular, FontWeight.Normal),
     Font(R.font.lexend_deca_medium, FontWeight.Medium),
     Font(R.font.lexend_deca_semibold, FontWeight.SemiBold)
 )
 
-val AppTypography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.ExtraBold,
-        fontSize = 36.sp,
-        lineHeight = 44.sp
-    ),
-    displayMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp
-    ),
-    displaySmall = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 28.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp
-    ),
-    titleLarge = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 22.sp,
-        lineHeight = 28.sp
-    ),
-    titleMedium = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Medium,
-        fontSize = 20.sp,
-        lineHeight = 24.sp
-    ),
-    titleSmall = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 20.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    ),
-    bodySmall = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    ),
-    labelMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp
+val LexendDeca: FontFamily
+    get() = if (isArabic) KOSans else LexendDecaDefault
+
+val AppTypography: Typography
+    get() = Typography(
+        displayLarge = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 36.sp,
+            lineHeight = 44.sp
+        ),
+        displayMedium = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            lineHeight = 40.sp
+        ),
+        displaySmall = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 28.sp,
+            lineHeight = 36.sp
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 28.sp,
+            lineHeight = 36.sp
+        ),
+        headlineMedium = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 24.sp,
+            lineHeight = 28.sp
+        ),
+        headlineSmall = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            lineHeight = 24.sp
+        ),
+        titleLarge = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 22.sp,
+            lineHeight = 28.sp
+        ),
+        titleMedium = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Medium,
+            fontSize = 20.sp,
+            lineHeight = 24.sp
+        ),
+        titleSmall = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+            lineHeight = 20.sp
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            lineHeight = 24.sp
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        ),
+        bodySmall = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+        ),
+        labelLarge = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        ),
+        labelMedium = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+        ),
+        labelSmall = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 11.sp,
+            lineHeight = 16.sp
+        )
     )
-)
 
 /**
  * One-off text styles for Home screen composables that don't fit Material3's fixed
@@ -123,36 +149,40 @@ val AppTypography = Typography(
  */
 object HomeTypography {
     /** "Daily Health Tip" card title — Plus Jakarta Sans SemiBold 14sp/20sp. */
-    val dailyTipTitle = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    )
+    val dailyTipTitle: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        )
 
     /** Recent History item product name — Lexend Deca Medium 18sp/22sp. */
-    val historyItemTitle = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Medium,
-        fontSize = 18.sp,
-        lineHeight = 22.sp
-    )
+    val historyItemTitle: TextStyle
+        get() = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp,
+            lineHeight = 22.sp
+        )
 
     /** Recent History item scan date/time — Lexend Deca Light 12sp/15sp. */
-    val historyItemDate = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Light,
-        fontSize = 12.sp,
-        lineHeight = 15.sp
-    )
+    val historyItemDate: TextStyle
+        get() = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Light,
+            fontSize = 12.sp,
+            lineHeight = 15.sp
+        )
 
     /** Verdict badge pill text ("HEALTHY", "PROBIOTIC"...) — Lexend Deca Light 10sp/13sp. */
-    val verdictBadge = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Light,
-        fontSize = 10.sp,
-        lineHeight = 13.sp
-    )
+    val verdictBadge: TextStyle
+        get() = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Light,
+            fontSize = 10.sp,
+            lineHeight = 13.sp
+        )
 }
 
 /**
@@ -162,28 +192,31 @@ object HomeTypography {
  */
 object CaloriesTypography {
     /** "Daily Products" header title — Plus Jakarta Sans SemiBold 22sp/28sp. */
-    val headerTitle = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 22.sp,
-        lineHeight = 28.sp
-    )
+    val headerTitle: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 22.sp,
+            lineHeight = 28.sp
+        )
 
     /** "Calorie Goals" / "Water" section titles — Plus Jakarta Sans Medium 20sp/25sp. */
-    val sectionTitle = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 20.sp,
-        lineHeight = 25.sp
-    )
+    val sectionTitle: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 20.sp,
+            lineHeight = 25.sp
+        )
 
     /** Small badge/pill text and the gauge's "Steps" label — Lexend Deca Light 12sp/15sp. */
-    val badgeText = TextStyle(
-        fontFamily = LexendDeca,
-        fontWeight = FontWeight.Light,
-        fontSize = 12.sp,
-        lineHeight = 15.sp
-    )
+    val badgeText: TextStyle
+        get() = TextStyle(
+            fontFamily = LexendDeca,
+            fontWeight = FontWeight.Light,
+            fontSize = 12.sp,
+            lineHeight = 15.sp
+        )
 }
 
 // --- Feature-Specific Typography Tokens ---
@@ -192,43 +225,49 @@ object CaloriesTypography {
  * Typography styles specific to the Product Details screen.
  */
 object ProductDetailsTypography {
-    val productTitle = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
-    )
+    val productTitle: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+        )
 }
 
 object ExerciseWorkoutTypography {
-    val timerText = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 34.sp,
-        lineHeight = 40.sp
-    )
-    val exerciseName = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    )
-    val totalTimeLabel = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp
-    )
-    val controlButtonLabel = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 18.sp,
-        lineHeight = 24.sp
-    )
-    val setsRepsLabel = TextStyle(
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 20.sp
-    )
+    val timerText: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 34.sp,
+            lineHeight = 40.sp
+        )
+    val exerciseName: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 24.sp,
+            lineHeight = 32.sp
+        )
+    val totalTimeLabel: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            lineHeight = 24.sp
+        )
+    val controlButtonLabel: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp,
+            lineHeight = 24.sp
+        )
+    val setsRepsLabel: TextStyle
+        get() = TextStyle(
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Medium,
+            fontSize = 16.sp,
+            lineHeight = 20.sp
+        )
 }
 
