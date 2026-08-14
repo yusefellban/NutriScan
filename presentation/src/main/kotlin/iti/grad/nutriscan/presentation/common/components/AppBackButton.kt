@@ -34,8 +34,12 @@ fun AppBackButton(
     modifier: Modifier = Modifier,
     surface: BackButtonSurface = BackButtonSurface.OnLight,
 ) {
+    // OnAccent's teal panel (#13A4AB / Teal1000) is a fixed brand color in both themes — the
+    // icon must stay white regardless of the app's light/dark setting, or it blends into the
+    // panel whenever isDark flips it to the same teal. OnLight's teal icon already contrasts
+    // fine against both a white background and a dark (#0F474A) one.
     val color = when (surface) {
-        BackButtonSurface.OnAccent -> if (AppTheme.isDark) AppTheme.colors.Teal1000 else Color.White
+        BackButtonSurface.OnAccent -> Color.White
         BackButtonSurface.OnLight -> AppTheme.colors.Teal1000
     }
 

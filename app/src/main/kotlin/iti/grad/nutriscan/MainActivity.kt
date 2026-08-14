@@ -50,6 +50,7 @@ import iti.grad.nutriscan.domain.settings.model.AppLanguage
 import iti.grad.nutriscan.domain.settings.model.ThemeMode
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.navigation.AppNavGraph
+import iti.grad.nutriscan.steps.StepsForegroundService
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -112,6 +113,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Re-attempted on every resume (harmless no-op if already running) rather than gated to a
+    // single "permission just granted" callback — this is what picks the service up right after
+    // the user grants ACTIVITY_RECOGNITION from the in-app dialog and the Activity comes back to
+    // the foreground, without presentation needing to reach into the app module to start it.
+    override fun onResume() {
+        super.onResume()
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (granted) StepsForegroundService.start(this)
     }
 }
 

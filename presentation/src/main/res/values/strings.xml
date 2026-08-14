@@ -351,6 +351,8 @@
     <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
+    <string name="steps_tracking_notification_title">Tracking your steps</string>
+    <string name="steps_tracking_notification_body">%1$d steps today</string>
     <string name="your_exercise">Your Exercise</string>
     <string name="kcal_exercise">kcal</string>
     <string name="min_today">min today</string>
@@ -439,14 +441,14 @@
     <string name="search_not_found_title">No results found</string>
     <string name="search_not_found_subtitle">No results found. Please try again.</string>
     <string name="search_not_found_button">Go to Scan</string>
-    <string name="product_card_swipe_hint">Swipe right to add</string>
+    <string name="product_card_swipe_hint">Swipe to add</string>
     <string name="product_card_kcal_unit">Kcal</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
-    <string name="food_log_swipe_remove_hint">Swipe to remove</string>
     <string name="food_log_remove_confirm_title">Remove item?</string>
     <string name="food_log_remove_confirm_message">This will remove it from today\'s food log.</string>
+    <string name="food_log_delete_item_action">Delete item</string>
     <string name="food_log_added_snackbar">Added %1$s to today\'s food log</string>
     <string name="food_log_add_error">Couldn\'t add this item. Please try again.</string>
     <string name="food_log_remove_error">Couldn\'t remove this item. Please try again.</string>

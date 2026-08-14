@@ -104,7 +104,7 @@ private fun ForgotPasswordScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {

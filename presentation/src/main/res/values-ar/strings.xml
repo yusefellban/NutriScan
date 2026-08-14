@@ -342,6 +342,8 @@
     <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
+    <string name="steps_tracking_notification_title">جارٍ تتبع خطواتك</string>
+    <string name="steps_tracking_notification_body">%1$d خطوة اليوم</string>
     <string name="your_exercise">تمارينك</string>
     <string name="kcal_exercise">سعرة حرارية</string>
     <string name="min_today">دقيقة اليوم</string>
@@ -429,14 +431,14 @@
     <string name="search_not_found_title">لم يتم العثور على نتائج</string>
     <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
     <string name="search_not_found_button">الذهاب للفحص</string>
-    <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
+    <string name="product_card_swipe_hint">اسحب للإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
-    <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>
     <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
     <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
+    <string name="food_log_delete_item_action">حذف العنصر</string>
     <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
     <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
     <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>

@@ -142,7 +142,6 @@ class CaloriesViewModelTest {
             val state = viewModel.state.value
 
             Assertions.assertEquals(0, state.tdee)
-            Assertions.assertNull(state.bmi)
             Assertions.assertEquals(0, state.caloriesGained)
             Assertions.assertEquals(0, state.caloriesBurned)
             Assertions.assertTrue(state.addedFoods.isEmpty())
@@ -257,7 +256,7 @@ class CaloriesViewModelTest {
             testScheduler.runCurrent()
 
             val card = vm.state.value.addedFoods.first()
-            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove(card.logEntryId!!))
+            vm.onEvent(CaloriesEvent.FoodItemDeleteClicked(card.logEntryId!!))
             vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
             testScheduler.runCurrent()
 
@@ -275,11 +274,11 @@ class CaloriesViewModelTest {
         }
 
         @Test
-        fun `FoodItemSwipedToRemove sets pendingRemoveFoodId without removing`() = runTest {
+        fun `FoodItemDeleteClicked sets pendingRemoveFoodId without removing`() = runTest {
             val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
             testScheduler.runCurrent()
 
-            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.FoodItemDeleteClicked("entry-1"))
             testScheduler.runCurrent()
 
             Assertions.assertEquals("entry-1", vm.state.value.pendingRemoveFoodId)
@@ -292,7 +291,7 @@ class CaloriesViewModelTest {
             coEvery { removeFoodEntry("entry-1") } returns Result.success(Unit)
             testScheduler.runCurrent()
 
-            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.FoodItemDeleteClicked("entry-1"))
             vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
             testScheduler.runCurrent()
 
@@ -305,7 +304,7 @@ class CaloriesViewModelTest {
             val vm = createViewModel(flowOf(listOf(foodEntry(id = "entry-1"))))
             testScheduler.runCurrent()
 
-            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.FoodItemDeleteClicked("entry-1"))
             vm.onEvent(CaloriesEvent.RemoveFoodDismissed)
             testScheduler.runCurrent()
 
@@ -319,7 +318,7 @@ class CaloriesViewModelTest {
             coEvery { removeFoodEntry("entry-1") } returns Result.failure(IllegalStateException("Not authenticated"))
             testScheduler.runCurrent()
 
-            vm.onEvent(CaloriesEvent.FoodItemSwipedToRemove("entry-1"))
+            vm.onEvent(CaloriesEvent.FoodItemDeleteClicked("entry-1"))
             vm.effect.test {
                 vm.onEvent(CaloriesEvent.RemoveFoodConfirmed)
                 testScheduler.runCurrent()
@@ -414,9 +413,18 @@ class CaloriesViewModelTest {
         }
 
         @Test
-        fun `WaterCupClicked out of order is a no-op`() = runTest {
-            // index 6 is neither the next empty cup (4) nor the last filled one (3)
+        fun `WaterCupClicked on an empty cup ahead of the next one jumps straight to it`() = runTest {
+            // waterConsumed=4 by default — index 6 is empty but not the immediate next cup
             viewModel.onEvent(CaloriesEvent.WaterCupClicked(6))
+            testScheduler.runCurrent()
+
+            coVerify { updateWaterCnt(7) }
+        }
+
+        @Test
+        fun `WaterCupClicked on a filled cup other than the last one is a no-op`() = runTest {
+            // waterConsumed=4 by default — index 1 is filled but not the last filled cup
+            viewModel.onEvent(CaloriesEvent.WaterCupClicked(1))
             testScheduler.runCurrent()
 
             coVerify(exactly = 0) { updateWaterCnt(any()) }
@@ -639,11 +647,11 @@ class CaloriesViewModelTest {
     }
 
     @Nested
-    @DisplayName("TDEE / BMI Observation")
+    @DisplayName("TDEE Observation")
     inner class UserMetricsObservation {
 
         @Test
-        fun `CaloriesViewModel state populates tdee and bmi from the user profile`() = runTest {
+        fun `CaloriesViewModel state populates tdee from the user profile`() = runTest {
             val user = iti.grad.nutriscan.domain.user.model.User(
                 id = "user-1",
                 firstName = "Test",
@@ -674,15 +682,13 @@ class CaloriesViewModelTest {
             testScheduler.runCurrent()
 
             Assertions.assertEquals(2350, vm.state.value.tdee)
-            Assertions.assertEquals(24.2, vm.state.value.bmi)
         }
 
         @Test
-        fun `tdee and bmi stay at defaults when the user has no computed metrics yet`() = runTest {
+        fun `tdee stays at default when the user has no computed metrics yet`() = runTest {
             testScheduler.runCurrent()
 
             Assertions.assertEquals(0, viewModel.state.value.tdee)
-            Assertions.assertNull(viewModel.state.value.bmi)
         }
     }
 }

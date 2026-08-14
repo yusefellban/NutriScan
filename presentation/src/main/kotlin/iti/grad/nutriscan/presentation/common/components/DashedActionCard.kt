@@ -33,6 +33,7 @@ fun DashedActionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: Dp = 32.dp,
+    showDashedBorder: Boolean = true,
 ) {
     val isDark = AppTheme.isDark
     val borderColor = if (isDark) AppTheme.colors.CaloriesAccentTeal1200 else AppTheme.colors.Gray600
@@ -45,7 +46,13 @@ fun DashedActionCard(
         modifier = modifier
             .clip(AppTheme.shapes.Large)
             .background(backgroundColor)
-            .dashedBorder(1.dp, borderColor, 24.dp, dashLength = 6.dp, gapLength = 4.dp)
+            .then(
+                if (showDashedBorder) {
+                    Modifier.dashedBorder(1.dp, borderColor, 24.dp, dashLength = 6.dp, gapLength = 4.dp)
+                } else {
+                    Modifier
+                }
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,

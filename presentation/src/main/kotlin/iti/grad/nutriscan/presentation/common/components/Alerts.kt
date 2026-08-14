@@ -10,6 +10,7 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,8 +61,9 @@ fun DeleteWarningAlert(
     CustomAlertDialog(
         title = title,
         message = message,
-        icon = painterResource(id = R.drawable.warning_ic),
-
+        icon = painterResource(id = R.drawable.ic_trash),
+        iconBackgroundColor = AppTheme.colors.AppSettingsLogoutAccent,
+        iconContentColor = Color.White,
         onDismiss = onDismiss
     ) {
         AlertButton(
@@ -73,7 +75,7 @@ fun DeleteWarningAlert(
         AlertButton(
             text = confirmText,
             backgroundColor = AppTheme.colors.AppSettingsLogoutAccent,
-            textColor = AppTheme.colors.Background,
+            textColor = Color.White,
             onClick = onConfirm
         )
     }
