@@ -8,6 +8,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import iti.grad.presentation.R
 
+import androidx.compose.ui.text.intl.Locale
+
+val KOSans = FontFamily(
+    Font(R.font.kosans_thin, FontWeight.Thin),
+    Font(R.font.kosans_extralight, FontWeight.ExtraLight),
+    Font(R.font.kosans_light, FontWeight.Light),
+    Font(R.font.kosans_regular, FontWeight.Normal),
+    Font(R.font.kosans_medium, FontWeight.Medium),
+    Font(R.font.kosans_semibold, FontWeight.SemiBold),
+    Font(R.font.kosans_bold, FontWeight.Bold)
+)
+
+private val isArabic: Boolean
+    get() = Locale.current.language == "ar"
+
+fun getAppFontFamily(defaultFont: FontFamily): FontFamily {
+    return if (isArabic) KOSans else defaultFont
+}
+
 val PlusJakartaSans = FontFamily(
     Font(R.font.plus_jakarta_sans_medium, FontWeight.Medium),
     Font(R.font.plus_jakarta_sans_semibold, FontWeight.SemiBold),
@@ -24,91 +43,91 @@ val LexendDeca = FontFamily(
 
 val AppTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.ExtraBold,
         fontSize = 36.sp,
         lineHeight = 44.sp
     ),
     displayMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         lineHeight = 40.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp
     ),
     headlineLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 28.sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 24.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.Medium,
         fontSize = 20.sp,
         lineHeight = 24.sp
     ),
     titleSmall = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 20.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = LexendDeca,
+        fontFamily = getAppFontFamily(LexendDeca),
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp
     ),
     labelLarge = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = PlusJakartaSans,
+        fontFamily = getAppFontFamily(PlusJakartaSans),
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp
