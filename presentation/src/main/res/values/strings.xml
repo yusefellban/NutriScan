@@ -15,6 +15,7 @@
     <string name="error_invalid_email">ERROR: Invalid email format.</string>
     <string name="error_empty_field">ERROR: Field cannot be empty.</string>
     <string name="error_invalid_name">Only letters, spaces, hyphens and apostrophes are allowed.</string>
+    <string name="error_invalid_name_length">Name must be between 3 and 100 characters.</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="prompt_have_account">Already have an account? Sign In.</string>
     <string name="name_label">Name</string>

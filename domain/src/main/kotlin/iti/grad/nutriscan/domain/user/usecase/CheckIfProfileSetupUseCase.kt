@@ -36,11 +36,18 @@ class CheckIfProfileSetupUseCase @Inject constructor(
 
         // 2. Fallback: cached server data has real fields (migration / fresh install)
         val user = userRepository.getUserData().firstOrNull()
+        
+        val isPlaceholderData = user?.gender == "MALE" &&
+                user.dateOfBirth == "2000-01-01" &&
+                user.heightCm == 170.0 &&
+                user.weightKg == 70.0
+
         val hasRealServerData = user != null &&
                 user.gender != null &&
                 user.dateOfBirth != null &&
                 user.heightCm != null &&
-                user.weightKg != null
+                user.weightKg != null &&
+                !isPlaceholderData
 
         if (hasRealServerData) {
             // Auto-heal: persist the flag so future checks skip the DB read
