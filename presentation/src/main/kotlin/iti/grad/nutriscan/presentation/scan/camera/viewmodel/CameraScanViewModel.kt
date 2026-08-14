@@ -335,7 +335,8 @@ class CameraScanViewModel @Inject constructor(
                             it.copy(
                                 activeScan = finalScan,
                                 isProcessingCenterAction = false,
-                                isScanning = false
+                                // isScanning remains true or false depending on how it was started
+                                // Barcode sets it to false, Photo keeps it true.
                             )
                         }
                         return
