@@ -8,12 +8,11 @@ import kotlinx.collections.immutable.persistentListOf
 @Immutable
 data class CaloriesState(
     val tdee: Int = 0,
-    val bmi: Double? = null,
     val caloriesGained: Int = 0,
     /** steps + exercise kcal burned today — see CaloriesViewModel.observeDailyTracking. */
     val caloriesBurned: Int = 0,
     val addedFoods: ImmutableList<ProductUiModel> = persistentListOf(),
-    /** Food-log entry pending user confirmation before removal — gates the ConfirmationDialog. */
+    /** Food-log entry pending user confirmation before removal — gates the DeleteWarningAlert. */
     val pendingRemoveFoodId: String? = null,
     val steps: Int = 0,
     val stepsGoal: Int = 10000,
