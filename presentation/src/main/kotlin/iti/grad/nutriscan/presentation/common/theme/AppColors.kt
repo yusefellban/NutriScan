@@ -377,6 +377,11 @@ data class AppColors internal constructor(
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
 
+    // --- Water Tracker ---
+    val WaterEmptyGlassTint: Color,
+    val WaterAddButtonBackground: Color,
+    val WaterAddButtonIconTint: Color,
+
     // --- User Profile Screen / App Settings ---
     // See AppColorsExtension's kdoc: kept out of this constructor to avoid
     // a D8 VerifyError crash from having too many constructor parameters.
@@ -665,6 +670,10 @@ fun lightColors() = AppColors(
     ShadowFemaleSelected = Color(0x6613A4AB),
     ShadowMaleSelected = Color(0x6613A4AB),
     ShadowDobActive = Color(0x6613A4AB),
+
+    WaterEmptyGlassTint = Color(0xFFD6D6D5), // Gray400
+    WaterAddButtonBackground = Color(0xFFF1F1F1), // Gray200
+    WaterAddButtonIconTint = Color(0xFF6A6A6A), // Gray1000
 
     extension = AppColorsExtension(
         // User Profile Screen — light values match the Figma light spec
@@ -1007,6 +1016,10 @@ fun darkColors() = AppColors(
     ShadowFemaleSelected = Color(0x99FF80AB), // Pink glow
     ShadowMaleSelected = Color(0x9975DEE3),
     ShadowDobActive = Color(0x9975DEE3),
+
+    WaterEmptyGlassTint = Color(0xFF108188), // Teal1300
+    WaterAddButtonBackground = Color(0xFF0F474A), // Teal1600
+    WaterAddButtonIconTint = Color(0xFF13A4AB), // Teal1000
 
     extension = AppColorsExtension(
         // User Profile Screen — dark values match the Figma dark spec

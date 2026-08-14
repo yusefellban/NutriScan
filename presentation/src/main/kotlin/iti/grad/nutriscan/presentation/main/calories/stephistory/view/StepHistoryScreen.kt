@@ -91,10 +91,10 @@ fun StepHistoryScreen(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = state.error ?: "Unknown Error")
+                    Text(text = state.error ?: stringResource(id = R.string.alert_error_title))
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { viewModel.onEvent(StepHistoryEvent.Retry) }) {
-                        Text("Retry")
+                        Text(stringResource(id = R.string.alert_button_retry))
                     }
                 }
             } else {
