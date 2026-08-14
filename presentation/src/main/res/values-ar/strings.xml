@@ -342,6 +342,8 @@
     <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
+    <string name="steps_tracking_notification_title">جارٍ تتبع خطواتك</string>
+    <string name="steps_tracking_notification_body">%1$d خطوة اليوم</string>
     <string name="your_exercise">تمارينك</string>
     <string name="kcal_exercise">سعرة حرارية</string>
     <string name="min_today">دقيقة اليوم</string>

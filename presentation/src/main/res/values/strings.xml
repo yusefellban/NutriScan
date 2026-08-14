@@ -351,6 +351,8 @@
     <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
+    <string name="steps_tracking_notification_title">Tracking your steps</string>
+    <string name="steps_tracking_notification_body">%1$d steps today</string>
     <string name="your_exercise">Your Exercise</string>
     <string name="kcal_exercise">kcal</string>
     <string name="min_today">min today</string>
