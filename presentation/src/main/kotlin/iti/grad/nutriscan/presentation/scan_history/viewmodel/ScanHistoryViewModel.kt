@@ -286,7 +286,11 @@ class ScanHistoryViewModel @Inject constructor(
                 .onSuccess { scans ->
                     val newUiItems = mapScansToUi(scans)
                     _state.update { state ->
-                        val combined = state.allHistoryItems + newUiItems
+                        // Deduplicate by id: the backend may return the same item across
+                        // page boundaries (e.g. a scan inserted between two fetches).
+                        // Duplicate ids in a LazyColumn with keyed items cause a crash.
+                        val combined = (state.allHistoryItems + newUiItems)
+                            .distinctBy { it.id }
                         state.copy(
                             isPaginationLoading = false,
                             allHistoryItems = combined,
