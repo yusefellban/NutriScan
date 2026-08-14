@@ -64,6 +64,9 @@ import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import androidx.compose.ui.graphics.Color
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.Image
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import iti.grad.nutriscan.presentation.common.components.InternetAlert
 import androidx.compose.foundation.layout.Arrangement
 import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
@@ -104,11 +107,32 @@ fun EditProfileScreen(
         }
     }
 
+    val cropLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract(),
+    ) { result ->
+        if (result.isSuccessful) {
+            val uriContent = result.uriContent
+            if (uriContent != null) {
+                viewModel.onEvent(EditProfileEvent.SelectAvatar(uriContent))
+            }
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
-                viewModel.onEvent(EditProfileEvent.SelectAvatar(uri))
+                cropLauncher.launch(
+                    CropImageContractOptions(
+                        uri = uri,
+                        cropImageOptions = CropImageOptions(
+                            imageSourceIncludeGallery = false,
+                            imageSourceIncludeCamera = false,
+                            guidelines = com.canhub.cropper.CropImageView.Guidelines.ON,
+                            showIntentChooser = false,
+                        )
+                    )
+                )
             }
         }
     )
