@@ -102,10 +102,10 @@ fun CameraScanScreen(
     val flashAlpha = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Create the ML Kit barcode analyzer only while in BARCODE mode.
+    // Create the ML Kit barcode analyzer and run it alongside ImageCapture in PHOTO mode.
     // Keyed on selectedMode so it is re-created (and the old one discarded) on mode switches.
     val barcodeAnalyzer: ImageAnalysis.Analyzer? = remember(state.selectedMode) {
-        if (state.selectedMode == ScanInputMode.BARCODE) {
+        if (state.selectedMode == ScanInputMode.PHOTO) {
             BarcodeScanAnalyzer { barcode, bounds ->
                 viewModel.onEvent(CameraScanEvent.BarcodeDetected(barcode, bounds))
             }
@@ -327,13 +327,14 @@ private fun CameraScanContent(
                             .background(Color.White.copy(alpha = flashAlpha)),
                     )
                 }
-                // AR overlay replaces the static ScanFrameOverlay in BARCODE mode.
-                if (state.selectedMode == ScanInputMode.BARCODE) {
+                // AR overlay renders in PHOTO mode whenever a barcode is detected in-frame.
+                if (state.selectedMode == ScanInputMode.PHOTO) {
                     BarcodeArOverlay(
-                        normalizedBounds = state.detectedBarcodeBounds,
-                        barcodeValue     = state.trackedBarcodeValue,
-                        isLocked         = state.isProcessingCenterAction,
-                        modifier         = Modifier.fillMaxSize(),
+                        normalizedBounds      = state.detectedBarcodeBounds,
+                        barcodeValue          = state.trackedBarcodeValue,
+                        isLocked              = state.isProcessingCenterAction,
+                        onBarcodeChipClicked  = { onEvent(CameraScanEvent.BarcodeChipClicked) },
+                        modifier              = Modifier.fillMaxSize(),
                     )
                 }
             }

@@ -21,6 +21,12 @@ sealed interface CameraScanEvent {
     data object DismissDeleteBookmark : CameraScanEvent
 
     /**
+     * Fired when the user taps the barcode chip shown by [BarcodeArOverlay] in PHOTO mode.
+     * Triggers a backend call to POST /v1/scans/barcode with the currently tracked barcode value.
+     */
+    data object BarcodeChipClicked : CameraScanEvent
+
+    /**
      * Fired by [BarcodeScanAnalyzer] on every CameraX analysis frame.
      * [barcode] and [normalizedBounds] are both null when no barcode is visible in frame.
      */

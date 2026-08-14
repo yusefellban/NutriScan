@@ -8,8 +8,14 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,8 +40,9 @@ import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import kotlinx.coroutines.launch
 
+
 /**
- * Full-screen AR overlay drawn directly on top of the camera preview in BARCODE mode.
+ * Full-screen AR overlay drawn directly on top of the camera preview in PHOTO mode.
  *
  * ## How coordinate mapping works
  * [normalizedBounds] carries the barcode's bounding box as normalised [0,1] values
@@ -53,19 +60,25 @@ import kotlinx.coroutines.launch
  * and fades out when the barcode leaves the frame.
  *
  * ## Lock colour transition
- * When [isLocked] becomes true (1.5 s stability timeout reached, submission in-flight),
- * the corner brackets and glow border smoothly animate from white → [AppColors.VerdictGreen]
- * to give the user clear AR feedback that the product was captured.
+ * When [isLocked] becomes true (submission in-flight), the corner brackets and glow border
+ * smoothly animate from white → [AppColors.VerdictGreen] to give the user clear AR feedback
+ * that the product was captured.
  *
- * @param normalizedBounds Normalised [0,1] bounding box from the last ML Kit frame, or null.
- * @param barcodeValue     The raw barcode digits to display in the floating pill badge.
- * @param isLocked         True while the barcode submission is in-flight (post lock-delay).
+ * ## Tappable barcode chip
+ * The barcode digits pill is rendered on the Canvas, so a transparent [Spacer] is positioned
+ * on top of it at runtime to capture tap gestures, which are forwarded via [onBarcodeChipClicked].
+ *
+ * @param normalizedBounds    Normalised [0,1] bounding box from the last ML Kit frame, or null.
+ * @param barcodeValue        The raw barcode digits to display in the floating pill badge.
+ * @param isLocked            True while the barcode submission is in-flight.
+ * @param onBarcodeChipClicked Invoked when the user taps the barcode chip. Use to trigger POST /v1/scans/barcode.
  */
 @Composable
 fun BarcodeArOverlay(
     normalizedBounds: RectF?,
     barcodeValue: String?,
     isLocked: Boolean,
+    onBarcodeChipClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -156,6 +169,53 @@ fun BarcodeArOverlay(
                     textMeasurer    = textMeasurer,
                 )
             }
+        }
+
+        // ── Tappable area over the barcode chip ───────────────────────────────────
+        // Since the badge is drawn on a Canvas we position a transparent clickable Spacer
+        // exactly where the badge will render, measured in Dp so Compose can lay it out.
+        if (!barcodeValue.isNullOrBlank() && alpha > 0f) {
+            val left   = animLeft  .value * canvasWidthPx
+            val bottom = animBottom.value * canvasHeightPx
+            val right  = animRight .value * canvasWidthPx
+            val boxWidth = right - left
+
+            // Badge geometry in px (must match drawBarcodeBadge exactly)
+            val badgePaddingH  = with(density) { 16.dp.toPx() }
+            val badgePaddingV  = with(density) { 7.dp.toPx() }
+            val badgeMarginTop = with(density) { 10.dp.toPx() }
+            val textStyle = TextStyle(
+                fontSize      = 13.sp,
+                fontWeight    = FontWeight.SemiBold,
+                letterSpacing = 1.5.sp,
+            )
+            val measured  = textMeasurer.measure(barcodeValue, textStyle)
+            val textW     = measured.size.width.toFloat()
+            val textH     = measured.size.height.toFloat()
+            val badgeW    = textW + badgePaddingH * 2
+            val badgeH    = textH + badgePaddingV * 2
+            val badgeCenterX = left + boxWidth / 2f
+            val badgeL    = badgeCenterX - badgeW / 2f
+            val badgeT    = bottom + badgeMarginTop
+
+            // Convert to Dp for Compose layout
+            val badgeLDp = with(density) { badgeL.toDp() }
+            val badgeTDp = with(density) { badgeT.toDp() }
+            val badgeWDp = with(density) { badgeW.toDp() }
+            val badgeHDp = with(density) { badgeH.toDp() }
+
+            Spacer(
+                modifier = Modifier
+                    .absoluteOffset(x = badgeLDp, y = badgeTDp)
+                    .width(badgeWDp)
+                    .height(badgeHDp)
+                    .clickable(
+                        enabled = !isLocked,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onBarcodeChipClicked,
+                    ),
+            )
         }
     }
 }

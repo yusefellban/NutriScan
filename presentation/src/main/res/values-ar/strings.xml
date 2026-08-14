@@ -304,13 +304,14 @@
     <string name="scan_center_action_upload">رفع</string>
     <string name="scan_gallery_selected_image_content_description">معاينة الصورة المختارة</string>
     <string name="scan_mode_barcode_hint">وجّه الكاميرا نحو باركود المنتج</string>
-    <string name="scan_mode_photo_hint">ضع المنتج داخل الإطار والتقط بوضوح</string>
+    <string name="scan_mode_photo_hint">التقط صورة للملصق أو وجّه الكاميرا نحو الباركود</string>
     <string name="scan_mode_gallery_hint">ارفع صورة منتج من المعرض</string>
     <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
     <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
     <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
     <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
     <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
+    <string name="scan_barcode_chip_tap_hint">اضغط لمسح الباركود</string>
     <string name="scan_saved_content_description">حفظ الفحص</string>
     <string name="scan_processing_placeholder_title">جاري المسح\nالباركود: %1$s</string>
     <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>

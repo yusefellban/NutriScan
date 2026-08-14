@@ -50,19 +50,10 @@ class CameraScanViewModel @Inject constructor(
 
     private var currentScanJob: Job? = null
 
-    /** Debounce job for the 1.5 s barcode stability timer. */
-    private var barcodeLockJob: Job? = null
-
     /**
-     * The barcode value for which a lock timer is currently running.
-     * Used to detect when a different barcode enters the frame mid-timer so we can reset.
-     */
-    private var lastLockedBarcode: String? = null
-
-    /** 
-     * Debounce job for clearing the barcode state. ML Kit often drops detection for a few 
-     * frames. Instead of instantly hiding the AR overlay (causing flashing/trembling), 
-     * we wait 500ms before clearing. 
+     * Debounce job for clearing the barcode state. ML Kit often drops detection for a few
+     * frames. Instead of instantly hiding the AR overlay (causing flashing/trembling),
+     * we wait 500ms before clearing.
      */
     private var barcodeLossJob: Job? = null
 
@@ -116,6 +107,7 @@ class CameraScanViewModel @Inject constructor(
             is CameraScanEvent.DismissDeleteBookmark -> handleDismissDeleteBookmark()
             is CameraScanEvent.BarcodeDetected      -> handleBarcodeDetected(event.barcode, event.normalizedBounds)
             is CameraScanEvent.BarcodeLocked        -> handleBarcodeLocked(event.barcode)
+            is CameraScanEvent.BarcodeChipClicked   -> handleBarcodeChipClicked()
         }
     }
 
@@ -128,13 +120,10 @@ class CameraScanViewModel @Inject constructor(
             return
         }
 
-        // Cancel any in-flight image scan or barcode lock when switching modes.
-        if (mode == ScanInputMode.GALLERY || mode == ScanInputMode.PHOTO) {
-            currentScanJob?.cancel()
-        }
-        if (mode != ScanInputMode.BARCODE) {
-            clearBarcodeState()
-        }
+        // Cancel any in-flight scan job when switching modes.
+        currentScanJob?.cancel()
+        // Clear barcode tracking state when leaving PHOTO mode.
+        clearBarcodeState()
 
         _state.update {
             it.copy(
@@ -169,9 +158,7 @@ class CameraScanViewModel @Inject constructor(
     private fun handleCenterActionClicked() {
         val selectedMode = _state.value.selectedMode
         when (selectedMode) {
-            ScanInputMode.BARCODE,
-            ScanInputMode.PHOTO,
-            -> handleCaptureClicked()
+            ScanInputMode.PHOTO -> handleCaptureClicked()
 
             ScanInputMode.GALLERY -> {
                 val pendingPath = _state.value.pendingGalleryImagePath
@@ -449,9 +436,9 @@ class CameraScanViewModel @Inject constructor(
         currentScanJob?.cancel()
         clearBarcodeState()
         _state.update {
-            val shouldKeepGalleryPreview = it.selectedMode == ScanInputMode.GALLERY
-            val previewToKeep = if (shouldKeepGalleryPreview) {
-                // Keep only local file path; remote thumbnail URL cannot be uploaded as File.
+            // Keep gallery image path only when currently in GALLERY mode so the user
+            // can re-upload the same image without picking again.
+            val previewToKeep = if (it.selectedMode == ScanInputMode.GALLERY) {
                 it.pendingGalleryImagePath
             } else {
                 null
@@ -471,11 +458,13 @@ class CameraScanViewModel @Inject constructor(
 
     /**
      * Called on every analysis frame by [BarcodeScanAnalyzer] via [CameraScanEvent.BarcodeDetected].
+     * Updates the AR overlay position only — does NOT auto-submit the barcode.
+     * The user must tap the barcode chip explicitly to trigger submission.
      *
      * Resolves AR trembling/flashing via three strategies:
      * 1. **Frame-drop tolerance**: ML Kit often misses a frame. We wait 500ms before clearing.
      * 2. **Fixed size**: We lock the width/height on first detection so it doesn't breathe.
-     * 3. **Dead-band filter**: The center only updates if it moves > 1.5% of the screen.
+     * 3. **Dead-band filter**: The center only updates if it moves > 5% of the screen.
      */
     private fun handleBarcodeDetected(
         barcode: String?,
@@ -496,7 +485,7 @@ class CameraScanViewModel @Inject constructor(
         barcodeLossJob?.cancel()
         barcodeLossJob = null
 
-        // Reset the cached size if tracking a new/different barcode
+        // Reset the cached size if tracking a new/different barcode.
         if (barcode != lastTrackedBarcodeForSize) {
             lockedBoundsWidth = null
             lockedBoundsHeight = null
@@ -505,16 +494,16 @@ class CameraScanViewModel @Inject constructor(
             lastTrackedBarcodeForSize = barcode
         }
 
-        // Lock the width and height to the first detected bounds
+        // Lock the width and height to the first detected bounds.
         val w = lockedBoundsWidth ?: normalizedBounds.width().also { lockedBoundsWidth = it }
         val h = lockedBoundsHeight ?: normalizedBounds.height().also { lockedBoundsHeight = it }
-        
+
         val cx = normalizedBounds.centerX()
         val cy = normalizedBounds.centerY()
         val prevCx = lastEmittedCenterX
         val prevCy = lastEmittedCenterY
 
-        // Dead-band filter: Only update the center if it moved more than 5% (0.05f)
+        // Dead-band filter: Only update the center if it moved more than 5% (0.05f).
         // This makes the AR overlay rock-solid and extremely stable, ignoring all minor shifts.
         val shouldUpdateCenter = prevCx == null || prevCy == null ||
             kotlin.math.abs(cx - prevCx) > 0.05f ||
@@ -538,28 +527,22 @@ class CameraScanViewModel @Inject constructor(
                 )
             }
         }
-
-        // If a submission is already in-flight, do not start a new lock timer.
-        if (_state.value.isProcessingCenterAction) return
-
-        // Same barcode — let the existing timer finish.
-        if (barcode == lastLockedBarcode && barcodeLockJob?.isActive == true) return
-
-        // New (or changed) barcode — reset the stability timer (1.5s delay).
-        cancelBarcodeLock()
-        lastLockedBarcode = barcode
-        barcodeLockJob = viewModelScope.launch {
-            delay(BARCODE_LOCK_DELAY_MS.milliseconds)
-            onEvent(CameraScanEvent.BarcodeLocked(barcode))
-        }
     }
 
     /**
-     * Called after [BARCODE_LOCK_DELAY_MS] of stable detection.
-     * Guards against double-submission if the barcode lock fires while a scan is already running.
+     * No-op stub kept to avoid breaking the event sealed interface.
+     * Auto-lock is disabled in the unified Photo mode — users tap the chip instead.
      */
-    private fun handleBarcodeLocked(barcode: String) {
+    private fun handleBarcodeLocked(barcode: String) = Unit
+
+    /**
+     * Called when the user taps the barcode chip shown by [BarcodeArOverlay] in PHOTO mode.
+     * Guards against submission while another scan is already in-flight.
+     */
+    private fun handleBarcodeChipClicked() {
         if (_state.value.isProcessingCenterAction) return
+        val barcode = _state.value.trackedBarcodeValue ?: return
+        if (barcode.isBlank()) return
         submitBarcode(barcode)
     }
 
@@ -611,16 +594,8 @@ class CameraScanViewModel @Inject constructor(
         }
     }
 
-    /** Cancels the submission timer, but leaves the visual tracking state intact. */
-    private fun cancelBarcodeLock() {
-        barcodeLockJob?.cancel()
-        barcodeLockJob = null
-        lastLockedBarcode = null
-    }
-
     /** Fully clears all barcode tracking state, instantly hiding the AR overlay. */
     private fun clearBarcodeState() {
-        cancelBarcodeLock()
         barcodeLossJob?.cancel()
         barcodeLossJob = null
         lockedBoundsWidth = null
@@ -629,14 +604,5 @@ class CameraScanViewModel @Inject constructor(
         lastEmittedCenterX = null
         lastEmittedCenterY = null
         _state.update { it.copy(detectedBarcodeBounds = null, trackedBarcodeValue = null) }
-    }
-
-    companion object {
-        /**
-         * Duration in milliseconds that the same barcode must be continuously detected before
-         * we auto-submit it to the backend. 1 500 ms balances responsiveness with accuracy —
-         * long enough to avoid accidental triggers during a camera sweep.
-         */
-        const val BARCODE_LOCK_DELAY_MS = 1_500L
     }
 }
