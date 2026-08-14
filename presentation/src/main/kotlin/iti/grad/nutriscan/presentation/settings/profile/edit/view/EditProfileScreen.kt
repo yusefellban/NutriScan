@@ -298,7 +298,8 @@ private fun EditProfileContent(
                     onValueChange = { onEvent(EditProfileEvent.UpdateFirstName(it)) },
                     hint = stringResource(R.string.edit_profile_first_name_hint),
                     trailingIconRes = R.drawable.ic_edit,
-                    isReadOnly = !state.isEditMode
+                    isReadOnly = !state.isEditMode,
+                    errorMessage = state.firstNameErrorResId?.let { stringResource(it) }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -308,7 +309,8 @@ private fun EditProfileContent(
                     onValueChange = { onEvent(EditProfileEvent.UpdateLastName(it)) },
                     hint = stringResource(R.string.edit_profile_last_name_hint),
                     trailingIconRes = R.drawable.ic_edit,
-                    isReadOnly = !state.isEditMode
+                    isReadOnly = !state.isEditMode,
+                    errorMessage = state.lastNameErrorResId?.let { stringResource(it) }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -339,7 +341,8 @@ private fun EditProfileContent(
                         },
                         unit = "cm",
                         isReadOnly = !state.isEditMode,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        errorMessage = state.heightErrorResId?.let { stringResource(it) }
                     )
 
                     EditProfileMeasurementField(
@@ -353,7 +356,8 @@ private fun EditProfileContent(
                         },
                         unit = "kg",
                         isReadOnly = !state.isEditMode,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        errorMessage = state.weightErrorResId?.let { stringResource(it) }
                     )
                 }
 
