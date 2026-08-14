@@ -1,7 +1,10 @@
 package iti.grad.nutriscan.presentation.home.view.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,12 +54,19 @@ fun DailyHealthTipCard(
     val dayOfMonth = remember { Calendar.getInstance().get(Calendar.DAY_OF_MONTH) }
     val tipIndex = (dayOfMonth - 1) % dailyTips.size
     val currentTip = dailyTips.getOrElse(tipIndex) { dailyTips.firstOrNull() ?: "" }
+    var expanded by remember { mutableStateOf(false) }
 
     val foregroundShadowColor = AppTheme.colors.Teal200.copy(alpha = 0.5f)
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
+            .animateContentSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { expanded = !expanded },
+            )
             .customShadow(
                 shape = RoundedCornerShape(22.dp),
                 color = AppTheme.colors.Teal200.copy(alpha = 0.2f),
@@ -102,7 +115,7 @@ fun DailyHealthTipCard(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.home_daily_tip_title),
                 style = HomeTypography.dailyTipTitle,
@@ -113,7 +126,7 @@ fun DailyHealthTipCard(
                 text = currentTip,
                 style = AppTheme.typography.bodyLarge,
                 color = AppTheme.colors.PrimaryVariant,
-                maxLines = 2,
+                maxLines = if (expanded) Int.MAX_VALUE else 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
