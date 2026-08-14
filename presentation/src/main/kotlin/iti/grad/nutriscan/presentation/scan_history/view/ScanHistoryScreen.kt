@@ -1,18 +1,15 @@
 package iti.grad.nutriscan.presentation.scan_history.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -25,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
-import iti.grad.nutriscan.presentation.common.components.AppTopHeader
 import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.SelectableChip
@@ -40,6 +36,7 @@ import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.scan_history.viewmodel.ScanHistoryViewModel
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 
@@ -108,15 +105,16 @@ private fun ScanHistoryContent(
     }
 
     Scaffold(
-        snackbarHost = { 
+        snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = 32.dp)
-            ) { data -> 
-                AppSnackbar(data) 
-            } 
+            ) { data ->
+                AppSnackbar(data)
+            }
         },
-        containerColor = AppTheme.colors.Background
+        containerColor = AppTheme.colors.Background,
+        contentWindowInsets = WindowInsets(0),
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -124,19 +122,13 @@ private fun ScanHistoryContent(
                 .padding(paddingValues)
         ) {
         // ── Top Header ──────────────────────────────────────────
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(AppTheme.colors.Primary)
-        ) {
-            AppTopHeader(
-                title = stringResource(R.string.scan_history_title),
-                onBackClick = { onEvent(ScanHistoryEvent.BackClicked) },
-                actionIconResId = R.drawable.ic_date,
-                actionIconContentDescription = "Filter by date",
-                onActionClick = { onEvent(ScanHistoryEvent.ShowDatePicker(true)) }
-            )
-        }
+        AppSettingsHeader(
+            title = stringResource(R.string.scan_history_title),
+            onBackClick = { onEvent(ScanHistoryEvent.BackClicked) },
+            actionIconResId = R.drawable.ic_date,
+            actionIconContentDescription = "Filter by date",
+            onActionClick = { onEvent(ScanHistoryEvent.ShowDatePicker(true)) }
+        )
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
