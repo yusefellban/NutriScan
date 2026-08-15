@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -78,22 +79,26 @@ fun WaterTrackerCard(
                 color = AppTheme.colors.SectionSubtitle,
             )
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                // KOSans (the font swapped in for Arabic) has no "/" glyph, so it renders
+                // blank there — pin this counter to the Latin font since it's digits/
+                // punctuation only, already forced LTR regardless of locale.
+                val counterStyle = AppTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Default)
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = waterConsumed.toString(),
-                        style = AppTheme.typography.bodyLarge,
+                        style = counterStyle,
                         color = AppTheme.colors.Teal1000,
                     )
                     Text(
                         text = " / ",
-                        style = AppTheme.typography.bodyLarge,
+                        style = counterStyle,
                         color = AppTheme.colors.Teal1000,
                     )
                     Text(
                         text = waterGoal.toString(),
-                        style = AppTheme.typography.bodyLarge,
+                        style = counterStyle,
                         color = AppTheme.colors.Teal1000,
                     )
                 }

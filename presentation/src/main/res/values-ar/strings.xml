@@ -295,6 +295,8 @@
     <string name="scan_brand_unknown">علامة تجارية غير معروفة</string>
     <string name="scan_camera_permission_denied">مطلوب الوصول إلى الكاميرا لمسح المنتجات</string>
     <string name="scan_camera_permission_retry">منح الإذن</string>
+    <string name="nutrigpt_voice_permission_denied">مطلوب الوصول إلى الميكروفون للمحادثة الصوتية</string>
+    <string name="nutrigpt_voice_permission_retry">منح الإذن</string>
     <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
     <string name="scan_frame_content_description">إطار ماسح الباركود</string>
     <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>

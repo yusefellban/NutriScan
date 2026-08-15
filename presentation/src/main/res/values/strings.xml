@@ -301,6 +301,8 @@
     <string name="scan_brand_unknown">Unknown brand</string>
     <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
     <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="nutrigpt_voice_permission_denied">Microphone access is required for voice chat</string>
+    <string name="nutrigpt_voice_permission_retry">Grant permission</string>
     <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
