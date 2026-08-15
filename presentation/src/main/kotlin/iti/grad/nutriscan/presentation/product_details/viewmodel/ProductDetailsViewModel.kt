@@ -15,6 +15,7 @@ import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScanByIdUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
+import iti.grad.nutriscan.presentation.common.util.formatHalfStep
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
@@ -153,10 +154,7 @@ class ProductDetailsViewModel @Inject constructor(
     private fun String?.toGrams(): Float =
         this?.split(" ")?.firstOrNull()?.toFloatOrNull() ?: 0f
 
-    private fun Float?.format(): String {
-        val value = this ?: 0f
-        return if (value % 1f == 0f) value.toLong().toString() else value.toString()
-    }
+    private fun Float?.format(): String = (this ?: 0f).formatHalfStep()
 
     private fun mapToScanResult(detail: ProductDetail): ScanResult {
         return ScanResult(

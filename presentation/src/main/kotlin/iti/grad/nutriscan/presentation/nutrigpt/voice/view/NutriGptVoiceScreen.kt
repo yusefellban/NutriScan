@@ -46,8 +46,18 @@ fun NutriGptVoiceScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    fun checkAudioPermission() = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.RECORD_AUDIO
+    ) == PackageManager.PERMISSION_GRANTED
+
+    var hasAudioPermission by remember { mutableStateOf(checkAudioPermission()) }
+
     val requestAudioPermission = rememberAudioPermissionRequester(
-        onGranted = { viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true)) },
+        onGranted = {
+            hasAudioPermission = true
+            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+        },
         onDenied = {
             Toast.makeText(context, "Microphone permission is required", Toast.LENGTH_SHORT).show()
         }
@@ -66,17 +76,12 @@ fun NutriGptVoiceScreen(
         }
     }
 
-    // Auto-start listening when entering screen (if permission granted)
+    // Re-check on entry rather than auto-requesting — a placeholder card below lets the
+    // user opt in via "Grant permission" instead of the system dialog firing immediately.
     LaunchedEffect(Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
-        
-        if (hasPermission) {
+        hasAudioPermission = checkAudioPermission()
+        if (hasAudioPermission) {
             viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-        } else {
-            requestAudioPermission()
         }
     }
 
@@ -149,66 +154,80 @@ fun NutriGptVoiceScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Waveform
-            VoiceWaveform(
-                isAnimating = state.isListening || state.isPlaying || state.isGenerating,
-                isRtl = state.chatLanguage == ChatLanguage.AR
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Status Text
-            val statusText = when {
-                state.isGenerating -> stringResource(id = R.string.nutrigpt_voice_generating)
-                state.isListening -> if (state.currentQuery.isNotBlank()) state.currentQuery else stringResource(id = R.string.nutrigpt_listening_hint)
-                else -> ""
-            }
-            
-            val isHintText = state.isGenerating || (state.isListening && state.currentQuery.isBlank())
-            val textAlign = if (isHintText) {
-                TextAlign.Center
+            if (!hasAudioPermission) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.nutrigpt_voice_permission_denied),
+                        style = AppTheme.typography.bodyMedium,
+                        color = AppTheme.colors.TextPrimary,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    AppButton(
+                        textResId = R.string.nutrigpt_voice_permission_retry,
+                        isLoading = false,
+                        onClick = { requestAudioPermission() },
+                    )
+                }
             } else {
-                TextAlign.Start
-            }
-
-            Text(
-                text = statusText,
-                color = AppTheme.colors.PrimaryVariant,
-                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                textAlign = textAlign,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 48.dp)
-            )
-
-            // Main Action Button (Mic / Fast Forward)
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.colors.ChatSendButtonBackground)
-                    .clickable {
-                        val hasPermission = ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.RECORD_AUDIO
-                        ) == PackageManager.PERMISSION_GRANTED
-
-                        when {
-                            !hasPermission -> requestAudioPermission()
-                            state.isListening -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
-                            state.isPlaying || state.isGenerating -> viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
-                            else -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (state.isPlaying || state.isGenerating) Icons.Rounded.FastForward else Icons.Rounded.Mic,
-                    contentDescription = "Action",
-                    tint = AppTheme.colors.ChatSendButtonIcon,
-                    modifier = Modifier.size(36.dp)
+                // Waveform
+                VoiceWaveform(
+                    isAnimating = state.isListening || state.isPlaying || state.isGenerating,
+                    isRtl = state.chatLanguage == ChatLanguage.AR
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Status Text
+                val statusText = when {
+                    state.isGenerating -> stringResource(id = R.string.nutrigpt_voice_generating)
+                    state.isListening -> if (state.currentQuery.isNotBlank()) state.currentQuery else stringResource(id = R.string.nutrigpt_listening_hint)
+                    else -> ""
+                }
+
+                val isHintText = state.isGenerating || (state.isListening && state.currentQuery.isBlank())
+                val textAlign = if (isHintText) {
+                    TextAlign.Center
+                } else {
+                    TextAlign.Start
+                }
+
+                Text(
+                    text = statusText,
+                    color = AppTheme.colors.PrimaryVariant,
+                    style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    textAlign = textAlign,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 48.dp)
+                )
+
+                // Main Action Button (Mic / Fast Forward)
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .background(AppTheme.colors.ChatSendButtonBackground)
+                        .clickable {
+                            when {
+                                state.isListening -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
+                                state.isPlaying || state.isGenerating -> viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
+                                else -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (state.isPlaying || state.isGenerating) Icons.Rounded.FastForward else Icons.Rounded.Mic,
+                        contentDescription = "Action",
+                        tint = AppTheme.colors.ChatSendButtonIcon,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(48.dp))

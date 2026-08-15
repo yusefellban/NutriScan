@@ -301,6 +301,8 @@
     <string name="scan_brand_unknown">Unknown brand</string>
     <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
     <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="nutrigpt_voice_permission_denied">Microphone access is required for voice chat</string>
+    <string name="nutrigpt_voice_permission_retry">Grant permission</string>
     <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
@@ -589,6 +591,8 @@
     <string name="step_history_daily_average">Daily average</string>
     <string name="step_history_total_steps">Total steps</string>
     <string name="step_history_steps">steps</string>
+    <string name="step_history_of_goal">of %1$s Goal</string>
+    <string name="step_history_load_error">Failed to load step history</string>
     <string name="step_history_period_week">Week</string>
     <string name="step_history_period_month">Month</string>
     <string name="step_history_period_3months">3 Months</string>

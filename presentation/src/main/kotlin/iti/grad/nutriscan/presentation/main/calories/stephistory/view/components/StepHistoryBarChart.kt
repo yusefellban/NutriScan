@@ -17,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.domain.steps.history.model.StepHistorySummary
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.stepHistoryCardShadow
+import iti.grad.presentation.R
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -44,7 +46,7 @@ fun StepHistoryBarChart(
             .padding(24.dp)
     ) {
         Text(
-            text = "Step History",
+            text = stringResource(id = R.string.step_history_title),
             style = AppTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
