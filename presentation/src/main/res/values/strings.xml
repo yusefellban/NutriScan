@@ -15,6 +15,7 @@
     <string name="error_invalid_email">ERROR: Invalid email format.</string>
     <string name="error_empty_field">ERROR: Field cannot be empty.</string>
     <string name="error_invalid_name">Only letters, spaces, hyphens and apostrophes are allowed.</string>
+    <string name="error_invalid_name_length">Name must be between 3 and 100 characters.</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="prompt_have_account">Already have an account? Sign In.</string>
     <string name="name_label">Name</string>
@@ -138,6 +139,9 @@
     <string name="edit_profile_error_height_range">Height must be between 50 and 250 cm</string>
     <string name="edit_profile_error_weight_required">Please enter your weight</string>
     <string name="edit_profile_error_weight_range">Weight must be between 2 and 300 kg</string>
+
+    <string name="profile_setup_save_error">Failed to save profile</string>
+    <string name="auth_code_resent_success">Code resent successfully</string>
 
     <!-- Permissions -->
     <string name="action_cancel">Cancel</string>
@@ -684,4 +688,11 @@
     <string name="delete_scan_title">Delete Scan?</string>
     <string name="delete_scan_message">Are you sure you want to remove this scan from your history? This action cannot be undone.</string>
     <string name="alert_delete_success">Scan deleted successfully</string>
+    <string name="date_picker_reset">Reset</string>
+    <string name="step_history_distance">Distance</string>
+    <string name="step_history_calories">Calories</string>
+    <string name="step_history_time">Time</string>
+    <string name="step_unit_km">km</string>
+    <string name="step_unit_kcal">kcal</string>
+    <string name="step_unit_min">min</string>
 </resources>

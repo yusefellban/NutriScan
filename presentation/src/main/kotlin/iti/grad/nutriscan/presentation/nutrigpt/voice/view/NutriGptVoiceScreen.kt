@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -131,7 +132,7 @@ fun NutriGptVoiceScreen(
             // Official Sources Header
             Text(
                 text = stringResource(id = R.string.nutrigpt_voice_official_sources),
-                color = AppTheme.colors.TextPrimary,
+                color = AppTheme.colors.PrimaryVariant,
                 style = AppTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )

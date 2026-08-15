@@ -20,7 +20,7 @@ fun VoiceWaveform(
     modifier: Modifier = Modifier,
     isAnimating: Boolean = false,
     isRtl: Boolean = false,
-    color: Color = AppTheme.colors.Primary
+    color: Color = AppTheme.colors.PrimaryVariant
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "waveform_transition")
     

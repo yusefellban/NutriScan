@@ -23,6 +23,8 @@
     <string name="error_password_mismatch">خطأ: كلمات المرور غير متطابقة!</string>
     <string name="error_invalid_email">خطأ: صيغة البريد الإلكتروني غير صحيحة.</string>
     <string name="error_empty_field">خطأ: لا يمكن ترك الحقل فارغاً.</string>
+    <string name="error_invalid_name">يسمح فقط بالأحرف والمسافات والشرطات والفواصل العليا.</string>
+    <string name="error_invalid_name_length">يجب أن يتكون الاسم من 3 إلى 100 حرف.</string>
     <string name="action_sign_up">تسجيل حساب</string>
     <string name="prompt_have_account">لديك حساب بالفعل؟ تسجيل الدخول.</string>
     <string name="name_label">الاسم</string>
@@ -670,4 +672,25 @@
         <item>التغذية الجيدة هي شكل من أشكال احترام الذات. اعتنِ بنفسك جيداً اليوم!</item>
         <item>النجاح هو مجموع العادات الصغيرة المتكررة يوماً بعد يوم.</item>
     </string-array>
+    <!-- Missing Translations -->
+    <string name="feature_coming_soon">قريباً…</string>
+    <string name="edit_profile_error_name_required">لا يمكن ترك هذا الحقل فارغاً</string>
+    <string name="edit_profile_error_name_invalid">يسمح فقط بالأحرف والمسافات والشرطات والفواصل العليا</string>
+    <string name="edit_profile_error_height_required">يرجى إدخال طولك</string>
+    <string name="edit_profile_error_height_range">يجب أن يكون الطول بين 50 و 250 سم</string>
+    <string name="edit_profile_error_weight_required">يرجى إدخال وزنك</string>
+    <string name="edit_profile_error_weight_range">يجب أن يكون الوزن بين 2 و 300 كجم</string>
+    <string name="server_problem_title">مشكلة في الخادم</string>
+    <string name="server_problem_subtitle">نواجه مشكلة في تحميل بياناتك. يرجى المحاولة مرة أخرى بعد قليل.</string>
+    <string name="server_problem_retry">حاول مرة أخرى</string>
+    <string name="delete_scan_title">حذف المسح</string>
+    <string name="delete_scan_message">هل أنت متأكد أنك تريد إزالة هذا المسح من السجل؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_delete_success">تم حذف المسح بنجاح</string>
+    <string name="date_picker_reset">إعادة ضبط</string>
+    <string name="step_history_distance">المسافة</string>
+    <string name="step_history_calories">السعرات</string>
+    <string name="step_history_time">الوقت</string>
+    <string name="step_unit_km">كم</string>
+    <string name="step_unit_kcal">سعرة</string>
+    <string name="step_unit_min">دقيقة</string>
 </resources>
