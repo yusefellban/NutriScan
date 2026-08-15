@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.layout.ContentScale
@@ -64,6 +65,7 @@ import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEffect
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanEvent
 import iti.grad.nutriscan.presentation.scan.camera.state.CameraScanState
@@ -96,6 +98,7 @@ fun CameraScanScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val haptics = LocalHapticFeedback.current
     val imageCapture = remember {
         ImageCapture.Builder()
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
@@ -247,6 +250,7 @@ fun CameraScanScreen(
                 }
 
                 is CameraScanEffect.TakePicture -> {
+                    haptics.tick()
                     coroutineScope.launch {
                         mediaActionSound.play(MediaActionSound.SHUTTER_CLICK)
                         flashAlpha.animateTo(1f, animationSpec = tween(50))

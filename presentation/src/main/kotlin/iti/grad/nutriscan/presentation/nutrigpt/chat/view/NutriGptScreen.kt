@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,6 +46,7 @@ import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.util.rememberAudioPermissionRequester
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
@@ -65,6 +67,7 @@ fun NutriGptScreen(
     val context = LocalContext.current
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val haptics = LocalHapticFeedback.current
 
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -218,6 +221,7 @@ fun NutriGptScreen(
                     }
                 },
                 onMicPress = {
+                    haptics.tick()
                     val hasPermission = ContextCompat.checkSelfPermission(
                         context,
                         Manifest.permission.RECORD_AUDIO
@@ -230,6 +234,7 @@ fun NutriGptScreen(
                     }
                 },
                 onMicRelease = {
+                    haptics.tick()
                     speechRecognizer?.stopListening()
                     // The UI will return to normal immediately, but we let onResults send the message
                     viewModel.onEvent(NutriGptEvent.SetListeningState(false))

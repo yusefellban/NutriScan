@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.presentation.R
 import kotlinx.coroutines.delay
 
@@ -168,6 +170,7 @@ private fun WaterCup(
     onLongClick: () -> Unit,
 ) {
     val fillFraction = remember { Animatable(if (isFilled) 1f else 0f) }
+    val haptics = LocalHapticFeedback.current
     LaunchedEffect(isFilled) {
         if (isFilled) delay(index * 60L)
         fillFraction.animateTo(if (isFilled) 1f else 0f, animationSpec = tween(300))
@@ -180,8 +183,8 @@ private fun WaterCup(
             .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = onClick,
-                onLongClick = onLongClick,
+                onClick = { haptics.tick(); onClick() },
+                onLongClick = { haptics.tick(); onLongClick() },
             ),
     ) {
         Icon(

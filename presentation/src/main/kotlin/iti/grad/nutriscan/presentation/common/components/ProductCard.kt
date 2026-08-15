@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,7 @@ import iti.grad.presentation.R
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.util.isAppRtl
+import iti.grad.nutriscan.presentation.common.util.tick
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -286,6 +288,7 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val density = LocalDensity.current
     val isRtl = isAppRtl()
     val buttonColor = AppTheme.colors.Teal1000
+    val haptics = LocalHapticFeedback.current
 
     // Track the drag offset
     val offsetX = remember { Animatable(0f) }
@@ -344,6 +347,7 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
                     onDragStopped = {
                         // If dragged past 70% of the track → trigger action
                         if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
+                            haptics.tick()
                             swipeAction.onTriggered()
                         }
                         // Always spring back to start
@@ -368,13 +372,13 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
 /** Small always-visible delete icon, bottom-right below the product name. */
 @Composable
 private fun DeleteStrip(onClick: () -> Unit) {
-    val stripBackground = if (AppTheme.isDark) Color(0xFF0A545A) else AppTheme.colors.ErrorBackground
+    val haptics = LocalHapticFeedback.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
-            .background(stripBackground)
-            .clickable { onClick() }
+            .background(AppTheme.colors.Teal1500)
+            .clickable { haptics.tick(); onClick() }
             .padding(vertical = 6.dp),
         contentAlignment = Alignment.Center,
     ) {
