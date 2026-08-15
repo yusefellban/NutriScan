@@ -33,9 +33,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,11 +45,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import coil3.compose.AsyncImage
 import iti.grad.presentation.R
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.util.isAppRtl
+import iti.grad.nutriscan.presentation.common.util.tick
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -61,12 +61,19 @@ fun ProductCard(
     calories: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isFailed: Boolean = false,
     swipeAction: ProductCardSwipeAction? = null,
+    /** Renders a full-card-width delete strip at the bottom (Calories food log) instead of a
+     * swipe gesture. Mutually exclusive with [swipeAction] in practice. */
+    onDeleteClick: (() -> Unit)? = null,
     /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
     caloriesOverlayOnImage: Boolean = false,
     /** Times this product was logged today. Shows an "x2"-style badge next to the calorie badge
      * instead of duplicating the card; 1 (the default) shows no badge. */
     quantity: Int = 1,
+    /** Draws this card's own drop shadow. Calories' food row disables it — that row already sits
+     * inside a container that carries one shadow for the whole group (see CaloriesScreen). */
+    showShadow: Boolean = true,
 ) {
     val density = LocalDensity.current
     val shadowBlurPx = with(density) { 12.dp.toPx() }
@@ -75,12 +82,18 @@ fun ProductCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .customShadow(
-                shape = RoundedCornerShape(12.dp),
-                color = AppTheme.colors.ProductCardShadow,
-                blurRadius = shadowBlurPx,
-                offsetX = 0f,
-                offsetY = shadowOffsetYPx
+            .then(
+                if (showShadow) {
+                    Modifier.customShadow(
+                        shape = RoundedCornerShape(12.dp),
+                        color = AppTheme.colors.ProductCardShadow,
+                        blurRadius = shadowBlurPx,
+                        offsetX = 0f,
+                        offsetY = shadowOffsetYPx
+                    )
+                } else {
+                    Modifier
+                }
             )
     ) {
         Surface(
@@ -97,14 +110,13 @@ fun ProductCard(
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                     .height(130.dp)
             ) {
-                AsyncImage(
+                AdaptiveAsyncImage(
                     model = imageUrl,
                     contentDescription = productName,
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop,
                     error = painterResource(id = R.drawable.ic_scanner),
                     placeholder = painterResource(id = R.drawable.ic_scanner)
                 )
@@ -149,9 +161,10 @@ fun ProductCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (verdict != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        VerdictBadge(verdict = verdict)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    when {
+                        isFailed -> FailedBadge()
+                        verdict != null -> VerdictBadge(verdict = verdict)
                     }
                 } else {
                     // Original layout: name+verdict on the left, kcal stacked badge on the right
@@ -172,9 +185,10 @@ fun ProductCard(
                                 overflow = TextOverflow.Ellipsis
                             )
 
-                            if (verdict != null) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                VerdictBadge(verdict = verdict)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            when {
+                                isFailed -> FailedBadge()
+                                verdict != null -> VerdictBadge(verdict = verdict)
                             }
                         }
 
@@ -206,6 +220,11 @@ fun ProductCard(
 
                     // Swipe slider row — inside the card
                     SwipeActionButton(swipeAction = swipeAction)
+                }
+
+                if (onDeleteClick != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    DeleteStrip(onClick = onDeleteClick)
                 }
             }
         }
@@ -268,8 +287,8 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isRtl = isAppRtl()
-    val isRemove = swipeAction is ProductCardSwipeAction.Remove
-    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.Teal1000
+    val buttonColor = AppTheme.colors.Teal1000
+    val haptics = LocalHapticFeedback.current
 
     // Track the drag offset
     val offsetX = remember { Animatable(0f) }
@@ -328,6 +347,7 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
                     onDragStopped = {
                         // If dragged past 70% of the track → trigger action
                         if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
+                            haptics.tick()
                             swipeAction.onTriggered()
                         }
                         // Always spring back to start
@@ -338,11 +358,7 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
                 ),
             contentAlignment = Alignment.Center
         ) {
-            val icon = when {
-                isRemove -> R.drawable.ic_trash
-                isRtl -> R.drawable.ic_arrow_left
-                else -> R.drawable.ic_arrow_right
-            }
+            val icon = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
@@ -350,6 +366,28 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
                 modifier = Modifier.size(16.dp)
             )
         }
+    }
+}
+
+/** Small always-visible delete icon, bottom-right below the product name. */
+@Composable
+private fun DeleteStrip(onClick: () -> Unit) {
+    val haptics = LocalHapticFeedback.current
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp))
+            .background(AppTheme.colors.Teal1500)
+            .clickable { haptics.tick(); onClick() }
+            .padding(vertical = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_trash),
+            contentDescription = stringResource(id = R.string.food_log_delete_item_action),
+            tint = AppTheme.colors.Error,
+            modifier = Modifier.size(12.dp),
+        )
     }
 }
 

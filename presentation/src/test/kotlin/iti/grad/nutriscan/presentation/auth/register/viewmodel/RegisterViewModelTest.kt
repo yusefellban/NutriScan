@@ -104,4 +104,57 @@ class RegisterViewModelTest {
         val alertState = viewModel.state.value.alertState
         assertTrue(alertState is iti.grad.nutriscan.presentation.common.state.AuthAlertState.Success)
     }
+
+    @Test
+    fun `SignUpClicked with symbols in first or last name sets error`() = runTest {
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("#$@"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("#%#"))
+        viewModel.onEvent(RegisterEvent.EmailChanged("test@example.com"))
+        viewModel.onEvent(RegisterEvent.PasswordChanged("Pass123"))
+        viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged("Pass123"))
+
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.firstNameErrorResId != null)
+        assertTrue(state.lastNameErrorResId != null)
+    }
+
+    @Test
+    fun `SignUpClicked with digits in first or last name sets error`() = runTest {
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("123"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("12345"))
+        viewModel.onEvent(RegisterEvent.EmailChanged("test@example.com"))
+        viewModel.onEvent(RegisterEvent.PasswordChanged("Pass123"))
+        viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged("Pass123"))
+
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.firstNameErrorResId != null)
+        assertTrue(state.lastNameErrorResId != null)
+    }
+
+    @Test
+    fun `SignUpClicked with valid hyphenated name has no name error`() = runTest {
+        val email = "test@example.com"
+        val password = "Password123"
+        coEvery { registerUseCase("Anne-Marie", "O'Brien", email, password) } returns Result.success(Unit)
+        coEvery { resendVerificationEmailUseCase(email) } returns Result.success(Unit)
+
+        viewModel.onEvent(RegisterEvent.FirstNameChanged("Anne-Marie"))
+        viewModel.onEvent(RegisterEvent.LastNameChanged("O'Brien"))
+        viewModel.onEvent(RegisterEvent.EmailChanged(email))
+        viewModel.onEvent(RegisterEvent.PasswordChanged(password))
+        viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(password))
+
+        viewModel.onEvent(RegisterEvent.SignUpClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals(null, state.firstNameErrorResId)
+        assertEquals(null, state.lastNameErrorResId)
+    }
 }

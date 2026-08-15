@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
 
@@ -42,8 +43,7 @@ fun CaloriesHistoryTopBar(
     ) {
         AppBackButton(
             onClick = onBackClick,
-            iconTint = AppTheme.colors.Teal1200,
-            borderColor = AppTheme.colors.CaloriesHistoryTopBarIconBg,
+            surface = BackButtonSurface.OnLight,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -51,7 +51,7 @@ fun CaloriesHistoryTopBar(
         Text(
             text = stringResource(R.string.calories_history_title),
             style = AppTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-            color = AppTheme.colors.CaloriesHistoryTitle,
+            color = AppTheme.colors.TextPrimary,
         )
 
         Spacer(modifier = Modifier.weight(1f))

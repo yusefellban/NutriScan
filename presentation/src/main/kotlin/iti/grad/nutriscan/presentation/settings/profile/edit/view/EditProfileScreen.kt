@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,7 +42,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEf
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Warning
 import androidx.compose.material3.DatePicker
 import androidx.compose.foundation.layout.FlowRow
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.InternetError
 import iti.grad.presentation.R
@@ -52,6 +53,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileSt
 import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.SuccessAlert
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import androidx.activity.result.contract.ActivityResultContracts
 import iti.grad.nutriscan.presentation.settings.profile.edit.state.EditProfileEvent
 import iti.grad.nutriscan.presentation.settings.profile.state.ProfileAlertState.Error
@@ -62,6 +64,9 @@ import iti.grad.nutriscan.presentation.common.components.ErrorAlert
 import androidx.compose.ui.graphics.Color
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.Image
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import iti.grad.nutriscan.presentation.common.components.InternetAlert
 import androidx.compose.foundation.layout.Arrangement
 import iti.grad.nutriscan.presentation.settings.profile.edit.viewmodel.EditProfileViewModel
@@ -78,6 +83,7 @@ import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.Edi
 import iti.grad.nutriscan.presentation.settings.profile.edit.view.components.EditProfileInputField
 import iti.grad.nutriscan.presentation.common.components.WarningAlert
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
@@ -101,11 +107,32 @@ fun EditProfileScreen(
         }
     }
 
+    val cropLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract(),
+    ) { result ->
+        if (result.isSuccessful) {
+            val uriContent = result.uriContent
+            if (uriContent != null) {
+                viewModel.onEvent(EditProfileEvent.SelectAvatar(uriContent))
+            }
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
-                viewModel.onEvent(EditProfileEvent.SelectAvatar(uri))
+                cropLauncher.launch(
+                    CropImageContractOptions(
+                        uri = uri,
+                        cropImageOptions = CropImageOptions(
+                            imageSourceIncludeGallery = false,
+                            imageSourceIncludeCamera = false,
+                            guidelines = com.canhub.cropper.CropImageView.Guidelines.ON,
+                            showIntentChooser = false,
+                        )
+                    )
+                )
             }
         }
     )
@@ -131,7 +158,16 @@ private fun EditProfileContent(
     onSelectAvatarClick: () -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+            override fun isSelectableYear(year: Int): Boolean {
+                return year <= java.time.LocalDate.now().year
+            }
+        }
+    )
 
     Scaffold(
         containerColor = AppTheme.colors.Background,
@@ -155,7 +191,8 @@ private fun EditProfileContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(innerPadding)
+                .imePadding()
         ) {
             // Scrollable fields container
             Column(
@@ -173,8 +210,7 @@ private fun EditProfileContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(EditProfileEvent.BackClicked) },
-                        iconTint = AppTheme.colors.Teal1000,
-                        borderColor = AppTheme.colors.Teal1000
+                        surface = BackButtonSurface.OnLight,
                     )
                 }
 
@@ -298,7 +334,8 @@ private fun EditProfileContent(
                     onValueChange = { onEvent(EditProfileEvent.UpdateFirstName(it)) },
                     hint = stringResource(R.string.edit_profile_first_name_hint),
                     trailingIconRes = R.drawable.ic_edit,
-                    isReadOnly = !state.isEditMode
+                    isReadOnly = !state.isEditMode,
+                    errorMessage = state.firstNameErrorResId?.let { stringResource(it) }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -308,7 +345,8 @@ private fun EditProfileContent(
                     onValueChange = { onEvent(EditProfileEvent.UpdateLastName(it)) },
                     hint = stringResource(R.string.edit_profile_last_name_hint),
                     trailingIconRes = R.drawable.ic_edit,
-                    isReadOnly = !state.isEditMode
+                    isReadOnly = !state.isEditMode,
+                    errorMessage = state.lastNameErrorResId?.let { stringResource(it) }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -339,7 +377,8 @@ private fun EditProfileContent(
                         },
                         unit = "cm",
                         isReadOnly = !state.isEditMode,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        errorMessage = state.heightErrorResId?.let { stringResource(it) }
                     )
 
                     EditProfileMeasurementField(
@@ -353,7 +392,8 @@ private fun EditProfileContent(
                         },
                         unit = "kg",
                         isReadOnly = !state.isEditMode,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        errorMessage = state.weightErrorResId?.let { stringResource(it) }
                     )
                 }
 
@@ -363,7 +403,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_chronic_conditions),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -420,7 +460,7 @@ private fun EditProfileContent(
                 Text(
                     text = stringResource(R.string.profile_setup_allergies),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.ProfileSetupSectionTitle
+                    color = AppTheme.colors.SectionSubtitle
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

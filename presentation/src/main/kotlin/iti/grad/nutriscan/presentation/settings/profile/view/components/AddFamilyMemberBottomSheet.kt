@@ -54,6 +54,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import iti.grad.presentation.R
 import java.io.File
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 
 /**
  * Bottom sheet for adding a family member: name + allergy/disease chip
@@ -76,24 +79,45 @@ fun AddFamilyMemberBottomSheet(
     val context = LocalContext.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    val cropLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract()
+    ) { result ->
+        if (result.isSuccessful) {
+            val uriContent = result.uriContent
+            if (uriContent == null) return@rememberLauncherForActivityResult
+
+            runCatching {
+                val targetFile = File(
+                    context.cacheDir,
+                    "family_member_${System.currentTimeMillis()}.jpg"
+                )
+                context.contentResolver.openInputStream(uriContent)?.use { input ->
+                    targetFile.outputStream().use { output -> input.copyTo(output) }
+                } ?: error("Unable to read selected image")
+
+                onEvent(AddFamilyMemberEvent.ImageSelected(targetFile.absolutePath))
+            }.onFailure {
+                errorMessage = context.getString(R.string.edit_profile_avatar_upload_error)
+            }
+        }
+    }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
 
-        runCatching {
-            val targetFile = File(
-                context.cacheDir,
-                "family_member_${System.currentTimeMillis()}.jpg"
+        cropLauncher.launch(
+            CropImageContractOptions(
+                uri = uri,
+                cropImageOptions = CropImageOptions(
+                    imageSourceIncludeGallery = false,
+                    imageSourceIncludeCamera = false,
+                    guidelines = com.canhub.cropper.CropImageView.Guidelines.ON,
+                    showIntentChooser = false,
+                )
             )
-            context.contentResolver.openInputStream(uri)?.use { input ->
-                targetFile.outputStream().use { output -> input.copyTo(output) }
-            } ?: error("Unable to read selected image")
-
-            onEvent(AddFamilyMemberEvent.ImageSelected(targetFile.absolutePath))
-        }.onFailure {
-            errorMessage = context.getString(R.string.edit_profile_avatar_upload_error)
-        }
+        )
     }
 
     LaunchedEffect(editingMemberId) {
@@ -131,7 +155,7 @@ fun AddFamilyMemberBottomSheet(
                     else R.string.add_family_member_title
                 ),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.Teal1000,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(20.dp))
 
@@ -263,7 +287,7 @@ fun AddFamilyMemberBottomSheet(
             Text(
                 text = stringResource(R.string.profile_setup_chronic_conditions),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.ProfileSetupSectionTitle,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(12.dp))
             ChipSelectionFlowRow(
@@ -281,7 +305,7 @@ fun AddFamilyMemberBottomSheet(
             Text(
                 text = stringResource(R.string.profile_setup_allergies),
                 style = AppTheme.typography.headlineMedium,
-                color = AppTheme.colors.ProfileSetupSectionTitle,
+                color = AppTheme.colors.SectionSubtitle,
             )
             Spacer(Modifier.height(12.dp))
             ChipSelectionFlowRow(

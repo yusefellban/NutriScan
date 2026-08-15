@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.news.state
 
 import iti.grad.nutriscan.domain.news.model.NewsTopicChip
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
@@ -25,4 +26,5 @@ data class NewsState(
     val searchQuery: String = "",
     val isLoading: Boolean = true,
     val errorMessageResId: Int? = null,
+    val errorType: AppErrorType = AppErrorType.UNKNOWN,
 )

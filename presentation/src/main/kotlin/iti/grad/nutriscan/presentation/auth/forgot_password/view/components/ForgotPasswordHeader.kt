@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
 import iti.grad.presentation.R
@@ -61,11 +62,13 @@ fun ForgotPasswordHeader(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                 )
+                .statusBarsPadding()
                 .padding(top = 48.dp, bottom = 48.dp)
         ) {
             // ── Back button ──────────────────────────────────────────────
             AppBackButton(
                 onClick = onBackClick,
+                surface = BackButtonSurface.OnAccent,
                 modifier = Modifier
                     .padding(start = 24.dp, top = 4.dp)
                     .align(Alignment.TopStart)

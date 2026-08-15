@@ -33,7 +33,7 @@ import iti.grad.nutriscan.presentation.auth.register.state.RegisterEvent
 import iti.grad.nutriscan.presentation.auth.register.state.RegisterState
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AuthBottomPrompt
-import iti.grad.nutriscan.presentation.common.components.FigmaInputField
+import iti.grad.nutriscan.presentation.common.components.AuthInputField
 import androidx.compose.material3.MaterialTheme
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
@@ -60,12 +60,12 @@ fun RegisterFormBody(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // ── First Name ─────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.firstName,
             onValueChange = { onEvent(RegisterEvent.FirstNameChanged(it)) },
             label = stringResource(R.string.first_name_label),
             hint = stringResource(R.string.first_name_hint),
-            leadingIconRes = R.drawable.ic_gender_male,
+            leadingIconRes = R.drawable.ic_person,
             hasError = state.firstNameErrorResId != null,
             errorResId = state.firstNameErrorResId,
             inputContainerBg = inputContainerBg,
@@ -74,12 +74,12 @@ fun RegisterFormBody(
         )
 
         // ── Last Name ──────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.lastName,
             onValueChange = { onEvent(RegisterEvent.LastNameChanged(it)) },
             label = stringResource(R.string.last_name_label),
             hint = stringResource(R.string.last_name_hint),
-            leadingIconRes = R.drawable.ic_gender_male,
+            leadingIconRes = R.drawable.ic_person,
             hasError = state.lastNameErrorResId != null,
             errorResId = state.lastNameErrorResId,
             inputContainerBg = inputContainerBg,
@@ -88,26 +88,27 @@ fun RegisterFormBody(
         )
 
         // ── Email ──────────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.email,
             onValueChange = { onEvent(RegisterEvent.EmailChanged(it)) },
             label = stringResource(R.string.email_label),
             hint = stringResource(R.string.email_hint),
-            leadingIconRes = R.drawable.ic_gender_male,
+            leadingIconRes = R.drawable.ic_email,
             hasError = state.emailErrorResId != null,
             errorResId = state.emailErrorResId,
             inputContainerBg = inputContainerBg,
             inputLabelColor = inputLabelColor,
-            inputTextColor = inputTextColor
+            inputTextColor = inputTextColor,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Email
         )
 
         // ── Password ───────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.password,
             onValueChange = { onEvent(RegisterEvent.PasswordChanged(it)) },
             label = stringResource(R.string.password_label),
             hint = stringResource(R.string.password_hint),
-            leadingIconRes = R.drawable.ic_gender_male_1,
+            leadingIconRes = R.drawable.ic_lock,
             isPassword = true,
             isPasswordVisible = state.passwordVisible,
             onVisibilityToggle = { onEvent(RegisterEvent.TogglePasswordVisibility) },
@@ -119,12 +120,12 @@ fun RegisterFormBody(
         )
 
         // ── Confirm Password ───────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.confirmPassword,
             onValueChange = { onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
             label = stringResource(R.string.confirm_password_label),
             hint = stringResource(R.string.password_hint),
-            leadingIconRes = R.drawable.ic_gender_male_1,
+            leadingIconRes = R.drawable.ic_lock,
             isPassword = true,
             isPasswordVisible = state.confirmPasswordVisible,
             onVisibilityToggle = { onEvent(RegisterEvent.ToggleConfirmPasswordVisibility) },

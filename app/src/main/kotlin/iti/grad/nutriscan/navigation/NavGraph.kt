@@ -1,5 +1,10 @@
 package iti.grad.nutriscan.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -8,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -56,9 +62,17 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: Any = SplashRoute
 ) {
+    val transitionSpec = tween<IntOffset>(durationMillis = 450)
+    val fadeSpec = tween<Float>(durationMillis = 450)
+
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        // Applies to every `composable<Route>` below — no per-screen wiring needed.
+        enterTransition = { slideInHorizontally(transitionSpec) { it } + fadeIn(fadeSpec) },
+        exitTransition = { fadeOut(fadeSpec) },
+        popEnterTransition = { fadeIn(fadeSpec) },
+        popExitTransition = { slideOutHorizontally(transitionSpec) { it } + fadeOut(fadeSpec) },
     ) {
         // 1. Splash Screen
         composable<SplashRoute> {
@@ -83,6 +97,11 @@ fun AppNavGraph(
                 },
                 onNavigateToProfileSetup = {
                     navController.navigate(ProfileSetupPagerRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 }
@@ -129,6 +148,11 @@ fun AppNavGraph(
                 },
                 onNavigateToForgotPassword = {
                     navController.navigate(ForgotPasswordRoute)
+                },
+                onNavigateToAccountPendingDeletion = { scheduledDate ->
+                    navController.navigate(AccountPendingDeletionRoute(scheduledDate)) {
+                        popUpTo(LoginRoute(isFromRegistration = route.isFromRegistration)) { inclusive = true }
+                    }
                 }
             )
         }

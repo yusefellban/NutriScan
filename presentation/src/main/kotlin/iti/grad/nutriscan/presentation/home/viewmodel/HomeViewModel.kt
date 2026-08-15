@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.dailytracking.usecase.ReconcileTodayUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetRecentScansUseCase
 import iti.grad.nutriscan.domain.streak.usecase.SyncDailyStreakUseCase
@@ -14,6 +15,8 @@ import iti.grad.nutriscan.presentation.common.model.UiText
 import iti.grad.nutriscan.presentation.home.state.HomeEffect
 import iti.grad.nutriscan.presentation.home.state.HomeEvent
 import iti.grad.nutriscan.presentation.common.model.HistoryItemUiModel
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.VerdictType
 import iti.grad.nutriscan.presentation.home.state.HomeState
 import iti.grad.presentation.R
@@ -104,7 +107,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isHistoryLoading = true, historyError = null) }
             
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { state ->
                         state.copy(
@@ -114,11 +117,12 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 .onFailure { error ->
-                    _state.update { 
+                    _state.update {
                         it.copy(
-                            isHistoryLoading = false, 
-                            historyError = error.message ?: "Failed to load recent scans"
-                        ) 
+                            isHistoryLoading = false,
+                            historyError = error.message ?: "Failed to load recent scans",
+                            historyErrorType = throwableToAppErrorType(error),
+                        )
                     }
                 }
         }
@@ -131,12 +135,17 @@ class HomeViewModel @Inject constructor(
         _state.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
             reconcileTodayUseCase()
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { it.copy(recentHistory = mapScansToUi(scans), historyError = null) }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(historyError = error.message ?: "Failed to load recent scans") }
+                    _state.update {
+                        it.copy(
+                            historyError = error.message ?: "Failed to load recent scans",
+                            historyErrorType = throwableToAppErrorType(error),
+                        )
+                    }
                 }
             _state.update { it.copy(isRefreshing = false) }
         }
@@ -144,7 +153,7 @@ class HomeViewModel @Inject constructor(
 
     private fun refreshHistorySilently() {
         viewModelScope.launch {
-            getRecentScansUseCase(page = 0, size = 3)
+            getRecentScansUseCase(page = 0, size = 5)
                 .onSuccess { scans ->
                     _state.update { state ->
                         state.copy(
@@ -157,17 +166,25 @@ class HomeViewModel @Inject constructor(
 
     private fun mapScansToUi(scans: List<ScanHistoryEntry>): ImmutableList<HistoryItemUiModel> {
         return scans.map { entry ->
-            val verdictType = when (entry.verdict) {
-                ProductVerdict.SAFE -> VerdictType.GREEN
-                ProductVerdict.CAUTION -> VerdictType.YELLOW
-                ProductVerdict.UNSAFE -> VerdictType.RED
-                null -> VerdictType.CYAN
+            val verdictType = if (entry.status == ScanStatus.FAILED) {
+                VerdictType.FAILED
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> VerdictType.GREEN
+                    ProductVerdict.CAUTION -> VerdictType.YELLOW
+                    ProductVerdict.UNSAFE -> VerdictType.RED
+                    null -> VerdictType.CYAN
+                }
             }
-            val verdictLabelResId = when (entry.verdict) {
-                ProductVerdict.SAFE -> R.string.verdict_safe
-                ProductVerdict.CAUTION -> R.string.verdict_caution
-                ProductVerdict.UNSAFE -> R.string.verdict_unsafe
-                null -> R.string.verdict_safe
+            val verdictLabelResId = if (entry.status == ScanStatus.FAILED) {
+                R.string.scan_status_failed
+            } else {
+                when (entry.verdict) {
+                    ProductVerdict.SAFE -> R.string.verdict_safe
+                    ProductVerdict.CAUTION -> R.string.verdict_caution
+                    ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+                    null -> R.string.verdict_unknown
+                }
             }
             
             val scanDate = entry.scannedAt?.let { formatRelativeDate(it) } ?: UiText.DynamicString("Unknown Date")

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsSegmentedToggle
@@ -44,8 +45,7 @@ fun ChatTopBar(
     ) {
         AppBackButton(
             onClick = onNavigateBack,
-            iconTint = AppTheme.colors.Primary,
-            borderColor = AppTheme.colors.Primary
+            surface = BackButtonSurface.OnLight,
         )
         
         Spacer(modifier = Modifier.width(16.dp))
@@ -54,7 +54,7 @@ fun ChatTopBar(
             text = stringResource(id = R.string.nutrigpt_title),
             style = AppTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.SemiBold,
-                color = AppTheme.colors.PrimaryVariant
+                color = AppTheme.colors.TextPrimary
             ),
             modifier = Modifier.weight(1f)
         )

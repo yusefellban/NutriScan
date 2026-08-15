@@ -37,7 +37,6 @@ import iti.grad.nutriscan.presentation.common.components.StepsGaugeCard
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.ProductCard
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
-import iti.grad.nutriscan.presentation.common.components.ProductCardSwipeAction
 import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.WaterTrackerCard
 
@@ -49,6 +48,7 @@ import androidx.compose.foundation.layout.Column
 import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import androidx.compose.foundation.lazy.LazyColumn
 import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
@@ -63,11 +63,17 @@ import androidx.compose.runtime.Composable
 import iti.grad.nutriscan.presentation.common.components.DashedActionCard
 import iti.grad.nutriscan.presentation.main.calories.viewmodel.CaloriesViewModel
 import androidx.compose.ui.platform.LocalLocale
-import iti.grad.nutriscan.presentation.common.components.CalorieGoalsPager
+import iti.grad.nutriscan.presentation.common.components.CalorieGoalsCard
+import iti.grad.nutriscan.presentation.common.components.dashedBorder
+import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
 
 /**
  * Calories Dashboard ("Daily Products") — second bottom-nav tab.
@@ -110,7 +116,7 @@ fun CaloriesScreen(
                     snackbarScope.launch {
                         snackbarHostState.showAppSnackbar(
                             message = context.getString(effect.messageResId),
-                            type = SnackbarType.ERROR
+                            type = effect.type
                         )
                     }
                 }
@@ -182,41 +188,63 @@ private fun CaloriesContent(
                 }
             } else {
                 item {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(IntrinsicSize.Min)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(AppTheme.colors.Surface)
+                            .dashedBorder(
+                                1.dp,
+                                if (AppTheme.isDark) Color(0xFF11939A) else AppTheme.colors.Gray600,
+                                24.dp,
+                                dashLength = 6.dp,
+                                gapLength = 4.dp
+                            )
+                            .padding(horizontal = 6.dp, vertical = 9.dp),
                     ) {
-                        DashedActionCard(
-                            label = stringResource(R.string.add_food),
-                            onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
-                            contentPadding = 16.dp,
+                        Row(
                             modifier = Modifier
-                                .width(140.dp)
-                                .fillMaxHeight(),
-                        )
-                        for (food in state.addedFoods) {
-                            key(food.id) {
-                                ProductCard(
-                                    imageUrl = food.imageUrl,
-                                    productName = food.productName,
-                                    verdict = null,
-                                    calories = food.calories,
-                                    quantity = food.quantity,
-                                    onClick = { onEvent(CaloriesEvent.FoodItemClicked(food)) },
-                                    swipeAction = ProductCardSwipeAction.Remove(
-                                        hintResId = R.string.food_log_swipe_remove_hint,
-                                        onTriggered = {
-                                            onEvent(CaloriesEvent.FoodItemSwipedToRemove(food.logEntryId ?: food.id))
-                                        },
-                                    ),
-                                    caloriesOverlayOnImage = true,
-                                    modifier = Modifier
-                                        .width(140.dp)
-                                        .fillMaxHeight(),
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min)
+                                .customShadow(
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = AppTheme.colors.ProductCardShadow,
+                                    blurRadius = with(LocalDensity.current) { 12.dp.toPx() },
+                                    offsetY = with(LocalDensity.current) { 6.dp.toPx() },
                                 )
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            DashedActionCard(
+                                label = stringResource(R.string.add_food),
+                                onClick = { onEvent(CaloriesEvent.AddFoodClicked) },
+                                contentPadding = 16.dp,
+                                showDashedBorder = false,
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .fillMaxHeight(),
+                            )
+                            for (food in state.addedFoods) {
+                                key(food.id) {
+                                    ProductCard(
+                                        imageUrl = food.imageUrl,
+                                        productName = food.productName,
+                                        verdict = null,
+                                        calories = food.calories,
+                                        quantity = food.quantity,
+                                        onClick = { onEvent(CaloriesEvent.FoodItemClicked(food)) },
+                                        onDeleteClick = {
+                                            onEvent(
+                                                CaloriesEvent.FoodItemDeleteClicked(food.logEntryId ?: food.id)
+                                            )
+                                        },
+                                        caloriesOverlayOnImage = true,
+                                        showShadow = false,
+                                        modifier = Modifier
+                                            .width(140.dp)
+                                            .fillMaxHeight(),
+                                    )
+                                }
                             }
                         }
                     }
@@ -224,11 +252,10 @@ private fun CaloriesContent(
             }
 
             item {
-                CalorieGoalsPager(
+                CalorieGoalsCard(
                     tdee = state.tdee,
                     caloriesGained = (state.caloriesGained - state.exerciseKcal).coerceAtLeast(0),
                     caloriesBurned = state.caloriesBurned,
-                    bmi = state.bmi,
                 )
             }
 
@@ -244,7 +271,7 @@ private fun CaloriesContent(
                         stepsGoal = state.stepsGoal,
                         onClick = onNavigateToStepHistory,
                         modifier = Modifier
-                            .weight(1f)
+                            .width(126.dp)
                             .fillMaxHeight(),
                     )
                     ExerciseCard(
@@ -252,7 +279,7 @@ private fun CaloriesContent(
                         exerciseMinutes = state.exerciseMinutes,
                         onAddClick = { onEvent(CaloriesEvent.AddExerciseClicked) },
                         modifier = Modifier
-                            .weight(1.2f)
+                            .weight(1f)
                             .fillMaxHeight(),
                     )
                 }
@@ -285,11 +312,15 @@ private fun CaloriesContent(
                 onDismiss = { onEvent(CaloriesEvent.RemoveFoodDismissed) }
             )
         }
+
 }
 
 @SuppressLint("NonObservableLocale")
 @Composable
-private fun CaloriesHeader(caloriesGained: Int, modifier: Modifier = Modifier) {
+private fun CaloriesHeader(
+    caloriesGained: Int,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -298,26 +329,31 @@ private fun CaloriesHeader(caloriesGained: Int, modifier: Modifier = Modifier) {
         Text(
             text = stringResource(R.string.daily_products),
             style = CaloriesTypography.headerTitle,
-            color = AppTheme.colors.CaloriesAccentTeal1200,
+            color = AppTheme.colors.SectionSubtitle,
         )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = String.format(LocalLocale.current.platformLocale, "%,d", caloriesGained),
-                style = CaloriesTypography.badgeText,
-                color = AppTheme.colors.Teal300,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(AppTheme.colors.Teal1000)
-                    .padding(horizontal = 3.dp),
-            )
-            Text(
-                text = stringResource(R.string.calorie_badge),
-                style = CaloriesTypography.badgeText,
-                color = AppTheme.colors.Teal1000,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = String.format(LocalLocale.current.platformLocale, "%,d", caloriesGained),
+                    style = CaloriesTypography.badgeText,
+                    color = AppTheme.colors.Teal300,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(AppTheme.colors.Teal1000)
+                        .padding(horizontal = 3.dp),
+                )
+                Text(
+                    text = stringResource(R.string.calorie_badge),
+                    style = CaloriesTypography.badgeText,
+                    color = AppTheme.colors.Teal1000,
+                )
+            }
         }
     }
 }

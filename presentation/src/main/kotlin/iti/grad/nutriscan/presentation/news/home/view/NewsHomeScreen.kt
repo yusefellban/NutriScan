@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.components.shimmerEffect
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
@@ -91,8 +92,7 @@ private fun NewsHomeContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(NewsHomeEvent.BackClicked) },
-                        iconTint = AppTheme.colors.NewsCategoryLabel,
-                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                        surface = BackButtonSurface.OnLight,
                     )
 
                     Icon(
@@ -130,8 +130,7 @@ private fun NewsHomeContent(
                     ) {
                         AppBackButton(
                             onClick = { onEvent(NewsHomeEvent.BackClicked) },
-                            iconTint = AppTheme.colors.NewsCategoryLabel,
-                            borderColor = AppTheme.colors.NewsCategoryLabel,
+                            surface = BackButtonSurface.OnLight,
                         )
 
                         Icon(
@@ -151,7 +150,7 @@ private fun NewsHomeContent(
                     Text(
                         text = stringResource(id = R.string.news_home_breaking_news),
                         style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = AppTheme.colors.NewsScreenTitle,
+                        color = AppTheme.colors.SectionSubtitle,
                         modifier = Modifier.padding(horizontal = 22.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +175,7 @@ private fun NewsHomeContent(
                     Text(
                         text = stringResource(id = R.string.news_home_recommendation),
                         style = AppTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = AppTheme.colors.NewsScreenTitle,
+                        color = AppTheme.colors.SectionSubtitle,
                         modifier = Modifier.padding(horizontal = 22.dp),
                     )
                     Spacer(modifier = Modifier.height(12.dp))

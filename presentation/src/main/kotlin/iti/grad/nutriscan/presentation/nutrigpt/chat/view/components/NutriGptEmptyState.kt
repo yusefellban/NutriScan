@@ -42,10 +42,10 @@ fun NutriGptEmptyState(modifier: Modifier = Modifier) {
             style = AppTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),
-            color = AppTheme.colors.Primary,
+            color = AppTheme.colors.PrimaryVariant,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
         
         Text(

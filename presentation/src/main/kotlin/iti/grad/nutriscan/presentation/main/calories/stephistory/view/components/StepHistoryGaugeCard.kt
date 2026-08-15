@@ -125,7 +125,7 @@ fun StepHistoryGaugeCard(
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "of $formattedGoal Goal",
+                        text = stringResource(id = R.string.step_history_of_goal, formattedGoal),
                         style = AppTheme.typography.bodySmall.copy(fontSize = 11.sp),
                         color = AppTheme.colors.StepHistoryGaugeLabelText
                     )

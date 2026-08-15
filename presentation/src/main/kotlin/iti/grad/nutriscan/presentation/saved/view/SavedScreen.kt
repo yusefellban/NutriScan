@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.presentation.R
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
 import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
@@ -148,13 +149,9 @@ private fun SavedScreenContent(
             when {
                 state.isLoading -> shimmerGrid()
                 state.error != null && state.products.isEmpty() -> {
-                    AppEmptyStateWidget(
-                        lightImageRes = R.drawable.no_network_connection_light,
-                        darkImageRes = R.drawable.no_network_connection_dark,
-                        title = stringResource(R.string.offline_state_title),
-                        subtitle = stringResource(R.string.offline_state_subtitle),
-                        buttonText = stringResource(R.string.offline_state_retry),
-                        onButtonClick = { onEvent(SavedEvent.RetryLoad) },
+                    AppErrorWidget(
+                        errorType = state.errorType,
+                        onRetry = { onEvent(SavedEvent.RetryLoad) },
                         modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding),
                     )
                 }

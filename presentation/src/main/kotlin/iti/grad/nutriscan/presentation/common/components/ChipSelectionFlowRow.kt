@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.presentation.R
 
 /**

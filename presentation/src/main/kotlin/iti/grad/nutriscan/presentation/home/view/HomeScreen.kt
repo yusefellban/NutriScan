@@ -43,6 +43,7 @@ import iti.grad.nutriscan.presentation.common.components.HistoryItemCard
 import iti.grad.nutriscan.presentation.common.components.HistoryItemShimmerCard
 import iti.grad.nutriscan.presentation.common.components.PullToRefreshShimmerBox
 import iti.grad.nutriscan.presentation.common.components.HomeScreenShimmer
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.home.view.components.HomeGreetingHeader
 import iti.grad.nutriscan.presentation.home.view.components.ScanReadyCard
@@ -167,7 +168,7 @@ private fun HomeFeedContent(
                 Text(
                     text = stringResource(R.string.home_explore),
                     style = AppTheme.typography.headlineMedium,
-                    color = AppTheme.colors.PrimaryVariant,
+                    color = AppTheme.colors.SectionSubtitle,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -201,7 +202,7 @@ private fun HomeFeedContent(
                     Text(
                         text = stringResource(R.string.home_recent_history),
                         style = AppTheme.typography.headlineMedium,
-                        color = AppTheme.colors.PrimaryVariant,
+                        color = AppTheme.colors.SectionSubtitle,
                     )
                     Text(
                         text = stringResource(R.string.home_view_all),
@@ -226,7 +227,8 @@ private fun HomeFeedContent(
                 }
                 state.historyError != null -> {
                     item {
-                        OfflineStateWidget(
+                        AppErrorWidget(
+                            errorType = state.historyErrorType,
                             onRetry = { onEvent(HomeEvent.RetryLoadHistory) },
                             modifier = Modifier.padding(vertical = 24.dp)
                         )

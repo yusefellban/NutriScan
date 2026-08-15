@@ -9,7 +9,8 @@ sealed interface CaloriesEvent {
     /** Adds a new empty cup to the water tracker (increases [iti.grad.nutriscan.presentation.main.calories.state.CaloriesState.waterGoal]). */
     data object AddWaterClicked : CaloriesEvent
 
-    /** Taps the cup at [index] — fills it if it's the next empty cup, unfills it if it's the last filled one, no-op otherwise. */
+    /** Taps the cup at [index] — fills every cup up to and including it if it's empty (cascading
+     * fill animation plays in the UI), unfills it if it's the last filled one, no-op otherwise. */
     data class WaterCupClicked(val index: Int) : CaloriesEvent
 
     /** Long-presses the cup at [index] to delete it — only responds if it's the last cup. */
@@ -21,8 +22,9 @@ sealed interface CaloriesEvent {
     /** Reported back by the screen after the user responds to the Health Connect permission dialog. */
     data class StepsPermissionResult(val granted: Boolean) : CaloriesEvent
 
-    /** Swiped a food-log entry — shows the removal confirmation dialog, does not remove yet. */
-    data class FoodItemSwipedToRemove(val entryId: String) : CaloriesEvent
+    /** Tapped a food-log entry's delete button (manage mode) — shows the removal confirmation
+     * dialog, does not remove yet. */
+    data class FoodItemDeleteClicked(val entryId: String) : CaloriesEvent
     data object RemoveFoodConfirmed : CaloriesEvent
     data object RemoveFoodDismissed : CaloriesEvent
     data class FoodItemClicked(val product: ProductUiModel) : CaloriesEvent

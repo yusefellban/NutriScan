@@ -47,6 +47,7 @@ fun SavedProductGrid(
                 productName = product.productName,
                 verdict = product.verdict,
                 calories = product.calories,
+                isFailed = product.isFailed,
                 onClick = { onProductClick(product) },
                 swipeAction = ProductCardSwipeAction.Add(
                     hintResId = R.string.product_card_swipe_hint,

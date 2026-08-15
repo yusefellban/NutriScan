@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 30
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "VERSION_NAME", "\"${libs.versions.appVersionName.get()}\"")
@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.coil3.gif)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
+    implementation(libs.image.cropper)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

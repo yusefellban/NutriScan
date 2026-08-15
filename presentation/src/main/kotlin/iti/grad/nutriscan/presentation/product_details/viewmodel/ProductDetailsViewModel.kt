@@ -15,6 +15,7 @@ import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScanByIdUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
+import iti.grad.nutriscan.presentation.common.util.formatHalfStep
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
@@ -124,6 +125,7 @@ class ProductDetailsViewModel @Inject constructor(
             productName = scanResult.productName ?: "Unknown Product",
             brand = "Unknown Brand",
             imageUrl = scanResult.imageUrl ?: "",
+            status = scanResult.status,
             verdict = scanResult.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
             scanDate = scanResult.scannedAt?.let { 
                 try { LocalDate.parse(it.substringBefore("T")) } catch (e: Exception) { LocalDate.now() } 
@@ -132,7 +134,7 @@ class ProductDetailsViewModel @Inject constructor(
             flaggedIngredients = scanResult.foodSafetyResponse?.flaggedIngredients?.map {
                 FlaggedIngredient(
                     name = it.ingredient,
-                    matchTag = it.type,
+                    matchTag = it.name.takeIf { list -> list.isNotEmpty() }?.joinToString(", ") ?: it.type,
                     reason = it.reason
                 )
             } ?: emptyList(),
@@ -152,15 +154,12 @@ class ProductDetailsViewModel @Inject constructor(
     private fun String?.toGrams(): Float =
         this?.split(" ")?.firstOrNull()?.toFloatOrNull() ?: 0f
 
-    private fun Float?.format(): String {
-        val value = this ?: 0f
-        return if (value % 1f == 0f) value.toLong().toString() else value.toString()
-    }
+    private fun Float?.format(): String = (this ?: 0f).formatHalfStep()
 
     private fun mapToScanResult(detail: ProductDetail): ScanResult {
         return ScanResult(
             scanId = detail.id,
-            status = ScanStatus.COMPLETED,
+            status = detail.status,
             scannedAt = java.time.Instant.now().toString(),
             imageUrl = detail.imageUrl,
             productName = detail.productName,

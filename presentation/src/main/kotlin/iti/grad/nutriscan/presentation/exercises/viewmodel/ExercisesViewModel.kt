@@ -9,6 +9,8 @@ import iti.grad.nutriscan.domain.exercises.model.Exercise
 import iti.grad.nutriscan.domain.exercises.model.ExerciseQuery
 import iti.grad.nutriscan.domain.exercises.usecase.GetExerciseCategoriesUseCase
 import iti.grad.nutriscan.domain.exercises.usecase.GetExercisesUseCase
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.nutriscan.presentation.common.model.ExerciseType
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategoryUi
@@ -21,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import iti.grad.nutriscan.presentation.exercises.mock.ExercisesMockData
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -125,7 +128,7 @@ class ExercisesViewModel @Inject constructor(
                     // Fallback to static "All" if category request fails
                     _state.update {
                         it.copy(
-                            categories = kotlinx.collections.immutable.persistentListOf(
+                            categories = persistentListOf(
                                 ExerciseCategoryUi(id = "all", label = context.getString(R.string.exercises_category_all))
                             )
                         )
@@ -170,12 +173,13 @@ class ExercisesViewModel @Inject constructor(
                         )
                     }
                 },
-                onFailure = {
+                onFailure = { error ->
                     _state.update {
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
-                            errorMessageRes = R.string.exercises_load_error
+                            errorMessageRes = R.string.exercises_load_error,
+                            errorType = throwableToAppErrorType(error),
                         )
                     }
                 }

@@ -1,4 +1,4 @@
-package iti.grad.nutriscan.presentation.profile_setup.view.components
+package iti.grad.nutriscan.presentation.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

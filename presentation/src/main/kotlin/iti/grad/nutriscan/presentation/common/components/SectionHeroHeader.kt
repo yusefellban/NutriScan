@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
@@ -37,12 +40,17 @@ fun SectionHeroHeader(
             .clipToBounds()
             .background(AppTheme.colors.ProfileHeaderBackground),
     ) {
-        Image(
-            painter = painterResource(R.drawable.profile_edge),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
-            modifier = Modifier.align(Alignment.TopEnd),
-        )
+        // Purely decorative curve — pin it to the physical top-right corner regardless of
+        // locale so it looks identical in Arabic instead of jumping to the opposite corner
+        // (Alignment.TopEnd flips with RTL, but the artwork itself isn't mirrored to match).
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            Image(
+                painter = painterResource(R.drawable.profile_edge),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
         content()
     }
 }

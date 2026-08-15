@@ -12,6 +12,7 @@ import iti.grad.nutriscan.presentation.news.state.NewsEffect
 import iti.grad.nutriscan.presentation.news.state.NewsEvent
 import iti.grad.nutriscan.presentation.news.state.NewsState
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.presentation.R
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
@@ -131,9 +132,13 @@ class NewsViewModel @Inject constructor(
                     filterArticles()
                     _state.update { it.copy(isLoading = false) }
                 }
-                .onFailure {
+                .onFailure { error ->
                     _state.update {
-                        it.copy(isLoading = false, errorMessageResId = R.string.news_load_error)
+                        it.copy(
+                            isLoading = false,
+                            errorMessageResId = R.string.news_load_error,
+                            errorType = throwableToAppErrorType(error),
+                        )
                     }
                 }
         }

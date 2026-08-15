@@ -34,8 +34,14 @@ class ForgotPasswordViewModel @Inject constructor(
 
     fun onEvent(event: ForgotPasswordEvent) {
         when (event) {
-            is ForgotPasswordEvent.MethodSelected -> _state.update {
-                it.copy(selectedMethod = event.method)
+            is ForgotPasswordEvent.MethodSelected -> {
+                if (event.method == ResetMethod.EMAIL) {
+                    _state.update { it.copy(selectedMethod = event.method) }
+                } else {
+                    viewModelScope.launch {
+                        _effect.send(ForgotPasswordEffect.ShowSnackbar(messageResId = R.string.feature_coming_soon))
+                    }
+                }
             }
             is ForgotPasswordEvent.EmailChanged -> _state.update {
                 it.copy(email = event.email, emailErrorResId = null)
@@ -104,7 +110,7 @@ class ForgotPasswordViewModel @Inject constructor(
                 .onSuccess {
                     _state.update { it.copy(isLoading = false) }
                     _effect.send(
-                        ForgotPasswordEffect.ShowSnackbar(messageStr = "Code resent successfully")
+                        ForgotPasswordEffect.ShowSnackbar(messageResId = R.string.auth_code_resent_success)
                     )
                 }
                 .onFailure { throwable ->

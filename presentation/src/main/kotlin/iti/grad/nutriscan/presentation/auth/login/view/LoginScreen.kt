@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -57,7 +58,8 @@ fun LoginScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToProfileSetup: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit
+    onNavigateToForgotPassword: () -> Unit,
+    onNavigateToAccountPendingDeletion: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -99,6 +101,9 @@ fun LoginScreen(
                 is LoginEffect.NavigateToProfileSetup -> onNavigateToProfileSetup()
                 is LoginEffect.NavigateToRegister -> onNavigateToRegister()
                 is LoginEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
+                is LoginEffect.NavigateToAccountPendingDeletion -> {
+                    onNavigateToAccountPendingDeletion(effect.scheduledDeletionAt)
+                }
                 is LoginEffect.LaunchGoogleLogin -> {
                     val serviceConfig = AuthorizationServiceConfiguration(
                         Uri.parse(effect.config.authorizationEndpoint),
@@ -168,6 +173,8 @@ private fun LoginScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding())
+                .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
             // ── Teal header panel ──────────────────────────────────────────

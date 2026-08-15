@@ -49,7 +49,7 @@ class VoiceManagerImpl @Inject constructor(
             if (status == TextToSpeech.SUCCESS) {
                 isTtsInitialized = true
                 textToSpeech?.setPitch(0.92f)
-                textToSpeech?.setSpeechRate(0.88f)
+                textToSpeech?.setSpeechRate(1.2f)
                 textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {}
                     override fun onDone(utteranceId: String?) {
