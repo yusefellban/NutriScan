@@ -26,7 +26,7 @@ fun FlaggedIngredientCard(
 ) {
     Column(
         modifier = modifier
-            .width(160.dp)
+            // We remove the hardcoded width(160.dp) to let it fill the staggered column
             .border(
                 width = 1.dp,
                 color = AppTheme.colors.ProductDetailIngredientCardBorder,
@@ -46,7 +46,25 @@ fun FlaggedIngredientCard(
             maxLines = 2,
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        if (ingredient.matchTag.isNotBlank() && ingredient.matchTag != "UNKNOWN") {
+            Spacer(modifier = Modifier.height(8.dp))
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .background(
+                        color = AppTheme.colors.Gray400,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = ingredient.matchTag,
+                    style = AppTheme.typography.bodySmall.copy(fontSize = 10.sp),
+                    color = AppTheme.colors.Surface
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Reason text
         Text(
