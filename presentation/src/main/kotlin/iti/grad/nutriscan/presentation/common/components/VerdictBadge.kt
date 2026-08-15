@@ -34,8 +34,8 @@ fun VerdictBadge(
 ) {
     val (backgroundColor, textColor, textResId) = when (verdict) {
         ProductVerdict.SAFE -> Triple(AppTheme.colors.Teal1000, AppTheme.colors.Teal100, R.string.verdict_safe)
-        ProductVerdict.CAUTION -> Triple(AppTheme.colors.VerdictYellow, AppTheme.colors.ProductCardCautionText, R.string.verdict_caution)
-        ProductVerdict.UNSAFE -> Triple(AppTheme.colors.Error, AppTheme.colors.Teal100, R.string.verdict_unsafe)
+        ProductVerdict.CAUTION -> Triple(AppTheme.colors.VerdictCautionBackground, AppTheme.colors.VerdictCautionText, R.string.verdict_caution)
+        ProductVerdict.UNSAFE -> Triple(AppTheme.colors.VerdictUnsafeBackground, AppTheme.colors.VerdictUnsafeText, R.string.verdict_unsafe)
     }
 
     Box(

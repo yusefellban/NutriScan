@@ -271,7 +271,7 @@ private fun CaloriesContent(
                         stepsGoal = state.stepsGoal,
                         onClick = onNavigateToStepHistory,
                         modifier = Modifier
-                            .weight(1f)
+                            .width(126.dp)
                             .fillMaxHeight(),
                     )
                     ExerciseCard(
@@ -279,7 +279,7 @@ private fun CaloriesContent(
                         exerciseMinutes = state.exerciseMinutes,
                         onAddClick = { onEvent(CaloriesEvent.AddExerciseClicked) },
                         modifier = Modifier
-                            .weight(1.2f)
+                            .weight(1f)
                             .fillMaxHeight(),
                     )
                 }
