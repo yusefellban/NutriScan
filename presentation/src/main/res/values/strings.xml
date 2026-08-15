@@ -589,6 +589,8 @@
     <string name="step_history_daily_average">Daily average</string>
     <string name="step_history_total_steps">Total steps</string>
     <string name="step_history_steps">steps</string>
+    <string name="step_history_of_goal">of %1$s Goal</string>
+    <string name="step_history_load_error">Failed to load step history</string>
     <string name="step_history_period_week">Week</string>
     <string name="step_history_period_month">Month</string>
     <string name="step_history_period_3months">3 Months</string>

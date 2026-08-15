@@ -51,7 +51,7 @@ fun FlaggedIngredientCard(
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .background(
-                        color = AppTheme.colors.Gray400,
+                        color = AppTheme.colors.Teal1000,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -59,7 +59,7 @@ fun FlaggedIngredientCard(
                 Text(
                     text = ingredient.matchTag,
                     style = AppTheme.typography.bodySmall.copy(fontSize = 10.sp),
-                    color = AppTheme.colors.Surface
+                    color = AppTheme.colors.Teal100
                 )
             }
         }

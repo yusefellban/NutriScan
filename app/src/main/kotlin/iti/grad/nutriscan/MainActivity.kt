@@ -87,6 +87,13 @@ class MainActivity : ComponentActivity() {
                 val configuration = Configuration(baseContext.resources.configuration).apply {
                     setLocale(locale)
                 }
+                // Patch the process-wide Application Resources in place too, so contexts
+                // outside Compose (Hilt @ApplicationContext singletons, notification builders,
+                // Workers/Services) resolve strings in the chosen language as well — not just
+                // the Activity-scoped context below.
+                val appResources = baseContext.applicationContext.resources
+                appResources.updateConfiguration(configuration, appResources.displayMetrics)
+
                 // Wrap (not replace) the Activity context: Hilt's hiltViewModel() walks the
                 // ContextWrapper chain looking for the Activity, so the base context must stay
                 // the real Activity. Only resources are swapped for the localized ones.

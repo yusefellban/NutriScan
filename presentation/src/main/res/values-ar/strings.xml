@@ -566,6 +566,8 @@
     <string name="step_history_end_date">النهاية</string>
     <string name="step_history_total_steps">إجمالي الخطوات</string>
     <string name="step_history_steps">خطوة</string>
+    <string name="step_history_of_goal">من %1$s هدف</string>
+    <string name="step_history_load_error">فشل تحميل سجل الخطوات</string>
 
     <string name="daily_insight_title">رؤية يومية</string>
     <string name="step_history_period_week">أسبوع</string>

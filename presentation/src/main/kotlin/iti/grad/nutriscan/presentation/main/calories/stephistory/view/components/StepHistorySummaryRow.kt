@@ -27,7 +27,7 @@ import iti.grad.nutriscan.domain.steps.history.model.StepHistorySummary
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.components.stepHistoryCardShadow
-import java.util.Locale
+import iti.grad.nutriscan.presentation.common.util.formatHalfStep
 
 @Composable
 fun StepHistorySummaryRow(
@@ -38,7 +38,7 @@ fun StepHistorySummaryRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val distanceStr = String.format(Locale.getDefault(), "%.1f", summary?.totalDistanceKm ?: 0.0)
+        val distanceStr = (summary?.totalDistanceKm ?: 0.0).toFloat().formatHalfStep()
         
         SummaryCard(
             modifier = Modifier.weight(1f),

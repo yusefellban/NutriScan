@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,7 @@ fun StepHistoryScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -68,7 +70,7 @@ fun StepHistoryScreen(
                 is StepHistoryEffect.NavigateBack -> onNavigateBack()
                 is StepHistoryEffect.ShowError -> {
                     snackbarHostState.showAppSnackbar(
-                        message = effect.message,
+                        message = effect.message ?: context.getString(R.string.step_history_load_error),
                         type = SnackbarType.ERROR
                     )
                 }

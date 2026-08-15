@@ -64,10 +64,10 @@ class StepHistoryViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load step history"
+                        error = error.message
                     )
                 }
-                _effect.send(StepHistoryEffect.ShowError(error.message ?: "Failed to load step history"))
+                _effect.send(StepHistoryEffect.ShowError(error.message))
             }
         }
     }
