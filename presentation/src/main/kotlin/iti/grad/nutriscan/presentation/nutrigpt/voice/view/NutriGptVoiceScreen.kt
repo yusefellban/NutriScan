@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +36,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.voice.view.components.VoiceWavef
 import iti.grad.nutriscan.presentation.nutrigpt.voice.viewmodel.NutriGptVoiceViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.util.rememberAudioPermissionRequester
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsSegmentedToggle
 import iti.grad.presentation.R
 
@@ -45,6 +47,7 @@ fun NutriGptVoiceScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val haptics = LocalHapticFeedback.current
 
     fun checkAudioPermission() = ContextCompat.checkSelfPermission(
         context,
@@ -213,6 +216,7 @@ fun NutriGptVoiceScreen(
                         .clip(CircleShape)
                         .background(AppTheme.colors.ChatSendButtonBackground)
                         .clickable {
+                            haptics.tick()
                             when {
                                 state.isListening -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
                                 state.isPlaying || state.isGenerating -> viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)

@@ -30,11 +30,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.model.BottomNavTab
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.home.view.components.FloatingScanButton
 import iti.grad.presentation.R
 import kotlin.math.abs
@@ -212,13 +214,17 @@ private fun NavBarItem(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
+    val haptics = LocalHapticFeedback.current
     Box(
         modifier = Modifier
             .size(48.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = onClick,
+                onClick = {
+                    haptics.tick()
+                    onClick()
+                },
             ),
         contentAlignment = Alignment.Center,
     ) {

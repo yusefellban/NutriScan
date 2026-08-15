@@ -11,12 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.LexendDeca
+import iti.grad.nutriscan.presentation.common.util.tick
 
 /**
  * Generic 2/3-way segmented pill toggle used by the Appearance and Language rows.
@@ -50,6 +52,7 @@ private fun SettingsToggleChip(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
+    val haptics = LocalHapticFeedback.current
     Text(
         text = label,
         style = TextStyle(
@@ -75,7 +78,7 @@ private fun SettingsToggleChip(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = onClick,
+                onClick = { haptics.tick(); onClick() },
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),
     )

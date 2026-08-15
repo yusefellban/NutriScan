@@ -152,6 +152,14 @@ internal data class AppColorsExtension2(
     val ProductDetailNutritionCardBg: Color,
     val ProductDetailNutritionLabelText: Color,
     val ProductDetailNutritionText: Color,
+    /** Fixed brand hex, same in both modes — CAUTION verdict badge background. */
+    val VerdictCautionBackground: Color,
+    /** Fixed brand hex, same in both modes — CAUTION verdict badge text. */
+    val VerdictCautionText: Color,
+    /** Fixed brand hex, same in both modes — UNSAFE verdict badge background. */
+    val VerdictUnsafeBackground: Color,
+    /** Fixed brand hex, same in both modes — UNSAFE verdict badge text. */
+    val VerdictUnsafeText: Color,
 
     // --- Overlays ---
     /** Modal bottom sheet / dialog scrim. Replaces ad-hoc `Color(0x66...)` literals. */
@@ -474,6 +482,10 @@ data class AppColors internal constructor(
     val ProductDetailNutritionCardBg: Color get() = extension2.ProductDetailNutritionCardBg
     val ProductDetailNutritionLabelText: Color get() = extension2.ProductDetailNutritionLabelText
     val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
+    val VerdictCautionBackground: Color get() = extension2.VerdictCautionBackground
+    val VerdictCautionText: Color get() = extension2.VerdictCautionText
+    val VerdictUnsafeBackground: Color get() = extension2.VerdictUnsafeBackground
+    val VerdictUnsafeText: Color get() = extension2.VerdictUnsafeText
     val ScrimOverlay: Color get() = extension2.ScrimOverlay
 
     val ChatScreenBackground: Color get() = extension2.ChatScreenBackground
@@ -812,6 +824,10 @@ fun lightColors() = AppColors(
         ProductDetailNutritionLabelText = Color(0xFF777777), // Gray800
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
+        VerdictCautionBackground = Color(0xFFFFCC00),
+        VerdictCautionText = Color(0xFFFFFFFF),
+        VerdictUnsafeBackground = Color(0xFFFA4D5E),
+        VerdictUnsafeText = Color(0xFFFFFFFF),
 
         ScrimOverlay = Color(0x660F474A), // Teal1600 40% alpha — light mode scrim
         
@@ -1084,7 +1100,7 @@ fun darkColors() = AppColors(
         ProductCardCautionText = Color(0xFF0B5F65), // Teal1400
         ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
         ProductCardCaloriesText = Color(0xFF0F474A), // Teal1600
-        ProductCardSwipeContainerBackground = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeContainerBackground = Color(0xFF0A545A), // Teal1500
         ProductCardSwipeText = Color(0xFF108188), // Teal1300
         ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
 
@@ -1161,6 +1177,10 @@ fun darkColors() = AppColors(
         ProductDetailNutritionLabelText = Color(0xFF11939A), // Teal1200
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
+        VerdictCautionBackground = Color(0xFFFFCC00),
+        VerdictCautionText = Color(0xFFFFFFFF),
+        VerdictUnsafeBackground = Color(0xFFFA4D5E),
+        VerdictUnsafeText = Color(0xFFFFFFFF),
 
         ScrimOverlay = Color(0x99000000), // Black 60% alpha — dark mode scrim
         

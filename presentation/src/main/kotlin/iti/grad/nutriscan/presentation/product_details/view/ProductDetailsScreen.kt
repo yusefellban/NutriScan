@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,7 @@ import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
@@ -47,6 +49,7 @@ import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
+import iti.grad.nutriscan.presentation.product_details.view.components.ProductDetailsShimmer
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
 import iti.grad.nutriscan.presentation.product_details.viewmodel.ProductDetailsViewModel
@@ -89,6 +92,7 @@ private fun ProductDetailsContent(
     }
 
     val scrollState = rememberScrollState()
+    val haptics = LocalHapticFeedback.current
 
     Column(
         modifier = Modifier
@@ -125,7 +129,10 @@ private fun ProductDetailsContent(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = { onEvent(ProductDetailsEvent.BookmarkToggled) },
+                            onClick = {
+                                haptics.tick()
+                                onEvent(ProductDetailsEvent.BookmarkToggled)
+                            },
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -136,7 +143,7 @@ private fun ProductDetailsContent(
                         contentDescription = stringResource(
                             if (isBookmarked) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
                         ),
-                        tint = AppTheme.colors.Teal1600,
+                        tint = AppTheme.colors.CaloriesIconOnAccent,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -154,16 +161,7 @@ private fun ProductDetailsContent(
         ) {
                     when {
                         state.isLoading -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(400.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color = AppTheme.colors.Primary,
-                                )
-                            }
+                            ProductDetailsShimmer()
                         }
 
                         state.isNotFound -> {
