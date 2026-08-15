@@ -3,8 +3,6 @@ package iti.grad.nutriscan.presentation.nutrigpt.voice.view
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +34,7 @@ import iti.grad.nutriscan.presentation.nutrigpt.voice.state.NutriGptVoiceEvent
 import iti.grad.nutriscan.presentation.nutrigpt.voice.view.components.VoiceWaveform
 import iti.grad.nutriscan.presentation.nutrigpt.voice.viewmodel.NutriGptVoiceViewModel
 import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.util.rememberAudioPermissionRequester
 import iti.grad.nutriscan.presentation.settings.app.view.components.SettingsSegmentedToggle
 import iti.grad.presentation.R
 
@@ -47,15 +46,12 @@ fun NutriGptVoiceScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-        } else {
+    val requestAudioPermission = rememberAudioPermissionRequester(
+        onGranted = { viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true)) },
+        onDenied = {
             Toast.makeText(context, "Microphone permission is required", Toast.LENGTH_SHORT).show()
         }
-    }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -80,7 +76,7 @@ fun NutriGptVoiceScreen(
         if (hasPermission) {
             viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
         } else {
-            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            requestAudioPermission()
         }
     }
 
@@ -191,14 +187,18 @@ fun NutriGptVoiceScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(AppTheme.colors.Primary)
+                    .background(AppTheme.colors.ChatSendButtonBackground)
                     .clickable {
-                        if (state.isListening) {
-                            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
-                        } else if (state.isPlaying || state.isGenerating) {
-                            viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
-                        } else {
-                            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
+                        val hasPermission = ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.RECORD_AUDIO
+                        ) == PackageManager.PERMISSION_GRANTED
+
+                        when {
+                            !hasPermission -> requestAudioPermission()
+                            state.isListening -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(false))
+                            state.isPlaying || state.isGenerating -> viewModel.onEvent(NutriGptVoiceEvent.StopPlaying)
+                            else -> viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -206,7 +206,7 @@ fun NutriGptVoiceScreen(
                 Icon(
                     imageVector = if (state.isPlaying || state.isGenerating) Icons.Rounded.FastForward else Icons.Rounded.Mic,
                     contentDescription = "Action",
-                    tint = Color.White,
+                    tint = AppTheme.colors.ChatSendButtonIcon,
                     modifier = Modifier.size(36.dp)
                 )
             }

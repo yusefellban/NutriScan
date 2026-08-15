@@ -45,7 +45,7 @@ fun NutriGptEmptyState(modifier: Modifier = Modifier) {
             color = AppTheme.colors.PrimaryVariant,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
         
         Text(

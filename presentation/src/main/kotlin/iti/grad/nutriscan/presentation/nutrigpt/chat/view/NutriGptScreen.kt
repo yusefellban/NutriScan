@@ -8,8 +8,6 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.Box
@@ -46,6 +44,7 @@ import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.rememberAudioPermissionRequester
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
@@ -109,22 +108,23 @@ fun NutriGptScreen(
         }
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
-            }
-            speechRecognizer?.startListening(intent)
-            viewModel.onEvent(NutriGptEvent.SetListeningState(true))
-        } else {
+    fun startSpeechRecognition() {
+        val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
+        }
+        speechRecognizer?.startListening(intent)
+        viewModel.onEvent(NutriGptEvent.SetListeningState(true))
+    }
+
+    val requestAudioPermission = rememberAudioPermissionRequester(
+        onGranted = { startSpeechRecognition() },
+        onDenied = {
             Toast.makeText(context, "Microphone permission is required for voice input", Toast.LENGTH_SHORT).show()
         }
-    }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -222,18 +222,11 @@ fun NutriGptScreen(
                         context,
                         Manifest.permission.RECORD_AUDIO
                     ) == PackageManager.PERMISSION_GRANTED
-                    
+
                     if (hasPermission) {
-                        val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
-                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
-                        }
-                        speechRecognizer?.startListening(intent)
-                        viewModel.onEvent(NutriGptEvent.SetListeningState(true))
+                        startSpeechRecognition()
                     } else {
-                        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        requestAudioPermission()
                     }
                 },
                 onMicRelease = {
