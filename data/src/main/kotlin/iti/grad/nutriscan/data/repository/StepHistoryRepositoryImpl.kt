@@ -116,8 +116,9 @@ class StepHistoryRepositoryImpl @Inject constructor(
         StepHistoryPeriod.MONTH -> eachDay(startDate, endDate)
             .chunked(7)
             .mapIndexed { index, week ->
+                val weekWord = if (Locale.getDefault().language == "ar") "الأسبوع" else "Week"
                 MonthlyStepData(
-                    monthLabel = "Week ${index + 1}",
+                    monthLabel = "$weekWord ${index + 1}",
                     totalSteps = week.sumOf { stepsByDate[it] ?: 0 },
                 )
             }
