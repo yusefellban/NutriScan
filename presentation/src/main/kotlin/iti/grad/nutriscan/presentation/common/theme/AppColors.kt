@@ -71,6 +71,10 @@ internal data class AppColorsExtension(
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
     
+    // --- Food Log Card (Calories "Daily Products") ---
+    val FoodLogCardBackground: Color,
+    val FoodLogDashedBoxBackground: Color,
+
     // --- Product Card ---
     val ProductCardBackground: Color,
     val SavedSearchBarBorder: Color,
@@ -413,6 +417,9 @@ data class AppColors internal constructor(
     val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
     val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
 
+    val FoodLogCardBackground: Color get() = extension.FoodLogCardBackground
+    val FoodLogDashedBoxBackground: Color get() = extension.FoodLogDashedBoxBackground
+
     val ProductCardBackground: Color get() = extension.ProductCardBackground
     val SavedSearchBarBorder: Color get() = extension.SavedSearchBarBorder
     val ProductCardNameText: Color get() = extension.ProductCardNameText
@@ -743,6 +750,10 @@ fun lightColors() = AppColors(
         ShadowMaleSelected = Color(0x6613A4AB),
         ShadowDobActive = Color(0x6613A4AB),
         
+        // Food Log Card (Calories "Daily Products")
+        FoodLogCardBackground = Color(0xFFE8FAFA), // Teal100
+        FoodLogDashedBoxBackground = Color(0xFFFFFFFF), // White
+
         // Product Card
         ProductCardBackground = Color(0xFFFFFFFF), // White
         SavedSearchBarBorder = Color(0xFFC0C0C0), // Gray500
@@ -1093,6 +1104,10 @@ fun darkColors() = AppColors(
         ShadowMaleSelected = Color(0x9975DEE3),
         ShadowDobActive = Color(0x9975DEE3),
         
+        // Food Log Card (Calories "Daily Products")
+        FoodLogCardBackground = Color(0xFF0E4648),
+        FoodLogDashedBoxBackground = Color(0xFF095D61),
+
         // Product Card
         ProductCardBackground = Color(0xFF0A545A), // Teal1500
         SavedSearchBarBorder = Color(0xFF0F8389), // Teal1200

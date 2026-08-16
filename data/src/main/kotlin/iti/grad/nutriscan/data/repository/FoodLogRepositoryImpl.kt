@@ -115,6 +115,25 @@ class FoodLogRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun removeFoodEntryCompletely(entryId: String): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val userId = resolveUserId()
+            val existing = dao.getByIdForUser(entryId, userId)
+            val scanId = existing?.productId ?: entryId
+
+            Log.d(TAG, "removeFoodEntryCompletely: scanId=$scanId mealCnt=${existing?.mealCnt} — removing all servings, will DELETE")
+            dao.markDeletedForUser(entryId, userId)
+            val deleteResult = dailyTrackingRepository.deleteMeal(today(), scanId)
+            if (deleteResult.isSuccess) {
+                dao.hardDelete(entryId)
+                Log.d(TAG, "removeFoodEntryCompletely: DELETE OK for scanId=$scanId — row hard-deleted")
+            } else {
+                Log.e(TAG, "removeFoodEntryCompletely: DELETE FAILED for scanId=$scanId — tombstone kept, worker will retry", deleteResult.exceptionOrNull())
+            }
+            Unit
+        }
+    }
+
     /** Fails rather than falling back to a shared device-local id: that fallback made every
      * account on the device read and write the same rows, and it engaged for *every* signed-in
      * user because getCurrentUserId() was null until it learned to read the access token. Callers
