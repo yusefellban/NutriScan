@@ -154,6 +154,21 @@ class SavedViewModelTest {
         }
 
         @Test
+        fun `SwipeToAddTriggered invokes onResult with true on success, false on failure`() = runTest {
+            coEvery { addFoodEntryUseCase(any()) } returns Result.success(Unit)
+            var successResult: Boolean? = null
+            viewModel.onEvent(SavedEvent.SwipeToAddTriggered("1", onResult = { successResult = it }))
+            testScheduler.runCurrent()
+            Assertions.assertEquals(true, successResult)
+
+            coEvery { addFoodEntryUseCase(any()) } returns Result.failure(IllegalStateException("Not authenticated"))
+            var failureResult: Boolean? = null
+            viewModel.onEvent(SavedEvent.SwipeToAddTriggered("1", onResult = { failureResult = it }))
+            testScheduler.runCurrent()
+            Assertions.assertEquals(false, failureResult)
+        }
+
+        @Test
         fun `SwipeToAddTriggered with an unknown product id is a no-op`() = runTest {
             viewModel.effect.test {
                 viewModel.onEvent(SavedEvent.SwipeToAddTriggered("unknown-id"))

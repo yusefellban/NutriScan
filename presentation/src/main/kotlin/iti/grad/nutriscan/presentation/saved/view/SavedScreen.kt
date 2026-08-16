@@ -182,7 +182,9 @@ private fun SavedScreenContent(
                     SavedProductGrid(
                         products = state.filteredProducts,
                         onProductClick = { product -> onEvent(SavedEvent.ProductClicked(product)) },
-                        onSwipeToAdd = { productId -> onEvent(SavedEvent.SwipeToAddTriggered(productId)) },
+                        onSwipeToAdd = { productId, onResult ->
+                            onEvent(SavedEvent.SwipeToAddTriggered(productId, onResult))
+                        },
                         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 16.dp, bottom = bottomPadding + 4.dp),
                     )
                 }
