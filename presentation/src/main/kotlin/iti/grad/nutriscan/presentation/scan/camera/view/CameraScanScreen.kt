@@ -42,15 +42,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -59,6 +60,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
@@ -78,9 +82,6 @@ import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanFrameOver
 import iti.grad.nutriscan.presentation.scan.camera.view.components.ScanModeSelector
 import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
 import iti.grad.presentation.R
-import com.canhub.cropper.CropImageContract
-import com.canhub.cropper.CropImageContractOptions
-import com.canhub.cropper.CropImageOptions
 import java.io.File
 import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.collectLatest
@@ -89,37 +90,38 @@ import kotlinx.coroutines.launch
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun CameraScanScreen(
-    viewModel: CameraScanViewModel = hiltViewModel(),
-    bottomPadding: Dp = 0.dp,
-    snackbarHostState: SnackbarHostState,
-    captureTrigger: Int = 0,
-    onCenterActionUploadModeChanged: (Boolean) -> Unit = {},
-    onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
+        viewModel: CameraScanViewModel = hiltViewModel(),
+        bottomPadding: Dp = 0.dp,
+        snackbarHostState: SnackbarHostState,
+        captureTrigger: Int = 0,
+        onCenterActionUploadModeChanged: (Boolean) -> Unit = {},
+        onNavigateToProductDetail: (ProductUiModel) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
     val imageCapture = remember {
-        ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .build()
+        ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
     }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
-    val mediaActionSound = remember { MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) } }
+    val mediaActionSound = remember {
+        MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) }
+    }
     val flashAlpha = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
     // Create the ML Kit barcode analyzer and run it alongside ImageCapture in PHOTO mode.
     // Keyed on selectedMode so it is re-created (and the old one discarded) on mode switches.
-    val barcodeAnalyzer: ImageAnalysis.Analyzer? = remember(state.selectedMode) {
-        if (state.selectedMode == ScanInputMode.PHOTO) {
-            BarcodeScanAnalyzer { barcode, bounds ->
-                viewModel.onEvent(CameraScanEvent.BarcodeDetected(barcode, bounds))
+    val barcodeAnalyzer: ImageAnalysis.Analyzer? =
+            remember(state.selectedMode) {
+                if (state.selectedMode == ScanInputMode.PHOTO) {
+                    BarcodeScanAnalyzer { barcode, bounds ->
+                        viewModel.onEvent(CameraScanEvent.BarcodeDetected(barcode, bounds))
+                    }
+                } else {
+                    null
+                }
             }
-        } else {
-            null
-        }
-    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -132,82 +134,87 @@ fun CameraScanScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                val granted = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
+                val granted =
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                                PackageManager.PERMISSION_GRANTED
                 if (granted) {
                     viewModel.onEvent(CameraScanEvent.PermissionResult(true))
                 }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     var permissionRequestedFromButton by remember { mutableStateOf(false) }
     var permissionRequestedAt by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
-        if (!granted && permissionRequestedFromButton) {
-            val timeElapsed = System.currentTimeMillis() - permissionRequestedAt
-            if (timeElapsed < 350) {
-                val intent = Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.fromParts("package", context.packageName, null)
+    val permissionLauncher =
+            rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+            ) { granted ->
+                viewModel.onEvent(CameraScanEvent.PermissionResult(granted))
+                if (!granted && permissionRequestedFromButton) {
+                    val timeElapsed = System.currentTimeMillis() - permissionRequestedAt
+                    if (timeElapsed < 350) {
+                        val intent =
+                                Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", context.packageName, null)
+                                )
+                        context.startActivity(intent)
+                    }
+                }
+                permissionRequestedFromButton = false
+            }
+
+    val cropLauncher =
+            rememberLauncherForActivityResult(
+                    contract = CropImageContract(),
+            ) { result ->
+                if (result.isSuccessful) {
+                    val uriContent = result.uriContent
+                    if (uriContent == null) {
+                        viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
+                        return@rememberLauncherForActivityResult
+                    }
+                    val galleryFile =
+                            runCatching { copyUriToCacheFile(uriContent, context) }.getOrNull()
+                    if (galleryFile == null) {
+                        viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
+                    } else {
+                        viewModel.onEvent(CameraScanEvent.GalleryImageSelected(galleryFile))
+                    }
+                } else {
+                    // User cancelled cropping, we treat it as if they cancelled picking
+                    viewModel.onEvent(CameraScanEvent.GalleryPickCancelled)
+                }
+            }
+
+    val galleryLauncher =
+            rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent(),
+            ) { uri: Uri? ->
+                if (uri == null) {
+                    viewModel.onEvent(CameraScanEvent.GalleryPickCancelled)
+                    return@rememberLauncherForActivityResult
+                }
+
+                cropLauncher.launch(
+                        CropImageContractOptions(
+                                uri = uri,
+                                cropImageOptions =
+                                        CropImageOptions(
+                                                imageSourceIncludeGallery = false,
+                                                imageSourceIncludeCamera = false,
+                                                guidelines =
+                                                        com.canhub.cropper.CropImageView.Guidelines
+                                                                .ON,
+                                                showIntentChooser = false,
+                                        )
+                        )
                 )
-                context.startActivity(intent)
             }
-        }
-        permissionRequestedFromButton = false
-    }
-
-    val cropLauncher = rememberLauncherForActivityResult(
-        contract = CropImageContract(),
-    ) { result ->
-        if (result.isSuccessful) {
-            val uriContent = result.uriContent
-            if (uriContent == null) {
-                viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
-                return@rememberLauncherForActivityResult
-            }
-            val galleryFile = runCatching { copyUriToCacheFile(uriContent, context) }.getOrNull()
-            if (galleryFile == null) {
-                viewModel.onEvent(CameraScanEvent.GalleryPickFailed)
-            } else {
-                viewModel.onEvent(CameraScanEvent.GalleryImageSelected(galleryFile))
-            }
-        } else {
-            // User cancelled cropping, we treat it as if they cancelled picking
-            viewModel.onEvent(CameraScanEvent.GalleryPickCancelled)
-        }
-    }
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-    ) { uri: Uri? ->
-        if (uri == null) {
-            viewModel.onEvent(CameraScanEvent.GalleryPickCancelled)
-            return@rememberLauncherForActivityResult
-        }
-
-        cropLauncher.launch(
-            CropImageContractOptions(
-                uri = uri,
-                cropImageOptions = CropImageOptions(
-                    imageSourceIncludeGallery = false,
-                    imageSourceIncludeCamera = false,
-                    guidelines = com.canhub.cropper.CropImageView.Guidelines.ON,
-                    showIntentChooser = false,
-                )
-            )
-        )
-    }
 
     LaunchedEffect(state.selectedMode) {
         onCenterActionUploadModeChanged(state.selectedMode == ScanInputMode.GALLERY)
@@ -226,29 +233,27 @@ fun CameraScanScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is CameraScanEffect.ShowSnackBarRes ->
-                    snackbarHostState.showAppSnackbar(
-                        message = context.getString(effect.messageResId),
-                        type = SnackbarType.WARNING,
-                    )
-
+                        snackbarHostState.showAppSnackbar(
+                                message = context.getString(effect.messageResId),
+                                type = SnackbarType.WARNING,
+                        )
                 is CameraScanEffect.ShowSnackBar ->
-                    snackbarHostState.showAppSnackbar(
-                        message = effect.message,
-                        type = effect.snackbarType,
-                    )
-
+                        snackbarHostState.showAppSnackbar(
+                                message = effect.message,
+                                type = effect.snackbarType,
+                        )
                 is CameraScanEffect.RequestCameraPermission -> {
-                    val granted = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.CAMERA,
-                    ) == PackageManager.PERMISSION_GRANTED
+                    val granted =
+                            ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.CAMERA,
+                            ) == PackageManager.PERMISSION_GRANTED
                     if (granted) {
                         viewModel.onEvent(CameraScanEvent.PermissionResult(true))
                     } else {
                         permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
                 }
-
                 is CameraScanEffect.TakePicture -> {
                     haptics.tick()
                     coroutineScope.launch {
@@ -260,24 +265,24 @@ fun CameraScanScreen(
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
                     imageCapture.takePicture(
-                        outputOptions,
-                        cameraExecutor,
-                        object : ImageCapture.OnImageSavedCallback {
-                            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                viewModel.onEvent(CameraScanEvent.ImageCaptured(photoFile))
-                            }
+                            outputOptions,
+                            cameraExecutor,
+                            object : ImageCapture.OnImageSavedCallback {
+                                override fun onImageSaved(
+                                        outputFileResults: ImageCapture.OutputFileResults
+                                ) {
+                                    viewModel.onEvent(CameraScanEvent.ImageCaptured(photoFile))
+                                }
 
-                            override fun onError(exception: ImageCaptureException) {
-                                viewModel.onEvent(CameraScanEvent.ImageCaptureFailed(exception))
-                            }
-                        },
+                                override fun onError(exception: ImageCaptureException) {
+                                    viewModel.onEvent(CameraScanEvent.ImageCaptureFailed(exception))
+                                }
+                            },
                     )
                 }
-
                 is CameraScanEffect.OpenGalleryPicker -> {
                     galleryLauncher.launch("image/*")
                 }
-
                 is CameraScanEffect.NavigateToProductDetail -> {
                     onNavigateToProductDetail(effect.product)
                 }
@@ -296,35 +301,35 @@ fun CameraScanScreen(
     }
 
     CameraScanContent(
-        state = state,
-        imageCapture = imageCapture,
-        barcodeAnalyzer = barcodeAnalyzer,
-        onEvent = handleEvent,
-        bottomPadding = bottomPadding,
-        flashAlpha = flashAlpha.value,
+            state = state,
+            imageCapture = imageCapture,
+            barcodeAnalyzer = barcodeAnalyzer,
+            onEvent = handleEvent,
+            bottomPadding = bottomPadding,
+            flashAlpha = flashAlpha.value,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CameraScanContent(
-    state: CameraScanState,
-    imageCapture: ImageCapture,
-    barcodeAnalyzer: ImageAnalysis.Analyzer?,
-    onEvent: (CameraScanEvent) -> Unit,
-    bottomPadding: Dp,
-    flashAlpha: Float,
+        state: CameraScanState,
+        imageCapture: ImageCapture,
+        barcodeAnalyzer: ImageAnalysis.Analyzer?,
+        onEvent: (CameraScanEvent) -> Unit,
+        bottomPadding: Dp,
+        flashAlpha: Float,
 ) {
     val context = LocalContext.current
 
     if (state.showDeleteDialog) {
         DeleteWarningAlert(
-            title = stringResource(id = R.string.alert_remove_saved_title),
-            message = stringResource(id = R.string.alert_remove_saved_message),
-            confirmText = stringResource(id = R.string.action_remove),
-            cancelText = stringResource(id = R.string.action_cancel),
-            onConfirm = { onEvent(CameraScanEvent.ConfirmDeleteBookmark) },
-            onDismiss = { onEvent(CameraScanEvent.DismissDeleteBookmark) },
+                title = stringResource(id = R.string.alert_remove_saved_title),
+                message = stringResource(id = R.string.alert_remove_saved_message),
+                confirmText = stringResource(id = R.string.action_remove),
+                cancelText = stringResource(id = R.string.action_cancel),
+                onConfirm = { onEvent(CameraScanEvent.ConfirmDeleteBookmark) },
+                onDismiss = { onEvent(CameraScanEvent.DismissDeleteBookmark) },
         )
     }
 
@@ -338,59 +343,58 @@ private fun CameraScanContent(
         when {
             state.hasCameraPermission && !isGalleryMode -> {
                 CameraPreview(
-                    isScanning = state.isScanning,
-                    imageCapture = imageCapture,
-                    barcodeAnalyzer = barcodeAnalyzer,
-                    isPreviewActive = true,
-                    modifier = Modifier.fillMaxSize(),
+                        isScanning = state.isScanning,
+                        imageCapture = imageCapture,
+                        barcodeAnalyzer = barcodeAnalyzer,
+                        isPreviewActive = true,
+                        modifier = Modifier.fillMaxSize(),
                 )
                 if (flashAlpha > 0f) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White.copy(alpha = flashAlpha)),
+                            modifier =
+                                    Modifier.fillMaxSize()
+                                            .background(Color.White.copy(alpha = flashAlpha)),
                     )
                 }
                 // AR overlay renders in PHOTO mode whenever a barcode is detected in-frame.
                 if (state.selectedMode == ScanInputMode.PHOTO) {
                     BarcodeArOverlay(
-                        normalizedBounds      = state.detectedBarcodeBounds,
-                        barcodeValue          = state.trackedBarcodeValue,
-                        isLocked              = state.isProcessingCenterAction,
-                        onBarcodeChipClicked  = { onEvent(CameraScanEvent.BarcodeChipClicked) },
-                        modifier              = Modifier.fillMaxSize(),
+                            normalizedBounds = state.detectedBarcodeBounds,
+                            barcodeValue = state.trackedBarcodeValue,
+                            isLocked = state.isProcessingCenterAction,
+                            onBarcodeChipClicked = { onEvent(CameraScanEvent.BarcodeChipClicked) },
+                            modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
-
             state.permissionDenied && !isGalleryMode -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(AppTheme.colors.Background),
-                    contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().background(AppTheme.colors.Background),
+                        contentAlignment = Alignment.Center,
                 ) {
                     CameraPermissionDeniedContent(
-                        onRetry = {
-                            onEvent(CameraScanEvent.RequestPermissionClicked)
-                        },
+                            onRetry = { onEvent(CameraScanEvent.RequestPermissionClicked) },
                     )
                 }
             }
-
             else -> {
                 if (isGalleryMode && !galleryPreviewPath.isNullOrBlank()) {
                     AsyncImage(
-                        model = galleryPreviewPath,
-                        contentDescription = stringResource(R.string.scan_gallery_selected_image_content_description),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize(),
+                            model = galleryPreviewPath,
+                            contentDescription =
+                                    stringResource(
+                                            R.string.scan_gallery_selected_image_content_description
+                                    ),
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize(),
                     )
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(AppTheme.colors.Background.copy(alpha = 0.94f)),
+                            modifier =
+                                    Modifier.fillMaxSize()
+                                            .background(
+                                                    AppTheme.colors.Background.copy(alpha = 0.94f)
+                                            ),
                     )
                 }
             }
@@ -399,23 +403,23 @@ private fun CameraScanContent(
         // Scan beam overlay — shown only in camera (PHOTO) mode while actively scanning
         if (!state.permissionDenied && !isGalleryMode && state.isScanning) {
             ScanFrameOverlay(
-                selectedMode = state.selectedMode,
-                modifier = Modifier.fillMaxSize(),
+                    selectedMode = state.selectedMode,
+                    modifier = Modifier.fillMaxSize(),
             )
         }
 
         Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 78.dp, start = 20.dp, end = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                modifier =
+                        Modifier.align(Alignment.TopCenter)
+                                .padding(top = 78.dp, start = 20.dp, end = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Crossfade(targetState = state.selectedMode, label = "scanModeHint") { mode ->
                 Text(
-                    text = stringResource(mode.hintResId),
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.OnPrimary,
-                    textAlign = TextAlign.Center,
+                        text = stringResource(mode.hintResId),
+                        style = AppTheme.typography.bodyMedium,
+                        color = AppTheme.colors.OnPrimary,
+                        textAlign = TextAlign.Center,
                 )
             }
         }
@@ -425,81 +429,95 @@ private fun CameraScanContent(
             // every time a different scan arrives, so the box never carries over a stale
             // dismissed offset from the previous swipe.
             key(scan.scanId) {
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { dismissValue ->
-                        if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
-                            onEvent(CameraScanEvent.DismissScanClicked)
-                            true
-                        } else {
-                            false
-                        }
-                    },
-                )
-                
+                // rememberSwipeToDismissBoxState only runs this init block once per key(scanId) —
+                // reading `scan` directly here would forever see the isProcessing=true snapshot
+                // from the first composition, blocking the swipe even after it later fails.
+                val latestScan by rememberUpdatedState(scan)
+                val dismissState =
+                        rememberSwipeToDismissBoxState(
+                                confirmValueChange = { dismissValue ->
+                                    if (latestScan.isProcessing) {
+                                        // Block the swipe while a submit/poll is in flight — spring
+                                        // back
+                                        // instead of visually dismissing a card the ViewModel won't
+                                        // clear.
+                                        false
+                                    } else if (dismissValue == SwipeToDismissBoxValue.EndToStart ||
+                                                    dismissValue ==
+                                                            SwipeToDismissBoxValue.StartToEnd
+                                    ) {
+                                        onEvent(CameraScanEvent.DismissScanClicked)
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                },
+                        )
+
                 SwipeToDismissBox(
-                    state = dismissState,
-                    backgroundContent = {},
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .padding(bottom = activeScanBottomOffset),
+                        state = dismissState,
+                        backgroundContent = {},
+                        modifier =
+                                Modifier.align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .padding(bottom = activeScanBottomOffset),
                 ) {
                     ActiveScanCard(
-                        scan = scan,
-                        onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
-                        onCardClick = { onEvent(CameraScanEvent.CardClicked) },
-                        onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
+                            scan = scan,
+                            onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
+                            onCardClick = { onEvent(CameraScanEvent.CardClicked) },
+                            onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
                     )
                 }
             }
 
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = separatorBottomOffset)
-                    .width(72.dp)
-                    .height(4.dp)
-                    .background(
-                        color = AppTheme.colors.OnPrimary.copy(alpha = 0.32f),
-                        shape = RoundedCornerShape(50),
-                    ),
+                    modifier =
+                            Modifier.align(Alignment.BottomCenter)
+                                    .padding(bottom = separatorBottomOffset)
+                                    .width(72.dp)
+                                    .height(4.dp)
+                                    .background(
+                                            color = AppTheme.colors.OnPrimary.copy(alpha = 0.32f),
+                                            shape = RoundedCornerShape(50),
+                                    ),
             )
         }
 
-
         ScanModeSelector(
-            selectedMode = state.selectedMode,
-            hasSelectedGalleryImage = !state.pendingGalleryImagePath.isNullOrBlank() ||
-                (state.selectedMode == ScanInputMode.GALLERY && !state.activeScan?.thumbnailUrl.isNullOrBlank()),
-            onModeSelected = { onEvent(CameraScanEvent.ModeSelected(it)) },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = optionsBottomOffset),
+                selectedMode = state.selectedMode,
+                hasSelectedGalleryImage =
+                        !state.pendingGalleryImagePath.isNullOrBlank() ||
+                                (state.selectedMode == ScanInputMode.GALLERY &&
+                                        !state.activeScan?.thumbnailUrl.isNullOrBlank()),
+                onModeSelected = { onEvent(CameraScanEvent.ModeSelected(it)) },
+                modifier =
+                        Modifier.align(Alignment.BottomCenter)
+                                .padding(bottom = optionsBottomOffset),
         )
-
     }
 }
 
 @Composable
 private fun CameraPermissionDeniedContent(
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
+        onRetry: () -> Unit,
+        modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = stringResource(R.string.scan_camera_permission_denied),
-            style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.TextPrimary,
-            textAlign = TextAlign.Center,
+                text = stringResource(R.string.scan_camera_permission_denied),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.TextPrimary,
+                textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(24.dp))
         AppButton(
-            textResId = R.string.scan_camera_permission_retry,
-            isLoading = false,
-            onClick = onRetry,
+                textResId = R.string.scan_camera_permission_retry,
+                isLoading = false,
+                onClick = onRetry,
         )
     }
 }
@@ -507,9 +525,8 @@ private fun CameraPermissionDeniedContent(
 private fun copyUriToCacheFile(uri: Uri, context: Context): File {
     val file = File(context.cacheDir, "gallery_scan_${System.currentTimeMillis()}.jpg")
     context.contentResolver.openInputStream(uri)?.use { input ->
-        file.outputStream().use { output ->
-            input.copyTo(output)
-        }
-    } ?: error("Failed to open selected image")
+        file.outputStream().use { output -> input.copyTo(output) }
+    }
+            ?: error("Failed to open selected image")
     return file
 }
