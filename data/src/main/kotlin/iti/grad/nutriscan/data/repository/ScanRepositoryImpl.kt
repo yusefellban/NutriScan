@@ -2,6 +2,8 @@ package iti.grad.nutriscan.data.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import iti.grad.nutriscan.data.db.dao.ScannedProductDao
+import iti.grad.nutriscan.data.db.entity.ScannedProductEntity
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
 import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
@@ -28,6 +30,7 @@ class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
     private val scanApiService: ScanApiService,
     private val authRepository: IAuthRepository,
+    private val scannedProductDao: ScannedProductDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IScanRepository {
 
@@ -41,33 +44,54 @@ class ScanRepositoryImpl @Inject constructor(
 
     override suspend fun getProductByBarcode(barcode: String): Result<ProductResult> {
         return withContext(ioDispatcher) {
+            val cleanBarcode = barcode.trim()
             try {
-                val cleanBarcode = barcode.trim()
                 val response = openFoodFactsApiService.getProduct(cleanBarcode)
                 if (response.status == 1 && response.product != null) {
                     val product = response.product
                     val name = product.productName ?: product.productNameFr
                     val brand = product.brands
                     val imageUrl = product.imageFrontSmallUrl
-                    val healthTag = product.ecoscoreGrade?.uppercase() 
+                    val healthTag = product.ecoscoreGrade?.uppercase()
                         ?: product.nutritionGradesTags?.firstOrNull()?.uppercase()
-                    
-                    Result.success(
-                        ProductResult(
-                            barcode = barcode,
+
+                    val result = ProductResult(
+                        barcode = barcode,
+                        productName = name,
+                        brand = brand,
+                        imageUrl = imageUrl,
+                        healthTag = healthTag
+                    )
+                    scannedProductDao.insert(
+                        ScannedProductEntity(
+                            barcode = cleanBarcode,
                             productName = name,
                             brand = brand,
                             imageUrl = imageUrl,
-                            healthTag = healthTag
+                            healthTag = healthTag,
                         )
                     )
+                    Result.success(result)
                 } else if (response.status == 0) {
                     Result.failure(Exception("Not in OpenFoodFacts DB"))
                 } else {
                     Result.failure(Exception("Unknown API Error: Status ${response.status}"))
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                val cached = scannedProductDao.getByBarcode(cleanBarcode)
+                if (cached != null) {
+                    Result.success(
+                        ProductResult(
+                            barcode = barcode,
+                            productName = cached.productName,
+                            brand = cached.brand,
+                            imageUrl = cached.imageUrl,
+                            healthTag = cached.healthTag,
+                        )
+                    )
+                } else {
+                    Result.failure(e)
+                }
             }
         }
     }

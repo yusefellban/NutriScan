@@ -21,29 +21,34 @@ truth, remote fetch merged/written into Room, exposed as a `Flow` from the DAO, 
 | `WorkoutRepositoryImpl` | `WorkoutLogDao` |
 | `StepHistoryRepositoryImpl` | `DailyTrackingDao` (no separate step table) |
 
-## Gaps — network-only, blank/error screen with no connectivity
+## Fixed (2026-08-16) — cache-fallback pattern, see `docs/plans/2026-08-16-offline-first-gaps.md`
 
-### 1. `ExercisesRepositoryImpl` — cheapest fix, table already exists
-- `ExercisesDao` / `ExerciseEntity` / `ExerciseCategoryEntity` already exist in the Room schema.
-- But `getExercises()`, `getExerciseById()`, `getCategories()` call `api.*` directly — no DAO
-  read/write in the fetch path. The schema is dead weight until this is wired up.
-- **Work**: follow `FoodLogRepositoryImpl`'s shape — write remote results into `ExercisesDao` on
-  fetch, read from the DAO `Flow` as the source of truth, merge like the other repos above.
+### `ExercisesRepositoryImpl` — was already fine, audit was stale
+Re-checked the source: `getExercises()`/`getExerciseById()`/`getCategories()` already write
+through to `ExercisesDao` on a successful fetch and `.recoverCatching` back to the DAO on failure.
+This audit's original claim ("no DAO read/write in the fetch path") no longer matches the code —
+no work needed here.
 
-### 2. `ScanRepositoryImpl` — biggest gap, core flow
-- Pure `OpenFoodFactsApiService` / `ScanApiService` calls. No DAO/entity for scan *lookups* at all
-  (only `SavedScanEntity` exists, and that's for user-saved favorites, not general scan results).
-- Barcode/product scanning is fully network-only today — no connectivity means a blank/error result
-  for the app's core feature.
-- **Work**: needs a new entity/DAO for scanned-product results (at minimum cache-by-barcode), then
-  the same read-DAO-first-then-refresh pattern.
+### `ScanRepositoryImpl` — fixed
+Added `ScannedProductEntity` (keyed by barcode) + `ScannedProductDao`. `getProductByBarcode()` now
+writes a successful OpenFoodFacts lookup to Room and falls back to the cached row on failure — a
+previously-scanned barcode resolves offline. `getRecentScans()`'s in-memory cache is unchanged
+(works within a process lifetime; not persisted across restarts — lower priority, not the "blank
+screen offline" case).
 
-### 3. `NewsRepositoryImpl`
-- `NewsApiService` only, no `NewsEntity`/DAO anywhere in `db/entity` or `db/dao`.
-- Offline = empty headlines/search.
-- **Work**: add `NewsEntity` + DAO, cache last-fetched articles, merge like `FoodLogRepositoryImpl`.
+### `NewsRepositoryImpl` — fixed
+Added `NewsArticleEntity` (keyed by `url` + `feedKey`, so the headlines feed and each search never
+collide) + `NewsDao`. Headlines and search both cache-write on success and cache-read on failure,
+same shape as `ExercisesRepositoryImpl`.
 
-### 4. `NutriGptRepositoryImpl`
+Room version bumped 17 → 18 (`fallbackToDestructiveMigration()`, no manual migration needed — see
+`NutriScanDatabase` kdoc). Tests: `NewsRepositoryImplTest.kt` (new),
+`ScanRepositoryImplTest.kt` (extended) cover cache-write-on-success and cache-fallback-on-failure
+for both.
+
+## Open — needs product confirmation before building
+
+### `NutriGptRepositoryImpl`
 - `NutriGptApiService` only. Chat history lives in an in-memory `MutableStateFlow` — no persistence
   entity at all, so history is lost on app relaunch, not just offline.
 - **Work**: add a chat-message entity/DAO if persistence across relaunches is wanted; otherwise this
