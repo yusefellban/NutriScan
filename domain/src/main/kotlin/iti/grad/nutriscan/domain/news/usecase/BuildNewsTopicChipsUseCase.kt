@@ -13,6 +13,13 @@ import javax.inject.Inject
  * disease/allergy the current user actually has on file (matched against the full
  * catalog to resolve id -> display name). Zero conditions/allergies on file -> only
  * "All" is shown.
+ *
+ * All three inputs are live, backend-synced flows (see the [GetUserProfileUseCase],
+ * [GetDiseasesUseCase], [GetAllergiesUseCase] repositories): each self-triggers a
+ * network sync on first subscription and then polls periodically, so this use case
+ * does not need to trigger its own fetch. `combine` only emits once all three have
+ * produced at least one value, so on a cold start the chip row can briefly stay at
+ * "All" until the profile + catalogs finish their first sync.
  */
 class BuildNewsTopicChipsUseCase @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
