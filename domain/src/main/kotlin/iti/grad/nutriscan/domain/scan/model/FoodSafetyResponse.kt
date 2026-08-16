@@ -19,13 +19,16 @@ data class ScanFlaggedIngredient(
 
 /**
  * The AI food-safety evaluation for a scanned product.
- * Contains the overall verdict and the list of flagged ingredients.
+ * Contains the overall verdict, the list of flagged ingredients,
+ * and per-family-member alerts.
  *
  * ⚠️ Health-critical: verdict must never be silently defaulted —
  * a null verdict means analysis is still in progress or failed.
+ * familyAlerts must never be truncated or discarded.
  */
 data class FoodSafetyResponse(
     val verdict: ProductVerdict?,
     val flaggedIngredients: List<ScanFlaggedIngredient>,
     val summary: String?,
+    val familyAlerts: List<FamilyAlert> = emptyList(),
 )

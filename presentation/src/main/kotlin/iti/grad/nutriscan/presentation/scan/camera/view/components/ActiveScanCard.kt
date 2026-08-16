@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +42,8 @@ import iti.grad.nutriscan.presentation.common.components.VerdictBadge
 import iti.grad.nutriscan.presentation.common.components.customShadow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.scan.camera.state.ActiveScanUiModel
+import iti.grad.nutriscan.domain.scan.model.FamilyAlert
+import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.presentation.R
 
 @Composable
@@ -83,6 +87,7 @@ fun ActiveScanCard(
             )
             Spacer(modifier = Modifier.height(6.dp))
             val verdict = scan.fullResult?.foodSafetyResponse?.verdict
+            val familyAlerts = scan.fullResult?.foodSafetyResponse?.familyAlerts ?: emptyList()
             if (scan.isProcessing) {
                 ProcessingBadge(statusResId = R.string.scan_status_processing)
             } else if (scan.isFailed) {
@@ -90,7 +95,19 @@ fun ActiveScanCard(
             } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
             } else if (verdict != null) {
-                VerdictBadge(verdict = verdict)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    VerdictBadge(verdict = verdict)
+                    if (familyAlerts.isNotEmpty()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            familyAlerts.forEach { alert ->
+                                FamilyAlertBadge(alert = alert)
+                            }
+                        }
+                    }
+                }
             } else if (scan.healthTagResId != null) {
                 HealthBadge(text = stringResource(scan.healthTagResId))
             }
@@ -226,6 +243,38 @@ private fun HealthBadge(
             fontWeight = FontWeight.Bold,
             color = AppTheme.colors.Teal800,
             fontSize = 11.sp,
+        )
+    }
+}
+
+@Composable
+private fun FamilyAlertBadge(alert: FamilyAlert, modifier: Modifier = Modifier) {
+    val backgroundColor = when (alert.severity) {
+        ProductVerdict.SAFE -> AppTheme.colors.Teal1000
+        ProductVerdict.CAUTION -> AppTheme.colors.VerdictCautionBackground
+        ProductVerdict.UNSAFE -> AppTheme.colors.VerdictUnsafeBackground
+    }
+    
+    val verdictTextRes = when (alert.severity) {
+        ProductVerdict.SAFE -> R.string.verdict_safe
+        ProductVerdict.CAUTION -> R.string.verdict_caution
+        ProductVerdict.UNSAFE -> R.string.verdict_unsafe
+    }
+    
+    val verdictText = stringResource(verdictTextRes)
+    
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(backgroundColor)
+            .padding(horizontal = 8.dp, vertical = 3.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.scan_family_alert_badge, verdictText, alert.targetProfile),
+            style = AppTheme.typography.labelSmall.copy(fontSize = 11.sp),
+            fontWeight = FontWeight.Bold,
+            color = androidx.compose.ui.graphics.Color.White,
         )
     }
 }
