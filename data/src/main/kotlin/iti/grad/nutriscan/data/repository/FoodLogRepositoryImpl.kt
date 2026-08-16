@@ -30,8 +30,13 @@ class FoodLogRepositoryImpl @Inject constructor(
 ) : IFoodLogRepository {
 
     override fun observeTodayFoodLog(): Flow<List<FoodLogEntry>> = flow {
+        val userId = authRepository.getCurrentUserId()
+        if (userId == null) {
+            emit(emptyList())
+            return@flow
+        }
         emitAll(
-            dao.observeByUserAndDate(resolveUserId(), today().toString())
+            dao.observeByUserAndDate(userId, today().toString())
                 .map { entities -> entities.map { it.toDomain() } }
         )
     }.flowOn(ioDispatcher)
