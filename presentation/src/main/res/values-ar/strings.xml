@@ -436,6 +436,8 @@
     <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
     <string name="search_not_found_button">الذهاب للفحص</string>
     <string name="product_card_swipe_hint">اسحب للإضافة</string>
+    <string name="product_card_swipe_adding">جارٍ الإضافة…</string>
+    <string name="product_card_swipe_added">تمت الإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
