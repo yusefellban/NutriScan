@@ -479,6 +479,7 @@
     <string name="product_details_why_caution">لماذا الحذر؟</string>
     <string name="product_details_why_safe">لماذا هو آمن؟</string>
     <string name="product_details_family_alerts_title">تنبيهات العائلة</string>
+    <string name="scan_family_alert_badge">%1$s لـ %2$s</string>
     <string name="product_details_calories">السعرات الحرارية</string>
     <string name="product_details_serving">الحصة</string>
     <string name="product_details_sugar">السكر</string>
