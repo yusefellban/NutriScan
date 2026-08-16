@@ -107,9 +107,6 @@ object ExercisesRoute
 data class ExerciseWorkoutRoute(val exerciseId: String)
 
 @Serializable
-object NewsHomeRoute
-
-@Serializable
 data class NewsDetailRoute(
     val title: String,
     val description: String?,

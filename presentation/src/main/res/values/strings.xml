@@ -494,13 +494,17 @@
     <string name="product_details_bookmark_add">Save product</string>
     <string name="product_details_bookmark_remove">Remove from saved</string>
     <!-- News -->
-    <string name="news_screen_title">Discover</string>
+    <string name="news_screen_title">News</string>
     <string name="news_screen_subtitle">News from all around the world</string>
-    <string name="news_search_placeholder">Search</string>
+    <string name="news_search_placeholder">Search health news</string>
     <string name="news_search_filter_content_description">Filter</string>
     <string name="news_category_label">News</string>
     <string name="news_source_time_separator"> · </string>
     <string name="news_source_avatar_content_description">Source avatar</string>
+    <string name="news_author_prefix">By %1$s</string>
+    <string name="news_article_menu_content_description">More options</string>
+    <string name="news_menu_open_article">Open Article</string>
+    <string name="news_menu_share">Share</string>
     <string name="news_read_full_article">Read Full Article on Web</string>
     <string name="news_chip_all">Top Health</string>
     <string name="news_load_error">Couldn\'t load news. Please try again.</string>
@@ -516,9 +520,6 @@
     <string name="news_card_menu_content_description">More options</string>
     
     <!-- News Home Screen -->
-    <string name="news_home_breaking_news">Breaking News</string>
-    <string name="news_home_recommendation">Recommendation</string>
-    <string name="news_home_search_content_description">Search</string>
     <!-- NutriGPT Chat -->
     <string name="nutrigpt_title">Nutrition AI</string>
     <string name="nutrigpt_input_hint">Ask about nutrition…</string>
