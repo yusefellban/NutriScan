@@ -7,7 +7,8 @@ import java.time.LocalDate
  * Full product detail used by the Product Details screen.
  *
  * Holds everything shown on the detail page: header info, verdict,
- * flagged ingredients with allergy/condition matches, and nutritional macros.
+ * flagged ingredients with allergy/condition matches, per-family-member
+ * safety alerts, and nutritional macros.
  */
 data class ProductDetail(
     val id: String,
@@ -19,6 +20,8 @@ data class ProductDetail(
     val scanDate: LocalDate?,
     val safetyReasonText: String?,
     val flaggedIngredients: List<FlaggedIngredient>,
+    /** Per-family-member safety alerts. Health-critical — must never be silently defaulted to empty. */
+    val familyAlerts: List<FamilyAlert> = emptyList(),
     val calories: String?,
     val servingSize: String?,
     val protein: String?,

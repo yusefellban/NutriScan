@@ -492,6 +492,7 @@
     <string name="product_details_why_unsafe">Why It\'s Unsafe?</string>
     <string name="product_details_why_caution">Why Caution?</string>
     <string name="product_details_why_safe">Why It\'s Safe?</string>
+    <string name="product_details_family_alerts_title">Family Alerts</string>
     <string name="product_details_calories">Calories</string>
     <string name="product_details_serving">Serving</string>
     <string name="product_details_sugar">Sugar</string>

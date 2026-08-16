@@ -598,7 +598,7 @@ constructor(
         currentScanJob?.cancel()
         _state.update { state ->
             state.copy(
-                isScanning = false, // FREEZE the camera and AR overlay immediately
+
                 isProcessingCenterAction = true,
                 trackedBarcodeValue = barcode,
                 activeScan =

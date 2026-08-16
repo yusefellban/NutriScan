@@ -1,12 +1,14 @@
 package iti.grad.nutriscan.data.repository.mapper
 
 import iti.grad.nutriscan.data.remote.dto.FlaggedIngredientDto
+import iti.grad.nutriscan.data.remote.dto.FamilyAlertDto
 import iti.grad.nutriscan.data.remote.dto.FoodSafetyResponseDto
 import iti.grad.nutriscan.data.remote.dto.NutritionFactsDto
 import iti.grad.nutriscan.data.remote.dto.ScanResultResponseDto
 import iti.grad.nutriscan.data.remote.dto.ScanSubmissionResponseDto
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
+import iti.grad.nutriscan.domain.scan.model.FamilyAlert
 import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
 import iti.grad.nutriscan.domain.scan.model.NutritionFacts
 import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
@@ -64,7 +66,17 @@ private fun FoodSafetyResponseDto.toDomain(): FoodSafetyResponse {
     return FoodSafetyResponse(
         verdict = verdict?.let { mapVerdict(it) },
         flaggedIngredients = flaggedIngredients.map { it.toDomain() },
-        summary = summary
+        summary = summary,
+        familyAlerts = familyAlerts.map { it.toDomain() },
+    )
+}
+
+private fun FamilyAlertDto.toDomain(): FamilyAlert {
+    return FamilyAlert(
+        targetProfile = targetProfile ?: "",
+        // Use mapVerdict for consistency — defaults to SAFE for unknown strings per backend contract.
+        severity = severity?.let { mapVerdict(it) } ?: ProductVerdict.UNSAFE,
+        reason = reason ?: "",
     )
 }
 

@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.scan.model.FamilyAlert
 import iti.grad.nutriscan.domain.scan.model.FlaggedIngredient
 import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
 import iti.grad.nutriscan.domain.scan.model.NutritionFacts
 import iti.grad.nutriscan.domain.scan.model.ProductDetail
 import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
 import iti.grad.nutriscan.domain.scan.model.ScanResult
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScanByIdUseCase
+import iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase
 import iti.grad.nutriscan.domain.scan.usecase.SaveScanUseCase
 import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
@@ -38,8 +41,7 @@ constructor(
         private val saveScanUseCase: SaveScanUseCase,
         private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
         private val getSavedScanByIdUseCase: GetSavedScanByIdUseCase,
-        private val getScanResultUseCase:
-                iti.grad.nutriscan.domain.scan.usecase.GetScanResultUseCase,
+        private val getScanResultUseCase: GetScanResultUseCase,
 ) : ViewModel() {
 
     private val scanId: String = checkNotNull(savedStateHandle["scanId"])
@@ -139,7 +141,13 @@ constructor(
                 brand = "Unknown Brand",
                 imageUrl = scanResult.imageUrl ?: "",
                 status = scanResult.status,
-                verdict = scanResult.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
+                verdict = scanResult.foodSafetyResponse?.verdict
+                    // ⚠️ Health-critical: null verdict on a completed scan is NOT safe — it means
+                    // the analysis returned without a verdict. Surface CAUTION, never SAFE.
+                    ?: if (scanResult.status == ScanStatus.COMPLETED)
+                        ProductVerdict.CAUTION
+                    else
+                        ProductVerdict.SAFE,
                 scanDate =
                         scanResult.scannedAt?.let {
                             try {
@@ -163,6 +171,7 @@ constructor(
                             )
                         }
                                 ?: emptyList(),
+                familyAlerts = scanResult.foodSafetyResponse?.familyAlerts ?: emptyList(),
                 calories = scanResult.nutritionFacts?.calories?.toString() ?: "0",
                 servingSize = "1",
                 protein = scanResult.nutritionFacts?.proteinGrams.format(),
@@ -201,7 +210,8 @@ constructor(
                                                     type = it.matchTag,
                                                     name = listOf(it.name)
                                             )
-                                        }
+                                        },
+                                familyAlerts = detail.familyAlerts,
                         ),
                 nutritionFacts =
                         NutritionFacts(
