@@ -54,7 +54,7 @@ jobs:
       # ----------------------------
       - name: Create keystore.properties
         run: |
-          cat > keystore.properties <<EOF
+          cat > keystore.properties <<'EOF'
           storeFile=keystore1
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
