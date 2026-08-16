@@ -319,6 +319,7 @@
     <string name="scan_mode_selector_content_desc">Scan mode selector</string>
     <string name="scan_gallery_pick_prompt">Choose an image to scan</string>
     <string name="scan_gallery_pick_failed">Could not read selected image</string>
+    <string name="scan_still_processing_warning">Please wait until the current scan finishes processing.</string>
     <string name="scan_gallery_pick_cancelled">No image selected</string>
     <string name="scan_capture_failed_generic">Image capture failed. Please try again.</string>
     <string name="scan_barcode_chip_tap_hint">Tap to scan barcode</string>

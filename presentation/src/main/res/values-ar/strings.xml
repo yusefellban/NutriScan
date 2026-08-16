@@ -313,6 +313,7 @@
     <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
     <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
     <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
+    <string name="scan_still_processing_warning">من فضلك انتظر حتى ينتهي الفحص الحالي.</string>
     <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
     <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
     <string name="scan_barcode_chip_tap_hint">اضغط لمسح الباركود</string>
