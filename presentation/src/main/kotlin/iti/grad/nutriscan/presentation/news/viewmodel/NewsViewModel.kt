@@ -12,6 +12,7 @@ import iti.grad.nutriscan.presentation.news.state.NewsEffect
 import iti.grad.nutriscan.presentation.news.state.NewsEvent
 import iti.grad.nutriscan.presentation.news.state.NewsState
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
+import iti.grad.nutriscan.presentation.common.model.throwableToAppErrorType
 import iti.grad.presentation.R
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
@@ -24,7 +25,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
+
+private const val FOR_YOU_LABEL = "For You"
+private const val DISCOVER_LABEL = "Discover"
 
 @HiltViewModel
 class NewsViewModel @Inject constructor(
@@ -44,6 +49,9 @@ class NewsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             buildNewsTopicChipsUseCase().collectLatest { chips ->
+                Timber.d(
+                    "News chips loaded: ${chips.size} total -> ${chips.joinToString { it.label }}",
+                )
                 _state.update { it.copy(chips = chips.toPersistentList()) }
             }
         }
@@ -111,29 +119,22 @@ class NewsViewModel @Inject constructor(
             result
                 .onSuccess { articles ->
                     val chips = _state.value.chips
-                    val categoryLabel = chips.firstOrNull { it.id in selected && it.id != NewsTopicChip.ALL_CHIP_ID }?.label
-                    
-                    allArticles = articles.map { article ->
-                        val inferredCategory = categoryLabel ?: if (
-                            article.sourceName.contains("health", ignoreCase = true) || 
-                            article.sourceName.contains("science", ignoreCase = true) ||
-                            article.sourceName.contains("medical", ignoreCase = true) ||
-                            article.title.contains("collagen", ignoreCase = true) ||
-                            article.title.contains("disease", ignoreCase = true) ||
-                            article.title.contains("virus", ignoreCase = true)
-                        ) {
-                            "Health"
-                        } else {
-                            "News"
-                        }
-                        article.toUiModel(inferredCategory)
-                    }
+                    val hasProfileInterests = chips.any { it.id != NewsTopicChip.ALL_CHIP_ID }
+                    val specificChipLabel = chips.firstOrNull { it.id in selected && it.id != NewsTopicChip.ALL_CHIP_ID }?.label
+                    val feedLabel = specificChipLabel
+                        ?: if (hasProfileInterests) FOR_YOU_LABEL else DISCOVER_LABEL
+
+                    allArticles = articles.map { article -> article.toUiModel(feedLabel) }
                     filterArticles()
                     _state.update { it.copy(isLoading = false) }
                 }
-                .onFailure {
+                .onFailure { error ->
                     _state.update {
-                        it.copy(isLoading = false, errorMessageResId = R.string.news_load_error)
+                        it.copy(
+                            isLoading = false,
+                            errorMessageResId = R.string.news_load_error,
+                            errorType = throwableToAppErrorType(error),
+                        )
                     }
                 }
         }

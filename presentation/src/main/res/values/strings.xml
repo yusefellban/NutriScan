@@ -14,6 +14,8 @@
     <string name="error_password_mismatch">ERROR: Passwords do not match!</string>
     <string name="error_invalid_email">ERROR: Invalid email format.</string>
     <string name="error_empty_field">ERROR: Field cannot be empty.</string>
+    <string name="error_invalid_name">Only letters, spaces, hyphens and apostrophes are allowed.</string>
+    <string name="error_invalid_name_length">Name must be between 3 and 100 characters.</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="prompt_have_account">Already have an account? Sign In.</string>
     <string name="name_label">Name</string>
@@ -111,6 +113,7 @@
     <string name="profile_setup_weight_title_highlight">weight</string>
     <string name="profile_setup_weight_subtitle">Your weight helps us estimate your daily calorie needs more accurately.</string>
     <string name="profile_setup_placeholder_coming_soon">Coming soon…</string>
+    <string name="feature_coming_soon">Coming soon…</string>
     <string name="profile_setup_load_error">Something went wrong while loading. Please try again.</string>
     <string name="action_retry">Retry</string>
 
@@ -130,6 +133,15 @@
     <string name="edit_profile_dob_hint">Date of birth</string>
     <string name="edit_profile_height_label">Hight</string> <!-- Intentional typo to match image -->
     <string name="edit_profile_weight_label">Weight</string>
+    <string name="edit_profile_error_name_required">This field cannot be empty</string>
+    <string name="edit_profile_error_name_invalid">Only letters, spaces, hyphens and apostrophes are allowed</string>
+    <string name="edit_profile_error_height_required">Please enter your height</string>
+    <string name="edit_profile_error_height_range">Height must be between 50 and 250 cm</string>
+    <string name="edit_profile_error_weight_required">Please enter your weight</string>
+    <string name="edit_profile_error_weight_range">Weight must be between 2 and 300 kg</string>
+
+    <string name="profile_setup_save_error">Failed to save profile</string>
+    <string name="auth_code_resent_success">Code resent successfully</string>
 
     <!-- Permissions -->
     <string name="action_cancel">Cancel</string>
@@ -289,24 +301,27 @@
     <string name="scan_brand_unknown">Unknown brand</string>
     <string name="scan_camera_permission_denied">Camera access is required to scan products</string>
     <string name="scan_camera_permission_retry">Grant permission</string>
+    <string name="nutrigpt_voice_permission_denied">Microphone access is required for voice chat</string>
+    <string name="nutrigpt_voice_permission_retry">Grant permission</string>
     <string name="scan_add_to_list_coming_soon">Add to list coming soon</string>
     <string name="scan_frame_content_description">Barcode scanner viewfinder</string>
     <string name="scan_add_to_list_content_description">Add product to list</string>
-    <string name="scan_mode_qr">QR</string>
+    <string name="scan_mode_barcode">Barcode</string>
     <string name="scan_mode_photo">Photo</string>
     <string name="scan_mode_gallery">Image</string>
     <string name="scan_mode_gallery_change">Pick another image</string>
     <string name="scan_center_action_capture">Capture</string>
     <string name="scan_center_action_upload">Upload</string>
     <string name="scan_gallery_selected_image_content_description">Selected image preview</string>
-    <string name="scan_mode_qr_hint">Align QR code inside the frame</string>
-    <string name="scan_mode_photo_hint">Align product and capture clearly</string>
+    <string name="scan_mode_barcode_hint">Point at a product barcode to scan</string>
+    <string name="scan_mode_photo_hint">Capture a label or point at a barcode</string>
     <string name="scan_mode_gallery_hint">Upload a product image from gallery</string>
     <string name="scan_mode_selector_content_desc">Scan mode selector</string>
     <string name="scan_gallery_pick_prompt">Choose an image to scan</string>
     <string name="scan_gallery_pick_failed">Could not read selected image</string>
     <string name="scan_gallery_pick_cancelled">No image selected</string>
     <string name="scan_capture_failed_generic">Image capture failed. Please try again.</string>
+    <string name="scan_barcode_chip_tap_hint">Tap to scan barcode</string>
     <string name="scan_saved_content_description">Save scan</string>
     <string name="scan_processing_placeholder_title">Scan Processing\nBarcode: %1$s</string>
     <string name="scan_saved_to_bookmarks">Scan saved to Bookmarks</string>
@@ -342,6 +357,8 @@
     <string name="your_bmi">Your BMI</string>
     <string name="kcal_suffix">Kcal</string>
     <string name="steps">Steps</string>
+    <string name="steps_tracking_notification_title">Tracking your steps</string>
+    <string name="steps_tracking_notification_body">%1$d steps today</string>
     <string name="your_exercise">Your Exercise</string>
     <string name="kcal_exercise">kcal</string>
     <string name="min_today">min today</string>
@@ -430,14 +447,17 @@
     <string name="search_not_found_title">No results found</string>
     <string name="search_not_found_subtitle">No results found. Please try again.</string>
     <string name="search_not_found_button">Go to Scan</string>
-    <string name="product_card_swipe_hint">Swipe right to add</string>
+    <string name="product_card_swipe_hint">Swipe to add</string>
+    <string name="product_card_swipe_adding">Adding…</string>
+    <string name="product_card_swipe_added">Added</string>
     <string name="product_card_kcal_unit">Kcal</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
-    <string name="food_log_swipe_remove_hint">Swipe to remove</string>
     <string name="food_log_remove_confirm_title">Remove item?</string>
     <string name="food_log_remove_confirm_message">This will remove it from today\'s food log.</string>
+    <string name="food_log_delete_item_action">Delete item</string>
+    <string name="food_log_minus_item_action">Remove one serving</string>
     <string name="food_log_added_snackbar">Added %1$s to today\'s food log</string>
     <string name="food_log_add_error">Couldn\'t add this item. Please try again.</string>
     <string name="food_log_remove_error">Couldn\'t remove this item. Please try again.</string>
@@ -447,6 +467,7 @@
     <string name="verdict_safe">Safe</string>
     <string name="verdict_caution">Caution</string>
     <string name="verdict_unsafe">Unsafe</string>
+    <string name="verdict_unknown">Unknown</string>
 
     <!-- Product Details -->
     <string name="product_details_title">Product Details</string>
@@ -476,13 +497,17 @@
     <string name="product_details_bookmark_add">Save product</string>
     <string name="product_details_bookmark_remove">Remove from saved</string>
     <!-- News -->
-    <string name="news_screen_title">Discover</string>
+    <string name="news_screen_title">News</string>
     <string name="news_screen_subtitle">News from all around the world</string>
-    <string name="news_search_placeholder">Search</string>
+    <string name="news_search_placeholder">Search health news</string>
     <string name="news_search_filter_content_description">Filter</string>
     <string name="news_category_label">News</string>
     <string name="news_source_time_separator"> · </string>
     <string name="news_source_avatar_content_description">Source avatar</string>
+    <string name="news_author_prefix">By %1$s</string>
+    <string name="news_article_menu_content_description">More options</string>
+    <string name="news_menu_open_article">Open Article</string>
+    <string name="news_menu_share">Share</string>
     <string name="news_read_full_article">Read Full Article on Web</string>
     <string name="news_chip_all">Top Health</string>
     <string name="news_load_error">Couldn\'t load news. Please try again.</string>
@@ -498,9 +523,6 @@
     <string name="news_card_menu_content_description">More options</string>
     
     <!-- News Home Screen -->
-    <string name="news_home_breaking_news">Breaking News</string>
-    <string name="news_home_recommendation">Recommendation</string>
-    <string name="news_home_search_content_description">Search</string>
     <!-- NutriGPT Chat -->
     <string name="nutrigpt_title">Nutrition AI</string>
     <string name="nutrigpt_input_hint">Ask about nutrition…</string>
@@ -536,6 +558,9 @@
     <string name="offline_state_title">No connection</string>
     <string name="offline_state_subtitle">Oops! It seems you\'re currently offline.</string>
     <string name="offline_state_retry">Try again</string>
+    <string name="server_problem_title">Server Problem</string>
+    <string name="server_problem_subtitle">We\'re having trouble loading your data. Please try again in a moment.</string>
+    <string name="server_problem_retry">Try Again</string>
     
     <!-- Auth Alerts -->
     <string name="alert_login_failed_title">Login Failed</string>
@@ -560,12 +585,18 @@
     <string name="scan_history_empty_title">No scans yet</string>
     <string name="scan_history_empty_subtitle">Start your first scan to see whether a product is safe for you.</string>
     <string name="scan_history_empty_button">Start Scanning</string>
+    <string name="scan_history_no_results_title">No products found</string>
+    <string name="scan_history_no_results_subtitle">No scan matches "%1$s". Try a different name.</string>
     <string name="scan_history_error_load">Failed to load history</string>
+    <string name="scan_history_search_hint">Search by product name…</string>
+    <string name="scan_history_search_clear">Clear search</string>
     <!-- Step History -->
     <string name="step_history_title">Step history</string>
     <string name="step_history_daily_average">Daily average</string>
     <string name="step_history_total_steps">Total steps</string>
     <string name="step_history_steps">steps</string>
+    <string name="step_history_of_goal">of %1$s Goal</string>
+    <string name="step_history_load_error">Failed to load step history</string>
     <string name="step_history_period_week">Week</string>
     <string name="step_history_period_month">Month</string>
     <string name="step_history_period_3months">3 Months</string>
@@ -662,4 +693,14 @@
         <item>Good nutrition is a form of self-respect. Treat yourself right today!</item>
         <item>Success is the sum of small habits repeated day in and day out.</item>
     </string-array>
+    <string name="delete_scan_title">Delete Scan?</string>
+    <string name="delete_scan_message">Are you sure you want to remove this scan from your history? This action cannot be undone.</string>
+    <string name="alert_delete_success">Scan deleted successfully</string>
+    <string name="date_picker_reset">Reset</string>
+    <string name="step_history_distance">Distance</string>
+    <string name="step_history_calories">Calories</string>
+    <string name="step_history_time">Time</string>
+    <string name="step_unit_km">km</string>
+    <string name="step_unit_kcal">kcal</string>
+    <string name="step_unit_min">min</string>
 </resources>

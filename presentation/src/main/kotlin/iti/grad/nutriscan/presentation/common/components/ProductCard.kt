@@ -20,22 +20,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,11 +52,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import coil3.compose.AsyncImage
 import iti.grad.presentation.R
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.util.isAppRtl
+import iti.grad.nutriscan.presentation.common.util.tick
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -61,12 +68,19 @@ fun ProductCard(
     calories: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isFailed: Boolean = false,
     swipeAction: ProductCardSwipeAction? = null,
+    /** Renders a full-card-width delete strip at the bottom (Calories food log) instead of a
+     * swipe gesture. Mutually exclusive with [swipeAction] in practice. */
+    onDeleteClick: (() -> Unit)? = null,
     /** Food log (Calories) overlays kcal on the image; the Saved catalog keeps it in the info row. */
     caloriesOverlayOnImage: Boolean = false,
     /** Times this product was logged today. Shows an "x2"-style badge next to the calorie badge
      * instead of duplicating the card; 1 (the default) shows no badge. */
     quantity: Int = 1,
+    /** Draws this card's own drop shadow. Calories' food row disables it — that row already sits
+     * inside a container that carries one shadow for the whole group (see CaloriesScreen). */
+    showShadow: Boolean = true,
 ) {
     val density = LocalDensity.current
     val shadowBlurPx = with(density) { 12.dp.toPx() }
@@ -75,12 +89,18 @@ fun ProductCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .customShadow(
-                shape = RoundedCornerShape(12.dp),
-                color = AppTheme.colors.ProductCardShadow,
-                blurRadius = shadowBlurPx,
-                offsetX = 0f,
-                offsetY = shadowOffsetYPx
+            .then(
+                if (showShadow) {
+                    Modifier.customShadow(
+                        shape = RoundedCornerShape(12.dp),
+                        color = AppTheme.colors.ProductCardShadow,
+                        blurRadius = shadowBlurPx,
+                        offsetX = 0f,
+                        offsetY = shadowOffsetYPx
+                    )
+                } else {
+                    Modifier
+                }
             )
     ) {
         Surface(
@@ -97,14 +117,13 @@ fun ProductCard(
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                     .height(130.dp)
             ) {
-                AsyncImage(
+                AdaptiveAsyncImage(
                     model = imageUrl,
                     contentDescription = productName,
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop,
                     error = painterResource(id = R.drawable.ic_scanner),
                     placeholder = painterResource(id = R.drawable.ic_scanner)
                 )
@@ -149,9 +168,10 @@ fun ProductCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (verdict != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        VerdictBadge(verdict = verdict)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    when {
+                        isFailed -> FailedBadge()
+                        verdict != null -> VerdictBadge(verdict = verdict)
                     }
                 } else {
                     // Original layout: name+verdict on the left, kcal stacked badge on the right
@@ -172,9 +192,10 @@ fun ProductCard(
                                 overflow = TextOverflow.Ellipsis
                             )
 
-                            if (verdict != null) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                VerdictBadge(verdict = verdict)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            when {
+                                isFailed -> FailedBadge()
+                                verdict != null -> VerdictBadge(verdict = verdict)
                             }
                         }
 
@@ -207,6 +228,11 @@ fun ProductCard(
                     // Swipe slider row — inside the card
                     SwipeActionButton(swipeAction = swipeAction)
                 }
+
+                if (onDeleteClick != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    DeleteStrip(onClick = onDeleteClick)
+                }
             }
         }
     }
@@ -214,7 +240,7 @@ fun ProductCard(
 }
 
 @Composable
-private fun CaloriesBadge(
+internal fun CaloriesBadge(
     calories: String,
     background: Color,
     textColor: Color,
@@ -244,7 +270,7 @@ private fun CaloriesBadge(
 }
 
 @Composable
-private fun QuantityBadge(
+internal fun QuantityBadge(
     quantity: Int,
     background: Color,
     textColor: Color,
@@ -263,42 +289,88 @@ private fun QuantityBadge(
     )
 }
 
+private enum class SwipePhase { Idle, Submitting, Success }
+
 @Composable
 private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isRtl = isAppRtl()
-    val isRemove = swipeAction is ProductCardSwipeAction.Remove
-    val buttonColor = if (isRemove) AppTheme.colors.Error else AppTheme.colors.Teal1000
+    val buttonColor = AppTheme.colors.Teal1000
+    val haptics = LocalHapticFeedback.current
 
-    // Track the drag offset
+    var phase by remember { mutableStateOf(SwipePhase.Idle) }
     val offsetX = remember { Animatable(0f) }
+    val buttonWidthPx = remember { Animatable(0f) }
+    val pulseScale = remember { Animatable(1f) }
 
-    // We measure the pill width to constrain dragging
     var trackWidthPx by remember { mutableFloatStateOf(0f) }
-    val buttonWidthDp = 44.dp
+    val idleButtonWidthDp = 44.dp
     val paddingDp = 6.dp
 
-    val buttonWidthPx = with(density) { buttonWidthDp.toPx() }
+    val idleButtonWidthPx = with(density) { idleButtonWidthDp.toPx() }
     val paddingPx = with(density) { paddingDp.toPx() }
+    val fullButtonWidthPx = (trackWidthPx - paddingPx * 2f).coerceAtLeast(0f)
 
     // Max distance the button can slide (track width minus button width minus side paddings)
-    val maxOffsetPx = (trackWidthPx - buttonWidthPx - paddingPx * 2f).coerceAtLeast(0f)
+    val maxOffsetPx = (trackWidthPx - idleButtonWidthPx - paddingPx * 2f).coerceAtLeast(0f)
+
+    LaunchedEffect(trackWidthPx) {
+        if (phase == SwipePhase.Idle) buttonWidthPx.snapTo(idleButtonWidthPx)
+    }
+
+    fun resetToIdle() {
+        scope.launch {
+            offsetX.animateTo(0f, animationSpec = spring())
+            buttonWidthPx.animateTo(idleButtonWidthPx, animationSpec = spring())
+            phase = SwipePhase.Idle
+        }
+    }
+
+    fun showSuccess() {
+        phase = SwipePhase.Success
+        scope.launch {
+            offsetX.animateTo(0f, animationSpec = spring())
+            buttonWidthPx.animateTo(fullButtonWidthPx, animationSpec = spring())
+            pulseScale.animateTo(1.18f, animationSpec = spring(dampingRatio = 0.55f, stiffness = 300f))
+            pulseScale.animateTo(1f, animationSpec = spring())
+            kotlinx.coroutines.delay(900)
+            resetToIdle()
+        }
+    }
+
+    fun submit() {
+        phase = SwipePhase.Submitting
+        scope.launch { offsetX.animateTo(maxOffsetPx, animationSpec = spring()) }
+        swipeAction.onTriggered { success ->
+            if (success) showSuccess() else resetToIdle()
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .onSizeChanged { trackWidthPx = it.width.toFloat() }
             .background(
-                color = AppTheme.colors.ProductCardSwipeContainerBackground,
+                color = if (phase == SwipePhase.Success) {
+                    AppTheme.colors.Teal1000.copy(alpha = 0.24f)
+                } else {
+                    AppTheme.colors.ProductCardSwipeContainerBackground
+                },
                 shape = RoundedCornerShape(50)
             )
             .padding(paddingDp),
         contentAlignment = Alignment.CenterStart
     ) {
-        // Hint text — fades as button slides over it
+        // Hint text — fades as button slides over it, hidden once submitting/success
         Text(
-            text = stringResource(id = swipeAction.hintResId),
+            text = stringResource(
+                id = when (phase) {
+                    SwipePhase.Idle -> swipeAction.hintResId
+                    SwipePhase.Submitting -> R.string.product_card_swipe_adding
+                    SwipePhase.Success -> R.string.product_card_swipe_added
+                }
+            ),
             style = AppTheme.typography.bodySmall.copy(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal
@@ -307,49 +379,94 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
             color = AppTheme.colors.ProductCardSwipeText,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = buttonWidthDp + 2.dp, end = 2.dp)
+                .padding(start = idleButtonWidthDp + 2.dp, end = 2.dp)
+                .alpha(if (phase == SwipePhase.Idle) 1f else 0f)
         )
 
         // Teal sliding button
         Box(
             modifier = Modifier
                 .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                .size(width = buttonWidthDp, height = 32.dp)
+                .width(with(density) { buttonWidthPx.value.toDp() })
+                .height(32.dp)
+                .graphicsLayer { scaleX = pulseScale.value; scaleY = pulseScale.value }
                 .background(buttonColor, RoundedCornerShape(50))
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    state = rememberDraggableState { delta ->
-                        val effectiveDelta = if (isRtl) -delta else delta
-                        scope.launch {
-                            val newValue = (offsetX.value + effectiveDelta).coerceIn(0f, maxOffsetPx)
-                            offsetX.snapTo(newValue)
-                        }
-                    },
-                    onDragStopped = {
-                        // If dragged past 70% of the track → trigger action
-                        if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
-                            swipeAction.onTriggered()
-                        }
-                        // Always spring back to start
-                        scope.launch {
-                            offsetX.animateTo(0f, animationSpec = spring())
-                        }
+                .then(
+                    if (phase == SwipePhase.Idle) {
+                        Modifier.draggable(
+                            orientation = Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                val effectiveDelta = if (isRtl) -delta else delta
+                                scope.launch {
+                                    val newValue = (offsetX.value + effectiveDelta).coerceIn(0f, maxOffsetPx)
+                                    offsetX.snapTo(newValue)
+                                }
+                            },
+                            onDragStopped = {
+                                // If dragged past 50% of the track → trigger action
+                                if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.5f) {
+                                    haptics.tick()
+                                    submit()
+                                } else {
+                                    resetToIdle()
+                                }
+                            }
+                        )
+                    } else {
+                        Modifier
                     }
                 ),
             contentAlignment = Alignment.Center
         ) {
-            val icon = when {
-                isRemove -> R.drawable.ic_trash
-                isRtl -> R.drawable.ic_arrow_left
-                else -> R.drawable.ic_arrow_right
+            when (phase) {
+                SwipePhase.Idle -> {
+                    val icon = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                SwipePhase.Submitting -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                    )
+                }
+                SwipePhase.Success -> {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
-            )
         }
+    }
+}
+
+/** Small always-visible delete icon, bottom-right below the product name. */
+@Composable
+private fun DeleteStrip(onClick: () -> Unit) {
+    val haptics = LocalHapticFeedback.current
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp))
+            .background(AppTheme.colors.Teal1500)
+            .clickable { haptics.tick(); onClick() }
+            .padding(vertical = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_trash),
+            contentDescription = stringResource(id = R.string.food_log_delete_item_action),
+            tint = AppTheme.colors.Error,
+            modifier = Modifier.size(12.dp),
+        )
     }
 }
 

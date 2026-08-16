@@ -13,13 +13,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.presentation.common.components.VerdictBadge
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.CaloriesTypography
@@ -31,6 +35,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ProductInfoHeader(
     productName: String,
+    status: ScanStatus,
     verdict: ProductVerdict,
     scanDate: LocalDate?,
     safetyReasonText: String?,
@@ -84,12 +89,16 @@ fun ProductInfoHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            VerdictBadge(verdict = verdict)
-            Text(
-                text = stringResource(R.string.product_details_for_you),
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.colors.Teal1000,
-            )
+            if (status == ScanStatus.FAILED) {
+                FailedStatusBadge()
+            } else {
+                VerdictBadge(verdict = verdict)
+                Text(
+                    text = stringResource(R.string.product_details_for_you),
+                    style = AppTheme.typography.labelLarge,
+                    color = AppTheme.colors.Teal1000,
+                )
+            }
         }
 
         // ── Safety Reason ──
@@ -112,6 +121,38 @@ fun ProductInfoHeader(
                 text = reasonText,
                 style = CaloriesTypography.badgeText,
                 color = AppTheme.colors.ProductDetailSafetyReasonText,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FailedStatusBadge(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_close),
+            contentDescription = null,
+            tint = AppTheme.colors.TextSecondary,
+            modifier = Modifier.size(22.dp),
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(AppTheme.colors.TextSecondary.copy(alpha = 0.15f))
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.scan_status_failed),
+                style = AppTheme.typography.labelSmall,
+                color = AppTheme.colors.TextSecondary,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }
     }

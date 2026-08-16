@@ -11,6 +11,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import iti.grad.nutriscan.presentation.common.util.tick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
@@ -35,6 +37,7 @@ fun PullToRefreshShimmerBox(
     content: @Composable () -> Unit,
 ) {
     var showShimmer by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     // snapshotFlow can only observe snapshot State. isRefreshing is a plain Boolean parameter, so
     // reading it directly inside the effect below captures whatever it was on first composition and
@@ -60,7 +63,7 @@ fun PullToRefreshShimmerBox(
         // Keeps the spinner alive for the whole hold, so it never disappears above a still-
         // shimmering list when the ViewModel clears isRefreshing early.
         isRefreshing = isRefreshing || showShimmer,
-        onRefresh = onRefresh,
+        onRefresh = { haptics.tick(); onRefresh() },
         modifier = modifier,
     ) {
         if (showShimmer) shimmer() else content()

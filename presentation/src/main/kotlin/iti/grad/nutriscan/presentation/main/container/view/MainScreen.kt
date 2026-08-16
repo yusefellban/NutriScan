@@ -1,5 +1,7 @@
 package iti.grad.nutriscan.presentation.main.container.view
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -117,7 +119,12 @@ fun MainScreen(
         val bottomPadding = innerPadding.calculateBottomPadding()
 
         Box(modifier = Modifier.fillMaxSize()) {
-            when (selectedTab) {
+            Crossfade(
+                targetState = selectedTab,
+                animationSpec = tween(400),
+                label = "bottomNavTab",
+            ) { tab ->
+            when (tab) {
                 BottomNavTab.HOME -> {
                     HomeScreen(
                         bottomPadding = bottomPadding,
@@ -170,6 +177,7 @@ fun MainScreen(
                         onNavigateToCaloriesHistory = onNavigateToCaloriesHistory,
                     )
                 }
+            }
             }
         }
     }

@@ -7,6 +7,7 @@ import iti.grad.nutriscan.domain.common.CairoDateProvider
 import iti.grad.nutriscan.domain.common.model.ProductVerdict
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.AddFoodEntryUseCase
+import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.GetSavedScansUseCase
 import iti.grad.nutriscan.domain.scan.usecase.RefreshSavedScansUseCase
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
@@ -66,7 +67,7 @@ class SavedViewModel @Inject constructor(
             is SavedEvent.SwipeToAddTriggered -> {
                 val product = _state.value.products.find { it.id == event.productId }
                 if (product != null) {
-                    addToFoodLog(product)
+                    addToFoodLog(product, event.onResult)
                 }
             }
             is SavedEvent.RetryLoad -> {
@@ -76,7 +77,7 @@ class SavedViewModel @Inject constructor(
         }
     }
 
-    private fun addToFoodLog(product: ProductUiModel) {
+    private fun addToFoodLog(product: ProductUiModel, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val entry = FoodLogEntry(
                 id = UUID.randomUUID().toString(),
@@ -89,8 +90,14 @@ class SavedViewModel @Inject constructor(
                 addedAt = java.time.Instant.now(),
             )
             addFoodEntryUseCase(entry)
-                .onSuccess { _effect.send(SavedEffect.ShowAddedToFoodLogSnackbar(product.productName)) }
-                .onFailure { _effect.send(SavedEffect.ShowAddErrorSnackbar) }
+                .onSuccess {
+                    _effect.send(SavedEffect.ShowAddedToFoodLogSnackbar(product.productName))
+                    onResult(true)
+                }
+                .onFailure {
+                    _effect.send(SavedEffect.ShowAddErrorSnackbar)
+                    onResult(false)
+                }
         }
     }
 
@@ -121,7 +128,8 @@ class SavedViewModel @Inject constructor(
                         productName = scan.productName ?: "",
                         imageUrl = scan.imageUrl,
                         verdict = scan.foodSafetyResponse?.verdict ?: ProductVerdict.SAFE,
-                        calories = scan.nutritionFacts?.calories?.toString() ?: "0"
+                        calories = scan.nutritionFacts?.calories?.toString() ?: "0",
+                        isFailed = scan.status == ScanStatus.FAILED,
                     )
                 }.toImmutableList()
 

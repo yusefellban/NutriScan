@@ -23,6 +23,8 @@
     <string name="error_password_mismatch">خطأ: كلمات المرور غير متطابقة!</string>
     <string name="error_invalid_email">خطأ: صيغة البريد الإلكتروني غير صحيحة.</string>
     <string name="error_empty_field">خطأ: لا يمكن ترك الحقل فارغاً.</string>
+    <string name="error_invalid_name">يسمح فقط بالأحرف والمسافات والشرطات والفواصل العليا.</string>
+    <string name="error_invalid_name_length">يجب أن يتكون الاسم من 3 إلى 100 حرف.</string>
     <string name="action_sign_up">تسجيل حساب</string>
     <string name="prompt_have_account">لديك حساب بالفعل؟ تسجيل الدخول.</string>
     <string name="name_label">الاسم</string>
@@ -293,24 +295,27 @@
     <string name="scan_brand_unknown">علامة تجارية غير معروفة</string>
     <string name="scan_camera_permission_denied">مطلوب الوصول إلى الكاميرا لمسح المنتجات</string>
     <string name="scan_camera_permission_retry">منح الإذن</string>
+    <string name="nutrigpt_voice_permission_denied">مطلوب الوصول إلى الميكروفون للمحادثة الصوتية</string>
+    <string name="nutrigpt_voice_permission_retry">منح الإذن</string>
     <string name="scan_add_to_list_coming_soon">الإضافة للقائمة قريباً</string>
     <string name="scan_frame_content_description">إطار ماسح الباركود</string>
     <string name="scan_add_to_list_content_description">إضافة منتج للقائمة</string>
-    <string name="scan_mode_qr">كيو آر</string>
+    <string name="scan_mode_barcode">باركود</string>
     <string name="scan_mode_photo">صورة</string>
     <string name="scan_mode_gallery">صورة من المعرض</string>
     <string name="scan_mode_gallery_change">اختر صورة أخرى</string>
     <string name="scan_center_action_capture">التقاط</string>
     <string name="scan_center_action_upload">رفع</string>
     <string name="scan_gallery_selected_image_content_description">معاينة الصورة المختارة</string>
-    <string name="scan_mode_qr_hint">ضع رمز QR داخل الإطار</string>
-    <string name="scan_mode_photo_hint">ضع المنتج داخل الإطار والتقط بوضوح</string>
+    <string name="scan_mode_barcode_hint">وجّه الكاميرا نحو باركود المنتج</string>
+    <string name="scan_mode_photo_hint">التقط صورة للملصق أو وجّه الكاميرا نحو الباركود</string>
     <string name="scan_mode_gallery_hint">ارفع صورة منتج من المعرض</string>
     <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
     <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
     <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
     <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
     <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
+    <string name="scan_barcode_chip_tap_hint">اضغط لمسح الباركود</string>
     <string name="scan_saved_content_description">حفظ الفحص</string>
     <string name="scan_processing_placeholder_title">جاري المسح\nالباركود: %1$s</string>
     <string name="scan_saved_to_bookmarks">تم حفظ الفحص في المحفوظات</string>
@@ -341,6 +346,8 @@
     <string name="your_bmi">مؤشر كتلة جسمك</string>
     <string name="kcal_suffix">سعرة حرارية</string>
     <string name="steps">خطوات</string>
+    <string name="steps_tracking_notification_title">جارٍ تتبع خطواتك</string>
+    <string name="steps_tracking_notification_body">%1$d خطوة اليوم</string>
     <string name="your_exercise">تمارينك</string>
     <string name="kcal_exercise">سعرة حرارية</string>
     <string name="min_today">دقيقة اليوم</string>
@@ -428,14 +435,17 @@
     <string name="search_not_found_title">لم يتم العثور على نتائج</string>
     <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
     <string name="search_not_found_button">الذهاب للفحص</string>
-    <string name="product_card_swipe_hint">اسحب لليسار للإضافة</string>
+    <string name="product_card_swipe_hint">اسحب للإضافة</string>
+    <string name="product_card_swipe_adding">جارٍ الإضافة…</string>
+    <string name="product_card_swipe_added">تمت الإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
     <!-- Food Log -->
-    <string name="food_log_swipe_remove_hint">اسحب للإزالة</string>
     <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
     <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
+    <string name="food_log_delete_item_action">حذف العنصر</string>
+    <string name="food_log_minus_item_action">إزالة حصة واحدة</string>
     <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
     <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
     <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
@@ -445,6 +455,7 @@
     <string name="verdict_safe">آمن</string>
     <string name="verdict_caution">حذر</string>
     <string name="verdict_unsafe">غير آمن</string>
+    <string name="verdict_unknown">غير معروف</string>
 
     <!-- Product Details -->
     <string name="product_details_title">تفاصيل المنتج</string>
@@ -474,13 +485,17 @@
     <string name="product_details_bookmark_add">حفظ المنتج</string>
     <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
     <!-- News -->
-    <string name="news_screen_title">اكتشف</string>
+    <string name="news_screen_title">الأخبار</string>
     <string name="news_screen_subtitle">أخبار من جميع أنحاء العالم</string>
-    <string name="news_search_placeholder">بحث</string>
+    <string name="news_search_placeholder">ابحث عن أخبار صحية</string>
     <string name="news_search_filter_content_description">تصفية</string>
     <string name="news_category_label">أخبار</string>
     <string name="news_source_time_separator"> · </string>
     <string name="news_source_avatar_content_description">أيقونة المصدر</string>
+    <string name="news_author_prefix">بقلم %1$s</string>
+    <string name="news_article_menu_content_description">مزيد من الخيارات</string>
+    <string name="news_menu_open_article">فتح المقال</string>
+    <string name="news_menu_share">مشاركة</string>
     <string name="news_read_full_article">قراءة المقال كاملاً على الويب</string>
     <string name="news_chip_all">أهم الأخبار الصحية</string>
     <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
@@ -496,9 +511,6 @@
     <string name="news_card_menu_content_description">خيارات إضافية</string>
     
     <!-- News Home Screen -->
-    <string name="news_home_breaking_news">أخبار عاجلة</string>
-    <string name="news_home_recommendation">اقتراحات</string>
-    <string name="news_home_search_content_description">بحث</string>
     <!-- NutriGPT Chat -->
     <string name="nutrigpt_title">المساعد الذكي</string>
     <string name="nutrigpt_empty_title">اسأل أي شيء عن التغذية</string>
@@ -547,7 +559,11 @@
     <string name="scan_history_empty_title">لا توجد عمليات مسح حتى الآن</string>
     <string name="scan_history_empty_subtitle">ابدأ أول عملية مسح لك لترى ما إذا كان المنتج آمنًا لك.</string>
     <string name="scan_history_empty_button">ابدأ المسح</string>
+    <string name="scan_history_no_results_title">لم يُعثر على منتجات</string>
+    <string name="scan_history_no_results_subtitle">لا توجد نتائج لـ "%1$s". جرّب اسمًا مختلفًا.</string>
     <string name="scan_history_error_load">فشل تحميل السجل</string>
+    <string name="scan_history_search_hint">ابحث باسم المنتج…</string>
+    <string name="scan_history_search_clear">مسح البحث</string>
     <!-- Step History -->
     <string name="step_history_title">سجل الخطوات</string>
     <string name="step_history_daily_average">المتوسط اليومي</string>
@@ -556,6 +572,8 @@
     <string name="step_history_end_date">النهاية</string>
     <string name="step_history_total_steps">إجمالي الخطوات</string>
     <string name="step_history_steps">خطوة</string>
+    <string name="step_history_of_goal">من %1$s هدف</string>
+    <string name="step_history_load_error">فشل تحميل سجل الخطوات</string>
 
     <string name="daily_insight_title">رؤية يومية</string>
     <string name="step_history_period_week">أسبوع</string>
@@ -662,4 +680,25 @@
         <item>التغذية الجيدة هي شكل من أشكال احترام الذات. اعتنِ بنفسك جيداً اليوم!</item>
         <item>النجاح هو مجموع العادات الصغيرة المتكررة يوماً بعد يوم.</item>
     </string-array>
+    <!-- Missing Translations -->
+    <string name="feature_coming_soon">قريباً…</string>
+    <string name="edit_profile_error_name_required">لا يمكن ترك هذا الحقل فارغاً</string>
+    <string name="edit_profile_error_name_invalid">يسمح فقط بالأحرف والمسافات والشرطات والفواصل العليا</string>
+    <string name="edit_profile_error_height_required">يرجى إدخال طولك</string>
+    <string name="edit_profile_error_height_range">يجب أن يكون الطول بين 50 و 250 سم</string>
+    <string name="edit_profile_error_weight_required">يرجى إدخال وزنك</string>
+    <string name="edit_profile_error_weight_range">يجب أن يكون الوزن بين 2 و 300 كجم</string>
+    <string name="server_problem_title">مشكلة في الخادم</string>
+    <string name="server_problem_subtitle">نواجه مشكلة في تحميل بياناتك. يرجى المحاولة مرة أخرى بعد قليل.</string>
+    <string name="server_problem_retry">حاول مرة أخرى</string>
+    <string name="delete_scan_title">حذف المسح</string>
+    <string name="delete_scan_message">هل أنت متأكد أنك تريد إزالة هذا المسح من السجل؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="alert_delete_success">تم حذف المسح بنجاح</string>
+    <string name="date_picker_reset">إعادة ضبط</string>
+    <string name="step_history_distance">المسافة</string>
+    <string name="step_history_calories">السعرات</string>
+    <string name="step_history_time">الوقت</string>
+    <string name="step_unit_km">كم</string>
+    <string name="step_unit_kcal">سعرة</string>
+    <string name="step_unit_min">دقيقة</string>
 </resources>

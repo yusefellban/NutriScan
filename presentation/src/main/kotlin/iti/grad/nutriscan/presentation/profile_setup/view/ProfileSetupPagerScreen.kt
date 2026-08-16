@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.profile_setup.view
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -25,6 +26,7 @@ import iti.grad.nutriscan.presentation.profile_setup.view.components.HealthProfi
 import iti.grad.nutriscan.presentation.profile_setup.state.ProfileSetupPagerEvent
 import androidx.compose.ui.Alignment
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import iti.grad.nutriscan.presentation.profile_setup.view.components.WeightSelectionPage
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
@@ -99,6 +101,8 @@ fun ProfileSetupPagerScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
+                .imePadding()
         ) {
             // Pager fills the ENTIRE screen
             HorizontalPager(
@@ -144,8 +148,7 @@ fun ProfileSetupPagerScreen(
             if (!isHealthProfilePage) {
                 AppBackButton(
                     onClick = { viewModel.onEvent(ProfileSetupPagerEvent.BackClicked) },
-                    iconTint = AppTheme.colors.Primary,
-                    borderColor = AppTheme.colors.Primary,
+                    surface = BackButtonSurface.OnLight,
                     modifier = Modifier
                         .statusBarsPadding()
                         .padding(start = 24.dp, top = 24.dp)

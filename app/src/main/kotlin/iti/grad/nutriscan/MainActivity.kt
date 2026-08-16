@@ -50,6 +50,7 @@ import iti.grad.nutriscan.domain.settings.model.AppLanguage
 import iti.grad.nutriscan.domain.settings.model.ThemeMode
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.navigation.AppNavGraph
+import iti.grad.nutriscan.steps.StepsForegroundService
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -86,6 +87,13 @@ class MainActivity : ComponentActivity() {
                 val configuration = Configuration(baseContext.resources.configuration).apply {
                     setLocale(locale)
                 }
+                // Patch the process-wide Application Resources in place too, so contexts
+                // outside Compose (Hilt @ApplicationContext singletons, notification builders,
+                // Workers/Services) resolve strings in the chosen language as well — not just
+                // the Activity-scoped context below.
+                val appResources = baseContext.applicationContext.resources
+                appResources.updateConfiguration(configuration, appResources.displayMetrics)
+
                 // Wrap (not replace) the Activity context: Hilt's hiltViewModel() walks the
                 // ContextWrapper chain looking for the Activity, so the base context must stay
                 // the real Activity. Only resources are swapped for the localized ones.
@@ -112,6 +120,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Re-attempted on every resume (harmless no-op if already running) rather than gated to a
+    // single "permission just granted" callback — this is what picks the service up right after
+    // the user grants ACTIVITY_RECOGNITION from the in-app dialog and the Activity comes back to
+    // the foreground, without presentation needing to reach into the app module to start it.
+    override fun onResume() {
+        super.onResume()
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (granted) StepsForegroundService.start(this)
     }
 }
 

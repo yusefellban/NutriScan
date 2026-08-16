@@ -3,6 +3,7 @@ package iti.grad.nutriscan.presentation.settings.profile.edit.view.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,17 +43,19 @@ fun EditProfileInputField(
     modifier: Modifier = Modifier,
     isPassword: Boolean = false,
     isReadOnly: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    errorMessage: String? = null
 ) {
     val containerBg = AppTheme.colors.EditProfileInputBackground
-    val borderColor = AppTheme.colors.EditProfileInputBorder
+    val borderColor = if (errorMessage != null) AppTheme.colors.Error else AppTheme.colors.EditProfileInputBorder
     val baseTextColor = AppTheme.colors.TextPrimary
     val iconTint = AppTheme.colors.ProfileSetupSubtitle
     val hintColor = AppTheme.colors.ProfileSetupSubtitle
     val textColor = if (isReadOnly) hintColor else baseTextColor
 
+    Column(modifier = modifier.fillMaxWidth()) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(12.dp))
@@ -110,6 +113,17 @@ fun EditProfileInputField(
                 contentDescription = null,
                 tint = iconTint,
                 modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+                color = AppTheme.colors.Error,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
             )
         }
     }

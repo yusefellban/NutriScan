@@ -39,7 +39,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +46,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.news.state.NewsEffect
@@ -98,7 +99,7 @@ private fun NewsContent(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -106,15 +107,17 @@ private fun NewsContent(
                 ) {
                     AppBackButton(
                         onClick = { onEvent(NewsEvent.BackClicked) },
-                        iconTint = AppTheme.colors.NewsCategoryLabel,
-                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                        surface = BackButtonSurface.OnLight,
                     )
                 }
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    OfflineStateWidget(onRetry = { onEvent(NewsEvent.RetryClicked) })
+                    AppErrorWidget(
+                        errorType = state.errorType,
+                        onRetry = { onEvent(NewsEvent.RetryClicked) },
+                    )
                 }
             }
         } else {
@@ -124,33 +127,27 @@ private fun NewsContent(
                     .fillMaxSize()
                     .padding(horizontal = 22.dp)
             ) {
-                // Header: Back button + Title in same row
-                Spacer(modifier = Modifier.height(16.dp))
+                // Header: Back button + Title, left-aligned next to it (matches Exercise Workout header)
                 Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp, bottom = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     AppBackButton(
                         onClick = { onEvent(NewsEvent.BackClicked) },
-                        iconTint = AppTheme.colors.NewsCategoryLabel,
-                        borderColor = AppTheme.colors.NewsCategoryLabel,
+                        surface = BackButtonSurface.OnLight,
                     )
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
-                        Text(
-                            text = stringResource(id = R.string.news_screen_title),
-                            style = AppTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                            color = AppTheme.colors.NewsScreenTitle,
-                        )
-                        Text(
-                            text = stringResource(id = R.string.news_screen_subtitle),
-                            style = AppTheme.typography.bodySmall,
-                            color = AppTheme.colors.NewsSourceText,
-                        )
-                    }
+                    Text(
+                        text = stringResource(id = R.string.news_screen_title),
+                        style = AppTheme.typography.titleMedium,
+                        color = AppTheme.colors.TextPrimary,
+                        modifier = Modifier.padding(start = 12.dp),
+                    )
                 }
                 
                 // Search Bar
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 NewsSearchBar(
                     query = state.searchQuery,
                     onQueryChange = { onEvent(NewsEvent.SearchQueryChanged(it)) },
@@ -182,7 +179,8 @@ private fun NewsContent(
                                 NewsArticleShimmerCard()
                             }
                         }
-                        state.errorMessageResId != null -> OfflineStateWidget(
+                        state.errorMessageResId != null -> AppErrorWidget(
+                            errorType = state.errorType,
                             onRetry = { onEvent(NewsEvent.RetryClicked) },
                             modifier = Modifier.align(Alignment.Center),
                         )

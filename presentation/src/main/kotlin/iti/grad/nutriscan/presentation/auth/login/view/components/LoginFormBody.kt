@@ -22,7 +22,7 @@ import iti.grad.nutriscan.presentation.auth.login.state.LoginState
 import iti.grad.nutriscan.presentation.common.components.AppButton
 import iti.grad.nutriscan.presentation.common.components.AuthBottomPrompt
 import iti.grad.nutriscan.presentation.common.components.AuthDivider
-import iti.grad.nutriscan.presentation.common.components.FigmaInputField
+import iti.grad.nutriscan.presentation.common.components.AuthInputField
 import iti.grad.nutriscan.presentation.common.components.SocialLoginRow
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.theme.PlusJakartaSans
@@ -46,26 +46,27 @@ fun LoginFormBody(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // ── Email ──────────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.email,
             onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
             label = stringResource(R.string.email_label),
             hint = stringResource(R.string.email_hint),
-            leadingIconRes = R.drawable.ic_gender_male,
+            leadingIconRes = R.drawable.ic_email,
             hasError = state.emailErrorResId != null,
             errorResId = state.emailErrorResId,
             inputContainerBg = inputContainerBg,
             inputLabelColor = inputLabelColor,
-            inputTextColor = inputTextColor
+            inputTextColor = inputTextColor,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Email
         )
 
         // ── Password ───────────────────────────────────────────────────────
-        FigmaInputField(
+        AuthInputField(
             value = state.password,
             onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
             label = stringResource(R.string.password_label),
             hint = stringResource(R.string.password_hint),
-            leadingIconRes = R.drawable.ic_gender_male_1,
+            leadingIconRes = R.drawable.ic_lock,
             isPassword = true,
             isPasswordVisible = state.passwordVisible,
             onVisibilityToggle = { onEvent(LoginEvent.TogglePasswordVisibility) },
@@ -115,13 +116,14 @@ fun LoginFormBody(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ── Social icons ────────────────────────────────────────────────────
-        SocialLoginRow(
-            onSocialClick = { provider ->
-                onEvent(LoginEvent.SocialLoginClicked(provider))
-            }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        // Commented out for now — not ready to show yet.
+        // SocialLoginRow(
+        //     onSocialClick = { provider ->
+        //         onEvent(LoginEvent.SocialLoginClicked(provider))
+        //     }
+        // )
+        //
+        // Spacer(modifier = Modifier.height(24.dp))
 
         // ── Don't have an account? Sign Up. ─────────────────────────────────
         AuthBottomPrompt(

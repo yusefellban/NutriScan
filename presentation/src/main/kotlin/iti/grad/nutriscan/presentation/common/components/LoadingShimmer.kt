@@ -30,9 +30,9 @@ fun Modifier.shimmerEffect(): Modifier = composed {
     
     val shimmerColors = if (isDark) {
         listOf(
-            AppTheme.colors.Gray1300.copy(alpha = 0.5f),
-            AppTheme.colors.Gray1200.copy(alpha = 0.7f),
-            AppTheme.colors.Gray1300.copy(alpha = 0.5f),
+            AppTheme.colors.Gray700.copy(alpha = 0.9f),
+            AppTheme.colors.Gray500.copy(alpha = 1f),
+            AppTheme.colors.Gray700.copy(alpha = 0.9f),
         )
     } else {
         listOf(

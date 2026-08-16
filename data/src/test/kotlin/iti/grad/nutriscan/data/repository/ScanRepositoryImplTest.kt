@@ -3,14 +3,20 @@ package iti.grad.nutriscan.data.repository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import iti.grad.nutriscan.data.db.dao.ScannedProductDao
+import iti.grad.nutriscan.data.db.entity.ScannedProductEntity
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
+import iti.grad.nutriscan.data.remote.dto.OpenFoodFactsProductDto
+import iti.grad.nutriscan.data.remote.dto.OpenFoodFactsResponseDto
 import iti.grad.nutriscan.data.remote.dto.PageDto
 import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
 import iti.grad.nutriscan.domain.auth.repository.IAuthRepository
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -24,6 +30,7 @@ class ScanRepositoryImplTest {
     private lateinit var openFoodFactsApiService: OpenFoodFactsApiService
     private lateinit var scanApiService: ScanApiService
     private lateinit var authRepository: IAuthRepository
+    private lateinit var scannedProductDao: ScannedProductDao
     private lateinit var repository: ScanRepositoryImpl
 
     private fun page(vararg scanIds: String) = PageDto(
@@ -42,10 +49,12 @@ class ScanRepositoryImplTest {
         openFoodFactsApiService = mockk()
         scanApiService = mockk()
         authRepository = mockk()
+        scannedProductDao = mockk()
         repository = ScanRepositoryImpl(
             openFoodFactsApiService,
             scanApiService,
             authRepository,
+            scannedProductDao,
             UnconfinedTestDispatcher(),
         )
     }
@@ -88,5 +97,57 @@ class ScanRepositoryImplTest {
         coEvery { scanApiService.getRecentScans(0, 1) } returns page("fresh")
 
         assertEquals("fresh", repository.getRecentScans(0, 1).getOrThrow().single().scanId)
+    }
+
+    @Test
+    fun `a successful barcode lookup caches the result for offline reuse`() = runTest {
+        coEvery { openFoodFactsApiService.getProduct("111") } returns OpenFoodFactsResponseDto(
+            status = 1,
+            product = OpenFoodFactsProductDto(productName = "Milk", brands = "Almarai"),
+        )
+        coEvery { scannedProductDao.insert(any()) } returns Unit
+
+        val result = repository.getProductByBarcode("111").getOrThrow()
+
+        assertEquals("Milk", result.productName)
+        coVerify(exactly = 1) {
+            scannedProductDao.insert(
+                ScannedProductEntity(
+                    barcode = "111",
+                    productName = "Milk",
+                    brand = "Almarai",
+                    imageUrl = null,
+                    healthTag = null,
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `a barcode lookup with no connectivity falls back to the cached product`() = runTest {
+        coEvery { openFoodFactsApiService.getProduct("111") } throws java.io.IOException("no network")
+        coEvery { scannedProductDao.getByBarcode("111") } returns ScannedProductEntity(
+            barcode = "111",
+            productName = "Milk",
+            brand = "Almarai",
+            imageUrl = null,
+            healthTag = "A",
+        )
+
+        val result = repository.getProductByBarcode("111").getOrThrow()
+
+        assertEquals("Milk", result.productName)
+        assertEquals("A", result.healthTag)
+    }
+
+    @Test
+    fun `a barcode lookup with no connectivity and no cache fails`() = runTest {
+        coEvery { openFoodFactsApiService.getProduct("999") } throws java.io.IOException("no network")
+        coEvery { scannedProductDao.getByBarcode("999") } returns null
+
+        val result = repository.getProductByBarcode("999")
+
+        assertTrue(result.isFailure)
+        assertNull(result.getOrNull())
     }
 }

@@ -1,5 +1,10 @@
 package iti.grad.nutriscan.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -8,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,7 +44,6 @@ import iti.grad.nutriscan.presentation.settings.terms.view.TermsAndConditionsScr
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
-import iti.grad.nutriscan.presentation.news.home.view.NewsHomeScreen
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
 import iti.grad.nutriscan.presentation.news.detail.view.NewsDetailScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
@@ -56,9 +61,17 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: Any = SplashRoute
 ) {
+    val transitionSpec = tween<IntOffset>(durationMillis = 450)
+    val fadeSpec = tween<Float>(durationMillis = 450)
+
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        // Applies to every `composable<Route>` below — no per-screen wiring needed.
+        enterTransition = { slideInHorizontally(transitionSpec) { it } + fadeIn(fadeSpec) },
+        exitTransition = { fadeOut(fadeSpec) },
+        popEnterTransition = { fadeIn(fadeSpec) },
+        popExitTransition = { slideOutHorizontally(transitionSpec) { it } + fadeOut(fadeSpec) },
     ) {
         // 1. Splash Screen
         composable<SplashRoute> {
@@ -216,7 +229,7 @@ fun AppNavGraph(
                 onNavigateToProductDetail = { scanId ->
                     navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
-                onNavigateToNews = { navController.navigate(NewsHomeRoute) },
+                onNavigateToNews = { navController.navigate(NewsRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationHistoryRoute) },
@@ -422,29 +435,7 @@ fun AppNavGraph(
             )
         }
         
-         // 30a. News Home (Landing)
-        composable<NewsHomeRoute> {
-            NewsHomeScreen(
-                onNavigateBack = { navController.navigateUp() },
-                onNavigateToDiscover = { navController.navigate(NewsRoute) },
-                onNavigateToDetail = { article ->
-                    navController.navigate(
-                        NewsDetailRoute(
-                            title = article.title,
-                            description = article.description,
-                            url = article.url,
-                            imageUrl = article.imageUrl,
-                            sourceName = article.sourceName,
-                            publishedAtLabel = article.publishedAtLabel,
-                            author = article.author,
-                            category = article.category
-                        )
-                    )
-                }
-            )
-        }
-
-         // 30b. News Discover (Search)
+         // 30. News (single search + chips + list screen)
         composable<NewsRoute> {
             NewsScreen(
                 onNavigateBack = { navController.navigateUp() },

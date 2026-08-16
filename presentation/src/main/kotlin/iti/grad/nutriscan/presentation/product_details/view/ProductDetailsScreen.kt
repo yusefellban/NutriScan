@@ -1,43 +1,55 @@
 package iti.grad.nutriscan.presentation.product_details.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppTopHeader
+import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
+import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
+import iti.grad.nutriscan.presentation.common.components.SectionHeroHeader
 import iti.grad.presentation.R
 import iti.grad.nutriscan.presentation.common.components.DeleteWarningAlert
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffect
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
 import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 
+import iti.grad.nutriscan.presentation.product_details.view.components.ProductDetailsShimmer
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductImageCard
 import iti.grad.nutriscan.presentation.product_details.view.components.ProductInfoHeader
 import iti.grad.nutriscan.presentation.product_details.viewmodel.ProductDetailsViewModel
@@ -80,60 +92,76 @@ private fun ProductDetailsContent(
     }
 
     val scrollState = rememberScrollState()
+    val haptics = LocalHapticFeedback.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppTheme.colors.Background)
-            .verticalScroll(scrollState),
+            .background(AppTheme.colors.ProfileHeaderBackground),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(AppTheme.colors.Primary)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
+        // ── Top Bar ── same SectionHeroHeader shape/spacing as Home/Saved/Calories/Profile.
+        SectionHeroHeader {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 56.dp, bottom = 24.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // ── Top Bar ──
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    // Decorative semicircle, same as Home/Profile/Calories/Saved headers.
-                    Image(
-                        painter = painterResource(R.drawable.profile_edge),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
-                        modifier = Modifier.align(Alignment.TopEnd),
-                    )
-                    AppTopHeader(
-                        title = stringResource(R.string.product_details_title),
-                        onBackClick = { onEvent(ProductDetailsEvent.BackClicked) },
-                        actionIconResId = if (state.productDetail?.isBookmarked == true) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark_outline,
-                        actionIconContentDescription = stringResource(
-                            if (state.productDetail?.isBookmarked == true) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
-                        ),
-                        onActionClick = { onEvent(ProductDetailsEvent.BookmarkToggled) }
-                    )
-                }
+                AppBackButton(
+                    onClick = { onEvent(ProductDetailsEvent.BackClicked) },
+                    surface = BackButtonSurface.OnAccent,
+                )
 
-                // ── White Body Container ──
+                Spacer(modifier = Modifier.width(12.dp))
+
+                HeroHeaderTitle(
+                    text = stringResource(R.string.product_details_title),
+                    modifier = Modifier.weight(1f),
+                )
+
+                val isBookmarked = state.productDetail?.isBookmarked == true
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                        .background(AppTheme.colors.Background),
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(AppTheme.colors.Teal700)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {
+                                haptics.tick()
+                                onEvent(ProductDetailsEvent.BookmarkToggled)
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
                 ) {
+                    Icon(
+                        painter = painterResource(
+                            id = if (isBookmarked) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark_outline
+                        ),
+                        contentDescription = stringResource(
+                            if (isBookmarked) R.string.product_details_bookmark_remove else R.string.product_details_bookmark_add
+                        ),
+                        tint = AppTheme.colors.CaloriesIconOnAccent,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+        }
+
+        // ── White Body Container ──
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(AppTheme.colors.Background)
+                .verticalScroll(scrollState),
+        ) {
                     when {
                         state.isLoading -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(400.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color = AppTheme.colors.Primary,
-                                )
-                            }
+                            ProductDetailsShimmer()
                         }
 
                         state.isNotFound -> {
@@ -144,7 +172,8 @@ private fun ProductDetailsContent(
                         }
 
                         state.errorMessageResId != null -> {
-                            OfflineStateWidget(
+                            AppErrorWidget(
+                                errorType = state.errorType,
                                 onRetry = { onEvent(ProductDetailsEvent.RetryLoad) },
                                 modifier = Modifier.padding(vertical = 48.dp),
                             )
@@ -153,7 +182,9 @@ private fun ProductDetailsContent(
                         state.productDetail != null -> {
                             val product = state.productDetail
                             Column(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 20.dp),
                             ) {
                                 // ── Product Image ──
                                 ProductImageCard(
@@ -165,6 +196,7 @@ private fun ProductDetailsContent(
                                 // ── Name + Verdict + Safety Text ──
                                 ProductInfoHeader(
                                     productName = product.productName,
+                                    status = product.status,
                                     verdict = product.verdict,
                                     scanDate = product.scanDate,
                                     safetyReasonText = product.safetyReasonText,
@@ -195,8 +227,6 @@ private fun ProductDetailsContent(
                             }
                         }
                     }
-                }
-            }
         }
     }
 }

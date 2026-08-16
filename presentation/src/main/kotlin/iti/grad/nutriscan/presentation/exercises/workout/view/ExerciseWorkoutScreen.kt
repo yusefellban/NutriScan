@@ -56,6 +56,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.text.style.TextAlign
 import iti.grad.nutriscan.presentation.common.components.AppBackButton
+import iti.grad.nutriscan.presentation.common.components.BackButtonSurface
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.window.Dialog
@@ -180,8 +181,7 @@ fun ExerciseWorkoutScreen(
                         viewModel.onEvent(ExerciseWorkoutEvent.OnBackClick)
                     }
                 },
-                iconTint = AppTheme.colors.ExerciseBackButtonTint,
-                borderColor = AppTheme.colors.ExerciseBackButtonTint
+                surface = BackButtonSurface.OnLight,
             )
             Text(
                 text = stringResource(id = R.string.exercise_workout_title),

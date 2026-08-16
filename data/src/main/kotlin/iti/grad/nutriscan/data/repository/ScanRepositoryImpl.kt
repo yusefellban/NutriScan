@@ -2,8 +2,11 @@ package iti.grad.nutriscan.data.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import iti.grad.nutriscan.data.db.dao.ScannedProductDao
+import iti.grad.nutriscan.data.db.entity.ScannedProductEntity
 import iti.grad.nutriscan.data.remote.api.OpenFoodFactsApiService
 import iti.grad.nutriscan.data.remote.api.ScanApiService
+import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
 import iti.grad.nutriscan.domain.scan.model.ProductResult
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.repository.IScanRepository
@@ -21,11 +24,13 @@ import javax.inject.Inject
 import androidx.core.graphics.scale
 import iti.grad.nutriscan.domain.scan.model.ScanHistoryEntry
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
+import iti.grad.nutriscan.domain.common.runCatchingCancellable
 
 class ScanRepositoryImpl @Inject constructor(
     private val openFoodFactsApiService: OpenFoodFactsApiService,
     private val scanApiService: ScanApiService,
     private val authRepository: IAuthRepository,
+    private val scannedProductDao: ScannedProductDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IScanRepository {
 
@@ -39,33 +44,54 @@ class ScanRepositoryImpl @Inject constructor(
 
     override suspend fun getProductByBarcode(barcode: String): Result<ProductResult> {
         return withContext(ioDispatcher) {
+            val cleanBarcode = barcode.trim()
             try {
-                val cleanBarcode = barcode.trim()
                 val response = openFoodFactsApiService.getProduct(cleanBarcode)
                 if (response.status == 1 && response.product != null) {
                     val product = response.product
                     val name = product.productName ?: product.productNameFr
                     val brand = product.brands
                     val imageUrl = product.imageFrontSmallUrl
-                    val healthTag = product.ecoscoreGrade?.uppercase() 
+                    val healthTag = product.ecoscoreGrade?.uppercase()
                         ?: product.nutritionGradesTags?.firstOrNull()?.uppercase()
-                    
-                    Result.success(
-                        ProductResult(
-                            barcode = barcode,
+
+                    val result = ProductResult(
+                        barcode = barcode,
+                        productName = name,
+                        brand = brand,
+                        imageUrl = imageUrl,
+                        healthTag = healthTag
+                    )
+                    scannedProductDao.insert(
+                        ScannedProductEntity(
+                            barcode = cleanBarcode,
                             productName = name,
                             brand = brand,
                             imageUrl = imageUrl,
-                            healthTag = healthTag
+                            healthTag = healthTag,
                         )
                     )
+                    Result.success(result)
                 } else if (response.status == 0) {
                     Result.failure(Exception("Not in OpenFoodFacts DB"))
                 } else {
                     Result.failure(Exception("Unknown API Error: Status ${response.status}"))
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                val cached = scannedProductDao.getByBarcode(cleanBarcode)
+                if (cached != null) {
+                    Result.success(
+                        ProductResult(
+                            barcode = barcode,
+                            productName = cached.productName,
+                            brand = cached.brand,
+                            imageUrl = cached.imageUrl,
+                            healthTag = cached.healthTag,
+                        )
+                    )
+                } else {
+                    Result.failure(e)
+                }
             }
         }
     }
@@ -118,6 +144,25 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Submit a barcode value for AI nutritional analysis.
+     *
+     * Hits POST /v1/scans/barcode with { "barcode": "<value>" }.
+     * Returns a [ScanResult] in PROCESSING status. The caller is responsible for polling
+     * [getScanResult] until the status transitions to COMPLETED or FAILED before
+     * surfacing any verdict — see [IScanRepository.submitBarcodeScan] KDoc.
+     */
+    override suspend fun submitBarcodeScan(barcode: String): Result<ScanResult> {
+        return withContext(ioDispatcher) {
+            try {
+                val response = scanApiService.submitBarcodeScan(BarcodeScanRequestDto(barcode))
+                Result.success(response.toDomain())
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
     override suspend fun getScanResult(scanId: String): Result<ScanResult> {
         return withContext(ioDispatcher) {
             try {
@@ -153,28 +198,30 @@ class ScanRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecentScans(page: Int, size: Int): Result<List<ScanHistoryEntry>> {
+    override suspend fun getRecentScans(
+        page: Int,
+        size: Int,
+        date: String?,
+        verdict: String?,
+        query: String?,
+        scanStatus: String?,
+    ): Result<List<ScanHistoryEntry>> {
         return withContext(ioDispatcher) {
             val userId = authRepository.getCurrentUserId()
-            // Drop another account's cached scans before they can be read or extended.
-            if (userId != cachedScansUserId) {
-                localRecentScans = null
-                cachedScansUserId = userId
-            }
-
-            if (page == 0 && localRecentScans != null && localRecentScans!!.size >= size) {
+            val isFiltered = date != null || verdict != null || query != null || scanStatus != null
+            if (!isFiltered && page == 0 && localRecentScans != null && localRecentScans!!.size >= size && cachedScansUserId == userId) {
                 return@withContext Result.success(localRecentScans!!.take(size))
             }
             try {
-                val response = scanApiService.getRecentScans(page, size)
+                val response = scanApiService.getRecentScans(page, size, query, date, verdict, scanStatus)
                 val domainScans = response.content.map { it.toDomain() }
-                if (page == 0) {
+                if (!isFiltered && page == 0) {
                     localRecentScans = domainScans.toMutableList()
                     cachedScansUserId = userId
                 }
                 Result.success(domainScans)
             } catch (e: Exception) {
-                if (page == 0 && localRecentScans != null) {
+                if (!isFiltered && page == 0 && localRecentScans != null) {
                     Result.success(localRecentScans!!.take(size))
                 } else {
                     Result.failure(e)
@@ -185,4 +232,25 @@ class ScanRepositoryImpl @Inject constructor(
 
     // ponytail: returns null until scan history is persisted (no scan-history storage exists yet)
     override suspend fun getLastScanDate(): LocalDate? = null
+
+    override suspend fun getScanSuggestions(query: String): Result<List<String>> {
+        return withContext(ioDispatcher) {
+            try {
+                Result.success(scanApiService.getScanSuggestions(query))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun deleteScan(scanId: String): Result<Unit> {
+        return withContext(ioDispatcher) {
+            runCatchingCancellable {
+                scanApiService.deleteScan(scanId)
+                // Invalidate local cache
+                localRecentScans?.removeAll { it.scanId == scanId }
+                Unit
+            }
+        }
+    }
 }

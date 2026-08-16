@@ -16,9 +16,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,27 +48,34 @@ import java.time.Duration
 import java.time.Instant
 
 private val cardShape = RoundedCornerShape(16.dp)
+private val cardHeight = 156.dp
+private val cardContentInset = 8.dp
+private val articleImageSize = cardHeight - (cardContentInset * 2) // 140.dp
 
 @Composable
 fun NewsArticleCard(
     article: NewsUiArticle,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onShareClick: () -> Unit = {},
 ) {
+    var isMenuExpanded by remember { mutableStateOf(false) }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(cardHeight)
             .clip(cardShape)
             .border(width = 1.dp, color = AppTheme.colors.NewsCardBorder, shape = cardShape)
             .background(AppTheme.colors.NewsCardBg)
             .clickable(onClick = onClick)
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(cardContentInset),
+        horizontalArrangement = Arrangement.spacedBy(cardContentInset),
     ) {
-        // Thumbnail image — 96dp square, rounded
+        // Thumbnail image — derived from card height so left/bottom gaps stay equal (140dp)
         Box(
             modifier = Modifier
-                .size(96.dp)
+                .size(articleImageSize)
                 .clip(RoundedCornerShape(12.dp))
                 .background(AppTheme.colors.NewsSourceAvatarBg),
             contentAlignment = Alignment.Center
@@ -74,7 +92,7 @@ fun NewsArticleCard(
                     painter = painterResource(id = R.drawable.ic_image_placeholder),
                     contentDescription = null,
                     tint = AppTheme.colors.NewsCategoryLabel,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(32.dp)
                 )
             }
         }
@@ -83,68 +101,101 @@ fun NewsArticleCard(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .height(96.dp),
+                .height(articleImageSize),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            // Category + Title
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = article.category,
-                    style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = AppTheme.colors.NewsCategoryLabel,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            // Title + optional author
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = article.title,
                     style = AppTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = AppTheme.colors.NewsCardTitle,
-                    maxLines = 2,
+                    maxLines = if (article.author.isNullOrBlank()) 5 else 4,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (!article.author.isNullOrBlank()) {
+                    Text(
+                        text = stringResource(id = R.string.news_author_prefix, article.author),
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.colors.NewsSourceText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
 
-            // Source row: person avatar circle + source name + dot + time
+            // Bottom row: feed label + dot + time, and a trailing three-dot menu
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                // Teal circle with person icon
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .background(AppTheme.colors.NewsSourceAvatarBg, CircleShape),
-                    contentAlignment = Alignment.Center,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f, fill = false),
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_person_solid),
-                        contentDescription = stringResource(id = R.string.news_source_avatar_content_description),
-                        tint = AppTheme.colors.NewsCategoryLabel,
-                        modifier = Modifier.size(10.dp),
+                    Text(
+                        text = article.category,
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.colors.NewsCategoryLabel,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Text(
+                        text = stringResource(id = R.string.news_source_time_separator),
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.colors.NewsSourceText,
+                    )
+
+                    Text(
+                        text = formatPublishedAt(article.publishedAtLabel),
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.colors.NewsSourceText,
+                        maxLines = 1,
                     )
                 }
 
-                Text(
-                    text = article.sourceName,
-                    style = AppTheme.typography.bodySmall,
-                    color = AppTheme.colors.NewsSourceText,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false),
-                )
+                Spacer(modifier = Modifier.weight(1f))
 
-                Text(
-                    text = stringResource(id = R.string.news_source_time_separator),
-                    style = AppTheme.typography.bodySmall,
-                    color = AppTheme.colors.NewsSourceText,
-                )
-
-                Text(
-                    text = formatPublishedAt(article.publishedAtLabel),
-                    style = AppTheme.typography.bodySmall,
-                    color = AppTheme.colors.NewsSourceText,
-                    maxLines = 1,
-                )
+                Box {
+                    IconButton(
+                        onClick = { isMenuExpanded = true },
+                        modifier = Modifier.size(24.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreHoriz,
+                            contentDescription = stringResource(id = R.string.news_article_menu_content_description),
+                            tint = AppTheme.colors.NewsSourceText,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = isMenuExpanded,
+                        onDismissRequest = { isMenuExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(id = R.string.news_menu_open_article)) },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.OpenInBrowser, contentDescription = null)
+                            },
+                            onClick = {
+                                isMenuExpanded = false
+                                onClick()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(id = R.string.news_menu_share)) },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.Share, contentDescription = null)
+                            },
+                            onClick = {
+                                isMenuExpanded = false
+                                onShareClick()
+                            },
+                        )
+                    }
+                }
             }
         }
     }
@@ -170,15 +221,16 @@ fun NewsArticleShimmerCard(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(cardHeight)
             .clip(cardShape)
             .border(width = 1.dp, color = AppTheme.colors.NewsCardBorder, shape = cardShape)
             .background(AppTheme.colors.NewsCardBg)
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(cardContentInset),
+        horizontalArrangement = Arrangement.spacedBy(cardContentInset),
     ) {
         Box(
             modifier = Modifier
-                .size(96.dp)
+                .size(articleImageSize)
                 .clip(RoundedCornerShape(12.dp))
                 .shimmerEffect()
         )
@@ -186,7 +238,7 @@ fun NewsArticleShimmerCard(modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .height(96.dp),
+                .height(articleImageSize),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

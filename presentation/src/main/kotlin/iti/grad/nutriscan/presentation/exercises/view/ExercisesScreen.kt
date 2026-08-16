@@ -1,9 +1,7 @@
 package iti.grad.nutriscan.presentation.exercises.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,12 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,30 +21,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.grad.nutriscan.presentation.common.components.AppBackButton
 import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemCard
 import iti.grad.nutriscan.presentation.common.components.ExerciseListItemShimmerCard
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEffect
 import iti.grad.nutriscan.presentation.exercises.state.ExercisesEvent
 import iti.grad.nutriscan.presentation.exercises.view.components.ExerciseInstructionsBottomSheet
 import iti.grad.nutriscan.presentation.exercises.viewmodel.ExercisesViewModel
-import iti.grad.nutriscan.presentation.profile_setup.view.components.SelectableChip
+import iti.grad.nutriscan.presentation.common.components.SelectableChip
 import iti.grad.nutriscan.presentation.saved.view.components.SavedSearchBar
+import iti.grad.nutriscan.presentation.settings.app.view.components.AppSettingsHeader
 import iti.grad.presentation.R
 import kotlinx.coroutines.flow.collectLatest
 import iti.grad.nutriscan.presentation.common.components.SearchNotFoundEmptyStateWidget
 
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.ui.graphics.Color
-
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 
 @Composable
@@ -72,41 +61,27 @@ fun ExercisesScreen(
 
     Scaffold(
         containerColor = AppTheme.colors.Background,
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top),
+        contentWindowInsets = WindowInsets(0),
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 22.dp)
         ) {
-            Spacer(modifier = Modifier.height(28.dp))
+        // ── Header ── same AppSettingsHeader panel/spacing as Scan History.
+        AppSettingsHeader(
+            title = stringResource(id = R.string.exercises_title),
+            onBackClick = { viewModel.onEvent(ExercisesEvent.OnBackClick) },
+        )
 
-        // ── Header ──
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AppBackButton(
-                onClick = { viewModel.onEvent(ExercisesEvent.OnBackClick) },
-                iconTint = AppTheme.colors.ExerciseBackButtonTint,
-                borderColor = AppTheme.colors.ExerciseBackButtonTint
-            )
-            Text(
-                text = stringResource(id = R.string.exercises_title),
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.TextPrimary,
-                modifier = Modifier.padding(start = 12.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // ── Search bar (shared component with height 48.dp to match UI height) ──
         SavedSearchBar(
             query = state.searchQuery,
             onQueryChange = { viewModel.onEvent(ExercisesEvent.OnSearchQueryChange(it)) },
-            height = 48.dp
+            height = 48.dp,
+            modifier = Modifier.padding(horizontal = 20.dp),
         )
 
         // 5- decrease slightly the vertical space between the search bar and the chips which are under it
@@ -114,6 +89,7 @@ fun ExercisesScreen(
 
         // ── Category chips ──
         LazyRow(
+            modifier = Modifier.padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(state.categories, key = { it.id }) { category ->
@@ -135,7 +111,7 @@ fun ExercisesScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ── Exercise list ──
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
             when {
                 state.isLoading -> {
                     LazyColumn(
@@ -152,7 +128,8 @@ fun ExercisesScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        OfflineStateWidget(
+                        AppErrorWidget(
+                            errorType = state.errorType,
                             onRetry = { viewModel.onEvent(ExercisesEvent.OnRetryClick) }
                         )
                     }

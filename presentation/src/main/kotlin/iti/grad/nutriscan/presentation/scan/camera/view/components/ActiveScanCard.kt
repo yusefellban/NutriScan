@@ -47,6 +47,7 @@ fun ActiveScanCard(
     scan: ActiveScanUiModel,
     onBookmarkClick: () -> Unit,
     onCardClick: () -> Unit = {},
+    onRetryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(22.dp)
@@ -97,25 +98,30 @@ fun ActiveScanCard(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (!scan.isProcessing && !scan.isFailed && scan.fullResult != null) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(AppTheme.colors.Teal800)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onBookmarkClick,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
-                    contentDescription = stringResource(R.string.scan_saved_content_description),
-                    tint = AppTheme.colors.PrimaryVariant,
-                    modifier = Modifier.size(22.dp),
-                )
+        if (scan.isFailed) {
+            // No retry button requested
+        } else if (!scan.isProcessing && scan.fullResult != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(AppTheme.colors.Teal800)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onBookmarkClick,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
+                        contentDescription = stringResource(R.string.scan_saved_content_description),
+                        tint = AppTheme.colors.PrimaryVariant,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
             }
         }
     }

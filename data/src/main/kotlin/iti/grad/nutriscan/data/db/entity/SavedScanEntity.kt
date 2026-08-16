@@ -10,6 +10,7 @@ data class SavedScanEntity(
     val scannedAt: String?,
     val imageUrl: String?,
     val verdict: String?, // SAFE, CAUTION, UNSAFE
+    val status: String, // COMPLETED, FAILED, PROCESSING
     val summary: String?,
     val productName: String?,
     // The flagged ingredients and nutrition facts will be stored as JSON strings

@@ -23,6 +23,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import iti.grad.presentation.R
 
 import iti.grad.nutriscan.domain.disease.usecase.SyncDiseasesUseCase
 import iti.grad.nutriscan.domain.allergy.usecase.SyncAllergiesUseCase
@@ -209,7 +210,7 @@ class ProfileSetupPagerViewModel @Inject constructor(
                 .onFailure { throwable ->
                     _effect.send(
                         ProfileSetupPagerEffect.ShowSnackbar(
-                            messageStr = throwable.message ?: "Failed to save profile"
+                            messageResId = R.string.profile_setup_save_error
                         )
                     )
                 }

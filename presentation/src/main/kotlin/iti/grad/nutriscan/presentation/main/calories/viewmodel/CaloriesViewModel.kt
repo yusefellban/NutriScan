@@ -10,10 +10,12 @@ import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateTargetWaterCntUseCa
 import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateWaterCntUseCase
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
+import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryCompletelyUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEffect
 import iti.grad.nutriscan.presentation.main.calories.state.CaloriesEvent
@@ -39,6 +41,7 @@ class CaloriesViewModel @Inject constructor(
     private val observeTodaySteps: ObserveTodayStepsUseCase,
     private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
     private val removeFoodEntry: RemoveFoodEntryUseCase,
+    private val removeFoodEntryCompletely: RemoveFoodEntryCompletelyUseCase,
     private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
     private val updateWaterCnt: UpdateWaterCntUseCase,
     private val updateTargetWaterCnt: UpdateTargetWaterCntUseCase,
@@ -61,19 +64,15 @@ class CaloriesViewModel @Inject constructor(
         observeUserMetrics()
     }
 
-    /** Server-computed TDEE/BMI (see [iti.grad.nutriscan.domain.user.model.User]) — null until
-     * the first profile sync completes. The Calories screen shows a placeholder in that gap
-     * rather than hiding the BMI page. */
+    /** Server-computed TDEE (see [iti.grad.nutriscan.domain.user.model.User]) — 0 until the
+     * first profile sync completes. */
     private fun observeUserMetrics() {
         viewModelScope.launch {
             userRepository.getUserData()
                 .catch { /* Ignored */ }
                 .collect { user ->
                 _state.update {
-                    it.copy(
-                        tdee = user?.tdee?.toInt() ?: 0,
-                        bmi = user?.bmi,
-                    )
+                    it.copy(tdee = user?.tdee?.toInt() ?: 0)
                 }
             }
         }
@@ -107,7 +106,7 @@ class CaloriesViewModel @Inject constructor(
             is CaloriesEvent.WaterCupLongPressed -> removeWaterCup(event.index)
             CaloriesEvent.StepsCardClicked -> checkStepsAccess()
             is CaloriesEvent.StepsPermissionResult -> handleStepsPermissionResult(event.granted)
-            is CaloriesEvent.FoodItemSwipedToRemove -> {
+            is CaloriesEvent.FoodItemDeleteClicked -> {
                 _state.update { it.copy(pendingRemoveFoodId = event.entryId) }
             }
             CaloriesEvent.RemoveFoodConfirmed -> confirmRemoveFood()
@@ -115,6 +114,7 @@ class CaloriesViewModel @Inject constructor(
                 _state.update { it.copy(pendingRemoveFoodId = null) }
             }
             is CaloriesEvent.FoodItemClicked -> navigate(CaloriesEffect.NavigateToProductDetail(event.product))
+            is CaloriesEvent.FoodItemMinusClicked -> minusFoodItem(event.entryId)
             CaloriesEvent.Refreshed -> refresh()
         }
     }
@@ -150,12 +150,21 @@ class CaloriesViewModel @Inject constructor(
         }
     }
 
+    /** Delete button — removes every serving of the entry, regardless of its current count. */
     private fun confirmRemoveFood() {
         val entryId = _state.value.pendingRemoveFoodId ?: return
         viewModelScope.launch {
-            removeFoodEntry(entryId)
+            removeFoodEntryCompletely(entryId)
                 .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.food_log_remove_error)) }
             _state.update { it.copy(pendingRemoveFoodId = null) }
+        }
+    }
+
+    /** Minus button — decrements one serving immediately, no confirmation. */
+    private fun minusFoodItem(entryId: String) {
+        viewModelScope.launch {
+            removeFoodEntry(entryId)
+                .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.food_log_remove_error)) }
         }
     }
 
@@ -207,7 +216,10 @@ class CaloriesViewModel @Inject constructor(
     private fun toggleWaterCup(index: Int) {
         val state = _state.value
         val newWaterCnt = when {
-            index == state.waterConsumed && index < state.waterGoal -> state.waterConsumed + 1
+            // Tapping any empty cup jumps straight to it — fills every cup up to and including
+            // it in one update; the cascading fill-by-fill look is purely a UI animation (see
+            // WaterTrackerCard.WaterCup), not a series of backend writes.
+            index >= state.waterConsumed && index < state.waterGoal -> index + 1
             index == state.waterConsumed - 1 && state.waterConsumed > 0 -> state.waterConsumed - 1
             else -> return
         }
@@ -224,7 +236,7 @@ class CaloriesViewModel @Inject constructor(
             updateTargetWaterCnt(newGoal)
             updateWaterCnt(newWaterCnt)
         }
-        navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed))
+        navigate(CaloriesEffect.ShowSnackbar(R.string.cup_removed, type = SnackbarType.SUCCESS))
     }
 
     private fun navigate(effect: CaloriesEffect) {

@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.scan.camera.view.components
 
+import androidx.compose.animation.core.EaseInOutSine
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -12,13 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -28,11 +26,9 @@ import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.scan.camera.state.ScanInputMode
 import iti.grad.presentation.R
-import androidx.compose.ui.graphics.drawscope.Stroke
 
-private val FrameSize = 260.dp
-private val CornerLength = 40.dp
-private val CornerStroke = 4.dp
+// The horizontal area the beam sweeps across (full screen width, limited vertical band)
+private val ScanAreaHeight = 260.dp
 
 @Composable
 fun ScanFrameOverlay(
@@ -40,34 +36,40 @@ fun ScanFrameOverlay(
     modifier: Modifier = Modifier,
 ) {
     val frameDescription = stringResource(R.string.scan_frame_content_description)
-    val cornerAlpha = when (selectedMode) {
-        ScanInputMode.QR -> 1f
-        ScanInputMode.PHOTO -> 0.9f
-        ScanInputMode.GALLERY -> 0.6f
-    }
-    val lineAlpha = when (selectedMode) {
-        ScanInputMode.QR -> 0.66f
-        ScanInputMode.PHOTO -> 0.5f
-        ScanInputMode.GALLERY -> 0.24f
-    }
+
     val durationMillis = when (selectedMode) {
-        ScanInputMode.QR -> 1200
-        ScanInputMode.PHOTO -> 2100
-        ScanInputMode.GALLERY -> 2800
+        ScanInputMode.PHOTO   -> 1800
+        ScanInputMode.GALLERY -> 2400
     }
-    val cornerColor = AppTheme.colors.OnPrimary.copy(alpha = cornerAlpha)
-    val scanLineColor = AppTheme.colors.OnPrimary.copy(alpha = lineAlpha)
+
+    val primaryColor = AppTheme.colors.Primary  // #13A4AB
+    val accentColor  = AppTheme.colors.Accent   // #47D3D9
+    val teal300      = AppTheme.colors.Teal300  // #CAF2F4
+
     val density = LocalDensity.current
 
-    val infiniteTransition = rememberInfiniteTransition(label = "scanLine")
-    val scanLineProgress by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
+    val infiniteTransition = rememberInfiniteTransition(label = "scanBeam")
+
+    // Beam moves top ↔ bottom with smooth ease
+    val scanProgress by infiniteTransition.animateFloat(
+        initialValue  = 0f,
+        targetValue   = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = durationMillis, easing = LinearEasing),
+            animation  = tween(durationMillis = durationMillis, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "scanLineProgress",
+        label = "scanProgress",
+    )
+
+    // Breathing glow — intensity pulses softly
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue  = 0.5f,
+        targetValue   = 1f,
+        animationSpec = infiniteRepeatable(
+            animation  = tween(durationMillis = 900, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "glowPulse",
     )
 
     Box(
@@ -75,94 +77,77 @@ fun ScanFrameOverlay(
             .semantics { contentDescription = frameDescription },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val frameSizePx = with(density) { FrameSize.toPx() }
-            val cornerLengthPx = with(density) { CornerLength.toPx() }
-            val strokeWidthPx = with(density) { CornerStroke.toPx() }
-            
+            val areaHeightPx = with(density) { ScanAreaHeight.toPx() }
+
             val w = size.width
             val h = size.height
-            
-            val left = (w - frameSizePx) / 2f
-            val top = (h - frameSizePx) / 2f
-            val right = left + frameSizePx
-            val bottom = top + frameSizePx
-            val cornerRadius = 35.dp.toPx()
-            
-            val overlayPath = Path().apply {
-                addRect(Rect(0f, 0f, w, h))
-                addRoundRect(
-                    RoundRect(
-                        left = left,
-                        top = top,
-                        right = right,
-                        bottom = bottom,
-                        cornerRadius = CornerRadius(cornerRadius, cornerRadius)
-                    )
-                )
-                fillType = PathFillType.EvenOdd
-            }
-            
-            drawPath(
-                path = overlayPath,
-                color = Color.Black.copy(alpha = 0.6f)
+
+            // Scan band centered vertically, full screen width
+            val top  = (h - areaHeightPx) / 2f
+
+            // Current Y of the beam inside the band
+            val lineY = top + areaHeightPx * scanProgress
+
+            // ── 1. Wide vertical glow band around the beam ────────────────────
+            val glowBandHeight = with(density) { 60.dp.toPx() }
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        primaryColor.copy(alpha = 0.10f * glowPulse),
+                        primaryColor.copy(alpha = 0.22f * glowPulse),
+                        primaryColor.copy(alpha = 0.10f * glowPulse),
+                        Color.Transparent,
+                    ),
+                    startY = lineY - glowBandHeight / 2f,
+                    endY   = lineY + glowBandHeight / 2f,
+                ),
+                topLeft = Offset(0f, lineY - glowBandHeight / 2f),
+                size    = Size(w, glowBandHeight),
             )
 
-            val cornersPath = Path().apply {
-                // Top-Left
-                moveTo(left, top + cornerLengthPx)
-                arcTo(
-                    rect = Rect(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius),
-                    startAngleDegrees = 180f,
-                    sweepAngleDegrees = 90f,
-                    forceMoveTo = false
-                )
-                lineTo(left + cornerLengthPx, top)
-
-                // Top-Right
-                moveTo(right - cornerLengthPx, top)
-                arcTo(
-                    rect = Rect(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius),
-                    startAngleDegrees = 270f,
-                    sweepAngleDegrees = 90f,
-                    forceMoveTo = false
-                )
-                lineTo(right, top + cornerLengthPx)
-
-                // Bottom-Right
-                moveTo(right, bottom - cornerLengthPx)
-                arcTo(
-                    rect = Rect(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom),
-                    startAngleDegrees = 0f,
-                    sweepAngleDegrees = 90f,
-                    forceMoveTo = false
-                )
-                lineTo(right - cornerLengthPx, bottom)
-
-                // Bottom-Left
-                moveTo(left + cornerLengthPx, bottom)
-                arcTo(
-                    rect = Rect(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom),
-                    startAngleDegrees = 90f,
-                    sweepAngleDegrees = 90f,
-                    forceMoveTo = false
-                )
-                lineTo(left, bottom - cornerLengthPx)
-            }
-
-            drawPath(
-                path = cornersPath,
-                color = cornerColor,
-                style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-            )
-
-            val lineY = top + (frameSizePx * scanLineProgress)
+            // ── 2. Outer soft halo line (wide, feathered) ─────────────────────
+            val outerStroke = with(density) { 8.dp.toPx() }
             drawLine(
-                color = scanLineColor,
-                start = Offset(left + 16f, lineY),
-                end = Offset(right - 16f, lineY),
-                strokeWidth = 2f,
-                cap = StrokeCap.Round,
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        accentColor.copy(alpha = 0.18f * glowPulse),
+                        primaryColor.copy(alpha = 0.35f * glowPulse),
+                        accentColor.copy(alpha = 0.18f * glowPulse),
+                        Color.Transparent,
+                    ),
+                    startX = 0f,
+                    endX   = w,
+                ),
+                start       = Offset(0f, lineY),
+                end         = Offset(w, lineY),
+                strokeWidth = outerStroke,
+                cap         = StrokeCap.Round,
             )
+
+            // ── 3. Inner crisp laser beam ─────────────────────────────────────
+            val beamStroke = with(density) { 2.dp.toPx() }
+            drawLine(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        teal300.copy(alpha = 0.5f),
+                        accentColor.copy(alpha = 0.85f * glowPulse),
+                        primaryColor,
+                        accentColor.copy(alpha = 0.85f * glowPulse),
+                        teal300.copy(alpha = 0.5f),
+                        Color.Transparent,
+                    ),
+                    startX = 0f,
+                    endX   = w,
+                ),
+                start       = Offset(0f, lineY),
+                end         = Offset(w, lineY),
+                strokeWidth = beamStroke,
+                cap         = StrokeCap.Round,
+            )
+
         }
     }
 }

@@ -71,6 +71,10 @@ internal data class AppColorsExtension(
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
     
+    // --- Food Log Card (Calories "Daily Products") ---
+    val FoodLogCardBackground: Color,
+    val FoodLogDashedBoxBackground: Color,
+
     // --- Product Card ---
     val ProductCardBackground: Color,
     val SavedSearchBarBorder: Color,
@@ -152,6 +156,14 @@ internal data class AppColorsExtension2(
     val ProductDetailNutritionCardBg: Color,
     val ProductDetailNutritionLabelText: Color,
     val ProductDetailNutritionText: Color,
+    /** Fixed brand hex, same in both modes — CAUTION verdict badge background. */
+    val VerdictCautionBackground: Color,
+    /** Fixed brand hex, same in both modes — CAUTION verdict badge text. */
+    val VerdictCautionText: Color,
+    /** Fixed brand hex, same in both modes — UNSAFE verdict badge background. */
+    val VerdictUnsafeBackground: Color,
+    /** Fixed brand hex, same in both modes — UNSAFE verdict badge text. */
+    val VerdictUnsafeText: Color,
 
     // --- Overlays ---
     /** Modal bottom sheet / dialog scrim. Replaces ad-hoc `Color(0x66...)` literals. */
@@ -377,6 +389,11 @@ data class AppColors internal constructor(
     val ShadowMaleSelected: Color,
     val ShadowDobActive: Color,
 
+    // --- Water Tracker ---
+    val WaterEmptyGlassTint: Color,
+    val WaterAddButtonBackground: Color,
+    val WaterAddButtonIconTint: Color,
+
     // --- User Profile Screen / App Settings ---
     // See AppColorsExtension's kdoc: kept out of this constructor to avoid
     // a D8 VerifyError crash from having too many constructor parameters.
@@ -399,6 +416,9 @@ data class AppColors internal constructor(
     val ProfileAddMemberAvatarBackground: Color get() = extension.ProfileAddMemberAvatarBackground
     val EditProfileInputBackground: Color get() = extension.EditProfileInputBackground
     val EditProfileInputBorder: Color get() = extension.EditProfileInputBorder
+
+    val FoodLogCardBackground: Color get() = extension.FoodLogCardBackground
+    val FoodLogDashedBoxBackground: Color get() = extension.FoodLogDashedBoxBackground
 
     val ProductCardBackground: Color get() = extension.ProductCardBackground
     val SavedSearchBarBorder: Color get() = extension.SavedSearchBarBorder
@@ -469,6 +489,10 @@ data class AppColors internal constructor(
     val ProductDetailNutritionCardBg: Color get() = extension2.ProductDetailNutritionCardBg
     val ProductDetailNutritionLabelText: Color get() = extension2.ProductDetailNutritionLabelText
     val ProductDetailNutritionText: Color get() = extension2.ProductDetailNutritionText
+    val VerdictCautionBackground: Color get() = extension2.VerdictCautionBackground
+    val VerdictCautionText: Color get() = extension2.VerdictCautionText
+    val VerdictUnsafeBackground: Color get() = extension2.VerdictUnsafeBackground
+    val VerdictUnsafeText: Color get() = extension2.VerdictUnsafeText
     val ScrimOverlay: Color get() = extension2.ScrimOverlay
 
     val ChatScreenBackground: Color get() = extension2.ChatScreenBackground
@@ -666,6 +690,10 @@ fun lightColors() = AppColors(
     ShadowMaleSelected = Color(0x6613A4AB),
     ShadowDobActive = Color(0x6613A4AB),
 
+    WaterEmptyGlassTint = Color(0xFFD6D6D5), // Gray400
+    WaterAddButtonBackground = Color(0xFFF1F1F1), // Gray200
+    WaterAddButtonIconTint = Color(0xFF6A6A6A), // Gray1000
+
     extension = AppColorsExtension(
         // User Profile Screen — light values match the Figma light spec
         ProfileHeaderBackground = Color(0xFF13A4AB), // Teal1000 — screen bg behind header
@@ -722,6 +750,10 @@ fun lightColors() = AppColors(
         ShadowMaleSelected = Color(0x6613A4AB),
         ShadowDobActive = Color(0x6613A4AB),
         
+        // Food Log Card (Calories "Daily Products")
+        FoodLogCardBackground = Color(0xFFE8FAFA), // Teal100
+        FoodLogDashedBoxBackground = Color(0xFFFFFFFF), // White
+
         // Product Card
         ProductCardBackground = Color(0xFFFFFFFF), // White
         SavedSearchBarBorder = Color(0xFFC0C0C0), // Gray500
@@ -803,6 +835,10 @@ fun lightColors() = AppColors(
         ProductDetailNutritionLabelText = Color(0xFF777777), // Gray800
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
+        VerdictCautionBackground = Color(0xFFFFCC00),
+        VerdictCautionText = Color(0xFFFFFFFF),
+        VerdictUnsafeBackground = Color(0xFFFA4D5E),
+        VerdictUnsafeText = Color(0xFFFFFFFF),
 
         ScrimOverlay = Color(0x660F474A), // Teal1600 40% alpha — light mode scrim
         
@@ -1008,6 +1044,10 @@ fun darkColors() = AppColors(
     ShadowMaleSelected = Color(0x9975DEE3),
     ShadowDobActive = Color(0x9975DEE3),
 
+    WaterEmptyGlassTint = Color(0xFF108188), // Teal1300
+    WaterAddButtonBackground = Color(0xFF0F474A), // Teal1600
+    WaterAddButtonIconTint = Color(0xFF13A4AB), // Teal1000
+
     extension = AppColorsExtension(
         // User Profile Screen — dark values match the Figma dark spec
         ProfileHeaderBackground = Color(0xFF0A545A), // Teal1500 — screen bg behind header
@@ -1064,6 +1104,10 @@ fun darkColors() = AppColors(
         ShadowMaleSelected = Color(0x9975DEE3),
         ShadowDobActive = Color(0x9975DEE3),
         
+        // Food Log Card (Calories "Daily Products")
+        FoodLogCardBackground = Color(0xFF0E4648),
+        FoodLogDashedBoxBackground = Color(0xFF095D61),
+
         // Product Card
         ProductCardBackground = Color(0xFF0A545A), // Teal1500
         SavedSearchBarBorder = Color(0xFF0F8389), // Teal1200
@@ -1071,7 +1115,7 @@ fun darkColors() = AppColors(
         ProductCardCautionText = Color(0xFF0B5F65), // Teal1400
         ProductCardCaloriesBackground = Color(0xFFCAF2F4), // Teal300
         ProductCardCaloriesText = Color(0xFF0F474A), // Teal1600
-        ProductCardSwipeContainerBackground = Color(0xFF0F474A), // Teal1600
+        ProductCardSwipeContainerBackground = Color(0xFF0A545A), // Teal1500
         ProductCardSwipeText = Color(0xFF108188), // Teal1300
         ProductCardShadow = Color(0x8013A4AB), // Teal1000 50% alpha
 
@@ -1148,6 +1192,10 @@ fun darkColors() = AppColors(
         ProductDetailNutritionLabelText = Color(0xFF11939A), // Teal1200
         ProductDetailNutritionText = Color(0xFFF8F8F9), // Gray100
 
+        VerdictCautionBackground = Color(0xFFFFCC00),
+        VerdictCautionText = Color(0xFFFFFFFF),
+        VerdictUnsafeBackground = Color(0xFFFA4D5E),
+        VerdictUnsafeText = Color(0xFFFFFFFF),
 
         ScrimOverlay = Color(0x99000000), // Black 60% alpha — dark mode scrim
         

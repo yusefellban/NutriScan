@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.data.remote.api
 
+import iti.grad.nutriscan.data.remote.dto.BarcodeScanRequestDto
 import iti.grad.nutriscan.data.remote.dto.PageDto
 import iti.grad.nutriscan.data.remote.dto.ScanHistoryItemDto
 import iti.grad.nutriscan.data.remote.dto.ScanResultResponseDto
@@ -7,6 +8,7 @@ import iti.grad.nutriscan.data.remote.dto.ScanSubmissionResponseDto
 import iti.grad.nutriscan.data.remote.dto.UpdateScanDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -20,6 +22,19 @@ interface ScanApiService {
     @POST("v1/scans")
     suspend fun submitScan(@Part image: MultipartBody.Part): ScanSubmissionResponseDto
 
+    /**
+     * Submit a barcode value for AI nutritional analysis.
+     *
+     * POST /v1/scans/barcode
+     * Body: { "barcode": "5922157657516" }
+     * Response: { "scanId": "...", "status": "PROCESSING" }
+     *
+     * The returned [ScanSubmissionResponseDto.scanId] must be polled via [getScanResult]
+     * until status transitions to COMPLETED or FAILED.
+     */
+    @POST("v1/scans/barcode")
+    suspend fun submitBarcodeScan(@Body body: BarcodeScanRequestDto): ScanSubmissionResponseDto
+
     @GET("v1/scans/{scanId}")
     suspend fun getScanResult(@Path("scanId") scanId: String): ScanResultResponseDto
 
@@ -27,13 +42,25 @@ interface ScanApiService {
     suspend fun getRecentScans(
         @Query("page") page: Int,
         @Query("size") size: Int,
+        @Query("query") query: String? = null,
+        @Query("date") date: String? = null,
+        @Query("verdict") verdict: String? = null,
+        @Query("scanStatus") scanStatus: String? = null
     ): PageDto<ScanHistoryItemDto>
+
+    @GET("v1/scans/suggestions")
+    suspend fun getScanSuggestions(
+        @Query("query") query: String
+    ): List<String>
 
     @PATCH("v1/scans/{scanId}")
     suspend fun updateScan(
         @Path("scanId") scanId: String,
         @Body body: UpdateScanDto,
     ): ScanResultResponseDto
+
+    @DELETE("v1/scans/{scanId}")
+    suspend fun deleteScan(@Path("scanId") scanId: String)
 
     @GET("v1/scans/favorites")
     suspend fun getFavoriteScans(

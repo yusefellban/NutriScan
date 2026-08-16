@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.main.calories.state
 
 import androidx.annotation.StringRes
+import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 
 /**
@@ -12,7 +13,10 @@ import iti.grad.nutriscan.presentation.common.model.ProductUiModel
 sealed interface CaloriesEffect {
     data object NavigateToSavedProducts : CaloriesEffect
     data object NavigateToExercises : CaloriesEffect
-    data class ShowSnackbar(@StringRes val messageResId: Int) : CaloriesEffect
+    data class ShowSnackbar(
+        @StringRes val messageResId: Int,
+        val type: SnackbarType = SnackbarType.ERROR,
+    ) : CaloriesEffect
 
     /** Ask the screen to request the ACTIVITY_RECOGNITION runtime permission (needed to read the step counter). */
     data object RequestStepsPermission : CaloriesEffect

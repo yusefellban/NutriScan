@@ -8,8 +8,6 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.Box
@@ -35,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,8 +42,11 @@ import androidx.compose.material3.SnackbarHostState
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
 import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.OfflineStateWidget
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
+import iti.grad.nutriscan.presentation.common.util.rememberAudioPermissionRequester
+import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.ChatLanguage
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEffect
 import iti.grad.nutriscan.presentation.nutrigpt.chat.state.NutriGptEvent
@@ -65,6 +67,7 @@ fun NutriGptScreen(
     val context = LocalContext.current
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val haptics = LocalHapticFeedback.current
 
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -108,22 +111,23 @@ fun NutriGptScreen(
         }
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
-            }
-            speechRecognizer?.startListening(intent)
-            viewModel.onEvent(NutriGptEvent.SetListeningState(true))
-        } else {
+    fun startSpeechRecognition() {
+        val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
+        }
+        speechRecognizer?.startListening(intent)
+        viewModel.onEvent(NutriGptEvent.SetListeningState(true))
+    }
+
+    val requestAudioPermission = rememberAudioPermissionRequester(
+        onGranted = { startSpeechRecognition() },
+        onDenied = {
             Toast.makeText(context, "Microphone permission is required for voice input", Toast.LENGTH_SHORT).show()
         }
-    }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -196,7 +200,8 @@ fun NutriGptScreen(
                     
                     if (state.errorMessageResId != null) {
                         item(key = "error_widget") {
-                            OfflineStateWidget(
+                            AppErrorWidget(
+                                errorType = state.errorType,
                                 modifier = Modifier.padding(top = 16.dp),
                                 onRetry = { viewModel.onEvent(NutriGptEvent.RetryLastMessage) }
                             )
@@ -216,25 +221,20 @@ fun NutriGptScreen(
                     }
                 },
                 onMicPress = {
+                    haptics.tick()
                     val hasPermission = ContextCompat.checkSelfPermission(
                         context,
                         Manifest.permission.RECORD_AUDIO
                     ) == PackageManager.PERMISSION_GRANTED
-                    
+
                     if (hasPermission) {
-                        val langCode = if (state.chatLanguage == ChatLanguage.AR) "ar-EG" else "en-US"
-                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
-                        }
-                        speechRecognizer?.startListening(intent)
-                        viewModel.onEvent(NutriGptEvent.SetListeningState(true))
+                        startSpeechRecognition()
                     } else {
-                        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        requestAudioPermission()
                     }
                 },
                 onMicRelease = {
+                    haptics.tick()
                     speechRecognizer?.stopListening()
                     // The UI will return to normal immediately, but we let onResults send the message
                     viewModel.onEvent(NutriGptEvent.SetListeningState(false))

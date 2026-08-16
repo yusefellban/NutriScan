@@ -11,6 +11,9 @@ import iti.grad.nutriscan.domain.steps.history.model.StepHistorySummary
 import iti.grad.nutriscan.domain.steps.history.repository.IStepHistoryRepository
 import iti.grad.nutriscan.domain.user.repository.IUserRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -29,9 +32,6 @@ private const val STRIDE_TO_HEIGHT_RATIO = 0.415
 
 /** Average walking cadence, used to turn a step count into active minutes. */
 private const val STEPS_PER_MINUTE = 100
-
-/** One page big enough to cover the longest period the UI offers (six months). */
-private const val HISTORY_PAGE_SIZE = 200
 
 class StepHistoryRepositoryImpl @Inject constructor(
     private val dao: DailyTrackingDao,
@@ -74,24 +74,30 @@ class StepHistoryRepositoryImpl @Inject constructor(
     /**
      * Backend history first so the chart still covers days recorded on another device, with local
      * Room layered on top: today's steps are counted by this device's sensor and only pushed a
-     * couple of seconds later, so the local row is the fresher of the two. Falls back to Room alone
-     * when the request fails, which is also the offline path.
+     * couple of seconds later, so the local row is the fresher of the two.
+     *
+     * Fetches each day individually via [IDailyTrackingRepository.getRemoteDaySummary] (`GET
+     * /daily-tracking/{date}`) rather than [IDailyTrackingRepository.getHistoryPage] (`GET
+     * /daily-tracking`) — the paged endpoint isn't returning history, so it silently produced an
+     * empty result here (`runCatchingCancellable` + `getOrNull()` swallowed the failure). The
+     * per-date endpoint is the one already proven working (it backs the Calories History
+     * date-picker), so this reuses it instead of debugging the paged one.
      */
     private suspend fun loadStepsByDate(
         userId: String,
         startDate: LocalDate,
         endDate: LocalDate,
-    ): Map<LocalDate, Int> {
-        val remote = dailyTrackingRepository.getHistoryPage(0, HISTORY_PAGE_SIZE)
-            .getOrNull()
-            ?.entries.orEmpty()
-            .filter { it.date >= startDate && it.date <= endDate }
-            .associate { it.date to it.stepsCnt }
+    ): Map<LocalDate, Int> = coroutineScope {
+        val remote = eachDay(startDate, endDate)
+            .map { date -> async { date to dailyTrackingRepository.getRemoteDaySummary(date).getOrNull()?.stepsCnt } }
+            .awaitAll()
+            .mapNotNull { (date, steps) -> steps?.let { date to it } }
+            .toMap()
 
         val local = dao.getRange(userId, startDate.toString(), endDate.toString())
             .associate { LocalDate.parse(it.date) to it.stepsCnt }
 
-        return remote + local
+        remote + local
     }
 
     private fun bucket(
@@ -110,8 +116,9 @@ class StepHistoryRepositoryImpl @Inject constructor(
         StepHistoryPeriod.MONTH -> eachDay(startDate, endDate)
             .chunked(7)
             .mapIndexed { index, week ->
+                val weekWord = if (Locale.getDefault().language == "ar") "الأسبوع" else "Week"
                 MonthlyStepData(
-                    monthLabel = "Week ${index + 1}",
+                    monthLabel = "$weekWord ${index + 1}",
                     totalSteps = week.sumOf { stepsByDate[it] ?: 0 },
                 )
             }

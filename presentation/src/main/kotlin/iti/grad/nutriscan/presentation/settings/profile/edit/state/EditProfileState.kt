@@ -18,6 +18,11 @@ data class EditProfileState(
     val heightCm: Double? = null,
     val weightKg: Double? = null,
     val isSaving: Boolean = false,
+    /** Client-side validation errors (string resource ids), shown under the relevant field. Null means the field is valid. */
+    val firstNameErrorResId: Int? = null,
+    val lastNameErrorResId: Int? = null,
+    val heightErrorResId: Int? = null,
+    val weightErrorResId: Int? = null,
     val avatarUrl: String? = null,
     /** Cache-busting token for the avatar image — see [iti.grad.nutriscan.presentation.common.components.rememberAvatarImageRequest]. */
     val avatarUpdatedAt: String? = null,

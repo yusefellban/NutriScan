@@ -32,8 +32,13 @@ class StreakRepositoryImpl @Inject constructor(
 ) : IStreakRepository {
 
     override fun observeStreak(): Flow<Int> = flow {
+        val userId = authRepository.getCurrentUserId()
+        if (userId == null) {
+            emit(0)
+            return@flow
+        }
         emitAll(
-            streakDao.observe(resolveUserId()).map { entity ->
+            streakDao.observe(userId).map { entity ->
                 entity?.currentStreak ?: 0
             }
         )

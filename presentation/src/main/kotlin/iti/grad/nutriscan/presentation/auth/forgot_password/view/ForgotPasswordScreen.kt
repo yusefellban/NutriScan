@@ -2,6 +2,7 @@ package iti.grad.nutriscan.presentation.auth.forgot_password.view
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.Spacer
 import iti.grad.nutriscan.presentation.auth.forgot_password.viewmodel.ForgotPasswordViewModel
 import iti.grad.nutriscan.presentation.auth.forgot_password.view.components.ForgotPasswordHeader
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
-import iti.grad.nutriscan.presentation.common.components.SnackbarType
 import iti.grad.nutriscan.presentation.common.components.showAppSnackbar
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +64,7 @@ fun ForgotPasswordScreen(
                         ?: ""
                     snackbarHostState.showAppSnackbar(
                         message = message,
-                        type = SnackbarType.SUCCESS
+                        type = effect.type
                     )
                 }
             }
@@ -103,6 +103,8 @@ private fun ForgotPasswordScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding())
+                .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
             // ── Teal header with back button ─────────────────────────────
@@ -179,6 +181,7 @@ private fun ForgotPasswordScreenContent(
             email = state.email,
             onEmailChange = { onEvent(ForgotPasswordEvent.EmailChanged(it)) },
             errorResId = state.emailErrorResId,
+            isLoading = state.isLoading,
             onSend = { onEvent(ForgotPasswordEvent.SendResetLink) },
             onDismiss = { onEvent(ForgotPasswordEvent.DismissEmailInputDialog) }
         )

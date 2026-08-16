@@ -17,13 +17,16 @@ import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import iti.grad.nutriscan.presentation.common.components.AvatarCircle
 import iti.grad.nutriscan.presentation.common.components.HeroHeaderTitle
@@ -50,12 +53,16 @@ fun ProfileHeaderSection(
             .clipToBounds()
             .background(AppTheme.colors.ProfileHeaderBackground)
     ) {
-        Image(
-            painter = painterResource(R.drawable.profile_edge),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
-            modifier = Modifier.align(Alignment.TopEnd),
-        )
+        // Purely decorative curve — pin to the physical top-right corner regardless of
+        // locale, same as SectionHeroHeader.
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            Image(
+                painter = painterResource(R.drawable.profile_edge),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(AppTheme.colors.ProfileHeaderEdge),
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
 
         Row(
             modifier = Modifier

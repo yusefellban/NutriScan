@@ -1,6 +1,7 @@
 package iti.grad.nutriscan.presentation.exercises.state
 
 import androidx.compose.runtime.Immutable
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import iti.grad.nutriscan.presentation.common.model.ExerciseUiModel
 import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategoryUi
 import iti.grad.nutriscan.presentation.exercises.model.ExerciseCategory
@@ -20,5 +21,6 @@ data class ExercisesState(
     val currentPage: Int = 1,
     val hasNextPage: Boolean = false,
     val isLoadingMore: Boolean = false,
-    val errorMessageRes: Int? = null
+    val errorMessageRes: Int? = null,
+    val errorType: AppErrorType = AppErrorType.UNKNOWN,
 )
