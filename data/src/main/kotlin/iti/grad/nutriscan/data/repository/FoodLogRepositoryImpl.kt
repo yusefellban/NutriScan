@@ -30,8 +30,13 @@ class FoodLogRepositoryImpl @Inject constructor(
 ) : IFoodLogRepository {
 
     override fun observeTodayFoodLog(): Flow<List<FoodLogEntry>> = flow {
+        val userId = authRepository.getCurrentUserId()
+        if (userId == null) {
+            emit(emptyList())
+            return@flow
+        }
         emitAll(
-            dao.observeByUserAndDate(resolveUserId(), today().toString())
+            dao.observeByUserAndDate(userId, today().toString())
                 .map { entities -> entities.map { it.toDomain() } }
         )
     }.flowOn(ioDispatcher)
@@ -105,6 +110,25 @@ class FoodLogRepositoryImpl @Inject constructor(
                 } else {
                     Log.e(TAG, "removeFoodEntry: DELETE FAILED for scanId=$scanId — tombstone kept, worker will retry", deleteResult.exceptionOrNull())
                 }
+            }
+            Unit
+        }
+    }
+
+    override suspend fun removeFoodEntryCompletely(entryId: String): Result<Unit> = withContext(ioDispatcher) {
+        runCatchingCancellable {
+            val userId = resolveUserId()
+            val existing = dao.getByIdForUser(entryId, userId)
+            val scanId = existing?.productId ?: entryId
+
+            Log.d(TAG, "removeFoodEntryCompletely: scanId=$scanId mealCnt=${existing?.mealCnt} — removing all servings, will DELETE")
+            dao.markDeletedForUser(entryId, userId)
+            val deleteResult = dailyTrackingRepository.deleteMeal(today(), scanId)
+            if (deleteResult.isSuccess) {
+                dao.hardDelete(entryId)
+                Log.d(TAG, "removeFoodEntryCompletely: DELETE OK for scanId=$scanId — row hard-deleted")
+            } else {
+                Log.e(TAG, "removeFoodEntryCompletely: DELETE FAILED for scanId=$scanId — tombstone kept, worker will retry", deleteResult.exceptionOrNull())
             }
             Unit
         }

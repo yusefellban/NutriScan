@@ -10,6 +10,7 @@ import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateTargetWaterCntUseCa
 import iti.grad.nutriscan.domain.dailytracking.usecase.UpdateWaterCntUseCase
 import iti.grad.nutriscan.domain.foodlog.model.FoodLogEntry
 import iti.grad.nutriscan.domain.foodlog.usecase.ObserveTodayFoodLogUseCase
+import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryCompletelyUseCase
 import iti.grad.nutriscan.domain.foodlog.usecase.RemoveFoodEntryUseCase
 import iti.grad.nutriscan.domain.steps.usecase.CheckStepsPermissionUseCase
 import iti.grad.nutriscan.domain.steps.usecase.ObserveTodayStepsUseCase
@@ -40,6 +41,7 @@ class CaloriesViewModel @Inject constructor(
     private val observeTodaySteps: ObserveTodayStepsUseCase,
     private val observeTodayFoodLog: ObserveTodayFoodLogUseCase,
     private val removeFoodEntry: RemoveFoodEntryUseCase,
+    private val removeFoodEntryCompletely: RemoveFoodEntryCompletelyUseCase,
     private val observeTodayDailyTracking: ObserveTodayDailyTrackingUseCase,
     private val updateWaterCnt: UpdateWaterCntUseCase,
     private val updateTargetWaterCnt: UpdateTargetWaterCntUseCase,
@@ -112,6 +114,7 @@ class CaloriesViewModel @Inject constructor(
                 _state.update { it.copy(pendingRemoveFoodId = null) }
             }
             is CaloriesEvent.FoodItemClicked -> navigate(CaloriesEffect.NavigateToProductDetail(event.product))
+            is CaloriesEvent.FoodItemMinusClicked -> minusFoodItem(event.entryId)
             CaloriesEvent.Refreshed -> refresh()
         }
     }
@@ -147,12 +150,21 @@ class CaloriesViewModel @Inject constructor(
         }
     }
 
+    /** Delete button — removes every serving of the entry, regardless of its current count. */
     private fun confirmRemoveFood() {
         val entryId = _state.value.pendingRemoveFoodId ?: return
         viewModelScope.launch {
-            removeFoodEntry(entryId)
+            removeFoodEntryCompletely(entryId)
                 .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.food_log_remove_error)) }
             _state.update { it.copy(pendingRemoveFoodId = null) }
+        }
+    }
+
+    /** Minus button — decrements one serving immediately, no confirmation. */
+    private fun minusFoodItem(entryId: String) {
+        viewModelScope.launch {
+            removeFoodEntry(entryId)
+                .onFailure { navigate(CaloriesEffect.ShowSnackbar(R.string.food_log_remove_error)) }
         }
     }
 

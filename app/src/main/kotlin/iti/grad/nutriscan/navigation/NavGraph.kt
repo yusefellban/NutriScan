@@ -44,7 +44,6 @@ import iti.grad.nutriscan.presentation.settings.terms.view.TermsAndConditionsScr
 import iti.grad.nutriscan.presentation.settings.notifications.view.NotificationSettingsScreen
 import iti.grad.nutriscan.presentation.product_details.view.ProductDetailsScreen
 import iti.grad.nutriscan.presentation.news.view.NewsScreen
-import iti.grad.nutriscan.presentation.news.home.view.NewsHomeScreen
 import iti.grad.nutriscan.presentation.news.state.NewsUiArticle
 import iti.grad.nutriscan.presentation.news.detail.view.NewsDetailScreen
 import iti.grad.nutriscan.presentation.nutrigpt.chat.view.NutriGptScreen
@@ -230,7 +229,7 @@ fun AppNavGraph(
                 onNavigateToProductDetail = { scanId ->
                     navController.navigate(ProductDetailsRoute(scanId = scanId))
                 },
-                onNavigateToNews = { navController.navigate(NewsHomeRoute) },
+                onNavigateToNews = { navController.navigate(NewsRoute) },
                 onNavigateToChatWithAi = { navController.navigate(ChatWithAiRoute) },
                 onNavigateToHistory = { navController.navigate(ScanHistoryRoute) },
                 onNavigateToNotifications = { navController.navigate(NotificationHistoryRoute) },
@@ -436,29 +435,7 @@ fun AppNavGraph(
             )
         }
         
-         // 30a. News Home (Landing)
-        composable<NewsHomeRoute> {
-            NewsHomeScreen(
-                onNavigateBack = { navController.navigateUp() },
-                onNavigateToDiscover = { navController.navigate(NewsRoute) },
-                onNavigateToDetail = { article ->
-                    navController.navigate(
-                        NewsDetailRoute(
-                            title = article.title,
-                            description = article.description,
-                            url = article.url,
-                            imageUrl = article.imageUrl,
-                            sourceName = article.sourceName,
-                            publishedAtLabel = article.publishedAtLabel,
-                            author = article.author,
-                            category = article.category
-                        )
-                    )
-                }
-            )
-        }
-
-         // 30b. News Discover (Search)
+         // 30. News (single search + chips + list screen)
         composable<NewsRoute> {
             NewsScreen(
                 onNavigateBack = { navController.navigateUp() },

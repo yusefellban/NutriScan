@@ -14,5 +14,9 @@ interface IFoodLogRepository {
      * backend already knows about, avoiding a redundant/duplicate POST. */
     suspend fun addFoodEntryLocalOnly(entry: FoodLogEntry): Result<Unit>
 
+    /** Decrements by one serving, fully removing the entry once it hits zero. */
     suspend fun removeFoodEntry(entryId: String): Result<Unit>
+
+    /** Removes every serving of this entry in one call, regardless of its current count. */
+    suspend fun removeFoodEntryCompletely(entryId: String): Result<Unit>
 }

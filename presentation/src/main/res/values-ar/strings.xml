@@ -443,6 +443,7 @@
     <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
     <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
     <string name="food_log_delete_item_action">حذف العنصر</string>
+    <string name="food_log_minus_item_action">إزالة حصة واحدة</string>
     <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
     <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
     <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
@@ -482,13 +483,17 @@
     <string name="product_details_bookmark_add">حفظ المنتج</string>
     <string name="product_details_bookmark_remove">إزالة من المحفوظات</string>
     <!-- News -->
-    <string name="news_screen_title">اكتشف</string>
+    <string name="news_screen_title">الأخبار</string>
     <string name="news_screen_subtitle">أخبار من جميع أنحاء العالم</string>
-    <string name="news_search_placeholder">بحث</string>
+    <string name="news_search_placeholder">ابحث عن أخبار صحية</string>
     <string name="news_search_filter_content_description">تصفية</string>
     <string name="news_category_label">أخبار</string>
     <string name="news_source_time_separator"> · </string>
     <string name="news_source_avatar_content_description">أيقونة المصدر</string>
+    <string name="news_author_prefix">بقلم %1$s</string>
+    <string name="news_article_menu_content_description">مزيد من الخيارات</string>
+    <string name="news_menu_open_article">فتح المقال</string>
+    <string name="news_menu_share">مشاركة</string>
     <string name="news_read_full_article">قراءة المقال كاملاً على الويب</string>
     <string name="news_chip_all">أهم الأخبار الصحية</string>
     <string name="news_load_error">تعذّر تحميل الأخبار. حاول مرة أخرى.</string>
@@ -504,9 +509,6 @@
     <string name="news_card_menu_content_description">خيارات إضافية</string>
     
     <!-- News Home Screen -->
-    <string name="news_home_breaking_news">أخبار عاجلة</string>
-    <string name="news_home_recommendation">اقتراحات</string>
-    <string name="news_home_search_content_description">بحث</string>
     <!-- NutriGPT Chat -->
     <string name="nutrigpt_title">المساعد الذكي</string>
     <string name="nutrigpt_empty_title">اسأل أي شيء عن التغذية</string>
