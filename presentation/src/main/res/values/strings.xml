@@ -455,6 +455,7 @@
     <string name="food_log_remove_confirm_title">Remove item?</string>
     <string name="food_log_remove_confirm_message">This will remove it from today\'s food log.</string>
     <string name="food_log_delete_item_action">Delete item</string>
+    <string name="food_log_minus_item_action">Remove one serving</string>
     <string name="food_log_added_snackbar">Added %1$s to today\'s food log</string>
     <string name="food_log_add_error">Couldn\'t add this item. Please try again.</string>
     <string name="food_log_remove_error">Couldn\'t remove this item. Please try again.</string>

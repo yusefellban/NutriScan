@@ -22,11 +22,15 @@ sealed interface CaloriesEvent {
     /** Reported back by the screen after the user responds to the Health Connect permission dialog. */
     data class StepsPermissionResult(val granted: Boolean) : CaloriesEvent
 
-    /** Tapped a food-log entry's delete button (manage mode) — shows the removal confirmation
-     * dialog, does not remove yet. */
+    /** Tapped a food-log entry's delete button — shows the removal confirmation dialog, does not
+     * remove yet. Removes every serving of the entry, regardless of its current count. */
     data class FoodItemDeleteClicked(val entryId: String) : CaloriesEvent
     data object RemoveFoodConfirmed : CaloriesEvent
     data object RemoveFoodDismissed : CaloriesEvent
+
+    /** Tapped a food-log entry's minus button — decrements one serving immediately, no
+     * confirmation (removing the whole entry is [FoodItemDeleteClicked]'s job). */
+    data class FoodItemMinusClicked(val entryId: String) : CaloriesEvent
     data class FoodItemClicked(val product: ProductUiModel) : CaloriesEvent
 
     /** Pull-to-refresh: re-pulls today's water/steps and meals from the backend, so data logged on

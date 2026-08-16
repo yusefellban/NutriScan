@@ -116,13 +116,14 @@ fun LoginFormBody(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ── Social icons ────────────────────────────────────────────────────
-        SocialLoginRow(
-            onSocialClick = { provider ->
-                onEvent(LoginEvent.SocialLoginClicked(provider))
-            }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        // Commented out for now — not ready to show yet.
+        // SocialLoginRow(
+        //     onSocialClick = { provider ->
+        //         onEvent(LoginEvent.SocialLoginClicked(provider))
+        //     }
+        // )
+        //
+        // Spacer(modifier = Modifier.height(24.dp))
 
         // ── Don't have an account? Sign Up. ─────────────────────────────────
         AuthBottomPrompt(

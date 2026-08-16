@@ -233,7 +233,7 @@ fun ProductCard(
 }
 
 @Composable
-private fun CaloriesBadge(
+internal fun CaloriesBadge(
     calories: String,
     background: Color,
     textColor: Color,
@@ -263,7 +263,7 @@ private fun CaloriesBadge(
 }
 
 @Composable
-private fun QuantityBadge(
+internal fun QuantityBadge(
     quantity: Int,
     background: Color,
     textColor: Color,

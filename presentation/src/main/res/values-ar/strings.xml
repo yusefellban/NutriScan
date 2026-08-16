@@ -443,6 +443,7 @@
     <string name="food_log_remove_confirm_title">إزالة العنصر؟</string>
     <string name="food_log_remove_confirm_message">سيتم إزالته من سجل الطعام اليوم.</string>
     <string name="food_log_delete_item_action">حذف العنصر</string>
+    <string name="food_log_minus_item_action">إزالة حصة واحدة</string>
     <string name="food_log_added_snackbar">تمت إضافة %1$s إلى سجل الطعام اليوم</string>
     <string name="food_log_add_error">تعذّرت إضافة هذا العنصر. حاول مرة أخرى.</string>
     <string name="food_log_remove_error">تعذّرت إزالة هذا العنصر. حاول مرة أخرى.</string>
