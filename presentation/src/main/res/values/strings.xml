@@ -364,6 +364,8 @@
     <string name="min_today">min today</string>
     <string name="water">Water</string>
     <string name="cup_removed">Cup removed</string>
+    <string name="water_cup_remove_error">Couldn\'t remove the cup. Please try again.</string>
+    <string name="remove_water_cup">Remove cup</string>
     <string name="exercises_title">Exercises</string>
     <string name="exercises_categories_title">Categories</string>
     <string name="exercises_see_all">See All</string>
@@ -641,6 +643,8 @@
     <string name="calories_history_empty_title">No Calories History</string>
     <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
     <string name="calories_history_empty_button">Add meals</string>
+    <string name="calories_history_day_empty_title">No Calories History</string>
+    <string name="calories_history_day_empty_subtitle">There\'s no calories history for this day.</string>
 
     <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
     <string name="delete_account_button_label">Delete Account</string>
