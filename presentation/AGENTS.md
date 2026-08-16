@@ -331,7 +331,7 @@ ProductCard(imageUrl, productName, verdict, calories, onClick, modifier, swipeAc
 CalorieGoalsCard(tdee, caloriesGained, modifier)
 StepsGaugeCard(steps, stepsGoal, onClick, modifier)
 ExerciseCard(exerciseKcal, exerciseMinutes, onAddClick, modifier)
-WaterTrackerCard(waterConsumed, waterGoal, onAddWater, onCupClicked, onCupLongPressed, modifier)
+WaterTrackerCard(waterConsumed, waterGoal, onAddWater, onRemoveWater, onCupClicked, modifier)
 ```
 
 - **Before building a new component**, check this list. Duplicating an existing

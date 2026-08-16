@@ -582,6 +582,8 @@
     <string name="step_history_period_6months">٦ أشهر</string>
 
     <string name="cup_removed">تمت إزالة الكوب</string>
+    <string name="water_cup_remove_error">تعذّرت إزالة الكوب. حاول مرة أخرى.</string>
+    <string name="remove_water_cup">إزالة كوب</string>
     <string name="alert_verification_failed_title">فشل التحقق</string>
     <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة.</string>
     <string name="error_server_down">الخادم غير متاح مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
@@ -607,6 +609,8 @@
     <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
     <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
     <string name="calories_history_empty_button">إضافة وجبات</string>
+    <string name="calories_history_day_empty_title">لا يوجد سجل للسعرات</string>
+    <string name="calories_history_day_empty_subtitle">لا يوجد سجل للسعرات في هذا اليوم.</string>
     <!-- Notification History -->
     <string name="notification_history_title">الإشعارات</string>
     <string name="notification_history_clear_all">مسح الكل</string>
