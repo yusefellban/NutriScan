@@ -76,7 +76,7 @@ fun SettingsActionRow(
         Text(
             text = label,
             style = AppTheme.typography.titleSmall,
-            color = AppTheme.colors.MenuSectionLabel,
+            color = AppTheme.colors.Teal1000,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
