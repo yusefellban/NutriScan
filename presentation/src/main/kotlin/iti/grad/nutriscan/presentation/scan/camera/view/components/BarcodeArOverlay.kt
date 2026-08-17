@@ -210,7 +210,6 @@ fun BarcodeArOverlay(
                     .width(badgeWDp)
                     .height(badgeHDp)
                     .clickable(
-                        enabled = !isLocked,
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = onBarcodeChipClicked,

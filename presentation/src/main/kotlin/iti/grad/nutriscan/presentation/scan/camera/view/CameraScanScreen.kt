@@ -15,23 +15,23 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -46,13 +46,22 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -84,6 +93,7 @@ import iti.grad.nutriscan.presentation.scan.camera.viewmodel.CameraScanViewModel
 import iti.grad.presentation.R
 import java.io.File
 import java.util.concurrent.Executors
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -310,7 +320,6 @@ fun CameraScanScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CameraScanContent(
         state: CameraScanState,
@@ -336,8 +345,9 @@ private fun CameraScanContent(
     val isGalleryMode = state.selectedMode == ScanInputMode.GALLERY
     val galleryPreviewPath = state.pendingGalleryImagePath ?: state.activeScan?.thumbnailUrl
     val optionsBottomOffset = bottomPadding + 64.dp
-    val activeScanBottomOffset = bottomPadding + 164.dp
-    val separatorBottomOffset = bottomPadding + 126.dp
+    // True for the whole submit → poll window, not just the initial submit call — used to
+    // lock every entry point that would otherwise hit the backend again mid-scan.
+    val isBusy = state.isProcessingCenterAction || state.activeScan?.isProcessing == true
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -361,7 +371,7 @@ private fun CameraScanContent(
                     BarcodeArOverlay(
                             normalizedBounds = state.detectedBarcodeBounds,
                             barcodeValue = state.trackedBarcodeValue,
-                            isLocked = state.isProcessingCenterAction,
+                            isLocked = isBusy,
                             onBarcodeChipClicked = { onEvent(CameraScanEvent.BarcodeChipClicked) },
                             modifier = Modifier.fillMaxSize(),
                     )
@@ -425,76 +435,105 @@ private fun CameraScanContent(
         }
 
         state.activeScan?.let { scan ->
-            // key(scanId) forces a full recomposition — and a brand-new SwipeToDismissBoxState —
-            // every time a different scan arrives, so the box never carries over a stale
+            // key(scanId) forces a full recomposition — and a brand-new drag offset —
+            // every time a different scan arrives, so the sheet never carries over a stale
             // dismissed offset from the previous swipe.
             key(scan.scanId) {
-                // rememberSwipeToDismissBoxState only runs this init block once per key(scanId) —
-                // reading `scan` directly here would forever see the isProcessing=true snapshot
-                // from the first composition, blocking the swipe even after it later fails.
-                val latestScan by rememberUpdatedState(scan)
-                val dismissState =
-                        rememberSwipeToDismissBoxState(
-                                confirmValueChange = { dismissValue ->
-                                    if (latestScan.isProcessing) {
-                                        // Block the swipe while a submit/poll is in flight — spring
-                                        // back
-                                        // instead of visually dismissing a card the ViewModel won't
-                                        // clear.
-                                        false
-                                    } else if (dismissValue == SwipeToDismissBoxValue.EndToStart ||
-                                                    dismissValue ==
-                                                            SwipeToDismissBoxValue.StartToEnd
-                                    ) {
-                                        onEvent(CameraScanEvent.DismissScanClicked)
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                },
-                        )
+                val density = LocalDensity.current
+                val configuration = LocalConfiguration.current
+                val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+                val minHeightPx = screenHeightPx * 0.25f
+                val maxHeightPx = screenHeightPx * 0.5f
+                
+                val sheetHeightPx = remember { Animatable(minHeightPx) }
+                val dragScope = rememberCoroutineScope()
 
-                SwipeToDismissBox(
-                        state = dismissState,
-                        backgroundContent = {},
+                val nestedScrollConnection = remember {
+                    object : NestedScrollConnection {
+                        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                            val delta = available.y
+                            if (delta < 0 && sheetHeightPx.value < maxHeightPx) {
+                                val newHeight = (sheetHeightPx.value - delta).coerceAtMost(maxHeightPx)
+                                val consumed = sheetHeightPx.value - newHeight
+                                dragScope.launch { sheetHeightPx.snapTo(newHeight) }
+                                return Offset(0f, consumed)
+                            }
+                            return Offset.Zero
+                        }
+
+                        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                            val delta = available.y
+                            if (delta > 0 && sheetHeightPx.value > minHeightPx) {
+                                val newHeight = (sheetHeightPx.value - delta).coerceAtLeast(minHeightPx)
+                                val consumedPx = sheetHeightPx.value - newHeight
+                                dragScope.launch { sheetHeightPx.snapTo(newHeight) }
+                                return Offset(0f, consumedPx)
+                            }
+                            return Offset.Zero
+                        }
+
+                        override suspend fun onPreFling(available: Velocity): Velocity {
+                            val target = if (sheetHeightPx.value > (minHeightPx + maxHeightPx) / 2) maxHeightPx else minHeightPx
+                            dragScope.launch { 
+                                sheetHeightPx.animateTo(
+                                    target,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                ) 
+                            }
+                            return Velocity.Zero
+                        }
+                        
+                        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                            val target = if (sheetHeightPx.value > (minHeightPx + maxHeightPx) / 2) maxHeightPx else minHeightPx
+                            dragScope.launch { 
+                                sheetHeightPx.animateTo(
+                                    target,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                ) 
+                            }
+                            return Velocity.Zero
+                        }
+                    }
+                }
+
+                Box(
                         modifier =
                                 Modifier.align(Alignment.BottomCenter)
                                         .fillMaxWidth()
-                                        .padding(bottom = activeScanBottomOffset),
+                                        .height(with(density) { sheetHeightPx.value.toDp() })
+                                        .nestedScroll(nestedScrollConnection)
                 ) {
                     ActiveScanCard(
                             scan = scan,
+                            bottomSafeInset = bottomPadding,
                             onBookmarkClick = { onEvent(CameraScanEvent.BookmarkClicked) },
                             onCardClick = { onEvent(CameraScanEvent.CardClicked) },
-                            onRetryClick = { onEvent(CameraScanEvent.DismissScanClicked) },
+                            onRetryClick = { onEvent(CameraScanEvent.RetryClicked) },
                     )
                 }
             }
-
-            Box(
-                    modifier =
-                            Modifier.align(Alignment.BottomCenter)
-                                    .padding(bottom = separatorBottomOffset)
-                                    .width(72.dp)
-                                    .height(4.dp)
-                                    .background(
-                                            color = AppTheme.colors.OnPrimary.copy(alpha = 0.32f),
-                                            shape = RoundedCornerShape(50),
-                                    ),
-            )
         }
 
-        ScanModeSelector(
-                selectedMode = state.selectedMode,
-                hasSelectedGalleryImage =
-                        !state.pendingGalleryImagePath.isNullOrBlank() ||
-                                (state.selectedMode == ScanInputMode.GALLERY &&
-                                        !state.activeScan?.thumbnailUrl.isNullOrBlank()),
-                onModeSelected = { onEvent(CameraScanEvent.ModeSelected(it)) },
-                modifier =
-                        Modifier.align(Alignment.BottomCenter)
-                                .padding(bottom = optionsBottomOffset),
-        )
+        // The camera/gallery mode row only shows when there's no result sheet on screen —
+        // in the Figma, once the sheet is up, all that's left on top of it is the center
+        // capture button + nav bar, not this row as an extra layer.
+        if (state.activeScan == null) {
+            ScanModeSelector(
+                    selectedMode = state.selectedMode,
+                    hasSelectedGalleryImage = !state.pendingGalleryImagePath.isNullOrBlank(),
+                    onModeSelected = { onEvent(CameraScanEvent.ModeSelected(it)) },
+                    enabled = !isBusy,
+                    modifier =
+                            Modifier.align(Alignment.BottomCenter)
+                                    .padding(bottom = optionsBottomOffset),
+            )
+        }
     }
 }
 
