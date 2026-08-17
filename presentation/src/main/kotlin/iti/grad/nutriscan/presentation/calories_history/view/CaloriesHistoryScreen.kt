@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,35 +34,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEffect
 import iti.grad.nutriscan.presentation.calories_history.state.CaloriesHistoryEvent
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryDayCard
-import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
-import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.calories_history.view.components.CaloriesHistoryTopBar
 import iti.grad.nutriscan.presentation.calories_history.viewmodel.CaloriesHistoryViewModel
-import iti.grad.nutriscan.presentation.common.components.AppButton
+import iti.grad.nutriscan.presentation.common.components.AppEmptyStateWidget
+import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
 import iti.grad.nutriscan.presentation.common.components.AppSnackbar
+import iti.grad.nutriscan.presentation.common.model.AppErrorType
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.presentation.R
-import kotlinx.coroutines.flow.collectLatest
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneOffset
+import kotlinx.coroutines.flow.collectLatest
 
 private const val LOAD_MORE_THRESHOLD = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaloriesHistoryScreen(
-    onNavigateBack: () -> Unit,
-    onNavigateToAddMeals: () -> Unit,
-    viewModel: CaloriesHistoryViewModel = hiltViewModel(),
+        onNavigateBack: () -> Unit,
+        onNavigateToAddMeals: () -> Unit,
+        viewModel: CaloriesHistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -97,75 +92,67 @@ fun CaloriesHistoryScreen(
 
     // ── Date Picker Dialog ──
     if (state.showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = state.selectedDate
-                ?.atStartOfDay()
-                ?.toInstant(ZoneOffset.UTC)
-                ?.toEpochMilli(),
-            selectableDates = object : SelectableDates {
-                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return utcTimeMillis <= System.currentTimeMillis()
-                }
-            }
-        )
+        val datePickerState =
+                rememberDatePickerState(
+                        initialSelectedDateMillis =
+                                state.selectedDate
+                                        ?.atStartOfDay()
+                                        ?.toInstant(ZoneOffset.UTC)
+                                        ?.toEpochMilli(),
+                        selectableDates =
+                                object : SelectableDates {
+                                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                                        return utcTimeMillis <= System.currentTimeMillis()
+                                    }
+                                }
+                )
         DatePickerDialog(
-            onDismissRequest = {
-                viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker)
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val picked = Instant.ofEpochMilli(millis)
-                                .atZone(ZoneOffset.UTC)
-                                .toLocalDate()
-                            viewModel.onEvent(CaloriesHistoryEvent.DateSelected(picked))
-                        }
-                    },
-                ) {
-                    Text(stringResource(R.string.calories_history_date_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker)
-                    },
-                ) {
-                    Text(stringResource(R.string.calories_history_date_cancel))
-                }
-            },
-        ) {
-            DatePicker(state = datePickerState)
-        }
+                onDismissRequest = { viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker) },
+                confirmButton = {
+                    TextButton(
+                            onClick = {
+                                datePickerState.selectedDateMillis?.let { millis ->
+                                    val picked =
+                                            Instant.ofEpochMilli(millis)
+                                                    .atZone(ZoneOffset.UTC)
+                                                    .toLocalDate()
+                                    viewModel.onEvent(CaloriesHistoryEvent.DateSelected(picked))
+                                }
+                            },
+                    ) { Text(stringResource(R.string.calories_history_date_confirm)) }
+                },
+                dismissButton = {
+                    TextButton(
+                            onClick = { viewModel.onEvent(CaloriesHistoryEvent.DismissDatePicker) },
+                    ) { Text(stringResource(R.string.calories_history_date_cancel)) }
+                },
+        ) { DatePicker(state = datePickerState) }
     }
 
     Scaffold(
-        containerColor = AppTheme.colors.ScreenSurfaceBackground,
-        contentWindowInsets = WindowInsets(0),
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(bottom = 16.dp)
-            ) { data ->
-                AppSnackbar(snackbarData = data)
-            }
-        },
+            containerColor = AppTheme.colors.ScreenSurfaceBackground,
+            contentWindowInsets = WindowInsets(0),
+            snackbarHost = {
+                SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier.navigationBarsPadding().padding(bottom = 16.dp)
+                ) { data -> AppSnackbar(snackbarData = data) }
+            },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(AppTheme.colors.ScreenSurfaceBackground)
-                .padding(paddingValues)
-                .statusBarsPadding(),
+                modifier =
+                        Modifier.fillMaxSize()
+                                .background(AppTheme.colors.ScreenSurfaceBackground)
+                                .padding(paddingValues)
+                                .statusBarsPadding(),
         ) {
             CaloriesHistoryTopBar(
-                onBackClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateBack) },
-                onCalendarClick = { viewModel.onEvent(CaloriesHistoryEvent.CalendarClicked) },
-                isFilterActive = state.selectedDate != null,
-                onClearFilterClick = { viewModel.onEvent(CaloriesHistoryEvent.ClearDateFilter) },
+                    onBackClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateBack) },
+                    onCalendarClick = { viewModel.onEvent(CaloriesHistoryEvent.CalendarClicked) },
+                    isFilterActive = state.selectedDate != null,
+                    onClearFilterClick = {
+                        viewModel.onEvent(CaloriesHistoryEvent.ClearDateFilter)
+                    },
             )
 
             Box(modifier = Modifier.fillMaxSize()) {
@@ -173,22 +160,36 @@ fun CaloriesHistoryScreen(
                     // Full-screen loading on first page
                     state.isLoading -> {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(color = AppTheme.colors.Teal1000)
-                        }
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                        ) { CircularProgressIndicator(color = AppTheme.colors.Teal1000) }
                     }
 
                     // Empty state (no errors, no entries, not loading)
                     !state.isLoading && state.errorType == null && state.entries.isEmpty() -> {
                         AppEmptyStateWidget(
-                            lightImageRes = R.drawable.ic_no_calories_history_light,
-                            darkImageRes = R.drawable.ic_no_calories_history_dark,
-                            title = stringResource(R.string.calories_history_empty_title),
-                            subtitle = stringResource(R.string.calories_history_empty_subtitle),
-                            buttonText = stringResource(R.string.calories_history_empty_button),
-                            onButtonClick = { viewModel.onEvent(CaloriesHistoryEvent.NavigateToAddMeals) },
+                                lightImageRes = R.drawable.ic_no_calories_history_light,
+                                darkImageRes = R.drawable.ic_no_calories_history_dark,
+                                title = stringResource(R.string.calories_history_empty_title),
+                                subtitle = stringResource(R.string.calories_history_empty_subtitle),
+                                buttonText = stringResource(R.string.calories_history_empty_button),
+                                onButtonClick = {
+                                    viewModel.onEvent(CaloriesHistoryEvent.NavigateToAddMeals)
+                                },
+                        )
+                    }
+
+                    // Selected day has no tracking data (backend 404) — show empty state, not an
+                    // error
+                    state.errorType == AppErrorType.NOT_FOUND && state.selectedDate != null -> {
+                        AppEmptyStateWidget(
+                                lightImageRes = R.drawable.ic_no_calories_history_light,
+                                darkImageRes = R.drawable.ic_no_calories_history_dark,
+                                title = stringResource(R.string.calories_history_day_empty_title),
+                                subtitle =
+                                        stringResource(
+                                                R.string.calories_history_day_empty_subtitle
+                                        ),
                         )
                     }
 
@@ -196,44 +197,40 @@ fun CaloriesHistoryScreen(
                     state.errorType != null && state.entries.isEmpty() -> {
                         state.errorType?.let { errorType ->
                             AppErrorWidget(
-                                errorType = errorType,
-                                onRetry = { viewModel.onEvent(CaloriesHistoryEvent.Retry) },
+                                    errorType = errorType,
+                                    onRetry = { viewModel.onEvent(CaloriesHistoryEvent.Retry) },
                             )
                         }
                     }
-
                     else -> {
                         LazyColumn(
-                            state = listState,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .navigationBarsPadding(),
-                            contentPadding = PaddingValues(
-                                horizontal = 20.dp,
-                                vertical = 8.dp,
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(20.dp),
+                                state = listState,
+                                modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+                                contentPadding =
+                                        PaddingValues(
+                                                horizontal = 20.dp,
+                                                vertical = 8.dp,
+                                        ),
+                                verticalArrangement = Arrangement.spacedBy(20.dp),
                         ) {
                             items(
-                                items = state.entries,
-                                key = { it.dateLabel },
-                            ) { entry ->
-                                CaloriesHistoryDayCard(entry = entry)
-                            }
+                                    items = state.entries,
+                                    key = { it.dateLabel },
+                            ) { entry -> CaloriesHistoryDayCard(entry = entry) }
 
                             // Loading indicator at bottom while loading next page
                             if (state.isLoadingMore) {
                                 item {
                                     Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 16.dp),
-                                        contentAlignment = Alignment.Center,
+                                            modifier =
+                                                    Modifier.fillMaxWidth()
+                                                            .padding(vertical = 16.dp),
+                                            contentAlignment = Alignment.Center,
                                     ) {
                                         CircularProgressIndicator(
-                                            modifier = Modifier.size(28.dp),
-                                            color = AppTheme.colors.Teal1000,
-                                            strokeWidth = 2.dp,
+                                                modifier = Modifier.size(28.dp),
+                                                color = AppTheme.colors.Teal1000,
+                                                strokeWidth = 2.dp,
                                         )
                                     }
                                 }
@@ -245,5 +242,3 @@ fun CaloriesHistoryScreen(
         }
     }
 }
-
-

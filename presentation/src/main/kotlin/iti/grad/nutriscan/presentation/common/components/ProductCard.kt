@@ -20,19 +20,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -282,6 +289,8 @@ internal fun QuantityBadge(
     )
 }
 
+private enum class SwipePhase { Idle, Submitting, Success }
+
 @Composable
 private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val scope = rememberCoroutineScope()
@@ -290,34 +299,78 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
     val buttonColor = AppTheme.colors.Teal1000
     val haptics = LocalHapticFeedback.current
 
-    // Track the drag offset
+    var phase by remember { mutableStateOf(SwipePhase.Idle) }
     val offsetX = remember { Animatable(0f) }
+    val buttonWidthPx = remember { Animatable(0f) }
+    val pulseScale = remember { Animatable(1f) }
 
-    // We measure the pill width to constrain dragging
     var trackWidthPx by remember { mutableFloatStateOf(0f) }
-    val buttonWidthDp = 44.dp
+    val idleButtonWidthDp = 44.dp
     val paddingDp = 6.dp
 
-    val buttonWidthPx = with(density) { buttonWidthDp.toPx() }
+    val idleButtonWidthPx = with(density) { idleButtonWidthDp.toPx() }
     val paddingPx = with(density) { paddingDp.toPx() }
+    val fullButtonWidthPx = (trackWidthPx - paddingPx * 2f).coerceAtLeast(0f)
 
     // Max distance the button can slide (track width minus button width minus side paddings)
-    val maxOffsetPx = (trackWidthPx - buttonWidthPx - paddingPx * 2f).coerceAtLeast(0f)
+    val maxOffsetPx = (trackWidthPx - idleButtonWidthPx - paddingPx * 2f).coerceAtLeast(0f)
+
+    LaunchedEffect(trackWidthPx) {
+        if (phase == SwipePhase.Idle) buttonWidthPx.snapTo(idleButtonWidthPx)
+    }
+
+    fun resetToIdle() {
+        scope.launch {
+            offsetX.animateTo(0f, animationSpec = spring())
+            buttonWidthPx.animateTo(idleButtonWidthPx, animationSpec = spring())
+            phase = SwipePhase.Idle
+        }
+    }
+
+    fun showSuccess() {
+        phase = SwipePhase.Success
+        scope.launch {
+            offsetX.animateTo(0f, animationSpec = spring())
+            buttonWidthPx.animateTo(fullButtonWidthPx, animationSpec = spring())
+            pulseScale.animateTo(1.18f, animationSpec = spring(dampingRatio = 0.55f, stiffness = 300f))
+            pulseScale.animateTo(1f, animationSpec = spring())
+            kotlinx.coroutines.delay(900)
+            resetToIdle()
+        }
+    }
+
+    fun submit() {
+        phase = SwipePhase.Submitting
+        scope.launch { offsetX.animateTo(maxOffsetPx, animationSpec = spring()) }
+        swipeAction.onTriggered { success ->
+            if (success) showSuccess() else resetToIdle()
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .onSizeChanged { trackWidthPx = it.width.toFloat() }
             .background(
-                color = AppTheme.colors.ProductCardSwipeContainerBackground,
+                color = if (phase == SwipePhase.Success) {
+                    AppTheme.colors.Teal1000.copy(alpha = 0.24f)
+                } else {
+                    AppTheme.colors.ProductCardSwipeContainerBackground
+                },
                 shape = RoundedCornerShape(50)
             )
             .padding(paddingDp),
         contentAlignment = Alignment.CenterStart
     ) {
-        // Hint text — fades as button slides over it
+        // Hint text — fades as button slides over it, hidden once submitting/success
         Text(
-            text = stringResource(id = swipeAction.hintResId),
+            text = stringResource(
+                id = when (phase) {
+                    SwipePhase.Idle -> swipeAction.hintResId
+                    SwipePhase.Submitting -> R.string.product_card_swipe_adding
+                    SwipePhase.Success -> R.string.product_card_swipe_added
+                }
+            ),
             style = AppTheme.typography.bodySmall.copy(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal
@@ -326,45 +379,71 @@ private fun SwipeActionButton(swipeAction: ProductCardSwipeAction) {
             color = AppTheme.colors.ProductCardSwipeText,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = buttonWidthDp + 2.dp, end = 2.dp)
+                .padding(start = idleButtonWidthDp + 2.dp, end = 2.dp)
+                .alpha(if (phase == SwipePhase.Idle) 1f else 0f)
         )
 
         // Teal sliding button
         Box(
             modifier = Modifier
                 .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                .size(width = buttonWidthDp, height = 32.dp)
+                .width(with(density) { buttonWidthPx.value.toDp() })
+                .height(32.dp)
+                .graphicsLayer { scaleX = pulseScale.value; scaleY = pulseScale.value }
                 .background(buttonColor, RoundedCornerShape(50))
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    state = rememberDraggableState { delta ->
-                        val effectiveDelta = if (isRtl) -delta else delta
-                        scope.launch {
-                            val newValue = (offsetX.value + effectiveDelta).coerceIn(0f, maxOffsetPx)
-                            offsetX.snapTo(newValue)
-                        }
-                    },
-                    onDragStopped = {
-                        // If dragged past 70% of the track → trigger action
-                        if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.7f) {
-                            haptics.tick()
-                            swipeAction.onTriggered()
-                        }
-                        // Always spring back to start
-                        scope.launch {
-                            offsetX.animateTo(0f, animationSpec = spring())
-                        }
+                .then(
+                    if (phase == SwipePhase.Idle) {
+                        Modifier.draggable(
+                            orientation = Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                val effectiveDelta = if (isRtl) -delta else delta
+                                scope.launch {
+                                    val newValue = (offsetX.value + effectiveDelta).coerceIn(0f, maxOffsetPx)
+                                    offsetX.snapTo(newValue)
+                                }
+                            },
+                            onDragStopped = {
+                                // If dragged past 50% of the track → trigger action
+                                if (maxOffsetPx > 0f && offsetX.value >= maxOffsetPx * 0.5f) {
+                                    haptics.tick()
+                                    submit()
+                                } else {
+                                    resetToIdle()
+                                }
+                            }
+                        )
+                    } else {
+                        Modifier
                     }
                 ),
             contentAlignment = Alignment.Center
         ) {
-            val icon = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
-            )
+            when (phase) {
+                SwipePhase.Idle -> {
+                    val icon = if (isRtl) R.drawable.ic_arrow_left else R.drawable.ic_arrow_right
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                SwipePhase.Submitting -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                    )
+                }
+                SwipePhase.Success -> {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
         }
     }
 }

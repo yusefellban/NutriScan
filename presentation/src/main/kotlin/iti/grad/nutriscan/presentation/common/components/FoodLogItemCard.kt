@@ -1,5 +1,6 @@
 package iti.grad.nutriscan.presentation.common.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,14 +34,15 @@ import iti.grad.nutriscan.presentation.common.theme.AppTheme
 import iti.grad.nutriscan.presentation.common.util.tick
 import iti.grad.presentation.R
 
-private val CardWidth = 112.dp
-private val CardHeight = 84.dp
+private val CardWidth = 160.dp
+private val CardHeight = 116.dp
+private val AddCardWidth = 96.dp
 
 /**
- * A single logged meal in the Calories screen's "Daily Products" horizontal-scroll row — same
- * 112x84dp footprint as [iti.grad.nutriscan.presentation.settings.profile.view.components.FamilyMemberCard].
- * Top row: thumbnail, name, quantity badge. Bottom row: calorie pill, minus (-1 serving),
- * delete (removes every serving).
+ * A single logged meal in the Calories screen's "Daily Products" horizontal-scroll row.
+ * 160x116dp footprint, matching iOS `CalorieMealCard` (`DailyProductsSection.swift`).
+ * Top row: thumbnail, name (2 lines), quantity badge. Bottom row: calorie badge, minus
+ * (-1 serving, only shown when quantity > 1), delete (removes every serving).
  */
 @Composable
 fun FoodLogItemCard(
@@ -56,23 +58,24 @@ fun FoodLogItemCard(
         modifier = modifier
             .width(CardWidth)
             .height(CardHeight),
-        shape = RoundedCornerShape(16.dp),
-        color = AppTheme.colors.FoodLogCardBackground,
+        shape = RoundedCornerShape(18.dp),
+        color = AppTheme.colors.ProductCardBackground,
+        border = BorderStroke(1.dp, AppTheme.colors.Gray300),
     ) {
         Column(
-            modifier = Modifier.padding(7.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 AdaptiveAsyncImage(
                     model = imageUrl,
                     contentDescription = productName,
                     modifier = Modifier
-                        .size(34.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp)),
                     placeholder = painterResource(id = R.drawable.ic_photo_placeholder),
                     error = painterResource(id = R.drawable.ic_photo_placeholder),
                 )
@@ -81,44 +84,46 @@ fun FoodLogItemCard(
                         text = productName.ifBlank { stringResource(R.string.scan_product_unknown) },
                         style = AppTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                         ),
                         color = AppTheme.colors.ProductCardNameText,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    if (quantity > 1) {
-                        QuantityBadge(
-                            quantity = quantity,
-                            background = AppTheme.colors.Teal300,
-                            textColor = AppTheme.colors.Teal700,
-                            modifier = Modifier.padding(top = 2.dp),
-                        )
-                    }
+                    QuantityBadge(
+                        quantity = quantity,
+                        background = AppTheme.colors.Teal200,
+                        textColor = AppTheme.colors.Teal1600,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
                 }
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
+                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 CaloriesBadge(
                     calories = calories,
-                    background = AppTheme.colors.Teal300,
-                    textColor = AppTheme.colors.Teal700,
+                    background = AppTheme.colors.ProductCardCaloriesBackground,
+                    textColor = AppTheme.colors.ProductCardCaloriesText,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                    FoodLogRoundIconButton(
-                        icon = R.drawable.ic_minus,
-                        contentDescription = stringResource(R.string.food_log_minus_item_action),
-                        background = AppTheme.colors.Warning,
-                        onClick = onMinusClick,
-                    )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (quantity > 1) {
+                        FoodLogRoundIconButton(
+                            icon = R.drawable.ic_minus,
+                            contentDescription = stringResource(R.string.food_log_minus_item_action),
+                            background = AppTheme.colors.Gray200,
+                            tint = AppTheme.colors.Gray800,
+                            onClick = onMinusClick,
+                        )
+                    }
                     FoodLogRoundIconButton(
                         icon = R.drawable.ic_trash,
                         contentDescription = stringResource(R.string.food_log_delete_item_action),
-                        background = AppTheme.colors.Error,
+                        background = AppTheme.colors.ErrorBackground,
+                        tint = AppTheme.colors.Error,
                         onClick = onDeleteClick,
                     )
                 }
@@ -127,12 +132,12 @@ fun FoodLogItemCard(
     }
 }
 
-/** "Add Food" trigger sized to match [FoodLogItemCard] exactly — always the first item in the row. */
+/** "Add Food" trigger — always the first item in the row, matches iOS `AddFoodCarouselCard`. */
 @Composable
 fun CompactAddFoodCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.width(CardWidth).height(CardHeight),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.width(AddCardWidth).height(CardHeight),
+        shape = RoundedCornerShape(18.dp),
         color = AppTheme.colors.FoodLogCardBackground,
         onClick = onClick,
     ) {
@@ -169,12 +174,13 @@ private fun FoodLogRoundIconButton(
     icon: Int,
     contentDescription: String,
     background: Color,
+    tint: Color,
     onClick: () -> Unit,
 ) {
     val haptics = LocalHapticFeedback.current
     Box(
         modifier = Modifier
-            .size(18.dp)
+            .size(26.dp)
             .clip(CircleShape)
             .background(background)
             .clickable { haptics.tick(); onClick() },
@@ -183,8 +189,8 @@ private fun FoodLogRoundIconButton(
         Icon(
             painter = painterResource(id = icon),
             contentDescription = contentDescription,
-            tint = Color.White,
-            modifier = Modifier.size(10.dp),
+            tint = tint,
+            modifier = Modifier.size(12.dp),
         )
     }
 }

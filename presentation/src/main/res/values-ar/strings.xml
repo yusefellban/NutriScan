@@ -313,6 +313,7 @@
     <string name="scan_mode_selector_content_desc">اختيار وضع المسح</string>
     <string name="scan_gallery_pick_prompt">اختر صورة للفحص</string>
     <string name="scan_gallery_pick_failed">تعذر قراءة الصورة المختارة</string>
+    <string name="scan_still_processing_warning">من فضلك انتظر حتى ينتهي الفحص الحالي.</string>
     <string name="scan_gallery_pick_cancelled">لم يتم اختيار صورة</string>
     <string name="scan_capture_failed_generic">فشل التقاط الصورة. حاول مرة أخرى.</string>
     <string name="scan_barcode_chip_tap_hint">اضغط لمسح الباركود</string>
@@ -436,6 +437,8 @@
     <string name="search_not_found_subtitle">لم يتم العثور على نتائج. يرجى المحاولة مرة أخرى.</string>
     <string name="search_not_found_button">الذهاب للفحص</string>
     <string name="product_card_swipe_hint">اسحب للإضافة</string>
+    <string name="product_card_swipe_adding">جارٍ الإضافة…</string>
+    <string name="product_card_swipe_added">تمت الإضافة</string>
     <string name="product_card_kcal_unit">سعرة</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
@@ -475,6 +478,8 @@
     <string name="product_details_why_unsafe">لماذا هو غير آمن؟</string>
     <string name="product_details_why_caution">لماذا الحذر؟</string>
     <string name="product_details_why_safe">لماذا هو آمن؟</string>
+    <string name="product_details_family_alerts_title">تنبيهات العائلة</string>
+    <string name="scan_family_alert_badge">%1$s لـ %2$s</string>
     <string name="product_details_calories">السعرات الحرارية</string>
     <string name="product_details_serving">الحصة</string>
     <string name="product_details_sugar">السكر</string>
@@ -580,6 +585,8 @@
     <string name="step_history_period_6months">٦ أشهر</string>
 
     <string name="cup_removed">تمت إزالة الكوب</string>
+    <string name="water_cup_remove_error">تعذّرت إزالة الكوب. حاول مرة أخرى.</string>
+    <string name="remove_water_cup">إزالة كوب</string>
     <string name="alert_verification_failed_title">فشل التحقق</string>
     <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة.</string>
     <string name="error_server_down">الخادم غير متاح مؤقتاً. يرجى المحاولة مرة أخرى لاحقاً.</string>
@@ -605,6 +612,8 @@
     <string name="calories_history_empty_title">لا يوجد سجل للسعرات</string>
     <string name="calories_history_empty_subtitle">ابدأ في تتبع سعراتك الحرارية لرؤية تقدمك اليومي.</string>
     <string name="calories_history_empty_button">إضافة وجبات</string>
+    <string name="calories_history_day_empty_title">لا يوجد سجل للسعرات</string>
+    <string name="calories_history_day_empty_subtitle">لا يوجد سجل للسعرات في هذا اليوم.</string>
     <!-- Notification History -->
     <string name="notification_history_title">الإشعارات</string>
     <string name="notification_history_clear_all">مسح الكل</string>
@@ -699,4 +708,7 @@
     <string name="step_unit_km">كم</string>
     <string name="step_unit_kcal">سعرة</string>
     <string name="step_unit_min">دقيقة</string>
+
+    <string name="profile_setup_save_error">فشل في حفظ الملف الشخصي</string>
+    <string name="auth_code_resent_success">تم إعادة إرسال الرمز بنجاح</string>
 </resources>

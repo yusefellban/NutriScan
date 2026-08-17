@@ -6,34 +6,53 @@ sealed interface CaloriesEvent {
     data object AddFoodClicked : CaloriesEvent
     data object AddExerciseClicked : CaloriesEvent
 
-    /** Adds a new empty cup to the water tracker (increases [iti.grad.nutriscan.presentation.main.calories.state.CaloriesState.waterGoal]). */
+    /**
+     * Adds a new empty cup to the water tracker (increases
+     * [iti.grad.nutriscan.presentation.main.calories.state.CaloriesState.waterGoal]).
+     */
     data object AddWaterClicked : CaloriesEvent
 
-    /** Taps the cup at [index] — fills every cup up to and including it if it's empty (cascading
-     * fill animation plays in the UI), unfills it if it's the last filled one, no-op otherwise. */
+    /**
+     * Taps the cup at [index] — fills every cup up to and including it if it's empty (cascading
+     * fill animation plays in the UI), unfills it if it's the last filled one, no-op otherwise.
+     */
     data class WaterCupClicked(val index: Int) : CaloriesEvent
 
-    /** Long-presses the cup at [index] to delete it — only responds if it's the last cup. */
-    data class WaterCupLongPressed(val index: Int) : CaloriesEvent
+    /**
+     * Taps the minus button next to the add-cup button — removes the last cup. No-op if there are
+     * no cups left.
+     */
+    data object RemoveWaterClicked : CaloriesEvent
 
-    /** Checks Health Connect availability/permission — dispatched once on screen start, and again on every steps-gauge tap as a retry. */
+    /**
+     * Checks Health Connect availability/permission — dispatched once on screen start, and again on
+     * every steps-gauge tap as a retry.
+     */
     data object StepsCardClicked : CaloriesEvent
 
-    /** Reported back by the screen after the user responds to the Health Connect permission dialog. */
+    /**
+     * Reported back by the screen after the user responds to the Health Connect permission dialog.
+     */
     data class StepsPermissionResult(val granted: Boolean) : CaloriesEvent
 
-    /** Tapped a food-log entry's delete button — shows the removal confirmation dialog, does not
-     * remove yet. Removes every serving of the entry, regardless of its current count. */
+    /**
+     * Tapped a food-log entry's delete button — shows the removal confirmation dialog, does not
+     * remove yet. Removes every serving of the entry, regardless of its current count.
+     */
     data class FoodItemDeleteClicked(val entryId: String) : CaloriesEvent
     data object RemoveFoodConfirmed : CaloriesEvent
     data object RemoveFoodDismissed : CaloriesEvent
 
-    /** Tapped a food-log entry's minus button — decrements one serving immediately, no
-     * confirmation (removing the whole entry is [FoodItemDeleteClicked]'s job). */
+    /**
+     * Tapped a food-log entry's minus button — decrements one serving immediately, no confirmation
+     * (removing the whole entry is [FoodItemDeleteClicked]'s job).
+     */
     data class FoodItemMinusClicked(val entryId: String) : CaloriesEvent
     data class FoodItemClicked(val product: ProductUiModel) : CaloriesEvent
 
-    /** Pull-to-refresh: re-pulls today's water/steps and meals from the backend, so data logged on
-     * another device (or lost to a reinstall) shows up without waiting for the next app start. */
+    /**
+     * Pull-to-refresh: re-pulls today's water/steps and meals from the backend, so data logged on
+     * another device (or lost to a reinstall) shows up without waiting for the next app start.
+     */
     data object Refreshed : CaloriesEvent
 }

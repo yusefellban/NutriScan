@@ -44,6 +44,7 @@ import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEffec
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsEvent
 import iti.grad.nutriscan.presentation.product_details.state.ProductDetailsState
 import iti.grad.nutriscan.presentation.product_details.view.components.FlaggedIngredientsRow
+import iti.grad.nutriscan.presentation.product_details.view.components.FamilyAlertsSection
 import iti.grad.nutriscan.presentation.product_details.view.components.NutritionFactsRow
 import iti.grad.nutriscan.presentation.common.components.NotFoundStateWidget
 import iti.grad.nutriscan.presentation.common.components.AppErrorWidget
@@ -208,6 +209,14 @@ private fun ProductDetailsContent(
                                     FlaggedIngredientsRow(
                                         verdict = product.verdict,
                                         ingredients = product.flaggedIngredients,
+                                    )
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
+
+                                // ── Family Alerts ──
+                                if (product.familyAlerts.isNotEmpty()) {
+                                    FamilyAlertsSection(
+                                        alerts = product.familyAlerts,
                                     )
                                     Spacer(modifier = Modifier.height(24.dp))
                                 }

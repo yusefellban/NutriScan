@@ -6,10 +6,13 @@ import androidx.annotation.StringRes
  * uses [ProductCard]'s `onDeleteClick` button instead of a swipe gesture. */
 sealed interface ProductCardSwipeAction {
     @get:StringRes val hintResId: Int
-    val onTriggered: () -> Unit
+
+    /** Invoked once the drag crosses the trigger threshold. Must call [onResult] with whether
+     * the action actually succeeded so the button can show its submitting/success feedback. */
+    val onTriggered: (onResult: (Boolean) -> Unit) -> Unit
 
     data class Add(
         @StringRes override val hintResId: Int,
-        override val onTriggered: () -> Unit,
+        override val onTriggered: (onResult: (Boolean) -> Unit) -> Unit,
     ) : ProductCardSwipeAction
 }

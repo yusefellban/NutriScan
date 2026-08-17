@@ -319,6 +319,7 @@
     <string name="scan_mode_selector_content_desc">Scan mode selector</string>
     <string name="scan_gallery_pick_prompt">Choose an image to scan</string>
     <string name="scan_gallery_pick_failed">Could not read selected image</string>
+    <string name="scan_still_processing_warning">Please wait until the current scan finishes processing.</string>
     <string name="scan_gallery_pick_cancelled">No image selected</string>
     <string name="scan_capture_failed_generic">Image capture failed. Please try again.</string>
     <string name="scan_barcode_chip_tap_hint">Tap to scan barcode</string>
@@ -364,6 +365,8 @@
     <string name="min_today">min today</string>
     <string name="water">Water</string>
     <string name="cup_removed">Cup removed</string>
+    <string name="water_cup_remove_error">Couldn\'t remove the cup. Please try again.</string>
+    <string name="remove_water_cup">Remove cup</string>
     <string name="exercises_title">Exercises</string>
     <string name="exercises_categories_title">Categories</string>
     <string name="exercises_see_all">See All</string>
@@ -448,6 +451,8 @@
     <string name="search_not_found_subtitle">No results found. Please try again.</string>
     <string name="search_not_found_button">Go to Scan</string>
     <string name="product_card_swipe_hint">Swipe to add</string>
+    <string name="product_card_swipe_adding">Adding…</string>
+    <string name="product_card_swipe_added">Added</string>
     <string name="product_card_kcal_unit">Kcal</string>
     <string name="product_card_quantity_badge">x%1$d</string>
 
@@ -487,6 +492,8 @@
     <string name="product_details_why_unsafe">Why It\'s Unsafe?</string>
     <string name="product_details_why_caution">Why Caution?</string>
     <string name="product_details_why_safe">Why It\'s Safe?</string>
+    <string name="product_details_family_alerts_title">Family Alerts</string>
+    <string name="scan_family_alert_badge">%1$s for %2$s</string>
     <string name="product_details_calories">Calories</string>
     <string name="product_details_serving">Serving</string>
     <string name="product_details_sugar">Sugar</string>
@@ -639,6 +646,8 @@
     <string name="calories_history_empty_title">No Calories History</string>
     <string name="calories_history_empty_subtitle">Start tracking your calories to see your daily progress.</string>
     <string name="calories_history_empty_button">Add meals</string>
+    <string name="calories_history_day_empty_title">No Calories History</string>
+    <string name="calories_history_day_empty_subtitle">There\'s no calories history for this day.</string>
 
     <!-- ── Delete Account (Settings) ─────────────────────────────────────────── -->
     <string name="delete_account_button_label">Delete Account</string>
@@ -701,4 +710,5 @@
     <string name="step_unit_km">km</string>
     <string name="step_unit_kcal">kcal</string>
     <string name="step_unit_min">min</string>
+    <string name="scan_retry_content_description">Retry Scan</string>
 </resources>

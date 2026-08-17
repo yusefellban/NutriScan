@@ -11,8 +11,10 @@ import iti.grad.nutriscan.data.db.MIGRATION_4_5
 import iti.grad.nutriscan.data.db.NutriScanDatabase
 import iti.grad.nutriscan.data.db.dao.FoodLogDao
 import iti.grad.nutriscan.data.db.dao.ExercisesDao
+import iti.grad.nutriscan.data.db.dao.NewsDao
 import iti.grad.nutriscan.data.db.dao.NotificationHistoryDao
 import iti.grad.nutriscan.data.db.dao.SavedScanDao
+import iti.grad.nutriscan.data.db.dao.ScannedProductDao
 import iti.grad.nutriscan.data.db.migration.MIGRATION_3_4
 import javax.inject.Singleton
 
@@ -74,4 +76,12 @@ object DatabaseModule {
     @Singleton
     fun provideNotificationHistoryDao(db: NutriScanDatabase): NotificationHistoryDao =
         db.notificationHistoryDao()
+
+    @Provides
+    @Singleton
+    fun provideNewsDao(db: NutriScanDatabase): NewsDao = db.newsDao()
+
+    @Provides
+    @Singleton
+    fun provideScannedProductDao(db: NutriScanDatabase): ScannedProductDao = db.scannedProductDao()
 }
