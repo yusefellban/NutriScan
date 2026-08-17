@@ -83,9 +83,6 @@ fun NutriGptVoiceScreen(
     // user opt in via "Grant permission" instead of the system dialog firing immediately.
     LaunchedEffect(Unit) {
         hasAudioPermission = checkAudioPermission()
-        if (hasAudioPermission) {
-            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
-        }
     }
 
     Box(
@@ -210,11 +207,17 @@ fun NutriGptVoiceScreen(
                 )
 
                 // Main Action Button (Mic / Fast Forward)
+                val buttonBgColor = if (AppTheme.isDark) {
+                    AppTheme.colors.ChatSendButtonBackground
+                } else {
+                    AppTheme.colors.Primary
+                }
+
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(AppTheme.colors.ChatSendButtonBackground)
+                        .background(buttonBgColor)
                         .clickable {
                             haptics.tick()
                             when {
