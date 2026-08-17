@@ -58,11 +58,11 @@ fun NutriGptVoiceScreen(
 
     val requestAudioPermission = rememberAudioPermissionRequester(
         onGranted = {
+            // Permission granted — just unlock the UI; do NOT auto-start listening.
             hasAudioPermission = true
-            viewModel.onEvent(NutriGptVoiceEvent.SetListeningState(true))
         },
         onDenied = {
-            Toast.makeText(context, "Microphone permission is required", Toast.LENGTH_SHORT).show()
+            hasAudioPermission = false
         }
     )
 
@@ -79,10 +79,15 @@ fun NutriGptVoiceScreen(
         }
     }
 
-    // Re-check on entry rather than auto-requesting — a placeholder card below lets the
-    // user opt in via "Grant permission" instead of the system dialog firing immediately.
+    // On first entry: check permission and auto-request it if missing.
+    // The system dialog fires immediately; granting it only unlocks the mic button — no
+    // auto-listening. If the user denies, the "Grant Permission" card is shown instead.
     LaunchedEffect(Unit) {
-        hasAudioPermission = checkAudioPermission()
+        if (checkAudioPermission()) {
+            hasAudioPermission = true
+        } else {
+            requestAudioPermission()
+        }
     }
 
     Box(
