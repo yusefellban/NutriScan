@@ -185,8 +185,14 @@ class ScanRepositoryImpl @Inject constructor(
                             calories = domainResult.nutritionFacts?.calories,
                             status = domainResult.status
                         )
-                        cache.removeAll { it.scanId == newEntry.scanId }
-                        cache.add(0, newEntry)
+                        
+                        val existingIndex = cache.indexOfFirst { it.scanId == newEntry.scanId }
+                        if (existingIndex != -1) {
+                            cache[existingIndex] = newEntry
+                        } else {
+                            cache.add(newEntry)
+                            cache.sortByDescending { it.scannedAt }
+                        }
                     }
                 }
                 

@@ -52,7 +52,7 @@ fun ScanReadyCard(
     // mode needs a brighter, higher-alpha core to read as a glow instead of a faint smudge.
     val isDark = AppTheme.isDark
     val glowColor = if (isDark) AppTheme.colors.Teal300 else AppTheme.colors.Teal500
-    val glowPeakAlpha = if (isDark) 0.35f else 0.16f
+    val glowPeakAlpha = 0.38f
 
     // Soft breathing glow across the whole card — grows/shrinks continuously, no held/frozen state.
     val glowTransition = rememberInfiniteTransition(label = "scanReadyGlow")

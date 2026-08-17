@@ -91,7 +91,6 @@ class SavedViewModel @Inject constructor(
             )
             addFoodEntryUseCase(entry)
                 .onSuccess {
-                    _effect.send(SavedEffect.ShowAddedToFoodLogSnackbar(product.productName))
                     onResult(true)
                 }
                 .onFailure {
