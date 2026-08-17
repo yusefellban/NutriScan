@@ -11,6 +11,9 @@ import iti.grad.nutriscan.domain.scan.model.FoodSafetyResponse
 import iti.grad.nutriscan.domain.scan.model.NutritionFacts
 import iti.grad.nutriscan.domain.scan.model.ProductDetail
 import iti.grad.nutriscan.domain.scan.model.ScanFlaggedIngredient
+import iti.grad.nutriscan.domain.family.usecase.GetFamilyMembersUseCase
+import iti.grad.nutriscan.domain.family.model.FamilyMember
+import kotlinx.coroutines.flow.first
 import iti.grad.nutriscan.domain.scan.model.ScanResult
 import iti.grad.nutriscan.domain.scan.model.ScanStatus
 import iti.grad.nutriscan.domain.scan.usecase.DeleteSavedScanUseCase
@@ -42,6 +45,7 @@ constructor(
         private val deleteSavedScanUseCase: DeleteSavedScanUseCase,
         private val getSavedScanByIdUseCase: GetSavedScanByIdUseCase,
         private val getScanResultUseCase: GetScanResultUseCase,
+        private val getFamilyMembersUseCase: GetFamilyMembersUseCase,
 ) : ViewModel() {
 
     private val scanId: String = checkNotNull(savedStateHandle["scanId"])
@@ -116,7 +120,8 @@ constructor(
                             exception?.javaClass?.simpleName == "NotFoundException"
 
             if (source != null) {
-                val detail = mapToProductDetail(source).copy(isBookmarked = savedScan != null)
+                val familyMembers = try { getFamilyMembersUseCase().first() } catch (e: Exception) { emptyList() }
+                val detail = mapToProductDetail(source, familyMembers).copy(isBookmarked = savedScan != null)
                 _state.update { it.copy(isLoading = false, productDetail = detail) }
             } else if (isNotFoundException) {
                 _state.update { it.copy(isLoading = false, isNotFound = true) }
@@ -134,7 +139,7 @@ constructor(
         }
     }
 
-    private fun mapToProductDetail(scanResult: ScanResult): ProductDetail {
+    private fun mapToProductDetail(scanResult: ScanResult, familyMembers: List<FamilyMember> = emptyList()): ProductDetail {
         return ProductDetail(
                 id = scanResult.scanId,
                 productName = scanResult.productName ?: "Unknown Product",
@@ -171,7 +176,10 @@ constructor(
                             )
                         }
                                 ?: emptyList(),
-                familyAlerts = scanResult.foodSafetyResponse?.familyAlerts ?: emptyList(),
+                familyAlerts = scanResult.foodSafetyResponse?.familyAlerts?.map { alert ->
+                    val matchingMember = familyMembers.find { it.name.equals(alert.targetProfile, ignoreCase = true) }
+                    alert.copy(targetImageUrl = matchingMember?.imageUrl)
+                } ?: emptyList(),
                 calories = scanResult.nutritionFacts?.calories?.toString() ?: "0",
                 servingSize = "1",
                 protein = scanResult.nutritionFacts?.proteinGrams.format(),

@@ -17,4 +17,5 @@ data class FamilyAlert(
     val targetProfile: String,
     val severity: ProductVerdict,
     val reason: String,
+    val targetImageUrl: String? = null,
 )
