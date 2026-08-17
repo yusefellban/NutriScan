@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,10 +33,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -52,26 +57,46 @@ fun ActiveScanCard(
     onBookmarkClick: () -> Unit,
     onCardClick: () -> Unit = {},
     onRetryClick: () -> Unit = {},
+    bottomSafeInset: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
-    val cardShape = RoundedCornerShape(22.dp)
+    // Sheet look: flush to the screen edges, rounded only at the top — like a bottom
+    // sheet resting under the camera preview, instead of a floating margined card.
+    val sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
 
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
             .customShadow(
-                shape = cardShape,
+                shape = sheetShape,
                 color = AppTheme.colors.Primary.copy(alpha = 0.35f),
                 blurRadius = 50f,
                 offsetY = 8f,
             )
-            .clip(cardShape)
+            .clip(sheetShape)
             .background(AppTheme.colors.PrimaryVariant)
-            .clickable(onClick = onCardClick)
-            .padding(horizontal = 12.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .clickable(onClick = onCardClick),
     ) {
+        // Drag handle, drawn inside the sheet itself (standard bottom-sheet affordance)
+        // instead of as a separate bar floating below the card.
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 10.dp, bottom = 2.dp)
+                .width(40.dp)
+                .height(4.dp)
+                .background(
+                    color = AppTheme.colors.OnPrimary.copy(alpha = 0.32f),
+                    shape = RoundedCornerShape(50),
+                ),
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
         ScanThumbnail(thumbnailUrl = scan.thumbnailUrl, isProcessing = scan.isProcessing)
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -115,32 +140,65 @@ fun ActiveScanCard(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (scan.isFailed) {
-            // No retry button requested
-        } else if (!scan.isProcessing && scan.fullResult != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(AppTheme.colors.Teal800)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onBookmarkClick,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
+        // Action buttons: bookmark only makes sense once we have a result to save, but
+        // retry is offered any time the card isn't actively processing — including the
+        // failed state, which previously had no way to try again.
+        if (!scan.isProcessing) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (!scan.isFailed && scan.fullResult != null) {
+                    CardActionButton(
+                        icon = painterResource(if (scan.isSaved) R.drawable.ic_bookmark_solid else R.drawable.ic_bookmark),
                         contentDescription = stringResource(R.string.scan_saved_content_description),
-                        tint = AppTheme.colors.PrimaryVariant,
-                        modifier = Modifier.size(22.dp),
+                        onClick = onBookmarkClick,
                     )
                 }
+
+                CardActionButton(
+                    icon = rememberVectorPainter(Icons.Default.Refresh),
+                    contentDescription = stringResource(R.string.scan_retry_content_description),
+                    onClick = onRetryClick,
+                )
             }
         }
+        }
+
+        // Extra empty space at the bottom of the sheet, sized to the real bottom safe-area
+        // inset (nav bar height) instead of a guessed fixed number — since the sheet now
+        // reaches the screen's bottom edge, this keeps it sitting "behind" the nav bar /
+        // center capture button (drawn on top, further down the z-order) exactly like Figma,
+        // instead of overlapping the product row above.
+        Spacer(modifier = Modifier.height(bottomSafeInset))
+    }
+}
+
+@Composable
+private fun CardActionButton(
+    icon: Painter,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(AppTheme.colors.Teal800)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = icon,
+            contentDescription = contentDescription,
+            tint = AppTheme.colors.PrimaryVariant,
+            modifier = Modifier.size(22.dp),
+        )
     }
 }
 

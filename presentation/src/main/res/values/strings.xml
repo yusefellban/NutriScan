@@ -710,4 +710,5 @@
     <string name="step_unit_km">km</string>
     <string name="step_unit_kcal">kcal</string>
     <string name="step_unit_min">min</string>
+    <string name="scan_retry_content_description">Retry Scan</string>
 </resources>

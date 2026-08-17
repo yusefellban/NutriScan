@@ -38,6 +38,7 @@ fun ScanModeSelector(
     hasSelectedGalleryImage: Boolean,
     onModeSelected: (ScanInputMode) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val selectorContentDescription = stringResource(R.string.scan_mode_selector_content_desc)
 
@@ -53,6 +54,7 @@ fun ScanModeSelector(
             ModeIconButton(
                 mode = mode,
                 isSelected = mode == selectedMode,
+                enabled = enabled,
                 onClick = { onModeSelected(mode) },
             )
         }
@@ -63,10 +65,13 @@ fun ScanModeSelector(
 private fun ModeIconButton(
     mode: ScanInputMode,
     isSelected: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
     // Selected = white filled circle (like Instagram active mode)
     // Unselected = semi-transparent dark circle
+    // Disabled (a scan is submitting/polling) = dimmed further and untappable, so users
+    // can't fire off a mode switch that would cancel the in-flight request.
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0.88f,
         animationSpec = spring(
@@ -76,7 +81,11 @@ private fun ModeIconButton(
         label = "iconScale",
     )
     val alpha by animateFloatAsState(
-        targetValue  = if (isSelected) 1f else 0.55f,
+        targetValue = when {
+            !enabled  -> 0.3f
+            isSelected -> 1f
+            else       -> 0.55f
+        },
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label        = "iconAlpha",
     )
@@ -95,6 +104,7 @@ private fun ModeIconButton(
             .clip(CircleShape)
             .background(bgColor)
             .clickable(
+                enabled           = enabled,
                 interactionSource = remember { MutableInteractionSource() },
                 indication        = null,
                 onClick           = onClick,
@@ -107,4 +117,3 @@ private fun ScanInputMode.icon(): ImageVector = when (this) {
     ScanInputMode.PHOTO   -> Icons.Default.PhotoCamera
     ScanInputMode.GALLERY -> Icons.Default.Image
 }
-

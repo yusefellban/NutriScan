@@ -454,14 +454,38 @@ constructor(
         viewModelScope.launch { _effect.send(CameraScanEffect.NavigateToProductDetail(uiModel)) }
     }
 
+    /**
+     * Retry = dismiss the current active-scan card, then — if the scan was taken in GALLERY
+     * mode — immediately reopen the system image picker so the user can pick a different photo.
+     * In PHOTO mode there's nothing extra to do: clearing [CameraScanState.activeScan] alone
+     * is enough to bring the live camera + [ScanFrameOverlay] back into view.
+     *
+     * Same in-flight guard as [handleDismissScanClicked]: retrying can't interrupt a
+     * submit/poll that's still running.
+     */
     private fun handleRetryClicked() {
+        if (_state.value.activeScan?.isProcessing == true) return
+
         currentScanJob?.cancel()
+        clearBarcodeState()
+
+        val wasGalleryMode = _state.value.selectedMode == ScanInputMode.GALLERY
+
         _state.update {
             it.copy(
                 isScanning = true,
                 isProcessingCenterAction = false,
+                // Drop the previous picked image — retrying means the user wants to choose
+                // a different one, not resubmit the same file.
+                pendingGalleryImagePath = null,
                 activeScan = null,
+                detectedBarcodeBounds = null,
+                trackedBarcodeValue = null,
             )
+        }
+
+        if (wasGalleryMode) {
+            openGalleryPicker()
         }
     }
 
