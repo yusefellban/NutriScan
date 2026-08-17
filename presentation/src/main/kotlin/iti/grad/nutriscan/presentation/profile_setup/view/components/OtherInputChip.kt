@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import iti.grad.nutriscan.presentation.common.components.dashedBorder
 import iti.grad.nutriscan.presentation.common.theme.AppTheme
 
+/*
 @Composable
 fun OtherInputChip(
     isEditing: Boolean,
@@ -146,3 +147,4 @@ fun OtherInputChip(
         }
     }
 }
+*/
