@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
@@ -67,6 +71,7 @@ fun ActiveScanCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .fillMaxHeight(0.5f)
             .customShadow(
                 shape = sheetShape,
                 color = AppTheme.colors.Primary.copy(alpha = 0.35f),
@@ -75,6 +80,7 @@ fun ActiveScanCard(
             )
             .clip(sheetShape)
             .background(AppTheme.colors.PrimaryVariant)
+            .verticalScroll(rememberScrollState())
             .clickable(onClick = onCardClick),
     ) {
         // Drag handle, drawn inside the sheet itself (standard bottom-sheet affordance)
@@ -120,13 +126,15 @@ fun ActiveScanCard(
             } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
             } else if (verdict != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     VerdictBadge(verdict = verdict)
                     if (familyAlerts.isNotEmpty()) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
                             familyAlerts.forEach { alert ->
                                 FamilyAlertBadge(alert = alert)
                             }
