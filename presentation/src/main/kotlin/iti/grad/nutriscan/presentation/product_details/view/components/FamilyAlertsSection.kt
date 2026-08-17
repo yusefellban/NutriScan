@@ -82,21 +82,30 @@ private fun FamilyAlertCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Avatar — first letter of the profile name
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(40.dp)
-                .background(
-                    color = AppTheme.colors.Teal1000,
-                    shape = CircleShape,
-                ),
-        ) {
-            Text(
-                text = alert.targetProfile.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
-                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = AppTheme.colors.Teal100,
+        if (alert.targetImageUrl != null) {
+            iti.grad.nutriscan.presentation.common.components.AvatarCircle(
+                avatarUrl = alert.targetImageUrl,
+                avatarUpdatedAt = null,
+                size = 40.dp,
+                ringWidth = 0.dp,
             )
+        } else {
+            // Avatar — first letter of the profile name
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        color = AppTheme.colors.Teal1000,
+                        shape = CircleShape,
+                    ),
+            ) {
+                Text(
+                    text = alert.targetProfile.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
+                    style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = AppTheme.colors.Teal100,
+                )
+            }
         }
 
         Column(modifier = Modifier.weight(1f)) {
