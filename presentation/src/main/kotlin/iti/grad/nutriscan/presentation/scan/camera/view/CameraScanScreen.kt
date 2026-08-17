@@ -47,10 +47,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -433,13 +439,75 @@ private fun CameraScanContent(
             // every time a different scan arrives, so the sheet never carries over a stale
             // dismissed offset from the previous swipe.
             key(scan.scanId) {
+                val density = LocalDensity.current
+                val configuration = LocalConfiguration.current
+                val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+                val minHeightPx = screenHeightPx * 0.25f
+                val maxHeightPx = screenHeightPx * 0.5f
+                
+                val sheetHeightPx = remember { Animatable(minHeightPx) }
+                val dragScope = rememberCoroutineScope()
+
+                val nestedScrollConnection = remember {
+                    object : NestedScrollConnection {
+                        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                            val delta = available.y
+                            if (delta < 0 && sheetHeightPx.value < maxHeightPx) {
+                                val newHeight = (sheetHeightPx.value - delta).coerceAtMost(maxHeightPx)
+                                val consumed = sheetHeightPx.value - newHeight
+                                dragScope.launch { sheetHeightPx.snapTo(newHeight) }
+                                return Offset(0f, consumed)
+                            }
+                            return Offset.Zero
+                        }
+
+                        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                            val delta = available.y
+                            if (delta > 0 && sheetHeightPx.value > minHeightPx) {
+                                val newHeight = (sheetHeightPx.value - delta).coerceAtLeast(minHeightPx)
+                                val consumedPx = sheetHeightPx.value - newHeight
+                                dragScope.launch { sheetHeightPx.snapTo(newHeight) }
+                                return Offset(0f, consumedPx)
+                            }
+                            return Offset.Zero
+                        }
+
+                        override suspend fun onPreFling(available: Velocity): Velocity {
+                            val target = if (sheetHeightPx.value > (minHeightPx + maxHeightPx) / 2) maxHeightPx else minHeightPx
+                            dragScope.launch { 
+                                sheetHeightPx.animateTo(
+                                    target,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                ) 
+                            }
+                            return Velocity.Zero
+                        }
+                        
+                        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                            val target = if (sheetHeightPx.value > (minHeightPx + maxHeightPx) / 2) maxHeightPx else minHeightPx
+                            dragScope.launch { 
+                                sheetHeightPx.animateTo(
+                                    target,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                ) 
+                            }
+                            return Velocity.Zero
+                        }
+                    }
+                }
+
                 Box(
                         modifier =
                                 Modifier.align(Alignment.BottomCenter)
                                         .fillMaxWidth()
-                                        // No bottom padding here — the sheet reaches all the way
-                                        // to the screen edge, sitting "behind" the nav bar / center
-                                        // capture button the same way the Figma sheet does.
+                                        .height(with(density) { sheetHeightPx.value.toDp() })
+                                        .nestedScroll(nestedScrollConnection)
                 ) {
                     ActiveScanCard(
                             scan = scan,

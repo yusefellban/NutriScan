@@ -71,7 +71,7 @@ fun ActiveScanCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
+            .fillMaxHeight()
             .customShadow(
                 shape = sheetShape,
                 color = AppTheme.colors.Primary.copy(alpha = 0.35f),
@@ -118,7 +118,6 @@ fun ActiveScanCard(
             )
             Spacer(modifier = Modifier.height(6.dp))
             val verdict = scan.fullResult?.foodSafetyResponse?.verdict
-            val familyAlerts = scan.fullResult?.foodSafetyResponse?.familyAlerts ?: emptyList()
             if (scan.isProcessing) {
                 ProcessingBadge(statusResId = R.string.scan_status_processing)
             } else if (scan.isFailed) {
@@ -126,21 +125,7 @@ fun ActiveScanCard(
             } else if (scan.statusResId != null) {
                 ProcessingBadge(statusResId = scan.statusResId)
             } else if (verdict != null) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    VerdictBadge(verdict = verdict)
-                    if (familyAlerts.isNotEmpty()) {
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            familyAlerts.forEach { alert ->
-                                FamilyAlertBadge(alert = alert)
-                            }
-                        }
-                    }
-                }
+                VerdictBadge(verdict = verdict)
             } else if (scan.healthTagResId != null) {
                 HealthBadge(text = stringResource(scan.healthTagResId))
             }
@@ -171,6 +156,22 @@ fun ActiveScanCard(
                 )
             }
         }
+        }
+
+        val familyAlerts = scan.fullResult?.foodSafetyResponse?.familyAlerts ?: emptyList()
+        if (familyAlerts.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                familyAlerts.forEach { alert ->
+                    FamilyAlertBadge(alert = alert)
+                }
+            }
         }
 
         // Extra empty space at the bottom of the sheet, sized to the real bottom safe-area
