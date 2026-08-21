@@ -123,7 +123,7 @@ android {
             !keyPass.isNullOrEmpty()
         ) {
             create("release") {
-                storeFile = file(storeFilePath)
+                storeFile = rootProject.file(storeFilePath)
                 storePassword = storePass
                 keyAlias = alias
                 keyPassword = keyPass
